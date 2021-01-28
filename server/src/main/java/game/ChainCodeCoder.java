@@ -6,6 +6,7 @@ public class ChainCodeCoder {
     private static final int FAST_BIT = 1<<7;
     private static final int STEPS_MASK = 7<<4;
     private static final int DIRECTION_MASK = 15;
+    public static final int MAX_STEPS = 8;
 
     /**
      * Encoding f,s,s,s,d,d,d,d
@@ -13,7 +14,7 @@ public class ChainCodeCoder {
      * @return data encoded in 8 bits
      */
     public byte encode(int direction, boolean fast, int steps) {
-        assert 0<steps && steps <= 8;
+        assert 0<steps && steps <= MAX_STEPS;
 
         // encode steps
         int stepBits = (steps-1) << 4;
@@ -27,7 +28,7 @@ public class ChainCodeCoder {
         return (byte) data;
     }
 
-    public int sampleDirection(double newAngle, double oldAngle) {
+    public int sampleDirectionChange(double newAngle, double oldAngle) {
         // transform to [0, 2*PI]
         newAngle += Math.PI;
         oldAngle += Math.PI;
@@ -40,14 +41,17 @@ public class ChainCodeCoder {
             delta -= Math.signum(delta) * 2.0 * Math.PI;
         }
         assert Math.abs(delta) <= Math.PI;
-        assert Math.abs(delta) <= MAX_DELTA + 1e-8 : "angle diff too big!";
+
+        // clamp delta angle
+        delta = Math.max(-MAX_DELTA, Math.min(delta, MAX_DELTA));
+        assert Math.abs(delta) <= MAX_DELTA;
 
         // angle sampling [0,15]
         int k = (byte) Math.round((7 * delta) / MAX_DELTA);
         return 2*Math.abs(k) + (k < 0 ? 1 : 0);
     }
 
-    public double decodeDirection(int direction) {
+    public double decodeDirectionChange(int direction) {
         int sign = 1 - ((direction & 1)<<1);
         int k = sign * (direction/2);
         return k * MAX_DELTA / 7.0;

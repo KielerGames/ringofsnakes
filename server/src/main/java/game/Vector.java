@@ -18,7 +18,7 @@ public class Vector {
         return Math.atan2(this.y, this.x);
     }
 
-    public void addAlpha(double alpha, double stepSize) {
+    public void addDirection(double alpha, double stepSize) {
         x += stepSize * Math.cos(alpha);
         y += stepSize * Math.sin(alpha);
     }

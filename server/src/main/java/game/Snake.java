@@ -1,5 +1,6 @@
 package game;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +11,7 @@ public class Snake {
     private double headDirection = 0.0;
     private double lastDirection = headDirection;
     private Vector lastCCPosition = headPosition.clone();
-    private List<SnakeChunk> chunks = new LinkedList<>();
+    public List<SnakeChunk> chunks = new LinkedList<>();
     private SnakeChunk currentChunk;
     private double speed = 1.0;
     private ChainCodeCoder coder = new ChainCodeCoder();
@@ -56,7 +57,7 @@ public class Snake {
         }
     }
 
-    class SnakeChunk {
+    public class SnakeChunk {
         public final static int CHUNK_SIZE = 64;
         Vector end;
         double endDirection;
@@ -140,6 +141,11 @@ public class Snake {
                     break;
                 }
             }
+        }
+
+        public ByteBuffer buffer() {
+            //TODO: header (message tag, length, endPos, ...)
+            return ByteBuffer.wrap(this.chainCodes);
         }
     }
 }

@@ -14,6 +14,10 @@ public class EventSocket {
     @OnOpen
     public void onWebSocketConnect(Session session) {
         System.out.println("Socket Connected: " + session);
+
+        var data = SnakeServer.getSnakeData();
+
+        session.getAsyncRemote().sendBinary(data);
     }
 
     @OnMessage

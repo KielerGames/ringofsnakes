@@ -1,5 +1,7 @@
 package server;
 
+import game.Snake;
+
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
@@ -15,9 +17,24 @@ public class EventSocket {
     public void onWebSocketConnect(Session session) {
         System.out.println("Socket Connected: " + session);
 
-        var data = SnakeServer.getSnakeData();
+        var snake = new Snake();
+        snake.tick();
+        snake.tick();
+        snake.updateDirection(80, 2);
+        snake.tick();
+        snake.tick();
+        snake.fast = true;
+        snake.tick();
+        snake.tick();
+        for(int i=0; i<4; i++) {
+            double alpha = Math.random() * 2.0 * Math.PI;
+            snake.updateDirection(alpha);
+            for(int j=0; j<10; j++) {
+                snake.tick();
+            }
+        }
 
-        session.getAsyncRemote().sendBinary(data);
+        session.getAsyncRemote().sendBinary(snake.chunks.get(0).buffer());
     }
 
     @OnMessage

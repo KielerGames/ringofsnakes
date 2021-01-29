@@ -9,22 +9,6 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 import java.nio.ByteBuffer;
 
 public class SnakeServer {
-    private static Snake testSnake;
-
-    static {
-        var snake = new Snake();
-        snake.tick();
-        snake.tick();
-        snake.updateDirection(80, 2);
-        snake.tick();
-        snake.tick();
-        snake.fast = true;
-        snake.tick();
-        snake.tick();
-        snake.debug();
-        testSnake = snake;
-    }
-
     public static void main(String[] args) {
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
@@ -62,9 +46,4 @@ public class SnakeServer {
             t.printStackTrace(System.err);
         }
     }
-
-    public static ByteBuffer getSnakeData() {
-        return testSnake.chunks.get(0).buffer();
-    }
 }
-

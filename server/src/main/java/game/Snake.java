@@ -29,6 +29,13 @@ public class Snake {
         this.headDirection = Math.atan2(y, x);
     }
 
+    public void updateDirection(double alpha) {
+        while(Math.abs(alpha) > Math.PI) {
+            alpha -= Math.signum(alpha) * 2.0 * Math.PI;
+        }
+        this.headDirection = alpha;
+    }
+
     public void tick() {
         // move head
         headPosition.addDirection(headDirection, ccStepLength);

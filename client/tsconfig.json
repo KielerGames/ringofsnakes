@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "outDir": "./public",
+        "target": "es2017",
+        "module": "es2020",
+        "sourceMap": true,
+        "jsx": "react",
+        "strict": true,
+        "noImplicitAny": true,
+        "strictPropertyInitialization": false,
+        "allowSyntheticDefaultImports": true
+    }
+}

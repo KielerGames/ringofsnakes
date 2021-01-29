@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 @ClientEndpoint
-@ServerEndpoint(value = "/events/")
+@ServerEndpoint(value = "/game")
 public class EventSocket {
     private CountDownLatch closureLatch = new CountDownLatch(1);
 

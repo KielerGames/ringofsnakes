@@ -64,6 +64,10 @@ public class Snake {
         }
     }
 
+    public SnakeChunk getLastChunk() {
+        return chunks.get(chunks.size() - 1);
+    }
+
     public class SnakeChunk {
         public final static int CHUNK_SIZE = 64;
         Vector end;

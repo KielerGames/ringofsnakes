@@ -6,9 +6,14 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
+import javax.websocket.Session;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SnakeServer {
+    private static Map<String, Player> players = new HashMap<>();
+
     public static void main(String[] args) {
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
@@ -21,8 +26,9 @@ public class SnakeServer {
         context.setContextPath("/");
         server.setHandler(context);
 
-        try
-        {
+        var ticker = new Thread(new Ticker());
+
+        try {
             // Initialize javax.websocket layer
             WebSocketServerContainerInitializer.configure(context,
                     (servletContext, wsContainer) ->
@@ -39,11 +45,55 @@ public class SnakeServer {
                     });
 
             server.start();
+            ticker.start();
             server.join();
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
             t.printStackTrace(System.err);
         }
+    }
+
+    public static Snake createSnake(Session session) {
+        var snake = new Snake();
+        snake.tick();
+        snake.tick();
+        var player = new Player(snake, session);
+        players.put(session.getId(), player);
+        return snake;
+    }
+
+    public static void setDirection(Session session, double alpha) {
+        var player = players.get(session.getId());
+        assert player != null;
+        player.session = session;
+        player.snake.updateDirection(alpha);
+    }
+
+    private static class Ticker implements Runnable {
+        public void run() {
+            System.out.println("Ticker running...");
+            while(true) {
+                players.forEach((id, player) -> player.snake.tick());
+                players.forEach(
+                        (id, player) -> player.session.getAsyncRemote().sendBinary(
+                                player.snake.getLastChunk().buffer())
+                );
+                try {
+                    Thread.sleep(1000 / 60);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+}
+
+class Player {
+    public Snake snake;
+    public Session session;
+
+    public Player(Snake snake, Session session) {
+        this.snake = snake;
+        this.session = session;
     }
 }

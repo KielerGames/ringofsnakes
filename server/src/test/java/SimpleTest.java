@@ -4,6 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SimpleTest {
     @Test
     void myAwesomeTest() {
-        assertEquals(2, 1+1);
+        assertEquals(42, 50 - 8);
     }
 }

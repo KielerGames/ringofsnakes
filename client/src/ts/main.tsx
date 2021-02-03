@@ -1,8 +1,8 @@
 import SnakeChunk from "./SnakeChunk";
 
-const worker = new Worker("worker.bundle.js");
+const worker = new Worker("worker.bundle.js", { name: "SnakeWorker" });
 worker.postMessage({ a: 1 });
-worker.addEventListener('message', (event) => {
+worker.addEventListener("message", (event) => {
     console.log("message from worker: ", event);
 });
 
@@ -20,9 +20,9 @@ websocket.binaryType = "arraybuffer";
 
 websocket.onopen = () => {
     console.log("sending");
-    canvas.addEventListener("mousemove", event => {
+    canvas.addEventListener("mousemove", (event) => {
         alpha += event.movementX / 20;
-        if(Math.abs(alpha) > Math.PI) {
+        if (Math.abs(alpha) > Math.PI) {
             alpha += (alpha < 0 ? 2 : -2) * Math.PI;
         }
         let buffer = new ArrayBuffer(8);
@@ -32,12 +32,12 @@ websocket.onopen = () => {
     });
 };
 
-websocket.onmessage = e => {
+websocket.onmessage = (e) => {
     console.log("data received");
     let chunk = new SnakeChunk(e.data);
     chunk.draw(ctx, 100, 300);
 };
 
-websocket.onclose = e => {
+websocket.onclose = (e) => {
     console.log("closed");
-}
+};

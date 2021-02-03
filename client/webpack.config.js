@@ -4,7 +4,10 @@ const pkg = require("./package.json");
 
 module.exports = {
     mode: "development",
-    entry: path.join(__dirname, "src", "ts", "main.tsx"),
+    entry: {
+        main: path.join(__dirname, "src", "ts", "main.tsx"),
+        worker: path.join(__dirname, "src", "ts", "worker.ts")
+    },
     target: "web",
     devtool: "eval-cheap-module-source-map",
     resolve: {
@@ -26,7 +29,7 @@ module.exports = {
         }),
     ],
     output: {
-        filename: "game.js",
+        filename: "[name].bundle.js",
         path: path.resolve(__dirname, "public"),
     },
 };

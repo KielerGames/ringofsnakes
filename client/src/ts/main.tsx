@@ -1,5 +1,11 @@
 import SnakeChunk from "./SnakeChunk";
 
+const worker = new Worker("worker.bundle.js");
+worker.postMessage({ a: 1 });
+worker.addEventListener('message', (event) => {
+    console.log("message from worker: ", event);
+});
+
 document.body.style.backgroundColor = "black";
 const canvas = document.createElement("canvas");
 canvas.style.backgroundColor = "white";

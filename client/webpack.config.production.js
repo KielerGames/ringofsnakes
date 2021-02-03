@@ -4,7 +4,10 @@ const pkg = require("./package.json");
 
 module.exports = {
     mode: "production",
-    entry: path.join(__dirname, "src", "ts", "main.tsx"),
+    entry: {
+        main: path.join(__dirname, "src", "ts", "main.tsx"),
+        worker: path.join(__dirname, "src", "ts", "worker.ts")
+    },
     target: "web",
     resolve: {
         extensions: [".ts", ".tsx", ".js"]
@@ -25,7 +28,7 @@ module.exports = {
         }),
     ],
     output: {
-        filename: "game.js",
-        path: path.resolve(__dirname, "public")
-    }
+        filename: "[name].bundle.js",
+        path: path.resolve(__dirname, "public"),
+    },
 }

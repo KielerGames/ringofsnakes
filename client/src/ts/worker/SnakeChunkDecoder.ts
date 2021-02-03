@@ -1,9 +1,14 @@
-import { SnakeChunkData } from "./protocol/main-worker";
-import * as CCD from "./ChainCodeDecoder";
+import { SnakeChunkData } from "../protocol/main-worker";
 
 const SNAKE_CHUNK_MAX_BYTES = 64;
 const SNAKE_CHUNK_HEADER_SIZE = 0;
+
+// chaincode
 const STEP_SIZE = 5.0;
+const MAX_DELTA = Math.PI / 90; // 2deg
+const FAST_BIT = 1<<7;
+const STEPS_MASK = 7<<4;
+const DIRECTION_MASK = 15;
 
 export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
     const view = new DataView(chunkBuffer);
@@ -29,19 +34,25 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
         maxY = y;
 
     for (let i = 0; i < n; i++) {
-        const data = CCD.decode(view.getUint8(SNAKE_CHUNK_HEADER_SIZE + i));
-        const midAlpha = alpha + 0.5 * data.dirDelta;
+        const data = view.getUint8(SNAKE_CHUNK_HEADER_SIZE + i);
 
-        // compute next alpha
-        alpha += data.dirDelta;
+        // decode chaincode
+        const fast = (data & FAST_BIT) > 0;
+        const steps = 1 + ((data & STEPS_MASK)>>4);
+        const dirDelta = decodeDirectionChange(data & DIRECTION_MASK);
+
+        // compute alphas
+        const midAlpha = alpha + 0.5 * dirDelta;
+        alpha += dirDelta;
         if (Math.abs(alpha) > Math.PI) {
             alpha += (alpha < 0 ? 2 : -2) * Math.PI;
         }
 
         // compute next (center) position
-        x += STEP_SIZE * Math.cos(alpha);
-        y += STEP_SIZE * Math.sin(alpha);
-        length += STEP_SIZE;
+        const s = steps * (fast ? 1.2 : 1) * STEP_SIZE;
+        x += s * Math.cos(alpha);
+        y += s * Math.sin(alpha);
+        length += s;
 
         // store in vertex buffer
         addPointToVertexBuffer(vertexBuffer, i + 1, x, y, midAlpha, width);
@@ -87,4 +98,10 @@ function addPointToVertexBuffer(
     vb[vbo + 5] = y - width * ny;
     vb[vbo + 6] = length;
     vb[vbo + 7] = -1.0;
+}
+
+function decodeDirectionChange(data:number) {
+    const sign = 1 - ((data & 1)<<1);
+    const k = sign * Math.floor(data/2);
+    return k * MAX_DELTA / 7.0;
 }

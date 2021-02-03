@@ -1,4 +1,4 @@
-import * as SCD from "./SnakeChunkDecoder";
+import * as SCD from "./worker/SnakeChunkDecoder";
 import { MessageFromMain, ConnectRequest } from "./protocol/main-worker";
 import { ClientToServerMessage } from "./protocol/client-server";
 

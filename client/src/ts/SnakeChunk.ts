@@ -1,4 +1,4 @@
-import { decode } from "./ChainCodeDecoder";
+import { decode } from "./worker/ChainCodeDecoder";
 
 export default class SnakeChunk {
     private points: { x: number; y: number }[] = [];

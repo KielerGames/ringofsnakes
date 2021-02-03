@@ -1,19 +1,9 @@
+import { SnakeChunkData } from "./protocol/main-worker";
 import * as CCD from "./ChainCodeDecoder";
 
 const SNAKE_CHUNK_MAX_BYTES = 64;
 const SNAKE_CHUNK_HEADER_SIZE = 0;
 const STEP_SIZE = 5.0;
-
-export type SnakeChunkData = {
-    glVertexBuffer: ArrayBuffer;
-    viewBox: {
-        minX: number;
-        maxX: number;
-        minY: number;
-        maxY: number;
-    };
-    length: number;
-};
 
 export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
     const view = new DataView(chunkBuffer);
@@ -86,15 +76,15 @@ function addPointToVertexBuffer(
     // update vertex buffer:
     const vbo = 8 * k;
 
-    // left vertex
-    vb[vbo + 0] = x - width * nx;
-    vb[vbo + 1] = y - width * ny;
-    vb[vbo + 2] = length;
-    vb[vbo + 3] = -1.0;
-
     // right vertex
-    vb[vbo + 4] = x + width * nx;
-    vb[vbo + 5] = y + width * ny;
+    vb[vbo + 0] = x + width * nx;
+    vb[vbo + 1] = y + width * ny;
+    vb[vbo + 2] = length;
+    vb[vbo + 3] = 1.0;
+
+    // left vertex
+    vb[vbo + 4] = x - width * nx;
+    vb[vbo + 5] = y - width * ny;
     vb[vbo + 6] = length;
-    vb[vbo + 7] = 1.0;
+    vb[vbo + 7] = -1.0;
 }

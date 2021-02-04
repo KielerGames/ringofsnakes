@@ -4,8 +4,8 @@ public class ChainCodeCoder {
     // 2deg -> 3sec for a full 360deg rotation
     private final double MAX_DELTA = Math.PI / 90; // 2deg
     private static final int FAST_BIT = 1<<7;
-    private static final int STEPS_MASK = 7<<4;
-    private static final int DIRECTION_MASK = 15;
+    public static final int STEPS_MASK = 7<<4;
+    public static final int DIRECTION_MASK = 15;
     public static final int MAX_STEPS = 8;
 
     /**
@@ -65,14 +65,4 @@ public class ChainCodeCoder {
     }
 }
 
-class DecodedData {
-    public int direction;
-    public boolean fast;
-    public int steps;
 
-    DecodedData(int direction, boolean fast, int steps) {
-        this.direction = direction;
-        this.fast = fast;
-        this.steps = steps;
-    }
-}

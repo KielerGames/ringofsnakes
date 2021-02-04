@@ -1,4 +1,4 @@
-export type MessageFromMain = ConnectRequest;
+export type MessageFromMain = ConnectToServer | UpdateTargetAlpha;
 
 export type MessageFromWorker = SnakeChunkData;
 
@@ -6,10 +6,15 @@ export type MessageFromWorker = SnakeChunkData;
 // Messages from Main Thread to Worker:
 // ======================================
 
-export type ConnectRequest = {
-    tag: "ConnectRequest";
+export type ConnectToServer = {
+    tag: "ConnectToServer";
     playerName: string;
 };
+
+export type UpdateTargetAlpha = {
+    tag: "UpdateTargetAlpha";
+    alpha: number
+}
 
 // ======================================
 // Messages from Worker to Main Thread:
@@ -23,6 +28,7 @@ export type ConnectRequest = {
  */
 export type SnakeChunkData = {
     glVertexBuffer: ArrayBuffer;
+    vertices: number;
     viewBox: {
         minX: number;
         maxX: number;

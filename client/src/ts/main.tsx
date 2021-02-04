@@ -1,45 +1,44 @@
+import { MessageFromMain, SnakeChunkData } from "./protocol/main-worker";
 import * as Renderer from "./renderer/test";
-
-const worker = new Worker("worker.bundle.js", { name: "SnakeWorker" });
-worker.postMessage({ a: 1 });
-worker.addEventListener("message", (event) => {
-    console.log("message from worker: ", event);
-});
+import Matrix from "./webgl/Matrix";
 
 document.body.style.backgroundColor = "black";
 const canvas = document.createElement("canvas");
-canvas.style.backgroundColor = "white";
-canvas.width = 600;
-canvas.height = 600;
+const gl = canvas.getContext("webgl")!;
+canvas.width = 1280;
+canvas.height = 720;
 document.body.appendChild(canvas);
-const ctx = canvas.getContext("2d")!;
-let alpha = 0.0;
 
-const websocket = new WebSocket("ws://127.0.0.1:8080/game");
-websocket.binaryType = "arraybuffer";
+// background color
+gl.clearColor(0.66, 0.85, 0.8, 1.0);
+gl.clear(gl.COLOR_BUFFER_BIT);
 
-websocket.onopen = () => {
-    console.log("sending");
-    canvas.addEventListener("mousemove", (event) => {
-        alpha += event.movementX / 20;
-        if (Math.abs(alpha) > Math.PI) {
-            alpha += (alpha < 0 ? 2 : -2) * Math.PI;
-        }
-        let buffer = new ArrayBuffer(8);
-        let view = new DataView(buffer);
-        view.setFloat64(0, alpha, false);
-        websocket.send(buffer);
-    });
-};
+// transformation matrix (un-stretch)
+const unstretch = new Matrix();
+unstretch.setEntry(0, 0, canvas.height / canvas.width);
 
-websocket.onmessage = (e) => {
-    console.log("data received");
-    // let chunk = new SnakeChunk(e.data);
-    // chunk.draw(ctx, 100, 300);
-};
+// create GPU buffer
+const vertexBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
-websocket.onclose = (e) => {
-    console.log("closed");
-};
+const program = Renderer.createSnakeShaderProgram(gl);
+program.use();
+program.setUniform("uColor", [0.2, 0.4, 1.0]);
+program.setUniform("uTransform", unstretch.data);
 
-Renderer.test();
+const worker = new Worker("worker.bundle.js", { name: "SnakeWorker" });
+worker.postMessage({
+    tag: "ConnectToServer",
+    playerName: "SnakeForceOne",
+} as MessageFromMain);
+worker.postMessage({
+    tag: "UpdateTargetAlpha",
+    alpha: 0.25 * Math.PI,
+} as MessageFromMain);
+
+worker.addEventListener("message", (event) => {
+    console.log("Snake Chunk data!")
+    const data = event.data.data as SnakeChunkData;
+    gl.bufferData(gl.ARRAY_BUFFER, data.glVertexBuffer, gl.STATIC_DRAW);
+    program.run(gl.TRIANGLE_STRIP, 0, data.vertices);
+});

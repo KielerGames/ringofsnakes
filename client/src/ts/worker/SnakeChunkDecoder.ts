@@ -26,8 +26,9 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
     const n = 64;
 
     // initialize variables
+    let length = 0.0;
     const vertexBuffer = new Float32Array(8 * (n + 1));
-    addPointToVertexBuffer(vertexBuffer, 0, x, y, alpha, width);
+    addPointToVertexBuffer(vertexBuffer, 0, x, y, alpha, width, length);
     let minX = x,
         maxX = x,
         minY = y,
@@ -55,12 +56,13 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
         length += s;
 
         // store in vertex buffer
-        addPointToVertexBuffer(vertexBuffer, i + 1, x, y, midAlpha, width);
+        addPointToVertexBuffer(vertexBuffer, i + 1, x, y, midAlpha, width, length);
     }
 
     return {
-        glVertexBuffer: vertexBuffer,
-        length: 0,
+        glVertexBuffer: vertexBuffer.buffer,
+        vertices: (n+1)*2,
+        length,
         viewBox: {
             minX: minX - width,
             maxX: maxX + width,
@@ -76,7 +78,8 @@ function addPointToVertexBuffer(
     x: number,
     y: number,
     alpha: number,
-    width: number
+    width: number,
+    length: number
 ): void {
     const normalAlpha = alpha - 0.5 * Math.PI;
 

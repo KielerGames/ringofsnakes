@@ -57,11 +57,11 @@ public class ChainCodeCoder {
         return k * MAX_DELTA / 7.0;
     }
 
-    public DecodedData decode(byte b) {
+    public DecodedDirectionData decode(byte b) {
         boolean fast = (b & FAST_BIT) > 0;
         int steps = 1 + ((b & STEPS_MASK)>>4);
         int direction = b & DIRECTION_MASK;
-        return new DecodedData(direction, fast, steps);
+        return new DecodedDirectionData(direction, fast, steps);
     }
 }
 

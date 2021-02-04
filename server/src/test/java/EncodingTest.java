@@ -1,5 +1,5 @@
 import game.ChainCodeCoder;
-import game.DecodedData;
+import game.DecodedDirectionData;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,7 +28,7 @@ public class EncodingTest {
 
     void testSpecificEncoding(int d, boolean f, int s){
         byte b = coder.encode(d,f,s);
-        DecodedData data = coder.decode(b);
+        DecodedDirectionData data = coder.decode(b);
         assertEquals(d, data.direction);
         assertEquals(f, data.fast);
         assertEquals(s, data.steps);

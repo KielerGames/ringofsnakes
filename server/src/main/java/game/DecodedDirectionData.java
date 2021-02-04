@@ -1,11 +1,11 @@
 package game;
 
-public class DecodedData {
+public class DecodedDirectionData {
     public int direction;
     public boolean fast;
     public int steps;
 
-    DecodedData(int direction, boolean fast, int steps) {
+    DecodedDirectionData(int direction, boolean fast, int steps) {
         this.direction = direction;
         this.fast = fast;
         this.steps = steps;

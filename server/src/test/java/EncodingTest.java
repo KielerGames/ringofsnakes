@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Tests the function of method encode and decode from the ChainCodeCoder Class.
- * All inputs withing the specified range are initially encoded and subsequently decoded.
- * When working correctly the values should be the same again, otherwise the test fails.
+ * Tests method encode and decode from the ChainCodeCoder Class.
+ * All inputs within the specified range are initially encoded and subsequently decoded.
+ * When working correctly the values should remain the same, otherwise the test fails.
  */
 public class EncodingTest {
 

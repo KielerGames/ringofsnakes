@@ -1,4 +1,4 @@
-import SnakeChunk from "./SnakeChunk";
+import * as Renderer from "./renderer/test";
 
 const worker = new Worker("worker.bundle.js", { name: "SnakeWorker" });
 worker.postMessage({ a: 1 });
@@ -34,10 +34,12 @@ websocket.onopen = () => {
 
 websocket.onmessage = (e) => {
     console.log("data received");
-    let chunk = new SnakeChunk(e.data);
-    chunk.draw(ctx, 100, 300);
+    // let chunk = new SnakeChunk(e.data);
+    // chunk.draw(ctx, 100, 300);
 };
 
 websocket.onclose = (e) => {
     console.log("closed");
 };
+
+Renderer.test();

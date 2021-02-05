@@ -6,8 +6,8 @@ const SNAKE_CHUNK_HEADER_SIZE = 0;
 // chaincode
 const STEP_SIZE = 5.0;
 const MAX_DELTA = Math.PI / 90; // 2deg
-const FAST_BIT = 1<<7;
-const STEPS_MASK = 7<<4;
+const FAST_BIT = 1 << 7;
+const STEPS_MASK = 7 << 4;
 const DIRECTION_MASK = 15;
 
 export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
@@ -39,7 +39,7 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
 
         // decode chaincode
         const fast = (data & FAST_BIT) > 0;
-        const steps = 1 + ((data & STEPS_MASK)>>4);
+        const steps = 1 + ((data & STEPS_MASK) >> 4);
         const dirDelta = decodeDirectionChange(data & DIRECTION_MASK);
 
         // compute alphas
@@ -56,12 +56,20 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
         length += s;
 
         // store in vertex buffer
-        addPointToVertexBuffer(vertexBuffer, i + 1, x, y, midAlpha, width, length);
+        addPointToVertexBuffer(
+            vertexBuffer,
+            i + 1,
+            x,
+            y,
+            midAlpha,
+            width,
+            length
+        );
     }
 
     return {
         glVertexBuffer: vertexBuffer.buffer,
-        vertices: (n+1)*2,
+        vertices: (n + 1) * 2,
         length,
         viewBox: {
             minX: minX - width,
@@ -103,8 +111,37 @@ function addPointToVertexBuffer(
     vb[vbo + 7] = -1.0;
 }
 
-function decodeDirectionChange(data:number) {
-    const sign = 1 - ((data & 1)<<1);
-    const k = sign * Math.floor(data/2);
-    return k * MAX_DELTA / 7.0;
+function decodeDirectionChange(data: number) {
+    const sign = 1 - ((data & 1) << 1);
+    const k = sign * Math.floor(data / 2);
+    return (k * MAX_DELTA) / 7.0;
+}
+
+export function test(): SnakeChunkData {
+    const n = 20;
+    const vertexBuffer = new Float32Array(8 * n);
+
+    let length = 0;
+    let alpha = Math.random() * Math.PI;
+    let x = 0,
+        y = 0;
+
+    for (let i = 0; i < n; i++) {
+        addPointToVertexBuffer(vertexBuffer, i, x, y, alpha, 0.5, length);
+        length += STEP_SIZE;
+        x += STEP_SIZE * Math.cos(alpha);
+        y += STEP_SIZE * Math.sin(alpha);
+    }
+
+    return {
+        glVertexBuffer: vertexBuffer.buffer,
+        vertices: n * 2,
+        length,
+        viewBox: {
+            minX: 0,
+            maxX: 0,
+            minY: 0,
+            maxY: 0,
+        },
+    };
 }

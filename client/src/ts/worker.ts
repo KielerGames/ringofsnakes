@@ -14,7 +14,7 @@ ctx.addEventListener("message", (event) => {
     switch (msg.tag) {
         case "UpdateTargetAlpha": {
             targetAlpha = msg.alpha;
-            if(websocket && websocket.readyState === WebSocket.OPEN) {
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
                 //TODO
                 let buffer = new ArrayBuffer(8);
                 let view = new DataView(buffer);
@@ -43,6 +43,10 @@ ctx.addEventListener("message", (event) => {
             };
             break;
         }
+        case "RunTest": {
+            setTimeout(test, 1000);
+            break;
+        }
     }
 });
 
@@ -59,4 +63,12 @@ function handleServerMessageEvent(event: MessageEvent): void {
         const json = JSON.parse(data);
         console.log("Received JSON data: ", json);
     }
+}
+
+function test(): void {
+    const chunkData = SCD.test();
+    // transfer data to main thread (including ownership of data.glVertexBuffer)
+    ctx.postMessage({ tag: "SnakeChunkData", data: chunkData }, [
+        chunkData.glVertexBuffer,
+    ]);
 }

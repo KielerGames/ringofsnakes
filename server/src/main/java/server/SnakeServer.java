@@ -75,7 +75,7 @@ public class SnakeServer {
                 players.forEach((id, player) -> player.snake.tick());
                 players.forEach(
                         (id, player) -> player.session.getAsyncRemote().sendBinary(
-                                player.snake.getLastChunk().buffer())
+                                player.snake.getLastChunk().chunkByteBuffer)
                 );
                 try {
                     Thread.sleep(1000 / 60);

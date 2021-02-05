@@ -20,7 +20,7 @@ public class EventSocket {
 
         var snake = SnakeServer.createSnake(session);
 
-        session.getAsyncRemote().sendBinary(snake.chunks.get(0).buffer());
+        session.getAsyncRemote().sendBinary(snake.chunks.get(0).chunkByteBuffer);
     }
 
     @OnMessage

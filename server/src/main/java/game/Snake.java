@@ -25,6 +25,12 @@ public class Snake {
         chunks.add(currentChunk);
     }
 
+    public Snake(double x, double y) {
+        this.headPosition = new Vector(x,y);
+        currentChunk = new SnakeChunk();
+        chunks.add(currentChunk);
+    }
+
     public void updateDirection(double x, double y) {
         this.headDirection = Math.atan2(y, x);
     }
@@ -57,12 +63,12 @@ public class Snake {
         }
     }
 
-    public void debug() {
+   /* public void debug() {
         System.out.println("Snake data:");
         for (SnakeChunk chunk : chunks) {
             chunk.debug();
         }
-    }
+    }*/
 
     public SnakeChunk getLastChunk() {
         return chunks.get(chunks.size() - 1);
@@ -72,7 +78,7 @@ public class Snake {
         public final static int CHUNK_SIZE = 64;
         Vector end;
         double endDirection;
-        private byte[] chainCodes;
+        public ByteBuffer chunkByteBuffer;
         double length = 0.0;
         double halfWidth;
 
@@ -88,7 +94,8 @@ public class Snake {
         private int lastDirDelta = 0;
 
         SnakeChunk() {
-            chainCodes = new byte[CHUNK_SIZE];
+
+
             end = headPosition;
             endDirection = headDirection;
             halfWidth = 0.5 * 0.2; // width 0.2
@@ -98,12 +105,29 @@ public class Snake {
 
             currentPosition = end.clone();
             currentAlpha = headDirection;
+
+            /**
+             * Encoding: endPositionX, endPositionY, endDirection, numberOfChainodes
+             *  Bytes:        [0,3]        [4,7]         [8,11]            [12]
+             * @return Header encoded in 13 Bytes
+             */
+            this.chunkByteBuffer = ByteBuffer.allocate(CHUNK_SIZE);
+            ByteBuffer buffer = this.chunkByteBuffer;
+            buffer.put((byte) 42 ); //change to something that makes sense.
+            buffer.putFloat((float) this.endDirection);
+            buffer.putFloat((float) this.currentPosition.y);
+            buffer.putFloat((float) this.currentPosition.x);
         }
 
         public void add(int dirDelta) {
+/*
             if (nextIndex == chainCodes.length) {
                 throw new IllegalStateException();
             }
+
+ */
+
+
 
             // update direction
             currentAlpha += coder.decodeDirectionChange(dirDelta);
@@ -116,11 +140,11 @@ public class Snake {
             length += ccStepLength;
             if (nextIndex > 0 && dirDelta == 0 && lastSteps < coder.MAX_STEPS && lastFast == fast) {
                 // increase steps of last chaincode
-                chainCodes[nextIndex-1] = coder.encode(lastDirDelta, fast, lastSteps + 1);
+                chunkByteBuffer.put(nextIndex-1, coder.encode(lastDirDelta, fast, lastSteps + 1));
                 lastSteps++;
             } else {
                 // add new chaincode
-                chainCodes[nextIndex] = coder.encode(dirDelta, fast, 1);
+                this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
                 nextIndex++;
                 lastDirDelta = dirDelta;
             }
@@ -134,10 +158,10 @@ public class Snake {
         }
 
         public boolean finalized() {
-            return nextIndex == chainCodes.length;
+            return this.chunkByteBuffer.position() == CHUNK_SIZE;
         }
 
-        public void debug() {
+/*        public void debug() {
             System.out.println("Snake chunk data:");
             int i=0;
             for (byte code : chainCodes) {
@@ -152,11 +176,7 @@ public class Snake {
                     break;
                 }
             }
-        }
+        }*/
 
-        public ByteBuffer buffer() {
-            //TODO: header (message tag, length, endPos, ...)
-            return ByteBuffer.wrap(this.chainCodes);
-        }
     }
 }

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * All inputs within the specified range are initially encoded and subsequently decoded.
  * When working correctly the values should remain the same, otherwise the test fails.
  */
-public class EncodingTest {
+public class ChainCodeEncodingTest {
 
     ChainCodeCoder coder = new ChainCodeCoder();
 

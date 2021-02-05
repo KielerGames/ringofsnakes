@@ -11,6 +11,6 @@ public class App {
         snake.fast = true;
         snake.tick();
         snake.tick();
-        snake.debug();
+
     }
 }

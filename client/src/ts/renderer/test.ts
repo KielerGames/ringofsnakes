@@ -7,7 +7,6 @@ export function createSnakeShaderProgram(gl: WebGLRenderingContext): WebGLShader
     return new WebGLShaderProgram(
         gl,
         __VERTEXSHADER_SNAKE__,
-        __FRAGMENTSHADER_SNAKE__,
-        true
+        __FRAGMENTSHADER_SNAKE__
     );
 }

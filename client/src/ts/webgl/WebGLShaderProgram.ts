@@ -1,3 +1,5 @@
+declare const __DEBUG__: boolean;
+
 type FloatData = null | number | number[] | Float32Array;
 
 export default class WebGLShaderProgram {
@@ -5,14 +7,13 @@ export default class WebGLShaderProgram {
     private program:WebGLProgram;
     private uniforms:Map<string, ShaderVar<WebGLUniformLocation>> = new Map();
     private attribs: Map<string, ShaderVar<number>>  = new Map();
-    private bufferLayout: string[] = [];
+    public bufferLayout: string[] = [];
     private autoStride:number = 0;
 
     public constructor(
         gl:WebGLRenderingContext,
         vertex:string,
-        fragment:string,
-        validate:boolean = false
+        fragment:string
     ) {
         this.gl = gl;
 
@@ -30,7 +31,7 @@ export default class WebGLShaderProgram {
             throw new Error("Shader linking failed: " + gl.getProgramInfoLog(program));
         }
 
-        if(validate) {
+        if(__DEBUG__) {
             gl.validateProgram(program);
 
             if(!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {

@@ -1,6 +1,9 @@
 import { MessageFromMain, SnakeChunkData } from "./protocol/main-worker";
 import * as Renderer from "./renderer/test";
 import Matrix from "./webgl/Matrix";
+import ReactDOM from "react-dom";
+import React from "react";
+import UserInput from "./components/UserInput";
 
 document.body.style.backgroundColor = "black";
 const canvas = document.createElement("canvas");
@@ -51,3 +54,7 @@ worker.addEventListener("message", (event) => {
     gl.clear(gl.COLOR_BUFFER_BIT);
     program.run(gl.TRIANGLE_STRIP, 0, data.vertices);
 });
+
+// react
+const root = document.getElementById("root");
+ReactDOM.render(<UserInput initial={0.0} />, root);

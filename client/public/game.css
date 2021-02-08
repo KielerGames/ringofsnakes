@@ -2,3 +2,35 @@ html, body {
     margin: 0;
     padding: 0;
 }
+
+#input-container {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    --ring-radius: 150px;
+    --ring-width: 14px;
+}
+
+#input-viz-ring {
+    position: relative;
+    width: var(--ring-radius);
+    height: var(--ring-radius);
+    border-radius: 50%;
+    border: var(--ring-width) solid rgba(16,16,16,0.15);
+}
+
+#input-viz-marker {
+    position: absolute;
+    top: calc(0px - var(--ring-width));
+    left: calc(0px - var(--ring-width));
+    width: var(--ring-radius);
+    height: var(--ring-radius);
+    border-radius: 50%;
+    border: var(--ring-width) solid white;
+    clip-path: polygon(50% 50%, 100% 40%, 100% 60%)
+}

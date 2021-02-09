@@ -13,7 +13,7 @@ const gl = canvas.getContext("webgl")!;
 document.body.appendChild(canvas);
 
 // background color
-gl.clearColor(0.66, 0.85, 0.8, 1.0);
+gl.clearColor(0.1, 0.1, 0.1, 1.0);
 gl.clear(gl.COLOR_BUFFER_BIT);
 
 // transformation matrix (un-stretch & scale)
@@ -34,7 +34,7 @@ const program = Renderer.createSnakeShaderProgram(gl);
 program.bufferLayout = ["vPosition", "vLength", "vCenterOffset"];
 console.log(program.bufferLayout);
 program.use();
-program.setUniform("uColor", [0.2, 0.4, 1.0]);
+program.setUniform("uColor", [0.1, 0.2, 0.5]);
 program.setUniform("uTransform", transform.data);
 
 const worker = new Worker("worker.bundle.js", { name: "SnakeWorker" });

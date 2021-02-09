@@ -8,8 +8,8 @@ import UserInput from "./components/UserInput";
 document.body.style.backgroundColor = "black";
 const canvas = document.createElement("canvas");
 const gl = canvas.getContext("webgl")!;
-canvas.width = 1280;
-canvas.height = 720;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 document.body.appendChild(canvas);
 
 // background color
@@ -56,5 +56,7 @@ worker.addEventListener("message", (event) => {
 });
 
 // react
-const root = document.getElementById("root");
+const root = document.createElement("div");
+root.id = "root";
+document.body.appendChild(root);
 ReactDOM.render(<UserInput initial={0.0} />, root);

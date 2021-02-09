@@ -45,14 +45,23 @@ export default class UserInput extends Component<Props, State> {
 
     private mouseMoveHandler(e: MouseEvent) {
         this.setState((state) => {
-            let alpha = state.alpha;
-            let x = Math.cos(alpha);
-            let y = Math.sin(alpha);
+            if (document.pointerLockElement === this.ref.current) {
+                let alpha = state.alpha;
+                let x = 2*Math.cos(alpha);
+                let y = 2*Math.sin(alpha);
 
-            x += 0.01 * e.movementX;
-            y += 0.01 * e.movementY;
+                x += 0.01 * e.movementX;
+                y += 0.01 * e.movementY;
 
-            return { alpha: x === 0.0 && y === 0.0 ? alpha : Math.atan2(y, x) };
+                return {
+                    alpha: x === 0.0 && y === 0.0 ? alpha : Math.atan2(y, x),
+                };
+            } else {
+                const x = e.pageX - 0.5 * window.innerWidth;
+                const y = e.pageY - 0.5 * window.innerHeight;
+
+                return { alpha: Math.atan2(y, x) };
+            }
         });
     }
 

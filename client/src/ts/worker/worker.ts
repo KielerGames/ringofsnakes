@@ -1,6 +1,6 @@
-import * as SCD from "./worker/SnakeChunkDecoder";
-import { MessageFromMain, ConnectToServer } from "./protocol/main-worker";
-import { ClientToServerMessage } from "./protocol/client-server";
+import * as SCD from "./SnakeChunkDecoder";
+import { MessageFromMain, ConnectToServer } from "../protocol/main-worker";
+import { ClientToServerMessage } from "../protocol/client-server";
 
 const ctx: Worker = self as any;
 

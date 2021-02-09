@@ -44,7 +44,7 @@ ctx.addEventListener("message", (event) => {
             break;
         }
         case "RunTest": {
-            setTimeout(test, 1000);
+            setInterval(test, 50);
             break;
         }
     }
@@ -66,7 +66,7 @@ function handleServerMessageEvent(event: MessageEvent): void {
 }
 
 function test(): void {
-    const chunkData = SCD.test();
+    const chunkData = SCD.test(targetAlpha);
     // transfer data to main thread (including ownership of data.glVertexBuffer)
     ctx.postMessage({ tag: "SnakeChunkData", data: chunkData }, [
         chunkData.glVertexBuffer,

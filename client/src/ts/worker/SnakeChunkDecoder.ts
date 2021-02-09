@@ -4,7 +4,7 @@ const SNAKE_CHUNK_MAX_BYTES = 64;
 const SNAKE_CHUNK_HEADER_SIZE = 0;
 
 // chaincode
-const STEP_SIZE = 5.0;
+const STEP_SIZE = 1.0;
 const MAX_DELTA = Math.PI / 90; // 2deg
 const FAST_BIT = 1 << 7;
 const STEPS_MASK = 7 << 4;
@@ -19,7 +19,7 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
     }
 
     // TODO: read from (not yet existing) header
-    const width = 1;
+    const width = 0.5;
     let alpha = 0;
     let x = 0,
         y = 0;
@@ -117,12 +117,12 @@ function decodeDirectionChange(data: number) {
     return (k * MAX_DELTA) / 7.0;
 }
 
-export function test(): SnakeChunkData {
+export function test(alpha:number): SnakeChunkData {
     const n = 20;
     const vertexBuffer = new Float32Array(8 * n);
 
     let length = 0;
-    let alpha = Math.random() * Math.PI;
+    //let alpha = Math.random() * Math.PI;
     let x = 0,
         y = 0;
 

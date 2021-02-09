@@ -7,9 +7,9 @@ import UserInput from "./components/UserInput";
 
 document.body.style.backgroundColor = "black";
 const canvas = document.createElement("canvas");
-const gl = canvas.getContext("webgl")!;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+const gl = canvas.getContext("webgl")!;
 document.body.appendChild(canvas);
 
 // background color
@@ -21,8 +21,8 @@ const unstretch = new Matrix();
 unstretch.setEntry(0, 0, canvas.height / canvas.width);
 
 const scale = new Matrix();
-scale.setEntry(0,0, 0.25);
-scale.setEntry(1,1, 0.25);
+scale.setEntry(0,0, 0.1);
+scale.setEntry(1,1, 0.1);
 
 const transform = Matrix.compose(scale, unstretch);
 
@@ -42,10 +42,7 @@ worker.postMessage({
     tag: "RunTest",
     //playerName: "SnakeForceOne",
 } as MessageFromMain);
-worker.postMessage({
-    tag: "UpdateTargetAlpha",
-    alpha: 0.25 * Math.PI,
-} as MessageFromMain);
+
 
 worker.addEventListener("message", (event) => {
     console.log("Snake Chunk data!")
@@ -59,4 +56,11 @@ worker.addEventListener("message", (event) => {
 const root = document.createElement("div");
 root.id = "root";
 document.body.appendChild(root);
-ReactDOM.render(<UserInput initial={0.0} />, root);
+ReactDOM.render(<UserInput initial={0.0} onChange={updateAlpha} />, root);
+
+function updateAlpha(newAlpha: number): void {
+    worker.postMessage({
+        tag: "UpdateTargetAlpha",
+        alpha: newAlpha,
+    } as MessageFromMain);
+}

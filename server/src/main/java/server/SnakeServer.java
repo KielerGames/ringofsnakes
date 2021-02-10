@@ -7,7 +7,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
 import javax.websocket.Session;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,8 +53,7 @@ public class SnakeServer {
 
     public static Snake createSnake(Session session) {
         var snake = new Snake();
-        //snake.tick();
-        //snake.tick();
+        snake.tick();
         var player = new Player(snake, session);
         players.put(session.getId(), player);
         return snake;
@@ -71,11 +69,10 @@ public class SnakeServer {
     private static class Ticker implements Runnable {
         public void run() {
             System.out.println("Ticker running...");
-            while(true) {
+            while (true) {
                 players.forEach((id, player) -> player.snake.tick());
                 players.forEach(
-                        (id, player) -> player.session.getAsyncRemote().sendBinary(
-                                player.snake.getLastChunk().chunkByteBuffer)
+                        (id, player) -> player.send()
                 );
                 try {
                     Thread.sleep(1000 / 60);
@@ -95,5 +92,10 @@ class Player {
     public Player(Snake snake, Session session) {
         this.snake = snake;
         this.session = session;
+    }
+
+    public void send() {
+        var buffer = snake.getLastChunk().chunkByteBuffer.asReadOnlyBuffer();
+        session.getAsyncRemote().sendBinary(buffer);
     }
 }

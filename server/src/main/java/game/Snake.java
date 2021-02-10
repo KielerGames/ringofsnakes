@@ -63,13 +63,6 @@ public class Snake {
         }
     }
 
-   /* public void debug() {
-        System.out.println("Snake data:");
-        for (SnakeChunk chunk : chunks) {
-            chunk.debug();
-        }
-    }*/
-
     public SnakeChunk getLastChunk() {
         return chunks.get(chunks.size() - 1);
     }
@@ -154,9 +147,6 @@ public class Snake {
                 lastSteps++;
             } else {
                 // add new chaincode
-                if(this.chunkByteBuffer.position() >= CHUNK_SIZE) {
-                    System.out.println("buffer overflow incoming!!!");
-                }
                 this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
                 this.numberOfChainCodes++;
                 lastSteps = 1;

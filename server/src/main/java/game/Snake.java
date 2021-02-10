@@ -120,7 +120,7 @@ public class Snake {
          */
         public ByteBuffer createChunkBuffer(double endX, double endY, double endDir, int numChainCodes) {
 
-            ByteBuffer buffer = ByteBuffer.allocate(13); //Create buffer with capacity of 13 Byte
+            ByteBuffer buffer = ByteBuffer.allocate(CHUNK_SIZE); //Create buffer with capacity of CHUNK_SIZE Byte
             buffer.put((byte) numChainCodes);           //Write to Byte as Position 0
             buffer.putFloat((float) endDir);             //Write 4 Bytes from 1 to 4
             buffer.putFloat((float) endY);               //Write 4 Bytes from 5 to 8

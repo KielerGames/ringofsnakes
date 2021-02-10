@@ -176,7 +176,7 @@ public class Snake {
             this.end.x = endX;
             this.end.y = endY;
             this.endDirection = endDir;
-            //this.chunkByteBuffer = createChunkBuffer(endX, endY, endDir, numChainCodes);
+            this.chunkByteBuffer = createChunkBuffer();
         }
 
     }

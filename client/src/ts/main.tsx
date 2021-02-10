@@ -21,8 +21,8 @@ const unstretch = new Matrix();
 unstretch.setEntry(0, 0, canvas.height / canvas.width);
 
 const scale = new Matrix();
-scale.setEntry(0,0, 0.1);
-scale.setEntry(1,1, 0.1);
+scale.setEntry(0, 0, 0.025);
+scale.setEntry(1, 1, 0.025);
 
 const transform = Matrix.compose(scale, unstretch);
 
@@ -43,13 +43,25 @@ worker.postMessage({
     playerName: "SnakeForceOne",
 } as MessageFromMain);
 
+const chunks: SnakeChunkData[] = [];
 
 worker.addEventListener("message", (event) => {
-    console.log("Snake Chunk data!")
+    //console.log("Snake Chunk data!")
     const data = event.data.data as SnakeChunkData;
-    gl.bufferData(gl.ARRAY_BUFFER, data.glVertexBuffer, gl.STATIC_DRAW);
+
     gl.clear(gl.COLOR_BUFFER_BIT);
+    // for (let chunk of chunks) {
+    //     gl.bufferData(gl.ARRAY_BUFFER, chunk.glVertexBuffer, gl.STATIC_DRAW);
+    //     program.run(gl.TRIANGLE_STRIP, 0, chunk.vertices);
+    // }
+
+    gl.bufferData(gl.ARRAY_BUFFER, data.glVertexBuffer, gl.STATIC_DRAW);
     program.run(gl.TRIANGLE_STRIP, 0, data.vertices);
+
+    // if (data.final) {
+    //     console.log("Chunk is final");
+    //     chunks.push(data);
+    // }
 });
 
 // react

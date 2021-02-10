@@ -4,7 +4,7 @@ const SNAKE_CHUNK_MAX_BYTES = 64;
 const SNAKE_CHUNK_HEADER_SIZE = 13;
 
 // chaincode
-const STEP_SIZE = 0.42;
+const STEP_SIZE = 0.2;
 const MAX_DELTA = Math.PI / 90; // 2deg
 const FAST_BIT = 1 << 7;
 const STEPS_MASK = 7 << 4;
@@ -77,6 +77,7 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
             minY: minY - width,
             maxY: maxY + width,
         },
+        final: chunkBuffer.byteLength === SNAKE_CHUNK_MAX_BYTES
     };
 }
 
@@ -145,5 +146,6 @@ export function test(alpha: number): SnakeChunkData {
             minY: 0,
             maxY: 0,
         },
+        final: false
     };
 }

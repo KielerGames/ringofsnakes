@@ -40,4 +40,5 @@ export type SnakeChunkData = {
         maxY: number;
     };
     length: number;
+    final: boolean;
 };

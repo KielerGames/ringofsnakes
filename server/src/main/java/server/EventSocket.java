@@ -34,8 +34,8 @@ public class EventSocket {
 
     @OnMessage
     public void onWebSocketMessage(Session session, ByteBuffer buffer) {
-        /*double alpha = buffer.getDouble(0);
-        SnakeServer.setDirection(session, alpha);*/
+        double alpha = buffer.getDouble(0);
+        SnakeServer.setDirection(session, alpha);
     }
 
     @OnClose

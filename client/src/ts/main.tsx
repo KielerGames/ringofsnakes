@@ -39,8 +39,8 @@ program.setUniform("uTransform", transform.data);
 
 const worker = new Worker("worker.bundle.js", { name: "SnakeWorker" });
 worker.postMessage({
-    tag: "RunTest",
-    //playerName: "SnakeForceOne",
+    tag: "ConnectToServer", //"RunTest",
+    playerName: "SnakeForceOne",
 } as MessageFromMain);
 
 

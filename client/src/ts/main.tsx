@@ -50,18 +50,18 @@ worker.addEventListener("message", (event) => {
     const data = event.data.data as SnakeChunkData;
 
     gl.clear(gl.COLOR_BUFFER_BIT);
-    // for (let chunk of chunks) {
-    //     gl.bufferData(gl.ARRAY_BUFFER, chunk.glVertexBuffer, gl.STATIC_DRAW);
-    //     program.run(gl.TRIANGLE_STRIP, 0, chunk.vertices);
-    // }
+    for (let chunk of chunks) {
+        gl.bufferData(gl.ARRAY_BUFFER, chunk.glVertexBuffer, gl.STATIC_DRAW);
+        program.run(gl.TRIANGLE_STRIP, 0, chunk.vertices);
+    }
 
     gl.bufferData(gl.ARRAY_BUFFER, data.glVertexBuffer, gl.STATIC_DRAW);
     program.run(gl.TRIANGLE_STRIP, 0, data.vertices);
 
-    // if (data.final) {
-    //     console.log("Chunk is final");
-    //     chunks.push(data);
-    // }
+    if (data.final) {
+        console.log("Chunk is final");
+        chunks.push(data);
+    }
 });
 
 // react

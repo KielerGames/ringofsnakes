@@ -51,12 +51,15 @@ public class SnakeServer {
         }
     }
 
-    public static Snake createSnake(Session session) {
+    public static void createPlayer(Session session) {
         var snake = new Snake();
         snake.tick();
         var player = new Player(snake, session);
         players.put(session.getId(), player);
-        return snake;
+    }
+
+    public static void removePlayer(Session session) {
+        players.remove(session.getId());
     }
 
     public static void setDirection(Session session, double alpha) {

@@ -1,4 +1,4 @@
-export type MessageFromMain = ConnectToServer | UpdateTargetAlpha | RunTest;
+export type MessageFromMain = ConnectToServer | UpdateTargetAlpha;
 
 export type MessageFromWorker = SnakeChunkData;
 
@@ -14,10 +14,6 @@ export type ConnectToServer = {
 export type UpdateTargetAlpha = {
     tag: "UpdateTargetAlpha";
     alpha: number
-}
-
-export type RunTest = {
-    tag: "RunTest";
 }
 
 // ======================================

@@ -1,24 +1,21 @@
 package game;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Snake {
-    private double length = 1.0;
-    private Vector headPosition;
-    private double headDirection = 0.0;
-    private double lastDirection = headDirection;
-    private Vector lastCCPosition;
-    public List<SnakeChunk> chunks = new LinkedList<>();
-    private SnakeChunk currentChunk;
-    private double speed = 1.0;
-    private ChainCodeCoder coder = new ChainCodeCoder();
-    public boolean fast = false;
-
     public static final double deltaTime = 1.0 / 60.0;
     public static final double ccStepLength = 0.2; //1.0 * deltaTime;
+    public List<SnakeChunk> chunks = new LinkedList<>();
+    public boolean fast = false;
+    private double length = 1.0;
+    private final Vector headPosition;
+    private double headDirection = 0.0;
+    private double lastDirection = headDirection;
+    private SnakeChunk currentChunk;
+    private final double speed = 1.0;
+    private final ChainCodeCoder coder = new ChainCodeCoder();
 
     public Snake() {
         this(0.0, 0.0);
@@ -26,7 +23,6 @@ public class Snake {
 
     public Snake(double startX, double startY) {
         this.headPosition = new Vector(startX, startY);
-        this.lastCCPosition = headPosition.clone();
         currentChunk = new SnakeChunk();
         chunks.add(currentChunk);
     }
@@ -65,120 +61,6 @@ public class Snake {
 
     public SnakeChunk getLastChunk() {
         return chunks.get(chunks.size() - 1);
-    }
-
-    public class SnakeChunk {
-        public final static int CHUNK_SIZE = 64;
-        Vector end;
-        double endDirection;
-        public ByteBuffer chunkByteBuffer;
-        double length = 0.0;
-        double halfWidth;
-
-        // bounding box
-        private double minX, maxX, minY, maxY;
-
-        // building state
-        private int nextIndex = 0;
-        private Vector currentPosition;
-        private double currentAlpha;
-        private int lastSteps = 0;
-        private boolean lastFast = false;
-        private int lastDirDelta = 0;
-        private int numberOfChainCodes = 0;
-
-
-        SnakeChunk() {
-
-            System.out.println("Creating new chunk!");
-
-            end = headPosition;
-            endDirection = headDirection;
-            halfWidth = 0.5 * 0.2; // width 0.2
-
-            minX = maxX = end.x;
-            minY = maxY = end.y;
-
-            currentPosition = end.clone();
-            currentAlpha = headDirection;
-
-            chunkByteBuffer = createChunkBuffer();
-        }
-
-
-        /**
-         * Encoding:  ChainCodes   endPositionX, endPositionY, endDirection, numberOfChainodes
-         * Bytes:       [63:13]      [12:9]        [8:5]         [4:1]               [0]
-         *
-         * @return Chunk encoded in 64 Bytes of which the first 13 Bytes are the Header
-         */
-        public ByteBuffer createChunkBuffer() {
-
-            ByteBuffer buffer = ByteBuffer.allocate(CHUNK_SIZE); //Create buffer with capacity of CHUNK_SIZE Byte
-            buffer.put((byte) this.numberOfChainCodes);          //Write to Byte as Position 0
-            buffer.putFloat((float) this.endDirection);          //Write 4 Bytes from 1 to 4
-            buffer.putFloat((float) this.end.y);                 //Write 4 Bytes from 5 to 8
-            buffer.putFloat((float) this.end.x);                 //Write 4 Bytes from 9 to 12
-            assert (buffer.position() == 13);
-            return buffer;
-
-        }
-
-        public void add(int dirDelta) {
-            if (this.chunkByteBuffer.position() >= CHUNK_SIZE) {
-                throw new IllegalStateException("Buffer is full!");
-            }
-
-            // update direction
-            currentAlpha += coder.decodeDirectionChange(dirDelta);
-            if (Math.abs(currentAlpha) > Math.PI) {
-                currentAlpha -= Math.signum(currentAlpha) * 2.0 * Math.PI;
-            }
-
-            // update chaincodes
-            currentPosition.addDirection(currentAlpha, ccStepLength);
-            length += ccStepLength;
-            if (nextIndex > 0 && dirDelta == 0 && lastSteps < coder.MAX_STEPS && lastFast == fast) {
-                // increase steps of last chaincode
-                chunkByteBuffer.put(nextIndex - 1, coder.encode(lastDirDelta, fast, lastSteps + 1));
-                lastSteps++;
-            } else {
-                // add new chaincode
-                this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
-                this.numberOfChainCodes++;
-                this.chunkByteBuffer.put(0, (byte) this.numberOfChainCodes);
-                lastSteps = 1;
-                lastDirDelta = dirDelta;
-            }
-            lastFast = fast;
-
-            // update bounding box
-            minX = Math.min(minX, currentPosition.x - halfWidth);
-            minY = Math.min(minY, currentPosition.y - halfWidth);
-            maxX = Math.max(maxX, currentPosition.x + halfWidth);
-            maxY = Math.max(maxY, currentPosition.y + halfWidth);
-        }
-
-        public boolean finalized() {
-            return this.chunkByteBuffer.position() == CHUNK_SIZE;
-        }
-
-
-        /**
-         * This Method has currently no purpose besides being useful in the testing of the encoding of the Snake Chunks.
-         *
-         * @param endX
-         * @param endY
-         * @param endDir
-         * @param numChainCodes
-         */
-        public void setChunkParameters(double endX, double endY, double endDir, int numChainCodes) {
-            this.end.x = endX;
-            this.end.y = endY;
-            this.endDirection = endDir;
-            this.chunkByteBuffer = createChunkBuffer();
-        }
-
     }
 
     public void debug() {
@@ -227,5 +109,116 @@ public class Snake {
                 }
             }
             */
+    }
+
+    public class SnakeChunk {
+        public final static int CHUNK_SIZE = 64;
+        public ByteBuffer chunkByteBuffer;
+        Vector end;
+        double endDirection;
+        double length = 0.0;
+        double halfWidth;
+
+        // bounding box
+        private double minX, maxX, minY, maxY;
+
+        // building state
+        private final int nextIndex = 0;
+        private final Vector currentPosition;
+        private double currentAlpha;
+        private int lastSteps = 0;
+        private boolean lastFast = false;
+        private int lastDirDelta = 0;
+        private int numberOfChainCodes = 0;
+
+
+        SnakeChunk() {
+            end = headPosition;
+            endDirection = headDirection;
+            halfWidth = 0.5 * 0.2; // width 0.2
+
+            minX = maxX = end.x;
+            minY = maxY = end.y;
+
+            currentPosition = end.clone();
+            currentAlpha = headDirection;
+
+            chunkByteBuffer = createChunkBuffer();
+        }
+
+
+        /**
+         * Encoding:  ChainCodes   endPositionX, endPositionY, endDirection, numberOfChainodes
+         * Bytes:       [63:13]      [12:9]        [8:5]         [4:1]               [0]
+         *
+         * @return Chunk encoded in 64 Bytes of which the first 13 Bytes are the Header
+         */
+        public ByteBuffer createChunkBuffer() {
+
+            ByteBuffer buffer = ByteBuffer.allocate(CHUNK_SIZE); //Create buffer with capacity of CHUNK_SIZE Byte
+            buffer.put((byte) this.numberOfChainCodes);          //Write to Byte as Position 0
+            buffer.putFloat((float) this.endDirection);          //Write 4 Bytes from 1 to 4
+            buffer.putFloat((float) this.end.y);                 //Write 4 Bytes from 5 to 8
+            buffer.putFloat((float) this.end.x);                 //Write 4 Bytes from 9 to 12
+            assert (buffer.position() == 13);
+            return buffer;
+
+        }
+
+        public void add(int dirDelta) {
+            if (this.chunkByteBuffer.position() >= CHUNK_SIZE) {
+                throw new IllegalStateException("Buffer is full!");
+            }
+
+            // update direction
+            currentAlpha += coder.decodeDirectionChange(dirDelta);
+            if (Math.abs(currentAlpha) > Math.PI) {
+                currentAlpha -= Math.signum(currentAlpha) * 2.0 * Math.PI;
+            }
+
+            // update chaincodes
+            currentPosition.addDirection(currentAlpha, ccStepLength);
+            length += ccStepLength;
+            if (nextIndex > 0 && dirDelta == 0 && lastSteps < ChainCodeCoder.MAX_STEPS && lastFast == fast) {
+                // increase steps of last chaincode
+                chunkByteBuffer.put(nextIndex - 1, coder.encode(lastDirDelta, fast, lastSteps + 1));
+                lastSteps++;
+            } else {
+                // add new chaincode
+                this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
+                this.numberOfChainCodes++;
+                this.chunkByteBuffer.put(0, (byte) this.numberOfChainCodes);
+                lastSteps = 1;
+                lastDirDelta = dirDelta;
+            }
+            lastFast = fast;
+
+            // update bounding box
+            minX = Math.min(minX, currentPosition.x - halfWidth);
+            minY = Math.min(minY, currentPosition.y - halfWidth);
+            maxX = Math.max(maxX, currentPosition.x + halfWidth);
+            maxY = Math.max(maxY, currentPosition.y + halfWidth);
+        }
+
+        public boolean finalized() {
+            return this.chunkByteBuffer.position() == CHUNK_SIZE;
+        }
+
+
+        /**
+         * This Method has currently no purpose besides being useful in the testing of the encoding of the Snake Chunks.
+         *
+         * @param endX
+         * @param endY
+         * @param endDir
+         * @param numChainCodes
+         */
+        public void setChunkParameters(double endX, double endY, double endDir, int numChainCodes) {
+            this.end.x = endX;
+            this.end.y = endY;
+            this.endDirection = endDir;
+            this.chunkByteBuffer = createChunkBuffer();
+        }
+
     }
 }

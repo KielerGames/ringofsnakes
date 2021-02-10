@@ -14,12 +14,15 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
     const view = new DataView(chunkBuffer);
 
     // validate data
-    if (chunkBuffer.byteLength > SNAKE_CHUNK_MAX_BYTES) {
+    if (
+        chunkBuffer.byteLength < SNAKE_CHUNK_HEADER_SIZE ||
+        chunkBuffer.byteLength > SNAKE_CHUNK_MAX_BYTES
+    ) {
         throw new Error("Invalid snake chunk size: " + chunkBuffer.byteLength);
     }
 
-    // TODO: read from (not yet existing) header
-    const width = 0.5;
+    // read chunk header
+    const width = 0.5; // TODO
     let alpha = view.getFloat32(1, false);
     let x = view.getFloat32(9, false),
         y = view.getFloat32(5, false);
@@ -77,7 +80,7 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
             minY: minY - width,
             maxY: maxY + width,
         },
-        final: chunkBuffer.byteLength === SNAKE_CHUNK_MAX_BYTES
+        final: chunkBuffer.byteLength === SNAKE_CHUNK_MAX_BYTES - 1,
     };
 }
 
@@ -116,36 +119,4 @@ function decodeDirectionChange(data: number) {
     const sign = 1 - ((data & 1) << 1);
     const k = sign * Math.floor(data / 2);
     return (k * MAX_DELTA) / 7.0;
-}
-
-export function test(alpha: number): SnakeChunkData {
-    const n = 20;
-    const vertexBuffer = new Float32Array(8 * n);
-
-    const time = performance.now() / 250;
-    let length = 0;
-    let x = 0,
-        y = 0;
-
-    for (let i = 0; i < n; i++) {
-        let width = 0.5 + 0.15 * Math.cos(0.64 * length + 0.33 * time);
-        addPointToVertexBuffer(vertexBuffer, i, x, y, alpha, width, length);
-        length += STEP_SIZE;
-        x += STEP_SIZE * Math.cos(alpha);
-        y += STEP_SIZE * Math.sin(alpha);
-        alpha += Math.sin(length + 0.8*time) * MAX_DELTA;
-    }
-
-    return {
-        glVertexBuffer: vertexBuffer.buffer,
-        vertices: n * 2,
-        length,
-        viewBox: {
-            minX: 0,
-            maxX: 0,
-            minY: 0,
-            maxY: 0,
-        },
-        final: false
-    };
 }

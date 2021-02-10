@@ -1,7 +1,5 @@
 package server;
 
-import game.Snake;
-
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
@@ -18,9 +16,7 @@ public class EventSocket {
     public void onWebSocketConnect(Session session) {
         System.out.println("Socket Connected: " + session);
 
-        var snake = SnakeServer.createSnake(session);
-
-        //session.getAsyncRemote().sendBinary(snake.chunks.get(0).chunkByteBuffer);
+        SnakeServer.createPlayer(session);
     }
 
     @OnMessage
@@ -39,8 +35,11 @@ public class EventSocket {
     }
 
     @OnClose
-    public void onWebSocketClose(CloseReason reason) {
+    public void onWebSocketClose(Session session, CloseReason reason) {
         System.out.println("Socket Closed: " + reason);
+        SnakeServer.removePlayer(session);
+
+        // TODO: what is the closureLatch for?
         closureLatch.countDown();
     }
 

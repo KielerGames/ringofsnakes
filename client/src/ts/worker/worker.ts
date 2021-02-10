@@ -43,9 +43,9 @@ ctx.addEventListener("message", (event) => {
             };
             break;
         }
-        case "RunTest": {
-            setInterval(test, 50);
-            break;
+        default: {
+            // @ts-ignore
+            console.warn(`Unknown message from main thread. (${msg.tag})`);
         }
     }
 });
@@ -65,10 +65,3 @@ function handleServerMessageEvent(event: MessageEvent): void {
     }
 }
 
-function test(): void {
-    const chunkData = SCD.test(targetAlpha);
-    // transfer data to main thread (including ownership of data.glVertexBuffer)
-    ctx.postMessage({ tag: "SnakeChunkData", data: chunkData }, [
-        chunkData.glVertexBuffer,
-    ]);
-}

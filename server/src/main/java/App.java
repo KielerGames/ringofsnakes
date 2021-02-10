@@ -3,15 +3,17 @@ import game.Snake;
 public class App {
     public static void main(String[] args) {
         Snake snake = new Snake(44, 45);
+        snake.debug();
         snake.tick();
+        snake.debug();
         snake.tick();
-        snake.updateDirection(80, 2);
+        snake.debug();
+        System.out.println("Changing the course of hist... the snake");
+        snake.updateDirection(3.14);
         snake.tick();
-        snake.updateDirection(81, 2);
+        snake.debug();
+        snake.fast = true;
         snake.tick();
-        snake.updateDirection(82, 2);
-        snake.tick();
-        snake.updateDirection(83, 2);
         snake.debug();
 
 

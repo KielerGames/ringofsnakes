@@ -92,7 +92,7 @@ public class Snake {
         private int lastSteps = 0;
         private boolean lastFast = false;
         private int lastDirDelta = 0;
-        private int numberofChainCodes = 0;
+        private int numberOfChainCodes = 0;
 
 
         SnakeChunk() {
@@ -117,8 +117,8 @@ public class Snake {
 
 
         /**
-         * Encoding: Chunks   endPositionX, endPositionY, endDirection, numberOfChainodes
-         * Bytes:   [63:13]   [12:9]        [8:5]         [4:1]               [0]
+         * Encoding:  ChainCodes   endPositionX, endPositionY, endDirection, numberOfChainodes
+         * Bytes:       [63:13]      [12:9]        [8:5]         [4:1]               [0]
          *
          * @return Chunk encoded in 64 Bytes of which the first 13 Bytes are the Header
          */
@@ -160,7 +160,7 @@ public class Snake {
             } else {
                 // add new chaincode
                 this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
-                this.numberofChainCodes++;
+                this.numberOfChainCodes++;
                 lastDirDelta = dirDelta;
             }
             lastFast = fast;
@@ -205,7 +205,8 @@ public class Snake {
             float endDirection = b.getFloat(1); //Get float from Byte Index 1 to 4
             float endY = b.getFloat(5); //Get float from Byte Index 5 to 8
             float endX = b.getFloat(9); //Get float from Byte Index 9 to 12
-            System.out.println("Number of chaincode in chunk: " + chunk.numberofChainCodes);
+            System.out.println("Snake head direction: " + this.headDirection);
+            System.out.println("Number of chaincode in chunk: " + chunk.numberOfChainCodes);
             System.out.println("---Begin of chunk header---");
             System.out.println("End direction: " + endDirection);
             System.out.println("End.Y: " + endY);
@@ -214,11 +215,10 @@ public class Snake {
 
             DecodedDirectionData d;
             System.out.println("---Begin of chaincode list---\n");
-            for (int i = 13; i < 13 + chunk.numberofChainCodes; i++) {
+            for (int i = 13; i < 13 + chunk.numberOfChainCodes; i++) {
                 System.out.println("Chaincode at Byte " + i);
                 d = coder.decode(b.get(i));
                 System.out.println(d.toString());
-                System.out.println("Decoded direction: " + coder.decodeDirectionChange(d.direction));
 
             }
             System.out.println("---End of chaincode---\n");

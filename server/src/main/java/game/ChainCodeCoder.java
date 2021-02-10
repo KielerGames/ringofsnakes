@@ -37,18 +37,21 @@ public class ChainCodeCoder {
         double delta = newAngle - oldAngle;
 
         // normalize change s.t. delta is in [-PI,PI]
-        if(Math.abs(delta) > Math.PI) {
+        if (Math.abs(delta) > Math.PI) {
             delta -= Math.signum(delta) * 2.0 * Math.PI;
         }
         assert Math.abs(delta) <= Math.PI;
 
         // clamp delta angle
+        if (Math.abs(delta) > MAX_DELTA) {
+            System.out.println(":::Warning:::\ndelta of " + delta + " is out of range!");
+        }
         delta = Math.max(-MAX_DELTA, Math.min(delta, MAX_DELTA));
-        assert Math.abs(delta) <= MAX_DELTA;
+
 
         // angle sampling [0,15]
         int k = (byte) Math.round((7 * delta) / MAX_DELTA);
-        return 2*Math.abs(k) + (k < 0 ? 1 : 0);
+        return 2 * Math.abs(k) + (k < 0 ? 1 : 0);
     }
 
     public double decodeDirectionChange(int direction) {

@@ -20,7 +20,7 @@ public class EventSocket {
 
         var snake = SnakeServer.createSnake(session);
 
-        session.getAsyncRemote().sendBinary(snake.chunks.get(0).chunkByteBuffer);
+        //session.getAsyncRemote().sendBinary(snake.chunks.get(0).chunkByteBuffer);
     }
 
     @OnMessage
@@ -34,8 +34,8 @@ public class EventSocket {
 
     @OnMessage
     public void onWebSocketMessage(Session session, ByteBuffer buffer) {
-        double alpha = buffer.getDouble(0);
-        SnakeServer.setDirection(session, alpha);
+        /*double alpha = buffer.getDouble(0);
+        SnakeServer.setDirection(session, alpha);*/
     }
 
     @OnClose

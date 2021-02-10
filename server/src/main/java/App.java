@@ -9,15 +9,15 @@ public class App {
         snake.tick();
         //snake.debug();
         System.out.println("Changing the course of hist... the snake");
-        snake.updateDirection(2);
+        //snake.updateDirection(0.015);
         snake.tick();
         //snake.debug();
-        snake.fast = true;
+        //snake.fast = true;
         snake.tick();
         //snake.debug();
 
 
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 5000; i++) {
             snake.tick();
         }
         snake.debug();

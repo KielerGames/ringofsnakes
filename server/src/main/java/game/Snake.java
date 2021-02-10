@@ -7,10 +7,10 @@ import java.util.List;
 
 public class Snake {
     private double length = 1.0;
-    private Vector headPosition = new Vector(0, 0);
+    private Vector headPosition;
     private double headDirection = 0.0;
     private double lastDirection = headDirection;
-    private Vector lastCCPosition = headPosition.clone();
+    private Vector lastCCPosition;
     public List<SnakeChunk> chunks = new LinkedList<>();
     private SnakeChunk currentChunk;
     private double speed = 1.0;
@@ -21,12 +21,12 @@ public class Snake {
     public static final double ccStepLength = 1.0 * deltaTime;
 
     public Snake() {
-        currentChunk = new SnakeChunk();
-        chunks.add(currentChunk);
+        this(0.0,0.0);
     }
 
     public Snake(double startX, double startY) {
         this.headPosition = new Vector(startX, startY);
+        this.lastCCPosition = headPosition.clone();
         currentChunk = new SnakeChunk();
         chunks.add(currentChunk);
     }
@@ -129,20 +129,15 @@ public class Snake {
             buffer.putFloat((float) endDir);             //Write 4 Bytes from 1 to 4
             buffer.putFloat((float) endY);               //Write 4 Bytes from 5 to 8
             buffer.putFloat((float) endX);               //Write 4 Bytes from 9 to 12
+            assert(buffer.position() == 13);
             return buffer;
 
         }
 
         public void add(int dirDelta) {
-/*
-            if (nextIndex == chainCodes.length) {
-                throw new IllegalStateException();
+            if (this.chunkByteBuffer.position() >= CHUNK_SIZE) {
+                throw new IllegalStateException("Buffer is full!");
             }
-
-
- */
-
-
 
             // update direction
             currentAlpha += coder.decodeDirectionChange(dirDelta);
@@ -159,8 +154,12 @@ public class Snake {
                 lastSteps++;
             } else {
                 // add new chaincode
+                if(this.chunkByteBuffer.position() >= CHUNK_SIZE) {
+                    System.out.println("buffer overflow incoming!!!");
+                }
                 this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
                 this.numberOfChainCodes++;
+                lastSteps = 1;
                 lastDirDelta = dirDelta;
             }
             lastFast = fast;

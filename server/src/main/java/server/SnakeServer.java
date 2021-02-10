@@ -54,8 +54,8 @@ public class SnakeServer {
 
     public static Snake createSnake(Session session) {
         var snake = new Snake();
-        snake.tick();
-        snake.tick();
+        //snake.tick();
+        //snake.tick();
         var player = new Player(snake, session);
         players.put(session.getId(), player);
         return snake;

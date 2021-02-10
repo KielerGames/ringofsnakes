@@ -1,7 +1,7 @@
 import { SnakeChunkData } from "../protocol/main-worker";
 
 const SNAKE_CHUNK_MAX_BYTES = 64;
-const SNAKE_CHUNK_HEADER_SIZE = 0;
+const SNAKE_CHUNK_HEADER_SIZE = 13;
 
 // chaincode
 const STEP_SIZE = 0.42;
@@ -20,10 +20,10 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
 
     // TODO: read from (not yet existing) header
     const width = 0.5;
-    let alpha = 0;
-    let x = 0,
-        y = 0;
-    const n = 64;
+    let alpha = view.getFloat32(1, false);
+    let x = view.getFloat32(9, false),
+        y = view.getFloat32(5, false);
+    const n = view.getUint8(0);
 
     // initialize variables
     let length = 0.0;

@@ -9,7 +9,7 @@ document.body.style.backgroundColor = "black";
 const canvas = document.createElement("canvas");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-const gl = canvas.getContext("webgl")!;
+const gl = canvas.getContext("webgl", { antialias: true })!;
 document.body.appendChild(canvas);
 
 // background color

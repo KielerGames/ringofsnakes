@@ -113,10 +113,10 @@ public class Snake {
 
 
         /**
-         * Encoding: endPositionX, endPositionY, endDirection, numberOfChainodes
-         * Bytes:        [12:9]        [8:5]         [4:1]            [0]
+         * Encoding: Chunks   endPositionX, endPositionY, endDirection, numberOfChainodes
+         * Bytes:   [63:13]   [12:9]        [8:5]         [4:1]               [0]
          *
-         * @return Header encoded in 13 Bytes
+         * @return Chunk encoded in 64 Bytes of which the first 13 Bytes are the Header
          */
         public ByteBuffer createChunkBuffer(double endX, double endY, double endDir, int numChainCodes) {
 

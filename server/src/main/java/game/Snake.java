@@ -95,6 +95,7 @@ public class Snake {
 
         SnakeChunk() {
 
+            System.out.println("Creating new chunk!");
 
             end = headPosition;
             endDirection = headDirection;
@@ -106,7 +107,7 @@ public class Snake {
             currentPosition = end.clone();
             currentAlpha = headDirection;
 
-            this.chunkByteBuffer = createChunkBuffer(this.end.x, this.end.y, this.endDirection, this.nextIndex);
+            chunkByteBuffer = createChunkBuffer(this.end.x, this.end.y, this.endDirection, this.nextIndex);
 
 
         }
@@ -125,6 +126,7 @@ public class Snake {
             buffer.putFloat((float) endDir);             //Write 4 Bytes from 1 to 4
             buffer.putFloat((float) endY);               //Write 4 Bytes from 5 to 8
             buffer.putFloat((float) endX);               //Write 4 Bytes from 9 to 12
+            this.nextIndex = 13;
             return buffer;
 
         }
@@ -134,6 +136,7 @@ public class Snake {
             if (nextIndex == chainCodes.length) {
                 throw new IllegalStateException();
             }
+
 
  */
 
@@ -171,22 +174,7 @@ public class Snake {
             return this.chunkByteBuffer.position() == CHUNK_SIZE;
         }
 
-/*        public void debug() {
-            System.out.println("Snake chunk data:");
-            int i=0;
-            for (byte code : chainCodes) {
-                var data = coder.decode(code);
-                var dir = coder.decode(code).direction;
-                var angle = Math.round(coder.decodeDirectionChange(dir) * 180 / Math.PI);
-                System.out.println(" dirDelta: " + angle + "°, steps: " + data.steps + ", code: " + code);
-                i++;
 
-                if(i == nextIndex && i < chainCodes.length) {
-                    System.out.println(" -- not finalized");
-                    break;
-                }
-            }
-        }*/
 
         /**
          * This Method has currently no purpose besides being useful in the testing of the encoding of the Snake Chunks.
@@ -203,5 +191,47 @@ public class Snake {
             this.chunkByteBuffer = createChunkBuffer(endX, endY, endDir, numChainCodes);
         }
 
+    }
+
+    public void debug() {
+
+        for (SnakeChunk chunk : chunks) {
+            System.out.println("Snake chunk data:");
+
+            ByteBuffer b = chunk.chunkByteBuffer;
+            int numberOfChainCodes = b.get(0); //Get int with Byte Index 0
+            float endDirection = b.getFloat(1); //Get float from Byte Index 1 to 4
+            float endY = b.getFloat(5); //Get float from Byte Index 5 to 8
+            float endX = b.getFloat(9); //Get float from Byte Index 9 to 12
+            System.out.println("Number of Chaincodes: " + numberOfChainCodes);
+            System.out.println("End Direction: " + endDirection);
+            System.out.println("End.Y: " + endY);
+            System.out.println("End.X: " + endX);
+
+            DecodedDirectionData d;
+            System.out.println("nextIndext = " + chunk.nextIndex);
+
+            for (int i = 13; i < chunk.nextIndex; i++) {
+                d = coder.decode(b.get(i));
+                System.out.println(d.toString());
+            }
+
+        }
+
+
+            /*
+            for (byte code : chainCodes) {
+                var data = coder.decode(code);
+                var dir = coder.decode(code).direction;
+                var angle = Math.round(coder.decodeDirectionChange(dir) * 180 / Math.PI);
+                System.out.println(" dirDelta: " + angle + "°, steps: " + data.steps + ", code: " + code);
+                i++;
+
+                if(i == nextIndex && i < chainCodes.length) {
+                    System.out.println(" -- not finalized");
+                    break;
+                }
+            }
+            */
     }
 }

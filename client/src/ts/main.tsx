@@ -10,8 +10,9 @@ const canvas = document.createElement("canvas");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const gl = canvas.getContext("webgl", {
+    alpha: false,
     antialias: true,
-    preserveDrawingBuffer: true,
+    preserveDrawingBuffer: true, // TODO: switch off
 })!;
 document.body.appendChild(canvas);
 

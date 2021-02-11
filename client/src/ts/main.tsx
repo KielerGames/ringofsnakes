@@ -25,8 +25,8 @@ const unstretch = new Matrix();
 unstretch.setEntry(0, 0, canvas.height / canvas.width);
 
 const scale = new Matrix();
-scale.setEntry(0, 0, 0.025);
-scale.setEntry(1, 1, 0.025);
+scale.setEntry(0, 0, 0.042);
+scale.setEntry(1, 1, 0.042);
 
 const transform = Matrix.compose(scale, unstretch);
 

@@ -9,7 +9,10 @@ document.body.style.backgroundColor = "black";
 const canvas = document.createElement("canvas");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-const gl = canvas.getContext("webgl", { antialias: true })!;
+const gl = canvas.getContext("webgl", {
+    antialias: true,
+    preserveDrawingBuffer: true,
+})!;
 document.body.appendChild(canvas);
 
 // background color
@@ -36,6 +39,7 @@ console.log(program.bufferLayout);
 program.use();
 program.setUniform("uColor", [0.1, 0.2, 0.5]);
 program.setUniform("uTransform", transform.data);
+gl.clear(gl.COLOR_BUFFER_BIT);
 
 const worker = new Worker("worker.bundle.js", { name: "SnakeWorker" });
 worker.postMessage({
@@ -46,10 +50,8 @@ worker.postMessage({
 const chunks: SnakeChunkData[] = [];
 
 worker.addEventListener("message", (event) => {
-    //console.log("Snake Chunk data!")
     const data = event.data.data as SnakeChunkData;
 
-    gl.clear(gl.COLOR_BUFFER_BIT);
     for (let chunk of chunks) {
         gl.bufferData(gl.ARRAY_BUFFER, chunk.glVertexBuffer, gl.STATIC_DRAW);
         program.run(gl.TRIANGLE_STRIP, 0, chunk.vertices);

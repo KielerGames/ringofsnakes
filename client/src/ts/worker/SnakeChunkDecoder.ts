@@ -1,7 +1,7 @@
 import { SnakeChunkData } from "../protocol/main-worker";
 
 const SNAKE_CHUNK_MAX_BYTES = 128;
-const SNAKE_CHUNK_HEADER_SIZE = 25;
+const SNAKE_CHUNK_HEADER_SIZE = 29;
 
 // chaincode
 const STEP_SIZE = 0.2;
@@ -9,6 +9,19 @@ const MAX_DELTA = Math.PI / 90; // 2deg
 const FAST_BIT = 1 << 7;
 const STEPS_MASK = 7 << 4;
 const DIRECTION_MASK = 15;
+
+/*
+ * Byte(s) | Description
+ * ================= HEADER ===================
+ * 0-1       snake id (short)
+ * 2-3       chunk id (short)
+ * 4         n: number of chain codes in this chunk (byte)
+ * 5-12      end direction (single float)
+ * 13-20     end position x (double float)
+ * 21-28     end position y (double float)
+ * ================= CONTENT ===================
+ * 29-(29+n) n ChainCodes (n bytes), 29+n < 128
+ */
 
 export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
     const view = new DataView(chunkBuffer);
@@ -22,11 +35,13 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
     }
 
     // read chunk header
+    const snakeId = view.getUint16(0, false);
+    const chunkId = view.getUint16(2, false);
+    const n = view.getUint8(4);
     const width = 0.5; // TODO
-    let alpha = view.getFloat64(1, false);
-    let x = view.getFloat64(17, false),
-        y = view.getFloat64(9, false);
-    const n = view.getUint8(0);
+    let alpha = view.getFloat64(5, false);
+    let x = view.getFloat64(13, false),
+        y = view.getFloat64(21, false);
 
     // initialize variables
     let length = 0.0;
@@ -71,16 +86,18 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
     }
 
     return {
+        snakeId,
+        chunkId,
         glVertexBuffer: vertexBuffer.buffer,
         vertices: (n + 1) * 2,
         length,
         viewBox: {
-            minX: minX - width,
-            maxX: maxX + width,
-            minY: minY - width,
-            maxY: maxY + width,
+            minX: minX - 0.5 * width,
+            maxX: maxX + 0.5 * width,
+            minY: minY - 0.5 * width,
+            maxY: maxY + 0.5 * width,
         },
-        final: chunkBuffer.byteLength === SNAKE_CHUNK_MAX_BYTES - 1,
+        full: chunkBuffer.byteLength === SNAKE_CHUNK_MAX_BYTES - 1, //TODO: fix
     };
 }
 

@@ -13,8 +13,8 @@ export type ConnectToServer = {
 
 export type UpdateTargetAlpha = {
     tag: "UpdateTargetAlpha";
-    alpha: number
-}
+    alpha: number;
+};
 
 // ======================================
 // Messages from Worker to Main Thread:
@@ -27,6 +27,9 @@ export type UpdateTargetAlpha = {
  *   2--1
  */
 export type SnakeChunkData = {
+    snakeId: number;
+    chunkId: number;
+
     glVertexBuffer: ArrayBuffer;
     vertices: number;
     viewBox: {
@@ -36,5 +39,5 @@ export type SnakeChunkData = {
         maxY: number;
     };
     length: number;
-    final: boolean;
+    full: boolean;
 };

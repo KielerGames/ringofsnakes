@@ -61,8 +61,8 @@ worker.addEventListener("message", (event) => {
     gl.bufferData(gl.ARRAY_BUFFER, data.glVertexBuffer, gl.STATIC_DRAW);
     program.run(gl.TRIANGLE_STRIP, 0, data.vertices);
 
-    if (data.final) {
-        console.log("Chunk is final");
+    if (data.full) {
+        console.log(`Chunk ${data.chunkId} of snake ${data.snakeId} is (almost) full.`);
         chunks.push(data);
     }
 });

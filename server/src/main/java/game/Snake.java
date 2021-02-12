@@ -5,10 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Snake {
-    public static final double deltaTime = 1.0 / 60.0;
-    public static final double ccStepLength = 0.2; //1.0 * deltaTime;
+    public static final double ccStepLength = 0.2;
     private final Vector headPosition;
-    private final double speed = 1.0;
     private final ChainCodeCoder coder = new ChainCodeCoder();
     public List<SnakeChunk> chunks = new LinkedList<>();
     public boolean fast = false;
@@ -30,10 +28,11 @@ public class Snake {
     }
 
     public void updateDirection(double alpha) {
-        while (Math.abs(alpha) > Math.PI) {
-            alpha -= Math.signum(alpha) * 2.0 * Math.PI;
+        if (Math.abs(alpha) > Math.PI) {
+            System.err.println("Alpha out of range: " + alpha);
+        } else {
+            this.targetDirection = alpha;
         }
-        this.targetDirection = alpha;
     }
 
     public void tick() {

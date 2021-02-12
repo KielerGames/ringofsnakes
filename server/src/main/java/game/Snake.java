@@ -145,18 +145,21 @@ public class Snake {
             // update chaincodes
             length += ccStepLength;
             final int nextIndex = this.chunkByteBuffer.position();
+            /*
             if (nextIndex > 0 && dirDelta == 0 && lastSteps < ChainCodeCoder.MAX_STEPS && lastFast == fast) {
                 // increase steps of last chaincode
                 chunkByteBuffer.put(nextIndex - 1, coder.encode(lastDirDelta, fast, lastSteps + 1));
                 lastSteps++;
             } else {
-                // add new chaincode
-                this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
-                this.numberOfChainCodes++;
-                this.chunkByteBuffer.put(0, (byte) this.numberOfChainCodes);
-                lastSteps = 1;
-                lastDirDelta = dirDelta;
-            }
+            */
+
+            // add new chaincode
+            this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
+            this.numberOfChainCodes++;
+            this.chunkByteBuffer.put(0, (byte) this.numberOfChainCodes);
+            lastSteps = 1;
+            lastDirDelta = dirDelta;
+            //}
             lastFast = fast;
 
             // update bounding box

@@ -37,9 +37,6 @@ public class Snake {
     }
 
     public void tick() {
-        // move head
-        headPosition.addDirection(headDirection, ccStepLength);
-
         // update direction
         int encDirDelta = coder.sampleDirectionChange(targetDirection, headDirection);
         double dirDelta = coder.decodeDirectionChange(encDirDelta);
@@ -47,6 +44,9 @@ public class Snake {
         if (Math.abs(headDirection) > Math.PI) {
             headDirection -= Math.signum(headDirection) * 2.0 * Math.PI;
         }
+
+        // move head
+        headPosition.addDirection(headDirection, ccStepLength);
 
         // update chunk
         currentChunk.add(encDirDelta);

@@ -78,7 +78,7 @@ public class SnakeServer {
                         (id, player) -> player.send()
                 );
                 try {
-                    Thread.sleep(1000 / 60);
+                    Thread.sleep(1000 / 30);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

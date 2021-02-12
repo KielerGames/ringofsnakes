@@ -44,7 +44,7 @@ public class ChainCodeCoder {
 
         // clamp delta angle
         if (Math.abs(delta) > MAX_DELTA) {
-            System.err.println("Warning: delta is out of range. (" + delta + ")");
+            //System.err.println("Warning: delta is out of range. (" + delta + ")");
         }
         delta = Math.max(-MAX_DELTA, Math.min(delta, MAX_DELTA));
 

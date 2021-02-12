@@ -68,9 +68,9 @@ public class Snake {
 
             ByteBuffer b = chunk.chunkByteBuffer;
             int numberOfChainCodes = b.get(0); //Get int with Byte Index 0
-            float endDirection = b.getFloat(1); //Get float from Byte Index 1 to 4
-            float endY = b.getFloat(5); //Get float from Byte Index 5 to 8
-            float endX = b.getFloat(9); //Get float from Byte Index 9 to 12
+            double endDirection = b.getDouble(1); //Get float from Byte Index 1 to 4
+            double endY = b.getDouble(9); //Get float from Byte Index 5 to 8
+            double endX = b.getDouble(17); //Get float from Byte Index 9 to 12
             System.out.println("Snake head direction: " + this.headDirection);
             System.out.println("Number of chaincode in chunk: " + chunk.numberOfChainCodes);
             System.out.println("---Begin of chunk header---");
@@ -81,7 +81,7 @@ public class Snake {
 
             DecodedDirectionData d;
             System.out.println("---Begin of chaincode list---\n");
-            for (int i = 13; i < 13 + chunk.numberOfChainCodes; i++) {
+            for (int i = 25; i < 25 + chunk.numberOfChainCodes; i++) {
                 System.out.println("Chaincode at Byte " + i);
                 d = coder.decode(b.get(i));
                 System.out.println(d.toString());
@@ -92,7 +92,7 @@ public class Snake {
     }
 
     public class SnakeChunk {
-        public final static int CHUNK_SIZE = 64;
+        public final static int CHUNK_SIZE = 128;
 
         // building state
         private final Vector currentPosition;
@@ -126,17 +126,17 @@ public class Snake {
 
         /**
          * Encoding:  ChainCodes   endPositionX, endPositionY, endDirection, numberOfChainodes
-         * Bytes:       [63:13]      [12:9]        [8:5]         [4:1]               [0]
+         * Bytes:       [127:25]      [24:17]        [16:9]         [8:1]               [0]
          *
-         * @return Chunk encoded in 64 Bytes of which the first 13 Bytes are the Header
+         * @return Chunk encoded in 64 Bytes of which the first 25 Bytes are the Header
          */
         public ByteBuffer createChunkBuffer() {
             ByteBuffer buffer = ByteBuffer.allocate(CHUNK_SIZE); //Create buffer with capacity of CHUNK_SIZE Byte
             buffer.put((byte) this.numberOfChainCodes);          //Write to Byte as Position 0
-            buffer.putFloat((float) this.endDirection);          //Write 4 Bytes from 1 to 4
-            buffer.putFloat((float) this.end.y);                 //Write 4 Bytes from 5 to 8
-            buffer.putFloat((float) this.end.x);                 //Write 4 Bytes from 9 to 12
-            assert (buffer.position() == 13);
+            buffer.putDouble(this.endDirection);          //Write 8 Bytes from 1 to 8
+            buffer.putDouble( this.end.y);                 //Write 8 Bytes from 9 to 16
+            buffer.putDouble( this.end.x);                 //Write 8 Bytes from 17 to 24
+            assert (buffer.position() == 25);
             return buffer;
         }
 

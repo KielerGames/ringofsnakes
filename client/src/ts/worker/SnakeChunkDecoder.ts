@@ -97,6 +97,9 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
             minY: minY - 0.5 * width,
             maxY: maxY + 0.5 * width,
         },
+        end: {
+            x, y
+        },
         full: chunkBuffer.byteLength === SNAKE_CHUNK_MAX_BYTES - 1, //TODO: fix
     };
 }

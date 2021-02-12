@@ -28,8 +28,6 @@ const scale = new Matrix();
 scale.setEntry(0, 0, 0.042);
 scale.setEntry(1, 1, 0.042);
 
-const transform = Matrix.compose(scale, unstretch);
-
 // create GPU buffer
 const vertexBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -39,12 +37,11 @@ program.bufferLayout = ["vPosition", "vLength", "vCenterOffset"];
 console.log(program.bufferLayout);
 program.use();
 program.setUniform("uColor", [0.1, 0.2, 0.5]);
-program.setUniform("uTransform", transform.data);
 gl.clear(gl.COLOR_BUFFER_BIT);
 
 const worker = new Worker("worker.bundle.js", { name: "SnakeWorker" });
 worker.postMessage({
-    tag: "ConnectToServer", //"RunTest",
+    tag: "ConnectToServer",
     playerName: "SnakeForceOne",
 } as MessageFromMain);
 
@@ -54,6 +51,13 @@ let totalLength = 0.0;
 
 worker.addEventListener("message", (event) => {
     const data = event.data.data as SnakeChunkData;
+
+    let translate = new Matrix();
+    translate.setEntry(0, 3, -data.end.x);
+    translate.setEntry(1, 3, -data.end.y);
+
+    const transform = Matrix.compose(Matrix.compose(unstretch, scale), translate);
+    program.setUniform("uTransform", transform.data);
 
     gl.clear(gl.COLOR_BUFFER_BIT);
     for (let chunk of chunks) {

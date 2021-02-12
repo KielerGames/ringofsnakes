@@ -12,7 +12,7 @@ canvas.height = window.innerHeight;
 const gl = canvas.getContext("webgl", {
     alpha: false,
     antialias: true,
-    preserveDrawingBuffer: true, // TODO: switch off
+    preserveDrawingBuffer: false,
 })!;
 document.body.appendChild(canvas);
 
@@ -49,10 +49,13 @@ worker.postMessage({
 } as MessageFromMain);
 
 const chunks: SnakeChunkData[] = [];
+const snakeLength = 150;
+let totalLength = 0.0;
 
 worker.addEventListener("message", (event) => {
     const data = event.data.data as SnakeChunkData;
 
+    gl.clear(gl.COLOR_BUFFER_BIT);
     for (let chunk of chunks) {
         gl.bufferData(gl.ARRAY_BUFFER, chunk.glVertexBuffer, gl.STATIC_DRAW);
         program.run(gl.TRIANGLE_STRIP, 0, chunk.vertices);
@@ -61,9 +64,22 @@ worker.addEventListener("message", (event) => {
     gl.bufferData(gl.ARRAY_BUFFER, data.glVertexBuffer, gl.STATIC_DRAW);
     program.run(gl.TRIANGLE_STRIP, 0, data.vertices);
 
+    if(totalLength + data.length > snakeLength) {
+        let deletedChunk = chunks.shift();
+        totalLength -= deletedChunk!.length;
+    }
+
     if (data.full) {
-        console.log(`Chunk ${data.chunkId} of snake ${data.snakeId} is (almost) full.`);
-        chunks.push(data);
+        let i = chunks.findIndex(c => c.chunkId === data.chunkId);
+        if(i === -1) {
+            console.log(`Chunk ${data.chunkId} of snake ${data.snakeId} is (almost) full.`);
+            console.log(`total length is ${totalLength}`);
+            chunks.push(data);
+            totalLength += data.length;
+        } else {
+            totalLength += data.length - chunks[i].length;
+            chunks[i] = data;
+        }
     }
 });
 

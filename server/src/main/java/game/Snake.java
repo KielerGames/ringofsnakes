@@ -106,7 +106,7 @@ public class Snake {
         private int lastSteps = 0;
         private boolean lastFast = false;
         private int lastDirDelta = 0;
-        private int numberOfChainCodes = 0;
+        private byte numberOfChainCodes = 0;
 
 
         SnakeChunk() {
@@ -129,10 +129,10 @@ public class Snake {
          */
         public ByteBuffer createChunkBuffer() {
             ByteBuffer buffer = ByteBuffer.allocate(CHUNK_SIZE); //Create buffer with capacity of CHUNK_SIZE Byte
-            buffer.put((byte) this.numberOfChainCodes);          //Write to Byte as Position 0
-            buffer.putDouble(this.endDirection);          //Write 8 Bytes from 1 to 8
-            buffer.putDouble( this.end.y);                 //Write 8 Bytes from 9 to 16
-            buffer.putDouble( this.end.x);                 //Write 8 Bytes from 17 to 24
+            buffer.put(this.numberOfChainCodes);                 //Write to Byte as Position 0
+            buffer.putDouble(this.endDirection);                 //Write 8 Bytes from 1 to 8
+            buffer.putDouble( this.end.y);                       //Write 8 Bytes from 9 to 16
+            buffer.putDouble( this.end.x);                       //Write 8 Bytes from 17 to 24
             assert (buffer.position() == 25);
             return buffer;
         }
@@ -143,23 +143,20 @@ public class Snake {
             }
 
             // update chaincodes
-            length += ccStepLength;
+            length += ccStepLength; //TODO: include fast
             final int nextIndex = this.chunkByteBuffer.position();
-            /*
             if (nextIndex > 0 && dirDelta == 0 && lastSteps < ChainCodeCoder.MAX_STEPS && lastFast == fast) {
                 // increase steps of last chaincode
                 chunkByteBuffer.put(nextIndex - 1, coder.encode(lastDirDelta, fast, lastSteps + 1));
                 lastSteps++;
             } else {
-            */
-
-            // add new chaincode
-            this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
-            this.numberOfChainCodes++;
-            this.chunkByteBuffer.put(0, (byte) this.numberOfChainCodes);
-            lastSteps = 1;
-            lastDirDelta = dirDelta;
-            //}
+                // add new chaincode
+                this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
+                this.numberOfChainCodes++;
+                this.chunkByteBuffer.put(0, this.numberOfChainCodes);
+                lastSteps = 1;
+                lastDirDelta = dirDelta;
+            }
             lastFast = fast;
 
             // update bounding box

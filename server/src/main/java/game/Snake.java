@@ -95,7 +95,6 @@ public class Snake {
         public final static int CHUNK_SIZE = 128;
 
         // building state
-        private final Vector currentPosition;
         public ByteBuffer chunkByteBuffer;
         Vector end;
         double endDirection;
@@ -111,14 +110,12 @@ public class Snake {
 
 
         SnakeChunk() {
-            end = headPosition;
+            end = headPosition.clone();
             endDirection = headDirection;
             halfWidth = 0.5 * 0.2; // width 0.2
 
             minX = maxX = end.x;
             minY = maxY = end.y;
-
-            currentPosition = end.clone();
 
             chunkByteBuffer = createChunkBuffer();
         }
@@ -146,7 +143,6 @@ public class Snake {
             }
 
             // update chaincodes
-            currentPosition.addDirection(headDirection, ccStepLength);
             length += ccStepLength;
             final int nextIndex = this.chunkByteBuffer.position();
             if (nextIndex > 0 && dirDelta == 0 && lastSteps < ChainCodeCoder.MAX_STEPS && lastFast == fast) {
@@ -164,10 +160,10 @@ public class Snake {
             lastFast = fast;
 
             // update bounding box
-            minX = Math.min(minX, currentPosition.x - halfWidth);
-            minY = Math.min(minY, currentPosition.y - halfWidth);
-            maxX = Math.max(maxX, currentPosition.x + halfWidth);
-            maxY = Math.max(maxY, currentPosition.y + halfWidth);
+            minX = Math.min(minX, headPosition.x - halfWidth);
+            minY = Math.min(minY, headPosition.y - halfWidth);
+            maxX = Math.max(maxX, headPosition.x + halfWidth);
+            maxY = Math.max(maxY, headPosition.y + halfWidth);
         }
 
         public boolean finalized() {

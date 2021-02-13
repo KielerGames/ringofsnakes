@@ -20,7 +20,7 @@ public class App {
         for (int i = 0; i < 5000; i++) {
             snake.tick();
         }
-        snake.debug();
+        //snake.debug();
 
 
     }

@@ -17,6 +17,7 @@ public class Snake {
     public final short id;
     private static short nextSnakeId = 0;
     private short nextChunkId = 0;
+    private boolean pathCompression = true;
 
     public Snake() {
         this(0.0, 0.0);
@@ -174,7 +175,7 @@ public class Snake {
 
             // path compression?
             final int nextIndex = this.chunkByteBuffer.position();
-            if (nextIndex > 0 && dirDelta == 0 && lastSteps < ChainCodeCoder.MAX_STEPS && lastFast == fast) {
+            if (nextIndex > 29 && dirDelta == 0 && lastSteps < ChainCodeCoder.MAX_STEPS && lastFast == fast && pathCompression) {
                 // increase steps of last chaincode
                 chunkByteBuffer.put(nextIndex - 1, coder.encode(lastDirDelta, fast, lastSteps + 1));
                 lastSteps++;

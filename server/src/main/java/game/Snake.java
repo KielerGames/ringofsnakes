@@ -6,6 +6,8 @@ import java.util.List;
 
 public class Snake {
     public static final double ccStepLength = 0.2;
+    private static short nextSnakeId = 0;
+    public final short id;
     private final Vector headPosition;
     private final ChainCodeCoder coder = new ChainCodeCoder();
     public List<SnakeChunk> chunks = new LinkedList<>();
@@ -14,8 +16,6 @@ public class Snake {
     private double headDirection;
     private double targetDirection;
     private SnakeChunk currentChunk;
-    public final short id;
-    private static short nextSnakeId = 0;
     private short nextChunkId = 0;
     private boolean pathCompression = true;
 
@@ -102,18 +102,16 @@ public class Snake {
     }
 
     public class SnakeChunk {
-        public final short id;
-
         public final static int CHUNK_SIZE = 128;
+        public final static int CHUNK_HEADER_SIZE = 29;
         private final static int CHUNK_N_POS = 4;
+        public final short id;
         public ByteBuffer chunkByteBuffer;
-        private int numberOfChainCodes = 0;
-
         Vector end;
         double endDirection;
         double length = 0.0;
         double halfWidth;
-
+        private int numberOfChainCodes = 0;
         // bounding box
         private double minX, maxX, minY, maxY;
 
@@ -136,7 +134,7 @@ public class Snake {
 
         /**
          * Encoding:
-         *
+         * <p>
          * Byte(s) | Description
          * ================= HEADER ===================
          * 0-1       snake id (short)
@@ -160,7 +158,7 @@ public class Snake {
             buffer.putDouble(this.endDirection);
             buffer.putDouble(this.end.x);
             buffer.putDouble(this.end.y);
-            assert (buffer.position() == 29);
+            assert (buffer.position() == CHUNK_HEADER_SIZE);
 
             return buffer;
         }
@@ -175,7 +173,7 @@ public class Snake {
 
             // path compression?
             final int nextIndex = this.chunkByteBuffer.position();
-            if (nextIndex > 29 && dirDelta == 0 && lastSteps < ChainCodeCoder.MAX_STEPS && lastFast == fast && pathCompression) {
+            if (nextIndex > CHUNK_HEADER_SIZE && dirDelta == 0 && lastSteps < ChainCodeCoder.MAX_STEPS && lastFast == fast && pathCompression) {
                 // increase steps of last chaincode
                 chunkByteBuffer.put(nextIndex - 1, coder.encode(lastDirDelta, fast, lastSteps + 1));
                 lastSteps++;

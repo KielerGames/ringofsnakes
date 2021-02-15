@@ -1,27 +1,28 @@
 package game;
 
 public class ChainCodeCoder {
-    // 2deg -> 3sec for a full 360deg rotation
-    private final double MAX_DELTA = Math.PI / 90; // 2deg
-    private static final int FAST_BIT = 1<<7;
-    public static final int STEPS_MASK = 7<<4;
+    public static final int STEPS_MASK = 7 << 4;
     public static final int DIRECTION_MASK = 15;
     public static final int MAX_STEPS = 8;
+    private static final int FAST_BIT = 1 << 7;
+    // 2deg -> 3sec for a full 360deg rotation
+    private final double MAX_DELTA = Math.PI / 90; // 2deg
 
     /**
      * Encoding f,s,s,s,d,d,d,d
      * f: fast bit, s: steps, d: direction
+     *
      * @return data encoded in 8 bits
      */
     public byte encode(int direction, boolean fast, int steps) {
-        assert 0<steps && steps <= MAX_STEPS;
+        assert 0 < steps && steps <= MAX_STEPS;
 
         // encode steps
-        int stepBits = (steps-1) << 4;
+        int stepBits = (steps - 1) << 4;
 
         // encode everything into a 8 bit
         int data = stepBits | direction;
-        if(fast) {
+        if (fast) {
             data |= FAST_BIT;
         }
 
@@ -29,10 +30,6 @@ public class ChainCodeCoder {
     }
 
     public int sampleDirectionChange(double newAngle, double oldAngle) {
-        // transform to [0, 2*PI]
-        newAngle += Math.PI;
-        oldAngle += Math.PI;
-
         // compute change
         double delta = newAngle - oldAngle;
 
@@ -43,11 +40,7 @@ public class ChainCodeCoder {
         assert Math.abs(delta) <= Math.PI;
 
         // clamp delta angle
-        if (Math.abs(delta) > MAX_DELTA) {
-            //System.err.println("Warning: delta is out of range. (" + delta + ")");
-        }
         delta = Math.max(-MAX_DELTA, Math.min(delta, MAX_DELTA));
-
 
         // angle sampling [0,15]
         int k = (byte) Math.round((7 * delta) / MAX_DELTA);
@@ -55,16 +48,37 @@ public class ChainCodeCoder {
     }
 
     public double decodeDirectionChange(int direction) {
-        int sign = 1 - ((direction & 1)<<1);
-        int k = sign * (direction/2);
+        int sign = 1 - ((direction & 1) << 1);
+        int k = sign * (direction / 2);
         return k * MAX_DELTA / 7.0;
     }
 
-    public DecodedDirectionData decode(byte b) {
+    public DecodedData decode(byte b) {
         boolean fast = (b & FAST_BIT) > 0;
-        int steps = 1 + ((b & STEPS_MASK)>>4);
+        int steps = 1 + ((b & STEPS_MASK) >> 4);
         int direction = b & DIRECTION_MASK;
-        return new DecodedDirectionData(direction, fast, steps);
+        return new DecodedData(direction, fast, steps);
+    }
+
+    public static class DecodedData {
+        public int direction;
+        public boolean fast;
+        public int steps;
+
+        DecodedData(int direction, boolean fast, int steps) {
+            this.direction = direction;
+            this.fast = fast;
+            this.steps = steps;
+        }
+
+        @Override
+        public String toString() {
+            String s = "";
+            s += "fast: " + this.fast + "\n";
+            s += "steps: " + this.steps + "\n";
+            s += "direction: " + this.direction + "\n";
+            return s;
+        }
     }
 }
 

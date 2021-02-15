@@ -17,7 +17,6 @@ public class Snake {
     private double targetDirection;
     private SnakeChunk currentChunk;
     private short nextChunkId = 0;
-    private boolean pathCompression = true;
 
     public Snake() {
         this(0.0, 0.0);
@@ -77,7 +76,6 @@ public class Snake {
             System.out.println("Snake chunk data:");
 
             ByteBuffer b = chunk.chunkByteBuffer;
-            int numberOfChainCodes = b.get(0); //Get int with Byte Index 0
             double endDirection = b.getDouble(1); //Get float from Byte Index 1 to 4
             double endY = b.getDouble(9); //Get float from Byte Index 5 to 8
             double endX = b.getDouble(17); //Get float from Byte Index 9 to 12
@@ -89,11 +87,10 @@ public class Snake {
             System.out.println("End.X: " + endX);
             System.out.println("---End of chunk header---\n");
 
-            DecodedDirectionData d;
             System.out.println("---Begin of chaincode list---\n");
             for (int i = 25; i < 25 + chunk.numberOfChainCodes; i++) {
                 System.out.println("Chaincode at Byte " + i);
-                d = coder.decode(b.get(i));
+                var d = coder.decode(b.get(i));
                 System.out.println(d.toString());
 
             }
@@ -168,24 +165,28 @@ public class Snake {
                 throw new IllegalStateException("Buffer is full!");
             }
 
-            // update chaincodes
+            // update chaincode
             length += ccStepLength; //TODO: include fast
 
             // path compression?
-            final int nextIndex = this.chunkByteBuffer.position();
-            if (nextIndex > CHUNK_HEADER_SIZE && dirDelta == 0 && lastSteps < ChainCodeCoder.MAX_STEPS && lastFast == fast && pathCompression) {
+            if (canUpdatePreviousChainCode(dirDelta)) {
                 // increase steps of last chaincode
-                chunkByteBuffer.put(nextIndex - 1, coder.encode(lastDirDelta, fast, lastSteps + 1));
+                chunkByteBuffer.put(
+                        this.chunkByteBuffer.position() - 1,
+                        coder.encode(lastDirDelta, fast, lastSteps + 1)
+                );
                 lastSteps++;
             } else {
                 // add new chaincode
                 this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
                 this.numberOfChainCodes++;
                 this.chunkByteBuffer.put(CHUNK_N_POS, (byte) this.numberOfChainCodes);
+
+                // reset path compression vars
+                lastFast = fast;
                 lastSteps = 1;
                 lastDirDelta = dirDelta;
             }
-            lastFast = fast;
 
             // update bounding box
             minX = Math.min(minX, headPosition.x - halfWidth);
@@ -194,19 +195,16 @@ public class Snake {
             maxY = Math.max(maxY, headPosition.y + halfWidth);
         }
 
+        private boolean canUpdatePreviousChainCode(int dirDelta) {
+            final boolean isNotFirst = this.chunkByteBuffer.position() > CHUNK_HEADER_SIZE;
+            final boolean noDirectionChange = dirDelta == 0;
+            final boolean stepsCanBeIncreased = lastSteps < ChainCodeCoder.MAX_STEPS;
+            final boolean fastIsUnchanged = lastFast == fast;
+            return isNotFirst && noDirectionChange && stepsCanBeIncreased && fastIsUnchanged;
+        }
+
         public boolean isFull() {
             return this.chunkByteBuffer.position() == CHUNK_SIZE;
         }
-
-        /**
-         * This Method has currently no purpose besides being useful in the testing of the encoding of the Snake Chunks.
-         */
-        public void setChunkParameters(double endX, double endY, double endDir, int numChainCodes) {
-            this.end.x = endX;
-            this.end.y = endY;
-            this.endDirection = endDir;
-            this.chunkByteBuffer = createChunkBuffer();
-        }
-
     }
 }

@@ -1,6 +1,6 @@
 import game.ChainCodeCoder;
-import game.DecodedDirectionData;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -13,12 +13,12 @@ public class ChainCodeEncodingTest {
     ChainCodeCoder coder = new ChainCodeCoder();
 
     @Test
-    void testAllEncodings(){
+    void testAllEncodings() {
         int directions = ChainCodeCoder.DIRECTION_MASK;
         int steps = ChainCodeCoder.MAX_STEPS;
 
-        for(int d = 0; d <= directions; d++){
-            for(int s = 1; s <= steps; s++){
+        for (int d = 0; d <= directions; d++) {
+            for (int s = 1; s <= steps; s++) {
                 testSpecificEncoding(d, false, s);
                 testSpecificEncoding(d, true, s);
             }
@@ -26,9 +26,9 @@ public class ChainCodeEncodingTest {
 
     }
 
-    void testSpecificEncoding(int d, boolean f, int s){
-        byte b = coder.encode(d,f,s);
-        DecodedDirectionData data = coder.decode(b);
+    void testSpecificEncoding(int d, boolean f, int s) {
+        byte b = coder.encode(d, f, s);
+        var data = coder.decode(b);
         assertEquals(d, data.direction);
         assertEquals(f, data.fast);
         assertEquals(s, data.steps);

@@ -1,11 +1,10 @@
+import { GameConfig } from "../protocol/client-server";
 import { SnakeChunkData } from "../protocol/main-worker";
 
 const SNAKE_CHUNK_MAX_BYTES = 128;
 const SNAKE_CHUNK_HEADER_SIZE = 29;
 
 // chaincode
-const STEP_SIZE = 0.2;
-const MAX_DELTA = Math.PI / 90; // 2deg
 const FAST_BIT = 1 << 7;
 const STEPS_MASK = 7 << 4;
 const DIRECTION_MASK = 15;
@@ -23,7 +22,10 @@ const DIRECTION_MASK = 15;
  * 29-(29+n) n ChainCodes (n bytes), 29+n < 128
  */
 
-export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
+export function decode(
+    config: GameConfig,
+    chunkBuffer: ArrayBuffer
+): SnakeChunkData {
     const view = new DataView(chunkBuffer);
 
     // validate data
@@ -58,7 +60,7 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
         // decode chaincode
         const fast = (data & FAST_BIT) > 0;
         const steps = 1 + ((data & STEPS_MASK) >> 4);
-        const dirDelta = decodeDirectionChange(data & DIRECTION_MASK);
+        const dirDelta = decodeDirectionChange(config, data & DIRECTION_MASK);
 
         // compute alphas
         const midAlpha = alpha + 0.5 * dirDelta;
@@ -68,7 +70,7 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
         }
 
         // compute next (center) position
-        const s = steps * (fast ? 1.2 : 1) * STEP_SIZE;
+        const s = steps * (fast ? config.fastSnakeSpeed : config.snakeSpeed);
         x += s * Math.cos(alpha);
         y += s * Math.sin(alpha);
         length += s;
@@ -98,7 +100,8 @@ export function decode(chunkBuffer: ArrayBuffer): SnakeChunkData {
             maxY: maxY + 0.5 * width,
         },
         end: {
-            x, y
+            x,
+            y,
         },
         full: chunkBuffer.byteLength === SNAKE_CHUNK_MAX_BYTES - 1, //TODO: fix
     };
@@ -135,8 +138,8 @@ function addPointToVertexBuffer(
     vb[vbo + 7] = -1.0;
 }
 
-function decodeDirectionChange(data: number) {
+function decodeDirectionChange(config: GameConfig, data: number) {
     const sign = 1 - ((data & 1) << 1);
     const k = sign * Math.floor(data / 2);
-    return (k * MAX_DELTA) / 7.0;
+    return (k * config.maxTurnDelta) / 7.0;
 }

@@ -28,6 +28,7 @@ public class Vector {
         this.y = s * v.y;
     }
 
+    @Override
     public Vector clone() {
         return new Vector(this.x, this.y);
     }

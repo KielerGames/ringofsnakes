@@ -1,17 +1,22 @@
 package server;
 
+import com.google.gson.Gson;
+import game.GameConfig;
 import game.snake.Snake;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import server.protocol.SpawnInfo;
 
 import javax.websocket.Session;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SnakeServer {
     private static Map<String, Player> players = new HashMap<>();
+    private static Gson gson = new Gson();
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -56,6 +61,12 @@ public class SnakeServer {
         snake.tick();
         var player = new Player(snake, session);
         players.put(session.getId(), player);
+        String data = gson.toJson(new SpawnInfo(snake.config, snake));
+        try {
+            player.session.getBasicRemote().sendText(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void removePlayer(Session session) {

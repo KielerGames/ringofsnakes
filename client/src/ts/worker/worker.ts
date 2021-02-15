@@ -1,11 +1,12 @@
 import * as SCD from "./SnakeChunkDecoder";
 import { MessageFromMain, ConnectToServer } from "../protocol/main-worker";
-import { ClientToServerMessage } from "../protocol/client-server";
+import { ClientToServerMessage, GameConfig, ServerToClientJSONMessage } from "../protocol/client-server";
 
 const ctx: Worker = self as any;
 
 let websocket: WebSocket | undefined = undefined;
 let targetAlpha = 0.0;
+let gameConfig:GameConfig|undefined = undefined;
 
 // Respond to message from parent thread
 ctx.addEventListener("message", (event) => {
@@ -54,14 +55,28 @@ function handleServerMessageEvent(event: MessageEvent): void {
     const data = event.data as ArrayBuffer | string;
 
     if (data instanceof ArrayBuffer) {
-        const chunkData = SCD.decode(data);
+        if(gameConfig === undefined) {
+            throw new Error("GameConfig not yet defined.");
+        }
+
+        const chunkData = SCD.decode(gameConfig, data);
         // transfer data to main thread (including ownership of data.glVertexBuffer)
         ctx.postMessage({ tag: "SnakeChunkData", data: chunkData }, [
             chunkData.glVertexBuffer,
         ]);
     } else {
-        const json = JSON.parse(data);
-        console.log("Received JSON data: ", json);
+        const msg = JSON.parse(data) as ServerToClientJSONMessage;
+        
+        switch(msg.tag) {
+            case "SpawnInfo": {
+                console.log("Spawn info: ", msg);
+                gameConfig = msg.gameConfig;
+                break;
+            }
+            default: {
+                throw new Error(`Unknown message from server. (tag = ${msg.tag})`);
+            }
+        }
     }
 }
 

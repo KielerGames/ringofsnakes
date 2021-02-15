@@ -1,7 +1,5 @@
-import game.Snake;
+import game.snake.Snake;
 import org.junit.jupiter.api.Test;
-
-import java.nio.ByteBuffer;
 
 public class SnakeChunkEncodingTest {
 

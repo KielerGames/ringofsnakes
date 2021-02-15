@@ -1,4 +1,4 @@
-import game.Snake;
+import game.snake.Snake;
 
 public class App {
     public static void main(String[] args) {

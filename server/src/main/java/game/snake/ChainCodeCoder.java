@@ -1,12 +1,18 @@
-package game;
+package game.snake;
+
+import game.GameConfig;
 
 public class ChainCodeCoder {
+    final double MAX_DELTA;
+
     public static final int STEPS_MASK = 7 << 4;
     public static final int DIRECTION_MASK = 15;
     public static final int MAX_STEPS = 8;
     private static final int FAST_BIT = 1 << 7;
-    // 2deg -> 3sec for a full 360deg rotation
-    private final double MAX_DELTA = Math.PI / 90; // 2deg
+
+    public ChainCodeCoder(GameConfig config) {
+        MAX_DELTA = config.maxTurnDelta;
+    }
 
     /**
      * Encoding f,s,s,s,d,d,d,d

@@ -1,6 +1,6 @@
 package server;
 
-import game.Snake;
+import game.snake.Snake;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;

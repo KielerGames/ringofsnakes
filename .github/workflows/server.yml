@@ -20,5 +20,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.14
-    - name: Build with Maven
-      run: mvn -B --update-snapshots verify --file server/pom.xml
+    - name: Cache Maven packages
+      uses: actions/cache@v2.1.4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Build & run tests with Maven
+      run: mvn -B test --file pom.xml
+      working-directory: server

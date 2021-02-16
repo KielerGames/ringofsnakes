@@ -109,7 +109,7 @@ class Player {
     }
 
     public void send() {
-        var buffer = snake.getLastChunk().chunkByteBuffer.asReadOnlyBuffer().flip();
+        var buffer = snake.getLatestBuffer();
         session.getAsyncRemote().sendBinary(buffer);
     }
 }

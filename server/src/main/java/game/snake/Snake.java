@@ -9,17 +9,20 @@ import java.util.List;
 
 public class Snake {
     public final GameConfig config = new GameConfig();
-
+    final ChainCodeCoder coder = new ChainCodeCoder(config);
     private static short nextSnakeId = 0;
+
     public final short id;
     final Vector headPosition;
-    final ChainCodeCoder coder = new ChainCodeCoder(config);
-    public List<SnakeChunk> chunks = new LinkedList<>();
-    private boolean fast = false;
-    private double length = 1.0;
     double headDirection;
     private double targetDirection;
-    private SnakeChunk currentChunk;
+    private SnakeChunkBuilder chunkBuilder;
+    public List<SnakeChunk> chunks = new LinkedList<>();
+
+    private boolean fast = false;
+    private double length = 1.0;
+
+
     private short nextChunkId = 0;
 
     public Snake() {
@@ -60,23 +63,30 @@ public class Snake {
         headPosition.addDirection(headDirection, config.snakeSpeed);
 
         // update chunk
-        currentChunk.add(headPosition, encDirDelta, fast);
+        chunkBuilder.append(headPosition, encDirDelta, fast);
 
         // after an update a chunk might be full
-        if (currentChunk.isFull()) {
+        if (chunkBuilder.isFull()) {
             beginChunk();
         }
     }
 
     private void beginChunk() {
-        assert currentChunk == null || currentChunk.isFull();
+        if(chunkBuilder != null) {
+            assert chunkBuilder.isFull();
 
-        currentChunk = new SnakeChunk(this, nextChunkId++);
-        chunks.add(currentChunk);
+            chunks.add(chunkBuilder.build());
+        }
+
+        chunkBuilder = new SnakeChunkBuilder(this, nextChunkId++);
     }
 
-    public SnakeChunk getLastChunk() {
-        return chunks.get(chunks.size() - 1);
+    public ByteBuffer getLatestBuffer() {
+        return chunkBuilder.getBuffer();
+    }
+
+    public double getWidth() {
+        return 0.2;
     }
 
     /*public void debug() {

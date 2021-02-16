@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import game.GameConfig;
 import game.snake.Snake;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -77,7 +76,7 @@ public class SnakeServer {
         var player = players.get(session.getId());
         assert player != null;
         player.session = session;
-        player.snake.updateDirection(alpha);
+        player.snake.setTargetDirection(alpha);
     }
 
     private static class Ticker implements Runnable {

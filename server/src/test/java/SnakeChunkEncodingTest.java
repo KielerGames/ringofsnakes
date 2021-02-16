@@ -1,23 +1,32 @@
+import game.GameConfig;
+import game.snake.ChainCodeCoder;
 import game.snake.Snake;
+import game.snake.SnakeChunk;
+import game.snake.SnakeChunkBuilder;
 import org.junit.jupiter.api.Test;
 
-public class SnakeChunkEncodingTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    Snake snake = new Snake(42, -42);
+public class SnakeChunkEncodingTest {
+    private static ChainCodeCoder coder = new ChainCodeCoder(new GameConfig());
 
     @Test
-    void Test(){
-        /*Snake.SnakeChunk chunk = snake.getLastChunk();
-        chunk.setChunkParameters(22, 33, 3.3, 44);
-        ByteBuffer b = chunk.chunkByteBuffer;
-        int numberOfChainCodes = b.get(0); //Get int with Byte Index 0
-        double endDirection = b.getFloat(1); //Get double from Byte Index 1 to 8
-        double endY = b.getFloat(9); //Get double from Byte Index 9 to 16
-        double endX = b.getFloat(9); //Get double from ybte index 17 to 24
-        System.out.println("Number of Chaincodes: " + numberOfChainCodes);
-        System.out.println("End Direction: " + endDirection);
-        System.out.println("End.Y: " + endY);
-        System.out.println("End.X: " + endX);*/
-        // TODO
+    void testValidityOfConstants() {
+        final int HEADER_SIZE = SnakeChunk.HEADER_BYTE_SIZE;
+        assertTrue(HEADER_SIZE < SnakeChunk.BYTE_SIZE);
+        assertTrue(SnakeChunk.BUFFER_N_POS <= HEADER_SIZE-1);
+        assertTrue(SnakeChunk.BUFFER_OFFSET_POS <= HEADER_SIZE-4);
+    }
+
+    @Test
+    void testEarlyChunkBuilding() {
+        Snake snake = new Snake();
+        final short chunkId = 42;
+        SnakeChunkBuilder builder = new SnakeChunkBuilder(coder, snake, chunkId);
+        assertFalse(builder.isFull());
+        builder.append(0, false);
+        builder.append(0, true);
+        assertFalse(builder.isFull());
+        assertThrows(IllegalStateException.class, () -> builder.build());
     }
 }

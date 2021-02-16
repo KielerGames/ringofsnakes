@@ -2,7 +2,7 @@ import { GameConfig } from "../protocol/client-server";
 import { SnakeChunkData } from "../protocol/main-worker";
 
 const SNAKE_CHUNK_MAX_BYTES = 128;
-const SNAKE_CHUNK_HEADER_SIZE = 29;
+const SNAKE_CHUNK_HEADER_SIZE = 21;
 
 // chaincode
 const FAST_BIT = 1 << 7;
@@ -15,11 +15,12 @@ const DIRECTION_MASK = 15;
  * 0-1       snake id (short)
  * 2-3       chunk id (short)
  * 4         n: number of chain codes in this chunk (byte)
- * 5-12      end direction (single float)
- * 13-20     end position x (double float)
- * 21-28     end position y (double float)
+ * 5-8       end direction (float)
+ * 9-12      end position x (float)
+ * 13-16     end position y (float)
+ * 17-20     offset within snake (float)
  * ================= CONTENT ===================
- * 29-(29+n) n ChainCodes (n bytes), 29+n < 128
+ * 21-(21+n) n ChainCodes (n bytes), 21+n < 128
  */
 
 export function decode(
@@ -41,9 +42,10 @@ export function decode(
     const chunkId = view.getUint16(2, false);
     const n = view.getUint8(4);
     const width = 0.5; // TODO
-    let alpha = view.getFloat64(5, false);
-    let x = view.getFloat64(13, false),
-        y = view.getFloat64(21, false);
+    let alpha = view.getFloat32(5, false);
+    let x = view.getFloat32(9, false),
+        y = view.getFloat32(13, false);
+    const offset = view.getFloat32(17, false);
 
     // initialize variables
     let length = 0.0;
@@ -93,6 +95,7 @@ export function decode(
         glVertexBuffer: vertexBuffer.buffer,
         vertices: (n + 1) * 2,
         length,
+        offset,
         viewBox: {
             minX: minX - 0.5 * width,
             maxX: maxX + 0.5 * width,

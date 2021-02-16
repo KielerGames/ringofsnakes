@@ -9,23 +9,21 @@ import java.util.List;
 import java.util.Random;
 
 public class Snake {
-    public final GameConfig config = new GameConfig();
-    final ChainCodeCoder coder = new ChainCodeCoder(config);
+    private static final int SNAKE_INFO_BYTE_SIZE = 20;
     private static Random random = new Random();
     private static short nextSnakeId = 0;
-    private short nextChunkId = 0;
-    private static final int SNAKE_INFO_BYTE_SIZE = 20;
-
+    public final GameConfig config = new GameConfig();
     public final short id;
     public final byte skin;
+    final ChainCodeCoder coder = new ChainCodeCoder(config);
     final Vector headPosition;
+    public List<SnakeChunk> chunks = new LinkedList<>();
     float headDirection;
+    private short nextChunkId = 0;
     private double targetDirection;
     private boolean fast = false;
     private float length = 1.0f;
-
     private SnakeChunkBuilder chunkBuilder;
-    public List<SnakeChunk> chunks = new LinkedList<>();
     private ByteBuffer snakeInfoBuffer;
 
     public Snake() {
@@ -49,7 +47,7 @@ public class Snake {
         beginChunk();
     }
 
-    public void updateDirection(double alpha) {
+    public void setTargetDirection(double alpha) {
         if (Math.abs(alpha) > Math.PI) {
             System.err.println("Alpha out of range: " + alpha);
         } else {
@@ -71,7 +69,7 @@ public class Snake {
         headPosition.addDirection(headDirection, config.snakeSpeed);
 
         // update chunks
-        chunkBuilder.append(headPosition, encDirDelta, fast);
+        chunkBuilder.append(encDirDelta, fast);
         // after an update a chunk might be full
         if (chunkBuilder.isFull()) {
             beginChunk();
@@ -79,13 +77,13 @@ public class Snake {
     }
 
     private void beginChunk() {
-        if(chunkBuilder != null) {
+        if (chunkBuilder != null) {
             assert chunkBuilder.isFull();
 
             chunks.add(chunkBuilder.build());
         }
 
-        chunkBuilder = new SnakeChunkBuilder(this, nextChunkId++);
+        chunkBuilder = new SnakeChunkBuilder(coder, this, nextChunkId++);
     }
 
     public ByteBuffer getLatestBuffer() {

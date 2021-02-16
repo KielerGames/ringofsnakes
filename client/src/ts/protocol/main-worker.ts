@@ -45,5 +45,6 @@ export type SnakeChunkData = {
     };
 
     length: number;
+    offset: number;
     full: boolean;
 };

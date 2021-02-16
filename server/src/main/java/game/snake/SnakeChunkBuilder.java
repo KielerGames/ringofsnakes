@@ -8,10 +8,13 @@ import java.nio.ByteBuffer;
 public class SnakeChunkBuilder {
     private final Snake snake;
     private final short id;
+    private final ChainCodeCoder coder;
 
     private Vector end;
     private float endDirection;
     private int numberOfChainCodes = 0;
+    private double x, y;
+    private float direction;
     private double minX, maxX, minY, maxY;
     private double length = 0.0;
     private int lastSteps = 0;
@@ -20,34 +23,37 @@ public class SnakeChunkBuilder {
 
     private ByteBuffer chunkByteBuffer;
 
-    public SnakeChunkBuilder(Snake snake, short chunkId) {
+    public SnakeChunkBuilder(ChainCodeCoder coder, Snake snake, short chunkId) {
         this.snake = snake;
         this.id = chunkId;
+        this.coder = coder;
 
         end = snake.headPosition.clone();
         endDirection = snake.headDirection;
+        direction = endDirection;
 
-        minX = maxX = end.x;
-        minY = maxY = end.y;
+        minX = maxX = x = end.x;
+        minY = maxY = y = end.y;
 
         chunkByteBuffer = createChunkBuffer();
     }
 
     /**
      * Encoding:
-     *
+     * <p>
      * Byte(s) | Description
      * ================= HEADER ===================
      * 0-1       snake id (short)
      * 2-3       chunk id (short)
      * 4         n: number of chain codes in this chunk (byte)
-     * 5-12      end direction (single float)
-     * 13-20     end position x (double float)
-     * 21-28     end position y (double float)
+     * 5-8       end direction (single float)
+     * 9-12      end position x (single float)
+     * 13-16     end position y (single float)
+     * 17-20     offset within snake
      * ================= CONTENT ===================
-     * 29-(29+n) n ChainCodes (n bytes), 29+n < 128
+     * 21-(21+n) n ChainCodes (n bytes), 21+n < 128
      *
-     * @return Chunk encoded in 128 Bytes of which the first 29 Bytes are the Header
+     * @return Chunk encoded in 128 Bytes of which the first 21 Bytes are the Header
      */
     private ByteBuffer createChunkBuffer() {
         ByteBuffer buffer = ByteBuffer.allocate(SnakeChunk.BYTE_SIZE);
@@ -56,23 +62,28 @@ public class SnakeChunkBuilder {
         buffer.putShort(this.snake.id);
         buffer.putShort(this.id);
         buffer.put((byte) this.numberOfChainCodes);
-        buffer.putDouble(this.endDirection);
-        buffer.putDouble(this.end.x);
-        buffer.putDouble(this.end.y);
+        buffer.putFloat(this.endDirection);
+        buffer.putFloat((float) this.end.x);
+        buffer.putFloat((float) this.end.y);
+        assert (buffer.position() == SnakeChunk.BUFFER_OFFSET_POS);
+        buffer.putFloat(0.0f);
         assert (buffer.position() == SnakeChunk.HEADER_BYTE_SIZE);
 
         return buffer;
     }
 
-    public void append(Vector headPosition, int dirDelta, boolean fast) {
+    public void append(int dirDelta, boolean fast) {
         if (this.chunkByteBuffer.position() >= SnakeChunk.BYTE_SIZE) {
             throw new IllegalStateException("Buffer is full!");
         }
 
-        final var coder = snake.coder;
+        direction += coder.decodeDirectionChange(dirDelta);
+        final double stepSize = fast ? snake.config.fastSnakeSpeed : snake.config.snakeSpeed;
+        x += Math.cos(direction);
+        y += Math.sin(direction);
 
         // update chaincode
-        length += fast ? snake.config.fastSnakeSpeed : snake.config.snakeSpeed;
+        length += stepSize;
 
         // path compression?
         if (canUpdatePreviousChainCode(dirDelta, fast)) {
@@ -96,14 +107,16 @@ public class SnakeChunkBuilder {
 
         // update bounding box
         final var halfWidth = 0.5 * snake.getWidth();
-        minX = Math.min(minX, headPosition.x - halfWidth);
-        minY = Math.min(minY, headPosition.y - halfWidth);
-        maxX = Math.max(maxX, headPosition.x + halfWidth);
-        maxY = Math.max(maxY, headPosition.y + halfWidth);
+        minX = Math.min(minX, x - halfWidth);
+        minY = Math.min(minY, y - halfWidth);
+        maxX = Math.max(maxX, x + halfWidth);
+        maxY = Math.max(maxY, y + halfWidth);
     }
 
     public SnakeChunk build() {
-        assert isFull();
+        if(!isFull()) {
+            throw new IllegalStateException();
+        }
 
         BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
 

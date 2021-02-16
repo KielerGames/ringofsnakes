@@ -35,7 +35,7 @@ public class SnakeChunkBuilder {
 
     /**
      * Encoding:
-     * <p>
+     *
      * Byte(s) | Description
      * ================= HEADER ===================
      * 0-1       snake id (short)

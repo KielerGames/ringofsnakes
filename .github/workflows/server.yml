@@ -20,5 +20,6 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.14
-    - name: Build with Maven
-      run: mvn -B --update-snapshots verify --file server/pom.xml
+    - name: Build & run tests with Maven
+      run: mvn -B test --file pom.xml
+      working-directory: server

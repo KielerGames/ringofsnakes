@@ -10,7 +10,7 @@ public class SnakeChunkBuilder {
     private final short id;
 
     private Vector end;
-    private double endDirection;
+    private float endDirection;
     private int numberOfChainCodes = 0;
     private double minX, maxX, minY, maxY;
     private double length = 0.0;

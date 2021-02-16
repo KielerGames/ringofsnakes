@@ -6,24 +6,27 @@ import math.Vector;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class Snake {
     public final GameConfig config = new GameConfig();
     final ChainCodeCoder coder = new ChainCodeCoder(config);
+    private static Random random = new Random();
     private static short nextSnakeId = 0;
+    private short nextChunkId = 0;
+    private static final int SNAKE_INFO_BYTE_SIZE = 20;
 
     public final short id;
+    public final byte skin;
     final Vector headPosition;
-    double headDirection;
+    float headDirection;
     private double targetDirection;
+    private boolean fast = false;
+    private float length = 1.0f;
+
     private SnakeChunkBuilder chunkBuilder;
     public List<SnakeChunk> chunks = new LinkedList<>();
-
-    private boolean fast = false;
-    private double length = 1.0;
-
-
-    private short nextChunkId = 0;
+    private ByteBuffer snakeInfoBuffer;
 
     public Snake() {
         this(0.0, 0.0);
@@ -31,10 +34,15 @@ public class Snake {
 
     public Snake(double startX, double startY) {
         id = nextSnakeId++;
+        skin = (byte) (random.nextInt(100) % 2);
+
+        snakeInfoBuffer = ByteBuffer.allocate(SNAKE_INFO_BYTE_SIZE);
+        snakeInfoBuffer.putShort(0, id);
+        snakeInfoBuffer.put(2, skin);
 
         // start position & rotation
         headPosition = new Vector(startX, startY);
-        headDirection = (Math.random() * 2.0 - 1.0) * Math.PI;
+        headDirection = (float) ((random.nextDouble() * 2.0 - 1.0) * Math.PI);
         targetDirection = headDirection;
 
         // create first chunk
@@ -62,9 +70,8 @@ public class Snake {
         // move head
         headPosition.addDirection(headDirection, config.snakeSpeed);
 
-        // update chunk
+        // update chunks
         chunkBuilder.append(headPosition, encDirDelta, fast);
-
         // after an update a chunk might be full
         if (chunkBuilder.isFull()) {
             beginChunk();
@@ -87,6 +94,17 @@ public class Snake {
 
     public double getWidth() {
         return 0.2;
+    }
+
+    public ByteBuffer getInfo() {
+        var buffer = this.snakeInfoBuffer;
+        buffer.put(3, (byte) (fast ? 1 : 0));
+        buffer.putFloat(4, length);
+        buffer.putFloat(8, headDirection);
+        buffer.putFloat(12, (float) headPosition.x);
+        buffer.putFloat(16, (float) headPosition.y);
+
+        return buffer.asReadOnlyBuffer().flip();
     }
 
     /*public void debug() {

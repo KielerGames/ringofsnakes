@@ -85,7 +85,7 @@ public class SnakeServer {
             while (true) {
                 players.forEach((id, player) -> player.snake.tick());
                 players.forEach(
-                        (id, player) -> player.send()
+                        (id, player) -> player.send(player.snake.getLatestBuffer())
                 );
                 try {
                     Thread.sleep(1000 / 30);
@@ -95,20 +95,5 @@ public class SnakeServer {
             }
 
         }
-    }
-}
-
-class Player {
-    public Snake snake;
-    public Session session;
-
-    public Player(Snake snake, Session session) {
-        this.snake = snake;
-        this.session = session;
-    }
-
-    public void send() {
-        var buffer = snake.getLatestBuffer();
-        session.getAsyncRemote().sendBinary(buffer);
     }
 }

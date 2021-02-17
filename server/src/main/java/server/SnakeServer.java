@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import game.Game;
 import game.snake.Snake;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class SnakeServer {
     private static Map<String, Player> players = new HashMap<>();
     private static Gson gson = new Gson();
+    private static Game game = new Game();
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -56,16 +58,11 @@ public class SnakeServer {
     }
 
     public static void createPlayer(Session session) {
-        var snake = new Snake();
-        snake.tick();
+        var snake = game.addSnake();
         var player = new Player(snake, session);
         players.put(session.getId(), player);
-        String data = gson.toJson(new SpawnInfo(snake.config, snake));
-        try {
-            player.session.getBasicRemote().sendText(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String data = gson.toJson(new SpawnInfo(game.config, snake));
+        player.sendSync(data);
     }
 
     public static void removePlayer(Session session) {
@@ -81,19 +78,23 @@ public class SnakeServer {
 
     private static class Ticker implements Runnable {
         public void run() {
-            System.out.println("Ticker running...");
             while (true) {
-                players.forEach((id, player) -> player.snake.tick());
+                game.tick();
+
                 players.forEach(
                         (id, player) -> player.send(player.snake.getLatestBuffer())
                 );
-                try {
-                    Thread.sleep(1000 / 30);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
+                // TODO: measure time and adapt
+                sleep(1000 / 30);
             }
 
+        }
+
+        private void sleep(int time) {
+            try {
+                Thread.sleep(time);
+            } catch (InterruptedException e) {}
         }
     }
 }

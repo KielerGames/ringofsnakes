@@ -4,12 +4,13 @@ import game.snake.Snake;
 import game.world.World;
 import math.Vector;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class Game {
     public int id;
-    public GameConfig gameConfig = new GameConfig();
-    public List<Snake> snakes;
+    public GameConfig config = new GameConfig();
+    public List<Snake> snakes = new LinkedList<>();
     public World world;
 
     public Snake addSnake() {
@@ -24,7 +25,7 @@ public class Game {
     }
 
     public void tick() {
-        snakes.stream().forEach(snake -> snake.tick());
+        snakes.forEach(snake -> snake.tick());
 
         //TODO: check collisions
     }

@@ -5,7 +5,7 @@ import math.Vector;
 
 import java.nio.ByteBuffer;
 
-public class SnakeChunkBuilder {
+public class SnakeChunkBuilder implements SnakeChunkData{
     private final Snake snake;
     private final short id;
     private final ChainCodeCoder coder;
@@ -120,7 +120,7 @@ public class SnakeChunkBuilder {
 
         BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
 
-        return new SnakeChunk(chunkByteBuffer, box, length);
+        return new SnakeChunk(snake, chunkByteBuffer, box, length);
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {
@@ -137,5 +137,17 @@ public class SnakeChunkBuilder {
 
     public ByteBuffer getBuffer() {
         return chunkByteBuffer.asReadOnlyBuffer().flip();
+    }
+
+    public Snake getSnake() {
+        return this.snake;
+    }
+
+    public int getByteSize() {
+        return SnakeChunk.HEADER_BYTE_SIZE + numberOfChainCodes;
+    }
+
+    public boolean isEmpty() {
+        return numberOfChainCodes == 0;
     }
 }

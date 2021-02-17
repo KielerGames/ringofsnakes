@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Snake {
-    private static final int SNAKE_INFO_BYTE_SIZE = 20;
+    public static final int SNAKE_INFO_BYTE_SIZE = 20;
     private static Random random = new Random();
     private static short nextSnakeId = 0;
     public final GameConfig config = new GameConfig();

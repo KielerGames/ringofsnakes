@@ -1,6 +1,6 @@
 export type MessageFromMain = ConnectToServer | UpdateTargetAlpha;
 
-export type MessageFromWorker = SnakeChunkData;
+export type MessageFromWorker = { tag: "GameUpdateData"; data: GameUpdateData };
 
 // ======================================
 // Messages from Main Thread to Worker:
@@ -47,4 +47,22 @@ export type SnakeChunkData = {
     length: number;
     offset: number;
     full: boolean;
+};
+
+export type SnakeInfo = {
+    snakeId: number;
+    skin: number;
+    fast: boolean;
+    length: number;
+    direction: number;
+    position: {
+        x: number;
+        y: number;
+    };
+};
+
+export type GameUpdateData = {
+    targetSnakeId: number;
+    snakeInfos: SnakeInfo[];
+    chunkData: SnakeChunkData[];
 };

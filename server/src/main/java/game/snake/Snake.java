@@ -23,7 +23,7 @@ public class Snake {
     private double targetDirection;
     private boolean fast = false;
     private float length = 1.0f;
-    private SnakeChunkBuilder chunkBuilder;
+    public SnakeChunkBuilder chunkBuilder;
     private ByteBuffer snakeInfoBuffer;
 
     public Snake() {
@@ -86,7 +86,10 @@ public class Snake {
         chunkBuilder = new SnakeChunkBuilder(coder, this, nextChunkId++);
     }
 
-    public ByteBuffer getLatestBuffer() {
+    public ByteBuffer getLatestMeaningfulBuffer() {
+        if(chunkBuilder.isEmpty() && chunks.size() > 0) {
+            return chunks.get(chunks.size()-1).getBuffer();
+        }
         return chunkBuilder.getBuffer();
     }
 
@@ -101,6 +104,7 @@ public class Snake {
         buffer.putFloat(8, headDirection);
         buffer.putFloat(12, (float) headPosition.x);
         buffer.putFloat(16, (float) headPosition.y);
+        buffer.position(SNAKE_INFO_BYTE_SIZE);
 
         return buffer.asReadOnlyBuffer().flip();
     }

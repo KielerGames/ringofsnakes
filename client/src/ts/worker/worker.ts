@@ -1,12 +1,18 @@
-import * as SCD from "./SnakeChunkDecoder";
+import * as GUD from "./decoder/GameUpdateDecoder";
 import { MessageFromMain, ConnectToServer } from "../protocol/main-worker";
-import { ClientToServerMessage, GameConfig, ServerToClientJSONMessage } from "../protocol/client-server";
+import {
+    ClientToServerMessage,
+    GameConfig,
+    ServerToClientJSONMessage,
+} from "../protocol/client-server";
+import { transferAll } from "../protocol/utils";
 
 const ctx: Worker = self as any;
 
 let websocket: WebSocket | undefined = undefined;
 let targetAlpha = 0.0;
-let gameConfig:GameConfig|undefined = undefined;
+let gameConfig: GameConfig | undefined = undefined;
+let snakeId: number = -1;
 
 // Respond to message from parent thread
 ctx.addEventListener("message", (event) => {
@@ -55,28 +61,27 @@ function handleServerMessageEvent(event: MessageEvent): void {
     const data = event.data as ArrayBuffer | string;
 
     if (data instanceof ArrayBuffer) {
-        if(gameConfig === undefined) {
+        if (gameConfig === undefined) {
             throw new Error("GameConfig not yet defined.");
         }
 
-        const chunkData = SCD.decode(gameConfig, data);
-        // transfer data to main thread (including ownership of data.glVertexBuffer)
-        ctx.postMessage({ tag: "SnakeChunkData", data: chunkData }, [
-            chunkData.glVertexBuffer,
-        ]);
+        const updateData = GUD.decode(snakeId, gameConfig, data);
+        transferAll(ctx, { tag: "GameUpdateData", data: updateData });
     } else {
         const msg = JSON.parse(data) as ServerToClientJSONMessage;
-        
-        switch(msg.tag) {
+
+        switch (msg.tag) {
             case "SpawnInfo": {
                 console.log("Spawn info: ", msg);
                 gameConfig = msg.gameConfig;
+                snakeId = msg.snakeId;
                 break;
             }
             default: {
-                throw new Error(`Unknown message from server. (tag = ${msg.tag})`);
+                throw new Error(
+                    `Unknown message from server. (tag = ${msg.tag})`
+                );
             }
         }
     }
 }
-

@@ -2,15 +2,15 @@ package server;
 
 import com.google.gson.Gson;
 import game.Game;
-import game.snake.Snake;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import server.protocol.GameUpdate;
 import server.protocol.SpawnInfo;
 
 import javax.websocket.Session;
-import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,9 +81,15 @@ public class SnakeServer {
             while (true) {
                 game.tick();
 
-                players.forEach(
-                        (id, player) -> player.send(player.snake.getLatestBuffer())
-                );
+                if(players.size() > 0) {
+                    GameUpdate updateMessage = new GameUpdate();
+                    game.snakes.forEach(snake -> {
+                        snake.chunks.forEach(chunk -> updateMessage.addSnakeChunk(chunk));
+                        updateMessage.addSnakeChunk(snake.chunkBuilder);
+                    });
+                    ByteBuffer message = updateMessage.createBuffer();
+                    players.forEach((id, player) -> player.send(message));
+                }
 
                 // TODO: measure time and adapt
                 sleep(1000 / 30);
@@ -94,7 +100,8 @@ public class SnakeServer {
         private void sleep(int time) {
             try {
                 Thread.sleep(time);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         }
     }
 }

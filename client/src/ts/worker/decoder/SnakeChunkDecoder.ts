@@ -1,5 +1,5 @@
-import { GameConfig } from "../protocol/client-server";
-import { SnakeChunkData } from "../protocol/main-worker";
+import { GameConfig } from "../../protocol/client-server";
+import { SnakeChunkData } from "../../protocol/main-worker";
 
 const SNAKE_CHUNK_MAX_BYTES = 128;
 const SNAKE_CHUNK_HEADER_SIZE = 21;
@@ -23,18 +23,23 @@ const DIRECTION_MASK = 15;
  * 21-(21+n) n ChainCodes (n bytes), 21+n < 128
  */
 
+type DecodedData = {
+    chunk: SnakeChunkData;
+    nextByteOffset: number;
+};
+
 export function decode(
     config: GameConfig,
-    chunkBuffer: ArrayBuffer
-): SnakeChunkData {
-    const view = new DataView(chunkBuffer);
+    chunkBuffer: ArrayBuffer,
+    byteOffset: number = 0
+): DecodedData {
+    const view = new DataView(chunkBuffer, byteOffset);
 
     // validate data
     if (
-        chunkBuffer.byteLength < SNAKE_CHUNK_HEADER_SIZE ||
-        chunkBuffer.byteLength > SNAKE_CHUNK_MAX_BYTES
+        view.byteLength < SNAKE_CHUNK_HEADER_SIZE
     ) {
-        throw new Error("Invalid snake chunk size: " + chunkBuffer.byteLength);
+        throw new Error("Snake chunk buffer is too small: " + view.byteLength);
     }
 
     // read chunk header
@@ -89,7 +94,7 @@ export function decode(
         );
     }
 
-    return {
+    const chunkData = {
         snakeId,
         chunkId,
         glVertexBuffer: vertexBuffer.buffer,
@@ -108,6 +113,23 @@ export function decode(
         },
         full: chunkBuffer.byteLength === SNAKE_CHUNK_MAX_BYTES - 1, //TODO: fix
     };
+
+    return {
+        chunk: chunkData,
+        nextByteOffset: byteOffset + SNAKE_CHUNK_HEADER_SIZE + n
+    }
+}
+
+export function decodeN(n: number, config: GameConfig, buffer: ArrayBuffer, offset: number): SnakeChunkData[] {
+    const chunkData: SnakeChunkData[] = new Array(n);
+    
+    for(let i=0; i<n; i++) {
+        const data = decode(config, buffer, offset);
+        chunkData[i] = data.chunk;
+        offset = data.nextByteOffset;
+    }
+
+    return chunkData;
 }
 
 function addPointToVertexBuffer(

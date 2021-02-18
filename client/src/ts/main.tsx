@@ -1,9 +1,10 @@
-import { MessageFromMain, SnakeChunkData } from "./protocol/main-worker";
+import { GameUpdateData, MessageFromMain, SnakeChunkData } from "./protocol/main-worker";
 import * as Renderer from "./renderer/test";
 import Matrix from "./webgl/Matrix";
 import ReactDOM from "react-dom";
 import React from "react";
 import UserInput from "./components/UserInput";
+import GameData from "./data/GameData";
 
 document.body.style.backgroundColor = "black";
 const canvas = document.createElement("canvas");
@@ -45,46 +46,24 @@ worker.postMessage({
     playerName: "SnakeForceOne",
 } as MessageFromMain);
 
-const chunks: SnakeChunkData[] = [];
-const snakeLength = 150;
-let totalLength = 0.0;
+const data = new GameData();
 
 worker.addEventListener("message", (event) => {
-    const data = event.data.data as SnakeChunkData;
+    data.update(event.data.data as GameUpdateData);
 
     let translate = new Matrix();
-    translate.setEntry(0, 3, -data.end.x);
-    translate.setEntry(1, 3, -data.end.y);
+    translate.setEntry(0, 3, -data.targetSnake.data.position.x);
+    translate.setEntry(1, 3, -data.targetSnake.data.position.y);
 
     const transform = Matrix.compose(Matrix.compose(unstretch, scale), translate);
     program.setUniform("uTransform", transform.data);
 
     gl.clear(gl.COLOR_BUFFER_BIT);
-    for (let chunk of chunks) {
-        gl.bufferData(gl.ARRAY_BUFFER, chunk.glVertexBuffer, gl.STATIC_DRAW);
-        program.run(gl.TRIANGLE_STRIP, 0, chunk.vertices);
-    }
 
-    gl.bufferData(gl.ARRAY_BUFFER, data.glVertexBuffer, gl.STATIC_DRAW);
-    program.run(gl.TRIANGLE_STRIP, 0, data.vertices);
-
-    if(totalLength + data.length > snakeLength) {
-        let deletedChunk = chunks.shift();
-        totalLength -= deletedChunk!.length;
-    }
-
-    if (data.full) {
-        let i = chunks.findIndex(c => c.chunkId === data.chunkId);
-        if(i === -1) {
-            console.log(`Chunk ${data.chunkId} of snake ${data.snakeId} is (almost) full.`);
-            console.log(`total length is ${totalLength}`);
-            chunks.push(data);
-            totalLength += data.length;
-        } else {
-            totalLength += data.length - chunks[i].length;
-            chunks[i] = data;
-        }
-    }
+    data.forEachChunk(chunk => {
+        gl.bufferData(gl.ARRAY_BUFFER, chunk.data.glVertexBuffer, gl.STATIC_DRAW);
+        program.run(gl.TRIANGLE_STRIP, 0, chunk.data.vertices);
+    });
 });
 
 // react

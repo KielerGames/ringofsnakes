@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+declare const __DEBUG__: boolean;
+
 type Props = {
     initial?: number;
     onChange?: (newAlpha: number) => void;
@@ -41,6 +43,10 @@ export default class UserInput extends Component<Props, State> {
     }
 
     private clickHandler() {
+        if (__DEBUG__) {
+            return;
+        }
+
         if (document.pointerLockElement !== this.ref.current) {
             this.ref.current!.requestPointerLock();
         }

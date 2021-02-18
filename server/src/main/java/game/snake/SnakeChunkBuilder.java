@@ -150,4 +150,8 @@ public class SnakeChunkBuilder implements SnakeChunkData{
     public boolean isEmpty() {
         return numberOfChainCodes == 0;
     }
+
+    public int getUniqueId() {
+        return this.chunkByteBuffer.getInt(0);
+    }
 }

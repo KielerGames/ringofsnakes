@@ -22,7 +22,11 @@ public class GameUpdate {
 
         snakeChunkBuffers.add(chunk.getBuffer());
         snakeChunkBufferSize += chunk.getByteSize();
-        snakes.add(chunk.getSnake());
+        addSnake(chunk.getSnake());
+    }
+
+    public void addSnake(Snake snake) {
+        snakes.add(snake);
     }
 
     public ByteBuffer createBuffer() {
@@ -37,9 +41,13 @@ public class GameUpdate {
         buffer.put((byte) snakeChunkBuffers.size());
 
         snakes.forEach(snake -> buffer.put(snake.getInfo()));
-        snakeChunkBuffers.forEach(scb -> buffer.put(scb));
+        snakeChunkBuffers.forEach(buffer::put);
 
         assert buffer.position() == bufferSize;
         return buffer.asReadOnlyBuffer().flip();
+    }
+
+    public boolean isEmpty() {
+        return snakes.size() == 0;
     }
 }

@@ -12,6 +12,7 @@ public class SnakeChunk implements SnakeChunkData {
     private final Snake snake;
     private ByteBuffer chunkByteBuffer;
     private double length;
+    private int uniqueId;
 
     private BoundingBox boundingBox;
 
@@ -23,6 +24,7 @@ public class SnakeChunk implements SnakeChunkData {
         chunkByteBuffer = buffer;
         boundingBox = box;
         this.length = length;
+        this.uniqueId = buffer.getInt(0); // bytes 0-3
     }
 
     public ByteBuffer getBuffer() {
@@ -39,5 +41,9 @@ public class SnakeChunk implements SnakeChunkData {
 
     public boolean isEmpty() {
         return false;
+    }
+
+    public int getUniqueId() {
+        return this.uniqueId;
     }
 }

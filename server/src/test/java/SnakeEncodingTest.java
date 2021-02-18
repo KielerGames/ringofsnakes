@@ -29,7 +29,7 @@ public class SnakeEncodingTest {
         builder.append(0, false);
         builder.append(0, true);
         assertFalse(builder.isFull());
-        assertThrows(IllegalStateException.class, () -> builder.build());
+        assertThrows(IllegalStateException.class, builder::build);
     }
 
     @Test
@@ -50,6 +50,7 @@ public class SnakeEncodingTest {
         var n = snake.chunks.size();
         var i = 0;
 
+        // fill a chunk
         while(snake.chunks.size() == n) {
             snake.tick();
 

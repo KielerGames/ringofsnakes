@@ -30,7 +30,7 @@ public class GameUpdate {
     }
 
     public ByteBuffer createBuffer() {
-        final int snakeInfoSize = snakes.size() * Snake.SNAKE_INFO_BYTE_SIZE;
+        final int snakeInfoSize = snakes.size() * Snake.INFO_BYTE_SIZE;
         final int bufferSize = HEADER_SIZE + snakeInfoSize + snakeChunkBufferSize;
         ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
 

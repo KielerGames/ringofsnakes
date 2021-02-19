@@ -13,4 +13,6 @@ public interface SnakeChunkData {
      * @return An id that is unique within the game
      */
     int getUniqueId();
+
+    float getLength();
 }

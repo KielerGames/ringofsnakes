@@ -11,12 +11,12 @@ public class SnakeChunk implements SnakeChunkData {
 
     private final Snake snake;
     private ByteBuffer chunkByteBuffer;
-    private double length;
+    private float length;
     private int uniqueId;
 
     private BoundingBox boundingBox;
 
-    protected SnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, double length) {
+    protected SnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, float length) {
         assert buffer.position() == BYTE_SIZE;
         assert length > 0;
 
@@ -45,5 +45,17 @@ public class SnakeChunk implements SnakeChunkData {
 
     public int getUniqueId() {
         return this.uniqueId;
+    }
+
+    public float getLength() {
+        return this.length;
+    }
+
+    public void setOffset(float offset) {
+        chunkByteBuffer.putFloat(BUFFER_OFFSET_POS, offset);
+    }
+
+    public boolean isJunk() {
+        return chunkByteBuffer.getFloat(BUFFER_OFFSET_POS) >= snake.getLength();
     }
 }

@@ -36,8 +36,8 @@ public class SnakeEncodingTest {
     void testSnakeInfoBuffer() {
         var snake = new Snake();
         var snakeInfo = snake.getInfo();
-        assertEquals(Snake.SNAKE_INFO_BYTE_SIZE, snakeInfo.capacity());
-        var buffer = ByteBuffer.allocate(1 + Snake.SNAKE_INFO_BYTE_SIZE);
+        assertEquals(Snake.INFO_BYTE_SIZE, snakeInfo.capacity());
+        var buffer = ByteBuffer.allocate(1 + Snake.INFO_BYTE_SIZE);
         buffer.put((byte) 42);
         assertEquals(1, buffer.position());
         buffer.put(snakeInfo);

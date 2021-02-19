@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Random;
 
 public class Snake {
-    public static final int SNAKE_INFO_BYTE_SIZE = 20;
+    public static final int INFO_BYTE_SIZE = 20;
+    public static final float START_LENGTH = 42f;
     private static Random random = new Random();
     private static short nextSnakeId = 0;
     public final GameConfig config = new GameConfig();
@@ -22,7 +23,7 @@ public class Snake {
     private short nextChunkId = 0;
     private double targetDirection;
     private boolean fast = false;
-    private float length = 1.0f;
+    private float length = START_LENGTH;
     public SnakeChunkBuilder chunkBuilder;
     private ByteBuffer snakeInfoBuffer;
 
@@ -34,7 +35,7 @@ public class Snake {
         id = nextSnakeId++;
         skin = (byte) (random.nextInt(100) % 2);
 
-        snakeInfoBuffer = ByteBuffer.allocate(SNAKE_INFO_BYTE_SIZE);
+        snakeInfoBuffer = ByteBuffer.allocate(INFO_BYTE_SIZE);
         snakeInfoBuffer.putShort(0, id);
         snakeInfoBuffer.put(2, skin);
 
@@ -74,6 +75,17 @@ public class Snake {
         if (chunkBuilder.isFull()) {
             beginChunk();
         }
+        float offset = chunkBuilder.getLength();
+        for(SnakeChunk chunk : chunks) {
+            chunk.setOffset(offset);
+            offset += chunk.getLength();
+        }
+        if(chunks.size() > 0) {
+            SnakeChunk lastChunk = chunks.get(chunks.size()-1);
+            if(lastChunk.isJunk()) {
+                chunks.remove(chunks.size()-1);
+            }
+        }
     }
 
     private void beginChunk() {
@@ -93,8 +105,12 @@ public class Snake {
         return chunkBuilder.getBuffer();
     }
 
-    public double getWidth() {
-        return 0.2;
+    public float getWidth() {
+        return 0.2f;
+    }
+
+    public float getLength() {
+        return this.length;
     }
 
     public ByteBuffer getInfo() {
@@ -104,7 +120,7 @@ public class Snake {
         buffer.putFloat(8, headDirection);
         buffer.putFloat(12, (float) headPosition.x);
         buffer.putFloat(16, (float) headPosition.y);
-        buffer.position(SNAKE_INFO_BYTE_SIZE);
+        buffer.position(INFO_BYTE_SIZE);
 
         return buffer.asReadOnlyBuffer().flip();
     }

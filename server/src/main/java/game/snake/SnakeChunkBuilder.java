@@ -120,7 +120,7 @@ public class SnakeChunkBuilder implements SnakeChunkData{
 
         BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
 
-        return new SnakeChunk(snake, chunkByteBuffer, box, length);
+        return new SnakeChunk(snake, chunkByteBuffer, box, (float) length);
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {
@@ -153,5 +153,9 @@ public class SnakeChunkBuilder implements SnakeChunkData{
 
     public int getUniqueId() {
         return this.chunkByteBuffer.getInt(0);
+    }
+
+    public float getLength() {
+        return (float) this.length;
     }
 }

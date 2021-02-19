@@ -87,8 +87,6 @@ public class SnakeServer {
                     player.sendUpdate();
                 });
 
-                //TODO: garbage-collect chunks
-
                 // TODO: measure time and adapt
                 sleep(1000 / 30);
             }

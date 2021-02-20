@@ -29,7 +29,7 @@ public class Player {
             nextUpdate.addSnake(chunk.getSnake());
         } else {
             nextUpdate.addSnakeChunk(chunk);
-            if(chunk instanceof SnakeChunk) {
+            if(chunk.isFull()) {
                 knownChunks.add(chunk.getUniqueId());
             }
         }

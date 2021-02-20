@@ -7,6 +7,7 @@ public interface SnakeChunkData {
     Snake getSnake();
     int getByteSize();
     boolean isEmpty();
+    boolean isFull();
 
     /**
      * The id is a combination of snake id and chunk id

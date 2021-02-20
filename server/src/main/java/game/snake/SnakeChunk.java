@@ -43,6 +43,8 @@ public class SnakeChunk implements SnakeChunkData {
         return false;
     }
 
+    public boolean isFull() { return true; }
+
     public int getUniqueId() {
         return this.uniqueId;
     }

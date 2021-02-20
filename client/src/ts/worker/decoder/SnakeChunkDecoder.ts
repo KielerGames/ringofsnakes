@@ -111,7 +111,7 @@ export function decode(
             x,
             y,
         },
-        full: chunkBuffer.byteLength === SNAKE_CHUNK_MAX_BYTES - 1, //TODO: fix
+        full: (SNAKE_CHUNK_HEADER_SIZE + n) === SNAKE_CHUNK_MAX_BYTES,
     };
 
     return {

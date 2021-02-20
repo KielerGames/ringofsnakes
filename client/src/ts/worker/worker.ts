@@ -62,7 +62,8 @@ function handleServerMessageEvent(event: MessageEvent): void {
 
     if (data instanceof ArrayBuffer) {
         if (gameConfig === undefined) {
-            throw new Error("GameConfig not yet defined.");
+            console.warn("GameConfig not yet defined.");
+            return;
         }
 
         const updateData = GUD.decode(snakeId, gameConfig, data);

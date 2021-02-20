@@ -61,6 +61,9 @@ worker.addEventListener("message", (event) => {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     data.forEachChunk(chunk => {
+        program.setUniform("uHeadOffset", chunk.data.offset);
+        program.setUniform("uChunkLength", chunk.data.length);
+        program.setUniform("uSnakeLength", chunk.snake.data.length);
         gl.bufferData(gl.ARRAY_BUFFER, chunk.data.glVertexBuffer, gl.STATIC_DRAW);
         program.run(gl.TRIANGLE_STRIP, 0, chunk.data.vertices);
     });

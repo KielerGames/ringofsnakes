@@ -1,3 +1,4 @@
+import { GameConfig } from "../protocol/client-server";
 import { SnakeChunkData, SnakeInfo } from "../protocol/main-worker";
 
 export class Snake {
@@ -8,18 +9,24 @@ export class Snake {
         this.data = info;
     }
 
-    public update(newInfo: SnakeInfo): void {
+    public update(newInfo: SnakeInfo, cfg: GameConfig): void {
         this.data = newInfo;
-        
+
         this.chunks.forEach((chunk) => {
             if (chunk.data.full) {
-                chunk.data.offset += newInfo.fast ? 0.25 : 0.2; // TODO
+                chunk.data.offset += newInfo.fast
+                    ? cfg.fastSnakeSpeed
+                    : cfg.snakeSpeed;
             }
         });
     }
 
     public get id(): number {
         return this.data.snakeId;
+    }
+
+    public get length(): number {
+        return this.data.length;
     }
 }
 
@@ -34,6 +41,10 @@ export class SnakeChunk {
 
     public get id(): number {
         return this.data.chunkId;
+    }
+
+    public get length(): number {
+        return this.data.length;
     }
 
     public getUniqueId(): number {

@@ -6,11 +6,11 @@ public final class GameConfig {
     public final double maxTurnDelta;
 
     public GameConfig() {
-        snakeSpeed = 0.2;
-        fastSnakeSpeed = 0.25;
+        snakeSpeed = 0.24;
+        fastSnakeSpeed = 1.25 * snakeSpeed;
 
         // 2deg -> 3sec for a full 360deg rotation
-        maxTurnDelta = Math.toRadians(3);
+        maxTurnDelta = Math.toRadians(4);
 
     }
 }

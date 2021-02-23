@@ -11,11 +11,13 @@ export default class GameData {
     public targetSnake: Snake;
 
     public update(data: GameUpdateData): void {
+        this.gameConfig = data.gameConfig;
+
         // update snakes
         data.snakeInfos.forEach((snakeInfo) => {
             const snake = this.snakes.get(snakeInfo.snakeId);
             if (snake) {
-                snake.update(snakeInfo);
+                snake.update(snakeInfo, this.gameConfig);
             } else {
                 this.snakes.set(snakeInfo.snakeId, new Snake(snakeInfo));
             }
@@ -29,6 +31,9 @@ export default class GameData {
                 throw new Error(`No data for snake ${chunkData.snakeId}!`);
             }
             const chunk = new SnakeChunk(snake, chunkData);
+            if(chunk.data.full) {
+                console.log(`chunk ${chunk.getUniqueId()} is full (length ${chunk.length})`);
+            }
             snake.chunks.set(chunk.id, chunk);
             this.chunks.set(chunk.getUniqueId(), chunk);
         });
@@ -55,7 +60,7 @@ export default class GameData {
         });
 
         if(deleteChunks.length > 0) {
-            console.log(`Garbage-collected ${deleteChunks.length} chunks.`);
+            console.log(`Garbage-collected ${deleteChunks.length} chunk(s).`);
         }
     }
 }

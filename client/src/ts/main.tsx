@@ -62,8 +62,8 @@ worker.addEventListener("message", (event) => {
 
     data.forEachChunk(chunk => {
         program.setUniform("uHeadOffset", chunk.data.offset);
-        program.setUniform("uChunkLength", chunk.data.length);
-        program.setUniform("uSnakeLength", chunk.snake.data.length);
+        program.setUniform("uChunkLength", chunk.length);
+        program.setUniform("uSnakeLength", chunk.snake.length);
         gl.bufferData(gl.ARRAY_BUFFER, chunk.data.glVertexBuffer, gl.STATIC_DRAW);
         program.run(gl.TRIANGLE_STRIP, 0, chunk.data.vertices);
     });

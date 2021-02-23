@@ -1,3 +1,5 @@
+import { GameConfig } from "./client-server";
+
 export type MessageFromMain = ConnectToServer | UpdateTargetAlpha;
 
 export type MessageFromWorker = { tag: "GameUpdateData"; data: GameUpdateData };
@@ -65,4 +67,5 @@ export type GameUpdateData = {
     targetSnakeId: number;
     snakeInfos: SnakeInfo[];
     chunkData: SnakeChunkData[];
+    gameConfig: GameConfig;
 };

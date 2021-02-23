@@ -88,7 +88,7 @@ public class SnakeServer {
                 });
 
                 // TODO: measure time and adapt
-                sleep(1000 / 30);
+                sleep(1000 / 25);
             }
         }
 

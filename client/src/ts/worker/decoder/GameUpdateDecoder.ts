@@ -28,5 +28,6 @@ export function decode(
         snakeInfos: snakes,
         chunkData: chunks,
         targetSnakeId,
+        gameConfig: config,
     };
 }

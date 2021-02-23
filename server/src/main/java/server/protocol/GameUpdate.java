@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GameUpdate {
     private static final int HEADER_SIZE = 2;
@@ -49,5 +50,16 @@ public class GameUpdate {
 
     public boolean isEmpty() {
         return snakes.size() == 0;
+    }
+
+    @Override
+    public String toString() {
+        var snakes = this.snakes.stream()
+                .map(s -> String.valueOf(s.id))
+                .collect(Collectors.joining(","));
+        var chunks = snakeChunkBuffers.stream()
+                .map(c -> String.valueOf(c.getInt(0)))
+                .collect(Collectors.joining(","));
+        return "GameUpdate { snakes: " + snakes + ", chunks: " + chunks + " }";
     }
 }

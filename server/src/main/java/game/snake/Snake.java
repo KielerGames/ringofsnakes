@@ -93,7 +93,7 @@ public class Snake {
         if (chunkBuilder != null) {
             assert chunkBuilder.isFull();
 
-            chunks.add(chunkBuilder.build());
+            chunks.add(0, chunkBuilder.build());
         }
 
         chunkBuilder = new SnakeChunkBuilder(coder, this, nextChunkId++);

@@ -48,11 +48,11 @@ export function decode(
     let alpha = view.getFloat32(5, false);
     let x = view.getFloat32(9, false),
         y = view.getFloat32(13, false);
-    const offset = view.getFloat32(17, false);
+    const chunkOffset = view.getFloat32(17, false);
     const full = SNAKE_CHUNK_HEADER_SIZE + n === SNAKE_CHUNK_MAX_BYTES;
 
-    if(!full && offset !== 0.0) {
-        throw new Error(`Invalid chunk offset value: ${offset}`);
+    if(!full && chunkOffset !== 0.0) {
+        throw new Error(`Invalid chunk offset value: ${chunkOffset}`);
     }
 
     // initialize variables
@@ -103,7 +103,7 @@ export function decode(
         glVertexBuffer: vertexBuffer.buffer,
         vertices: (n + 1) * 2,
         length,
-        offset,
+        offset: chunkOffset,
         viewBox: {
             minX: minX - 0.5 * width,
             maxX: maxX + 0.5 * width,
@@ -147,7 +147,7 @@ function addPointToVertexBuffer(
     y: number,
     alpha: number,
     width: number,
-    length: number
+    pathOffset: number
 ): void {
     const normalAlpha = alpha - 0.5 * Math.PI;
 
@@ -161,13 +161,13 @@ function addPointToVertexBuffer(
     // right vertex
     vb[vbo + 0] = x + width * nx;
     vb[vbo + 1] = y + width * ny;
-    vb[vbo + 2] = length;
+    vb[vbo + 2] = pathOffset;
     vb[vbo + 3] = 1.0;
 
     // left vertex
     vb[vbo + 4] = x - width * nx;
     vb[vbo + 5] = y - width * ny;
-    vb[vbo + 6] = length;
+    vb[vbo + 6] = pathOffset;
     vb[vbo + 7] = -1.0;
 }
 

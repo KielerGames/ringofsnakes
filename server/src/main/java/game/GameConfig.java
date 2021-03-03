@@ -9,8 +9,8 @@ public final class GameConfig {
         snakeSpeed = 0.24;
         fastSnakeSpeed = 1.25 * snakeSpeed;
 
-        // 2deg -> 3sec for a full 360deg rotation
-        maxTurnDelta = Math.toRadians(5);
+        // max degrees per tick
+        maxTurnDelta = Math.toRadians(6);
 
     }
 }

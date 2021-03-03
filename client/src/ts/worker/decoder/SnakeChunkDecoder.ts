@@ -36,9 +36,7 @@ export function decode(
     const view = new DataView(chunkBuffer, byteOffset);
 
     // validate data
-    if (
-        view.byteLength < SNAKE_CHUNK_HEADER_SIZE
-    ) {
+    if (view.byteLength < SNAKE_CHUNK_HEADER_SIZE) {
         throw new Error("Snake chunk buffer is too small: " + view.byteLength);
     }
 
@@ -51,6 +49,11 @@ export function decode(
     let x = view.getFloat32(9, false),
         y = view.getFloat32(13, false);
     const offset = view.getFloat32(17, false);
+    const full = SNAKE_CHUNK_HEADER_SIZE + n === SNAKE_CHUNK_MAX_BYTES;
+
+    if(!full && offset !== 0.0) {
+        throw new Error(`Invalid chunk offset value: ${offset}`);
+    }
 
     // initialize variables
     let length = 0.0;
@@ -111,19 +114,24 @@ export function decode(
             x,
             y,
         },
-        full: (SNAKE_CHUNK_HEADER_SIZE + n) === SNAKE_CHUNK_MAX_BYTES,
+        full,
     };
 
     return {
         chunk: chunkData,
-        nextByteOffset: byteOffset + SNAKE_CHUNK_HEADER_SIZE + n
-    }
+        nextByteOffset: byteOffset + SNAKE_CHUNK_HEADER_SIZE + n,
+    };
 }
 
-export function decodeN(n: number, config: GameConfig, buffer: ArrayBuffer, offset: number): SnakeChunkData[] {
+export function decodeN(
+    n: number,
+    config: GameConfig,
+    buffer: ArrayBuffer,
+    offset: number
+): SnakeChunkData[] {
     const chunkData: SnakeChunkData[] = new Array(n);
-    
-    for(let i=0; i<n; i++) {
+
+    for (let i = 0; i < n; i++) {
         const data = decode(config, buffer, offset);
         chunkData[i] = data.chunk;
         offset = data.nextByteOffset;

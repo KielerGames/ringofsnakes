@@ -106,11 +106,10 @@ public class SnakeChunkBuilder implements SnakeChunkData{
         }
 
         // update bounding box
-        final var halfWidth = 0.5 * snake.getWidth();
-        minX = Math.min(minX, x - halfWidth);
-        minY = Math.min(minY, y - halfWidth);
-        maxX = Math.max(maxX, x + halfWidth);
-        maxY = Math.max(maxY, y + halfWidth);
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
     }
 
     public SnakeChunk build() {

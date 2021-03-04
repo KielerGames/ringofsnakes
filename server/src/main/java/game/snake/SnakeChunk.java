@@ -1,7 +1,11 @@
 package game.snake;
 
 import math.BoundingBox;
+import math.Vector;
+
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Map;
 
 public class SnakeChunk implements SnakeChunkData {
     public final static int BYTE_SIZE = 128;
@@ -13,6 +17,7 @@ public class SnakeChunk implements SnakeChunkData {
     private ByteBuffer chunkByteBuffer;
     private float length;
     private int uniqueId;
+    private Map<Integer, List<Vector>> pointData;
 
     private BoundingBox boundingBox;
 
@@ -25,6 +30,9 @@ public class SnakeChunk implements SnakeChunkData {
         boundingBox = box;
         this.length = length;
         this.uniqueId = buffer.getInt(0); // bytes 0-3
+
+        //TODO: init pointData
+        // split point list from snakechunkbuilder into map of sublists
     }
 
     public ByteBuffer getBuffer() {
@@ -51,6 +59,12 @@ public class SnakeChunk implements SnakeChunkData {
 
     public float getLength() {
         return this.length;
+    }
+
+    public boolean doesCollideWith(Vector position, double radius) {
+        //TODO: implement
+        // use pointData
+        return false;
     }
 
     public void setOffset(float offset) {

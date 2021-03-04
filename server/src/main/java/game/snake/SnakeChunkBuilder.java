@@ -4,6 +4,8 @@ import math.BoundingBox;
 import math.Vector;
 
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SnakeChunkBuilder implements SnakeChunkData{
     private final Snake snake;
@@ -22,6 +24,7 @@ public class SnakeChunkBuilder implements SnakeChunkData{
     private int lastDirDelta = 0;
 
     private ByteBuffer chunkByteBuffer;
+    private List<Vector> points = new LinkedList<>();
 
     public SnakeChunkBuilder(ChainCodeCoder coder, Snake snake, short chunkId) {
         this.snake = snake;
@@ -29,6 +32,7 @@ public class SnakeChunkBuilder implements SnakeChunkData{
         this.coder = coder;
 
         end = snake.headPosition.clone();
+        points.add(end.clone());
         endDirection = snake.headDirection;
         direction = endDirection;
 
@@ -81,6 +85,7 @@ public class SnakeChunkBuilder implements SnakeChunkData{
         final double stepSize = fast ? snake.config.fastSnakeSpeed : snake.config.snakeSpeed;
         x += Math.cos(direction);
         y += Math.sin(direction);
+        points.add(new Vector(x, y));
 
         // update chaincode
         length += stepSize;
@@ -156,5 +161,11 @@ public class SnakeChunkBuilder implements SnakeChunkData{
 
     public float getLength() {
         return (float) this.length;
+    }
+
+    public boolean doesCollideWith(Vector position, double radius) {
+        //TODO: implement
+        // use point list, check every point
+        return false;
     }
 }

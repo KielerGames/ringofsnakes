@@ -1,5 +1,7 @@
 package game.snake;
 
+import math.Vector;
+
 import java.nio.ByteBuffer;
 
 public interface SnakeChunkData {
@@ -16,4 +18,13 @@ public interface SnakeChunkData {
     int getUniqueId();
 
     float getLength();
+
+    /**
+     * Checks if the ball at position {@code position} and radius {@code radius}
+     * collides with the snake within this chunk.
+     * @param position
+     * @param radius
+     * @return
+     */
+    boolean doesCollideWith(Vector position, double radius);
 }

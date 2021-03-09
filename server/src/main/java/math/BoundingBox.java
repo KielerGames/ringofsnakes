@@ -1,7 +1,7 @@
 package math;
 
 public class BoundingBox {
-    private double minX, maxX, minY, maxY;
+    public final double minX, maxX, minY, maxY;
 
     public BoundingBox(double minX, double maxX, double minY, double maxY) {
         assert minX <= maxX;

@@ -126,7 +126,7 @@ public class SnakeChunkBuilder implements SnakeChunkData{
         double chunkWidth = maxX - minX;
         double chunkHeight = maxY - minY;
 
-        return new SnakeChunk(snake, chunkByteBuffer, box, (float) length, (LinkedList<Vector>) points, minX, maxX, minY, maxY);
+        return new SnakeChunk(snake, chunkByteBuffer, box, (float) length, points);
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {

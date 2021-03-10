@@ -94,7 +94,7 @@ public class SnakeChunk implements SnakeChunkData {
         Vector bottomEdge = position.clone();
         bottomEdge.y -= radius;
 
-        LinkedList<Vector> potentialPositionPoints = new LinkedList<>();
+        List<Vector> potentialPositionPoints = new LinkedList<>();
         int rightHash, topHash, leftHash, bottomHash;
         rightHash = topHash = leftHash = bottomHash = -4242;
 
@@ -104,9 +104,7 @@ public class SnakeChunk implements SnakeChunkData {
             rightHash = getHashFromRowAndColumn(gridRow, gridColumn);
             List<Vector> points = pointData.get((byte) rightHash);
             if (points != null) {
-                for (Vector p : points) {
-                    potentialPositionPoints.add(p);
-                }
+                potentialPositionPoints.addAll(points);
             }
 
         }
@@ -116,9 +114,7 @@ public class SnakeChunk implements SnakeChunkData {
                 topHash = hash;
                 List<Vector> points = pointData.get((byte) topHash);
                 if (points != null) {
-                    for (Vector p : points) {
-                        potentialPositionPoints.add(p);
-                    }
+                    potentialPositionPoints.addAll(points);
                 }
 
             }
@@ -129,9 +125,7 @@ public class SnakeChunk implements SnakeChunkData {
                 leftHash = hash;
                 List<Vector> points = pointData.get((byte) leftHash);
                 if (points != null) {
-                    for (Vector p : points) {
-                        potentialPositionPoints.add(p);
-                    }
+                    potentialPositionPoints.addAll(points);
                 }
             }
         }
@@ -141,9 +135,7 @@ public class SnakeChunk implements SnakeChunkData {
                 bottomHash = hash;
                 List<Vector> points = pointData.get((byte) bottomHash);
                 if (points != null) {
-                    for (Vector p : points) {
-                        potentialPositionPoints.add(p);
-                    }
+                    potentialPositionPoints.addAll(points);
                 }
             }
         }
@@ -151,7 +143,7 @@ public class SnakeChunk implements SnakeChunkData {
         return doesCollideWith(position, potentialPositionPoints, radius);
     }
 
-    public boolean doesCollideWith(Vector position, List<Vector> points, double radius) {
+    private boolean doesCollideWith(Vector position, List<Vector> points, double radius) {
         for (Vector p : points) {
             if ((position.x - p.x) * (position.x - p.x) + (position.y - p.y) * (position.y - p.y) < radius * radius) {
                 return true;

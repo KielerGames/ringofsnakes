@@ -8,7 +8,7 @@ public final class GameConfig {
 
     public GameConfig() {
         snakeSpeed = 0.24;
-        fastSnakeSpeed = 1.5 * snakeSpeed;
+        fastSnakeSpeed = 2.0 * snakeSpeed;
 
         // max degrees per tick
         maxTurnDelta = Math.toRadians(6);

@@ -71,7 +71,7 @@ public class Snake {
         }
 
         // move head
-        headPosition.addDirection(headDirection, config.snakeSpeed);
+        headPosition.addDirection(headDirection, fast ? config.fastSnakeSpeed : config.snakeSpeed);
 
         // update chunks
         chunkBuilder.append(encDirDelta, fast);

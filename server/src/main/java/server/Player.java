@@ -41,7 +41,7 @@ public class Player {
         var wasEmpty = update.isEmpty();
         update.addSnakeChunk(snake.chunkBuilder);
         if(!wasEmpty) {
-            System.out.println("Sending " + update);
+            //System.out.println("Sending " + update);
         }
         send(update.createBuffer());
     }

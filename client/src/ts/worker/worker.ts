@@ -11,6 +11,7 @@ const ctx: Worker = self as any;
 
 let websocket: WebSocket | undefined = undefined;
 let targetAlpha = 0.0;
+let wantsToBeFast = false;
 let gameConfig: GameConfig | undefined = undefined;
 let snakeId: number = -1;
 
@@ -19,15 +20,10 @@ ctx.addEventListener("message", (event) => {
     const msg = event.data as MessageFromMain;
 
     switch (msg.tag) {
-        case "UpdateTargetAlpha": {
+        case "UpdateUserInput": {
             targetAlpha = msg.alpha;
-            if (websocket && websocket.readyState === WebSocket.OPEN) {
-                //TODO
-                let buffer = new ArrayBuffer(8);
-                let view = new DataView(buffer);
-                view.setFloat64(0, targetAlpha, false);
-                websocket!.send(buffer);
-            }
+            wantsToBeFast = msg.fast;
+            sendInputs();
             break;
         }
         case "ConnectToServer": {
@@ -84,5 +80,16 @@ function handleServerMessageEvent(event: MessageEvent): void {
                 );
             }
         }
+    }
+}
+
+function sendInputs(): void {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        let buffer = new ArrayBuffer(10);
+        let view = new DataView(buffer);
+        view.setFloat64(0, targetAlpha, false);
+        view.setUint8(8, wantsToBeFast ? 1 : 0);
+        view.setUint8(9, 42);
+        websocket!.send(buffer);
     }
 }

@@ -67,11 +67,16 @@ public class SnakeServer {
         players.remove(session.getId());
     }
 
-    public static void setDirection(Session session, double alpha) {
+    public static void updateUserInput(Session session, double alpha, boolean fast) {
         var player = players.get(session.getId());
-        assert player != null;
-        player.session = session;
-        player.snake.setTargetDirection(alpha);
+
+        if(player != null) {
+            player.session = session;
+            player.snake.setTargetDirection(alpha);
+            player.snake.setFast(fast);
+        } else {
+            System.err.println("Illegal request from client.");
+        }
     }
 
     private static class Ticker implements Runnable {

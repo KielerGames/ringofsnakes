@@ -4,10 +4,11 @@ declare const __DEBUG__: boolean;
 
 type Props = {
     initial?: number;
-    onChange?: (newAlpha: number) => void;
+    onChange: (newAlpha: number, newFast: boolean) => void;
 };
 
 type State = {
+    fast: boolean;
     alpha: number;
     lastChange: number;
 };
@@ -18,21 +19,29 @@ export default class UserInput extends Component<Props, State> {
 
     public constructor(props: Props) {
         super(props);
-        this.state = { alpha: props.initial ?? 0.0, lastChange: -Infinity };
+        this.state = {
+            alpha: props.initial ?? 0.0,
+            fast: false,
+            lastChange: -Infinity,
+        };
 
         this.clickHandler = this.clickHandler.bind(this);
         this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
     }
 
     public render() {
-        const time = (performance.now() - this.state.lastChange) / 1000;
         return (
             <div
                 id="input-container"
                 ref={this.ref}
                 onClick={this.clickHandler}
+                onPointerDown={() => this.changeFast(true)}
+                onPointerUp={() => this.changeFast(false)}
             >
-                <div id="input-viz-ring" className={time > 1 ? "hide" : ""}>
+                <div
+                    id="input-viz-ring"
+                    className={this.showRing() ? "" : "hide"}
+                >
                     <div
                         id="input-viz-marker"
                         style={{ transform: `rotate(${-this.state.alpha}rad)` }}
@@ -40,6 +49,16 @@ export default class UserInput extends Component<Props, State> {
                 </div>
             </div>
         );
+    }
+
+    private showRing(): boolean {
+        const timeDelta = performance.now() - this.state.lastChange;
+
+        if (document.pointerLockElement === this.ref.current) {
+            return timeDelta < 1000;
+        }
+
+        return false;
     }
 
     private clickHandler() {
@@ -50,6 +69,12 @@ export default class UserInput extends Component<Props, State> {
         if (document.pointerLockElement !== this.ref.current) {
             this.ref.current!.requestPointerLock();
         }
+    }
+
+    private changeFast(newFast: boolean): void {
+        this.setState({ fast: newFast }, () =>
+            this.props.onChange(this.state.alpha, this.state.fast)
+        );
     }
 
     private mouseMoveHandler(e: MouseEvent) {
@@ -80,7 +105,7 @@ export default class UserInput extends Component<Props, State> {
             },
             () => {
                 if (this.props.onChange) {
-                    this.props.onChange(this.state.alpha);
+                    this.props.onChange(this.state.alpha, this.state.fast);
                 }
                 if (this.timeout !== undefined) {
                     window.clearTimeout(this.timeout);

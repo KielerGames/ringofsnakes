@@ -1,6 +1,6 @@
 import { GameConfig } from "./client-server";
 
-export type MessageFromMain = ConnectToServer | UpdateTargetAlpha;
+export type MessageFromMain = ConnectToServer | UpdateUserInput;
 
 export type MessageFromWorker = { tag: "GameUpdateData"; data: GameUpdateData };
 
@@ -13,9 +13,10 @@ export type ConnectToServer = {
     playerName: string;
 };
 
-export type UpdateTargetAlpha = {
-    tag: "UpdateTargetAlpha";
+export type UpdateUserInput = {
+    tag: "UpdateUserInput";
     alpha: number;
+    fast: boolean;
 };
 
 // ======================================

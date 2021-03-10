@@ -28,7 +28,9 @@ public class EventSocket {
     @OnMessage
     public void onWebSocketMessage(Session session, ByteBuffer buffer) {
         double alpha = buffer.getDouble(0);
-        SnakeServer.setDirection(session, alpha);
+        boolean fast = buffer.get(8) != 0;
+        assert(buffer.get(9) == 42);
+        SnakeServer.updateUserInput(session, alpha, fast);
     }
 
     @OnClose

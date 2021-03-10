@@ -1,4 +1,8 @@
-import { GameUpdateData, MessageFromMain, SnakeChunkData } from "./protocol/main-worker";
+import {
+    GameUpdateData,
+    MessageFromMain,
+    SnakeChunkData,
+} from "./protocol/main-worker";
 import * as Renderer from "./renderer/test";
 import Matrix from "./webgl/Matrix";
 import ReactDOM from "react-dom";
@@ -55,16 +59,23 @@ worker.addEventListener("message", (event) => {
     translate.setEntry(0, 3, -data.targetSnake.data.position.x);
     translate.setEntry(1, 3, -data.targetSnake.data.position.y);
 
-    const transform = Matrix.compose(Matrix.compose(unstretch, scale), translate);
+    const transform = Matrix.compose(
+        Matrix.compose(unstretch, scale),
+        translate
+    );
     program.setUniform("uTransform", transform.data);
 
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    data.forEachChunk(chunk => {
+    data.forEachChunk((chunk) => {
         program.setUniform("uHeadOffset", chunk.data.offset);
         program.setUniform("uChunkLength", chunk.length);
         program.setUniform("uSnakeLength", chunk.snake.length);
-        gl.bufferData(gl.ARRAY_BUFFER, chunk.data.glVertexBuffer, gl.STATIC_DRAW);
+        gl.bufferData(
+            gl.ARRAY_BUFFER,
+            chunk.data.glVertexBuffer,
+            gl.STATIC_DRAW
+        );
         program.run(gl.TRIANGLE_STRIP, 0, chunk.data.vertices);
     });
 });
@@ -73,11 +84,12 @@ worker.addEventListener("message", (event) => {
 const root = document.createElement("div");
 root.id = "root";
 document.body.appendChild(root);
-ReactDOM.render(<UserInput initial={0.0} onChange={updateAlpha} />, root);
+ReactDOM.render(<UserInput initial={0.0} onChange={onInputChange} />, root);
 
-function updateAlpha(newAlpha: number): void {
+function onInputChange(newAlpha: number, newFast: boolean): void {
     worker.postMessage({
-        tag: "UpdateTargetAlpha",
+        tag: "UpdateUserInput",
         alpha: newAlpha,
+        fast: newFast,
     } as MessageFromMain);
 }

@@ -56,6 +56,10 @@ public class Snake {
         }
     }
 
+    public void setFast(boolean wantsFast) {
+        this.fast = wantsFast;
+    }
+
     public void tick() {
         // update direction
         int encDirDelta = coder.sampleDirectionChange(targetDirection, headDirection);

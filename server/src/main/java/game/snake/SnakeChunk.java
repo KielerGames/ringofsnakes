@@ -41,8 +41,10 @@ public class SnakeChunk implements SnakeChunkData {
         initPointData(points);
 
         //some primitive testing of the collision detection, needs to be deleted later
-        assert (doesCollideWith(snake.headPosition, 10) == doesCollideWith(snake.headPosition, points, 10));
-        if (doesCollideWith(snake.headPosition, points, 10)) {
+        HashSet<List<Vector>> set = new HashSet<>();
+        set.add(points);
+        assert (doesCollideWith(snake.headPosition, 10) == doesCollideWith(snake.headPosition, set, 10));
+        if (doesCollideWith(snake.headPosition, 10)) {
             System.out.println("Collision");
         }
 
@@ -51,9 +53,7 @@ public class SnakeChunk implements SnakeChunkData {
     private void initPointData(List<Vector> points) {
         byte b;
         for (Vector point : points) {
-
             byte hash = getHashFromRowAndColumn(getGridRow(point), getGridColumn(point));
-
             if (pointData.get(hash) == null) {
                 LinkedList<Vector> l = new LinkedList<>();
                 l.add(point);
@@ -62,20 +62,19 @@ public class SnakeChunk implements SnakeChunkData {
                 pointData.get(hash).add(point);
             }
         }
-        //System.out.println("Debug");
     }
 
     private int getGridColumn(Vector point) {
         double chunkWidth = boundingBox.maxX - boundingBox.minX;
         double relativePosition = (point.x - boundingBox.minX) / chunkWidth;
-        int column = (relativePosition != 1 ? (int) (relativePosition * gridSideLength) : (int) (relativePosition * gridSideLength));
+        int column = (int) relativePosition * gridSideLength;
         return column;
     }
 
     private int getGridRow(Vector point) {
         double chunkWidth = boundingBox.maxY - boundingBox.minY;
         double relativePosition = (point.y - boundingBox.minY) / chunkWidth;
-        int row = (relativePosition != 1 ? (int) (relativePosition * gridSideLength) : (int) (relativePosition * gridSideLength));
+        int row = (int) (relativePosition * gridSideLength);
         return row;
     }
 
@@ -85,68 +84,30 @@ public class SnakeChunk implements SnakeChunkData {
     }
 
     public boolean doesCollideWith(Vector position, double radius) {
-        Vector rightEdge = position.clone();
-        rightEdge.x += radius;
-        Vector topEdge = position.clone();
-        topEdge.y += radius;
-        Vector leftEdge = position.clone();
-        leftEdge.x -= radius;
-        Vector bottomEdge = position.clone();
-        bottomEdge.y -= radius;
-
-        List<Vector> potentialPositionPoints = new LinkedList<>();
-        int rightHash, topHash, leftHash, bottomHash;
-        rightHash = topHash = leftHash = bottomHash = -4242;
-
-        if (rightEdge.x <= boundingBox.maxX) {
-            int gridRow = getGridRow(rightEdge);
-            int gridColumn = getGridColumn(rightEdge);
-            rightHash = getHashFromRowAndColumn(gridRow, gridColumn);
-            List<Vector> points = pointData.get((byte) rightHash);
-            if (points != null) {
-                potentialPositionPoints.addAll(points);
-            }
-
-        }
-        if (topEdge.y <= boundingBox.maxY) {
-            int hash = getHashFromRowAndColumn(getGridRow(topEdge), getGridColumn(topEdge));
-            if (hash != rightHash) {
-                topHash = hash;
-                List<Vector> points = pointData.get((byte) topHash);
-                if (points != null) {
-                    potentialPositionPoints.addAll(points);
-                }
-
-            }
-        }
-        if (leftEdge.x >= boundingBox.minX) {
-            int hash = getHashFromRowAndColumn(getGridRow(leftEdge), getGridColumn(leftEdge));
-            if (hash != rightHash && hash != topHash) {
-                leftHash = hash;
-                List<Vector> points = pointData.get((byte) leftHash);
-                if (points != null) {
-                    potentialPositionPoints.addAll(points);
-                }
-            }
-        }
-        if (bottomEdge.y >= boundingBox.minY) {
-            int hash = getHashFromRowAndColumn(getGridRow(bottomEdge), getGridColumn(bottomEdge));
-            if (hash != rightHash && hash != topHash && hash != leftHash) {
-                bottomHash = hash;
-                List<Vector> points = pointData.get((byte) bottomHash);
-                if (points != null) {
-                    potentialPositionPoints.addAll(points);
-                }
-            }
-        }
-
-        return doesCollideWith(position, potentialPositionPoints, radius);
+        HashSet<List<Vector>> potentialColliders = new HashSet<>();
+        addSubChunkOfPointToSet(new Vector(position.x + radius, position.y), potentialColliders);
+        addSubChunkOfPointToSet(new Vector(position.x, position.y + radius), potentialColliders);
+        addSubChunkOfPointToSet(new Vector(position.x - radius, position.y), potentialColliders);
+        addSubChunkOfPointToSet(new Vector(position.x, position.y - radius), potentialColliders);
+        return doesCollideWith(position, potentialColliders, radius);
     }
 
-    private boolean doesCollideWith(Vector position, List<Vector> points, double radius) {
-        for (Vector p : points) {
-            if ((position.x - p.x) * (position.x - p.x) + (position.y - p.y) * (position.y - p.y) < radius * radius) {
-                return true;
+    private void addSubChunkOfPointToSet(Vector point, HashSet<List<Vector>> set) {
+        int gridRow = getGridRow(point);
+        int gridColumn = getGridColumn(point);
+        byte hash = getHashFromRowAndColumn(gridRow, gridColumn);
+        if (pointData.get(hash) != null) {
+            set.add(pointData.get(hash));
+        }
+
+    }
+
+    private boolean doesCollideWith(Vector position, HashSet<List<Vector>> points, double radius) {
+        for (List<Vector> l : points) {
+            for (Vector p : l) {
+                if ((position.x - p.x) * (position.x - p.x) + (position.y - p.y) * (position.y - p.y) < radius * radius) {
+                    return true;
+                }
             }
         }
         return false;

@@ -1,5 +1,6 @@
+import { DecodeResult } from "./DecodeResult";
 import { GameConfig } from "../../protocol/client-server";
-import { SnakeChunkData } from "../../protocol/main-worker";
+import { normalizeAngle } from "../../math/utils";
 
 const SNAKE_CHUNK_MAX_BYTES = 128;
 const SNAKE_CHUNK_HEADER_SIZE = 21;
@@ -8,6 +9,24 @@ const SNAKE_CHUNK_HEADER_SIZE = 21;
 const FAST_BIT = 1 << 7;
 const STEPS_MASK = 7 << 4;
 const DIRECTION_MASK = 15;
+
+type OrientedPoint = {
+    x: number;
+    y: number;
+    alpha: number;
+};
+
+export type DecodedSnakeChunk = {
+    snakeId: number;
+    chunkId: number;
+    pathLength: number;
+    pathOffset: number;
+    full: boolean;
+    points: number;
+    start: OrientedPoint;
+    end: OrientedPoint;
+    pathData: Float32Array;
+};
 
 /*
  * Byte(s) | Description
@@ -19,51 +38,48 @@ const DIRECTION_MASK = 15;
  * 9-12      end position x (float)
  * 13-16     end position y (float)
  * 17-20     offset within snake (float)
- * ================= CONTENT ===================
+ * ================== BODY ====================
  * 21-(21+n) n ChainCodes (n bytes), 21+n < 128
  */
 
-type DecodedData = {
-    chunk: SnakeChunkData;
-    nextByteOffset: number;
-};
-
 export function decode(
-    config: GameConfig,
-    chunkBuffer: ArrayBuffer,
-    byteOffset: number = 0
-): DecodedData {
-    const view = new DataView(chunkBuffer, byteOffset);
+    buffer: ArrayBuffer,
+    byteOffset: number,
+    config: GameConfig
+): DecodeResult<DecodedSnakeChunk> {
+    const view = new DataView(buffer, byteOffset);
 
-    // validate data
     if (view.byteLength < SNAKE_CHUNK_HEADER_SIZE) {
-        throw new Error("Snake chunk buffer is too small: " + view.byteLength);
+        throw new Error("Invalid buffer (too small for header)");
     }
 
     // read chunk header
     const snakeId = view.getUint16(0, false);
     const chunkId = view.getUint16(2, false);
     const n = view.getUint8(4);
-    const width = 0.5; // TODO
     let alpha = view.getFloat32(5, false);
     let x = view.getFloat32(9, false),
         y = view.getFloat32(13, false);
     const chunkOffset = view.getFloat32(17, false);
     const full = SNAKE_CHUNK_HEADER_SIZE + n === SNAKE_CHUNK_MAX_BYTES;
 
-    if(!full && chunkOffset !== 0.0) {
+    // verify
+    if (!full && chunkOffset !== 0.0) {
         throw new Error(`Invalid chunk offset value: ${chunkOffset}`);
+    }
+    if (view.byteLength < SNAKE_CHUNK_HEADER_SIZE + n) {
+        throw new Error("Invalid buffer (too small)");
     }
 
     // initialize variables
     let length = 0.0;
-    const vertexBuffer = new Float32Array(8 * (n + 1));
-    addPointToVertexBuffer(vertexBuffer, 0, x, y, alpha, width, length);
-    let minX = x,
-        maxX = x,
-        minY = y,
-        maxY = y;
+    let pathData = new Float32Array(4 * (n + 1));
+    pathData[0] = x;
+    pathData[1] = y;
+    pathData[2] = length;
+    pathData[3] = alpha;
 
+    // decode body
     for (let i = 0; i < n; i++) {
         const data = view.getUint8(SNAKE_CHUNK_HEADER_SIZE + i);
 
@@ -74,101 +90,45 @@ export function decode(
 
         // compute alphas
         const midAlpha = alpha + 0.5 * dirDelta;
-        alpha += dirDelta;
-        if (Math.abs(alpha) > Math.PI) {
-            alpha += (alpha < 0 ? 2 : -2) * Math.PI;
-        }
+        alpha = normalizeAngle(alpha + dirDelta);
 
-        // compute next (center) position
+        // compute next position
         const s = steps * (fast ? config.fastSnakeSpeed : config.snakeSpeed);
         x += s * Math.cos(alpha);
         y += s * Math.sin(alpha);
         length += s;
 
-        // store in vertex buffer
-        addPointToVertexBuffer(
-            vertexBuffer,
-            i + 1,
-            x,
-            y,
-            midAlpha,
-            width,
-            length
-        );
+        const idx = 4 * (i + 1);
+        pathData[idx + 0] = x;
+        pathData[idx + 1] = y;
+        pathData[idx + 2] = length;
+        pathData[idx + 3] = midAlpha;
     }
 
-    const chunkData = {
-        snakeId,
-        chunkId,
-        glVertexBuffer: vertexBuffer.buffer,
-        vertices: (n + 1) * 2,
-        length,
-        offset: chunkOffset,
-        viewBox: {
-            minX: minX - 0.5 * width,
-            maxX: maxX + 0.5 * width,
-            minY: minY - 0.5 * width,
-            maxY: maxY + 0.5 * width,
-        },
-        end: {
-            x,
-            y,
-        },
-        full,
-    };
+    pathData[pathData.length - 1] = alpha;
 
     return {
-        chunk: chunkData,
+        data: {
+            snakeId,
+            chunkId,
+            pathLength: length,
+            pathOffset: chunkOffset,
+            full,
+            points: n+1,
+            start: {
+                x,
+                y,
+                alpha,
+            },
+            end: {
+                x: pathData[0],
+                y: pathData[1],
+                alpha: pathData[2],
+            },
+            pathData,
+        },
         nextByteOffset: byteOffset + SNAKE_CHUNK_HEADER_SIZE + n,
     };
-}
-
-export function decodeN(
-    n: number,
-    config: GameConfig,
-    buffer: ArrayBuffer,
-    offset: number
-): SnakeChunkData[] {
-    const chunkData: SnakeChunkData[] = new Array(n);
-
-    for (let i = 0; i < n; i++) {
-        const data = decode(config, buffer, offset);
-        chunkData[i] = data.chunk;
-        offset = data.nextByteOffset;
-    }
-
-    return chunkData;
-}
-
-function addPointToVertexBuffer(
-    vb: Float32Array,
-    k: number,
-    x: number,
-    y: number,
-    alpha: number,
-    width: number,
-    pathOffset: number
-): void {
-    const normalAlpha = alpha - 0.5 * Math.PI;
-
-    // compute normal vector
-    const nx = Math.cos(normalAlpha);
-    const ny = Math.sin(normalAlpha);
-
-    // update vertex buffer:
-    const vbo = 8 * k;
-
-    // right vertex
-    vb[vbo + 0] = x + width * nx;
-    vb[vbo + 1] = y + width * ny;
-    vb[vbo + 2] = pathOffset;
-    vb[vbo + 3] = 1.0;
-
-    // left vertex
-    vb[vbo + 4] = x - width * nx;
-    vb[vbo + 5] = y - width * ny;
-    vb[vbo + 6] = pathOffset;
-    vb[vbo + 7] = -1.0;
 }
 
 function decodeDirectionChange(config: GameConfig, data: number) {

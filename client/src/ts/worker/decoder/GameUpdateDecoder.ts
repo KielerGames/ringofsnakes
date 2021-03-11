@@ -6,28 +6,41 @@ import { GameUpdateData } from "../../protocol/main-worker";
 const UPDATE_HEADER_SIZE = 2;
 
 export function decode(
-    targetSnakeId: number,
     config: GameConfig,
     buffer: ArrayBuffer
 ): GameUpdateData {
     const view = new DataView(buffer);
 
+    // read update header
     const numSnakeInfos = view.getUint8(0);
     const numSnakeChunks = view.getUint8(1);
 
-    const snakes = SID.decodeN(numSnakeInfos, buffer, UPDATE_HEADER_SIZE);
+    // read snake infos
+    let byteOffset = UPDATE_HEADER_SIZE;
+    const snakeInfos = new Array(numSnakeInfos);
+    for(let i=0; i<numSnakeInfos; i++) {
+        const result = SID.decode(buffer, byteOffset);
+        snakeInfos[i] = result.data;
+        byteOffset = result.nextByteOffset;
+    }
 
-    const chunks = SCD.decodeN(
-        numSnakeChunks,
-        config,
-        buffer,
-        UPDATE_HEADER_SIZE + numSnakeInfos * SID.SNAKE_INFO_SIZE
-    );
+    // read chunks
+    const chunks: SCD.DecodedSnakeChunk[] = new Array(numSnakeChunks);
+    for (let i = 0; i < numSnakeChunks; i++) {
+        const result = SCD.decode(buffer, byteOffset, config);
+        chunks[i] = result.data;
+        byteOffset = result.nextByteOffset;
+    }
+
+    if (byteOffset !== buffer.byteLength) {
+        console.warn(
+            `Unexpected update buffer size (expected ${byteOffset}, was ${buffer.byteLength})`
+        );
+    }
 
     return {
-        snakeInfos: snakes,
+        snakeInfos,
         chunkData: chunks,
-        targetSnakeId,
         gameConfig: config,
     };
 }

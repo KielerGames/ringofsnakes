@@ -1,7 +1,10 @@
+import { SnakeChunkData } from "../protocol/main-worker";
+import Snake from "./Snake";
+
 const VERTEX_SIZE = 4;
 
 export default class NonFinalChunk {
-    private snakeId: number;
+    private snake: Snake;
     private chunkId: number;
     private full:boolean;
     private points:Float32Array;
@@ -10,22 +13,36 @@ export default class NonFinalChunk {
 
     }
 
-    public createWebGlVertexBuffer(): ChunkVertexData {
+    public createWebGlVertexBuffer(): SnakeChunkData {
         const vertices = 42; //TODO
         const buffer = new Float32Array(2 * VERTEX_SIZE * vertices);
 
         return {
-            vertices,
+            id: this.uniqueId,
+
             buffer: buffer.buffer,
+            vertices,
+            viewBox: {
+                minX: NaN,
+                maxX: NaN,
+                minY: NaN,
+                maxY: NaN
+            },
+
+            end: {
+                x: NaN,
+                y: NaN
+            },
+
+            length: 0,
+            offset: 0,
             final: false //TODO
         };
     }
-}
 
-type ChunkVertexData = {
-    vertices: number;
-    buffer: ArrayBuffer;
-    final: boolean;
+    public get uniqueId():number {
+        return (this.snake.id<<16) + this.chunkId;
+    }
 }
 
 function addPointToVertexBuffer(

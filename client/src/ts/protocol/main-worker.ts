@@ -30,10 +30,9 @@ export type UpdateUserInput = {
  *   2--1
  */
 export type SnakeChunkData = {
-    snakeId: number;
-    chunkId: number;
+    id: number;
 
-    glVertexBuffer: ArrayBuffer;
+    buffer: ArrayBuffer;
     vertices: number;
     viewBox: {
         minX: number;
@@ -49,7 +48,7 @@ export type SnakeChunkData = {
 
     length: number;
     offset: number;
-    full: boolean;
+    final: boolean;
 };
 
 export type SnakeInfo = {
@@ -65,7 +64,6 @@ export type SnakeInfo = {
 };
 
 export type GameUpdateData = {
-    targetSnakeId: number;
     snakeInfos: SnakeInfo[];
     chunkData: SnakeChunkData[];
     gameConfig: GameConfig;

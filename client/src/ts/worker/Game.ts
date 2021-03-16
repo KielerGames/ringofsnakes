@@ -5,6 +5,7 @@ import {
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
 import NonFinalChunk from "./NonFinalChunk";
+import Snake from "./Snake";
 
 export default class Game {
     socket: WebSocket;
@@ -13,7 +14,7 @@ export default class Game {
     config: GameConfig;
     chunks: Map<UniqueChunkId, NonFinalChunk> = new Map();
     fullChunks: Map<UniqueChunkId, NonFinalChunk> = new Map();
-    snakeInfos: Map<SnakeId, any> = new Map();
+    snakes: Map<SnakeId, Snake> = new Map();
 
     constructor(socket: WebSocket, gameConfig: GameConfig) {
         this.socket = socket;

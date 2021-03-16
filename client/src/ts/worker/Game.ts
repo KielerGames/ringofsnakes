@@ -3,14 +3,17 @@ import {
     ServerToClientJSONMessage,
 } from "../protocol/client-server";
 import assert from "../utilities/assert";
+import * as GUD from "./decoder/GameUpdateDecoder";
+import NonFinalChunk from "./NonFinalChunk";
 
 export default class Game {
     socket: WebSocket;
 
     targetPlayerId: number;
     config: GameConfig;
-    nonFinalChunks: any[];
-    snakeInfos: any[];
+    chunks: Map<UniqueChunkId, NonFinalChunk> = new Map();
+    fullChunks: Map<UniqueChunkId, NonFinalChunk> = new Map();
+    snakeInfos: Map<SnakeId, any> = new Map();
 
     constructor(socket: WebSocket, gameConfig: GameConfig) {
         this.socket = socket;
@@ -23,11 +26,26 @@ export default class Game {
     }
 
     private onMessageFromServer(event: MessageEvent) {
-        const data = event.data as ArrayBuffer | string;
+        const rawData = event.data as ArrayBuffer | string;
 
-        if (data instanceof ArrayBuffer) {
+        if (rawData instanceof ArrayBuffer) {
+            const data = GUD.decode(this.config, rawData);
         } else {
-            const json = JSON.parse(data) as ServerToClientJSONMessage;
+            const json = JSON.parse(rawData) as ServerToClientJSONMessage;
+
+            switch(json.tag) {
+                case "SpawnInfo": {
+                    break;
+                }
+                default: {
+                    throw new Error(
+                        `Unknown message from server. (tag = ${json.tag})`
+                    );
+                }
+            }
         }
     }
 }
+
+type UniqueChunkId = number;
+type SnakeId = number;

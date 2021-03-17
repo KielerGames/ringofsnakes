@@ -1,11 +1,11 @@
 import Vector from "../math/Vector";
 import { SnakeInfo } from "../protocol/main-worker";
-import NonFinalChunk from "./NonFinalChunk";
+import WorkerChunk from "./WorkerChunk";
 
 export default class Snake {
     public readonly id:number;
 
-    private chunks: NonFinalChunk[];
+    private chunks: WorkerChunk[];
     private headPosition: Vector;
 
     public constructor(info: SnakeInfo) {

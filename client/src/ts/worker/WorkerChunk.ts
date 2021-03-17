@@ -1,23 +1,34 @@
 import BoundingBox from "../math/BoundingBox";
 import Vector from "../math/Vector";
 import { SnakeChunkData } from "../protocol/main-worker";
-import { FULL_CHUNK_NUM_POINTS } from "./decoder/SnakeChunkDecoder";
+import assert from "../utilities/assert";
+import { DecodedSnakeChunk, FULL_CHUNK_NUM_POINTS } from "./decoder/SnakeChunkDecoder";
 import Snake from "./Snake";
 
 const VERTEX_SIZE = 4;
 
-export default class NonFinalChunk {
+export default class WorkerChunk {
     private snake: Snake;
     private chunkId: number;
     private full:boolean;
-    private points:Float32Array = new Float32Array(FULL_CHUNK_NUM_POINTS * 2);
+    private pathData:Float32Array;
     private numPoints:number;
     private endPoint:Vector;
     private _final:boolean;
     private box:BoundingBox;
 
-    public constructor() {
+    public constructor(snake: Snake, data: DecodedSnakeChunk) {
+        assert(snake.id === data.snakeId);
+        this.snake = snake;
+        this.full = data.full;
 
+        if(data.full) {
+            this.pathData = data.pathData;
+            this._final = true;
+        } else {
+            this.pathData = new Float32Array(FULL_CHUNK_NUM_POINTS * 2);
+            this._final = false;
+        }
     }
 
     public createWebGlData(): SnakeChunkData {
@@ -35,7 +46,7 @@ export default class NonFinalChunk {
 
             length: 0,
             offset: 0,
-            final: false //TODO
+            final: this.final
         };
     }
 

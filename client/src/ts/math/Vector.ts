@@ -10,6 +10,15 @@ export default class Vector {
         this.x = x;
         this.y = y;
     }
+
+    public addPolar(alpha: number, distance: number): void {
+        this.x += distance * Math.cos(alpha);
+        this.y += distance * Math.sin(alpha);
+    }
+
+    public createTransferable(): PointLike {
+        return { x: this.x, y: this.y };
+    }
 }
 
 type PointLike = {

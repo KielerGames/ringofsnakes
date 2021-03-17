@@ -1,4 +1,7 @@
+import BoundingBox from "../math/BoundingBox";
+import Vector from "../math/Vector";
 import { SnakeChunkData } from "../protocol/main-worker";
+import { FULL_CHUNK_NUM_POINTS } from "./decoder/SnakeChunkDecoder";
 import Snake from "./Snake";
 
 const VERTEX_SIZE = 4;
@@ -7,14 +10,18 @@ export default class NonFinalChunk {
     private snake: Snake;
     private chunkId: number;
     private full:boolean;
-    private points:Float32Array;
+    private points:Float32Array = new Float32Array(FULL_CHUNK_NUM_POINTS * 2);
+    private numPoints:number;
+    private endPoint:Vector;
+    private _final:boolean;
+    private box:BoundingBox;
 
     public constructor() {
 
     }
 
-    public createWebGlVertexBuffer(): SnakeChunkData {
-        const vertices = 42; //TODO
+    public createWebGlData(): SnakeChunkData {
+        const vertices = this.full ? this.numPoints : (this.numPoints + 1);
         const buffer = new Float32Array(2 * VERTEX_SIZE * vertices);
 
         return {
@@ -22,17 +29,9 @@ export default class NonFinalChunk {
 
             buffer: buffer.buffer,
             vertices,
-            viewBox: {
-                minX: NaN,
-                maxX: NaN,
-                minY: NaN,
-                maxY: NaN
-            },
+            viewBox: this.box.createTransferable(0.5 * this.snake.width),
 
-            end: {
-                x: NaN,
-                y: NaN
-            },
+            end: this.endPoint.createTransferable(),
 
             length: 0,
             offset: 0,
@@ -40,8 +39,18 @@ export default class NonFinalChunk {
         };
     }
 
+    /**
+     * Combination of snake & chunk id. Unique within the game.
+     */
     public get uniqueId():number {
         return (this.snake.id<<16) + this.chunkId;
+    }
+
+    /**
+     * A chunk is final if it is full and all predictions have been corrected.
+     */
+    public get final():boolean {
+        return this._final;
     }
 }
 

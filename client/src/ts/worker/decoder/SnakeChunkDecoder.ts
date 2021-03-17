@@ -4,6 +4,8 @@ import { normalizeAngle } from "../../math/utils";
 
 const SNAKE_CHUNK_MAX_BYTES = 128;
 const SNAKE_CHUNK_HEADER_SIZE = 21;
+export const FULL_CHUNK_NUM_POINTS =
+    SNAKE_CHUNK_MAX_BYTES - SNAKE_CHUNK_HEADER_SIZE + 1;
 
 // chaincode
 const FAST_BIT = 1 << 7;
@@ -114,7 +116,7 @@ export function decode(
             pathLength: length,
             pathOffset: chunkOffset,
             full,
-            points: n+1,
+            points: n + 1,
             start: {
                 x,
                 y,

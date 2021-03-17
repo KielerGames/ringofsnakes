@@ -12,4 +12,8 @@ export default class Snake {
         this.id = info.snakeId;
         this.headPosition = Vector.fromObject(info.position);
     }
+
+    public get width():number {
+        return 0.5; //TODO
+    }
 }

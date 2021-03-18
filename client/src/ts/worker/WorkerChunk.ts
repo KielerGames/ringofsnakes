@@ -13,8 +13,10 @@ const VERTEX_SIZE = 4;
 export default class WorkerChunk {
     private snake: Snake;
     private chunkId: number;
-    private full: boolean;
+    private _full: boolean;
     private pathData: Float32Array;
+    private pathLength: number;
+    private offset: number;
     private numPoints: number;
     private endPoint: Vector;
     private _final: boolean;
@@ -23,8 +25,10 @@ export default class WorkerChunk {
     public constructor(snake: Snake, data: DecodedSnakeChunk) {
         assert(snake.id === data.snakeId);
         this.snake = snake;
-        this.full = data.full;
+        this._full = data.full;
         this.numPoints = data.points;
+        this.pathLength = data.pathLength;
+        this.offset = data.pathOffset;
 
         if (data.full) {
             this._final = true;
@@ -68,8 +72,8 @@ export default class WorkerChunk {
 
             end: this.endPoint.createTransferable(),
 
-            length: 0,
-            offset: 0,
+            length: this.pathLength,
+            offset: this.offset,
             final: this.final,
         };
     }
@@ -86,6 +90,10 @@ export default class WorkerChunk {
      */
     public get final(): boolean {
         return this._final;
+    }
+
+    public get full(): boolean {
+        return this._full;
     }
 }
 

@@ -57,7 +57,8 @@ export function decode(
 
     // read chunk header
     const snakeId = view.getUint16(0, false);
-    const chunkId = view.getUint16(2, false);
+    // combine snake id & chunk id to unqiue chunk id
+    const chunkId = view.getUint32(0, false);
     const n = view.getUint8(4);
     let alpha = view.getFloat32(5, false);
     let x = view.getFloat32(9, false),

@@ -1,7 +1,7 @@
 import { GameConfig } from "../../protocol/client-server";
 import * as SID from "./SnakeInfoDecoder";
 import * as SCD from "./SnakeChunkDecoder";
-import { GameUpdateData } from "../../protocol/main-worker";
+import { SnakeInfo } from "../../protocol/main-worker";
 
 const UPDATE_HEADER_SIZE = 2;
 
@@ -44,3 +44,9 @@ export function decode(
         gameConfig: config,
     };
 }
+
+export type GameUpdateData = {
+    snakeInfos: SnakeInfo[];
+    chunkData: SCD.DecodedSnakeChunk[];
+    gameConfig: GameConfig;
+};

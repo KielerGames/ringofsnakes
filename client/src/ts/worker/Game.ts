@@ -12,8 +12,7 @@ export default class Game {
 
     targetPlayerId: number;
     config: GameConfig;
-    chunks: Map<UniqueChunkId, WorkerChunk> = new Map();
-    fullChunks: Map<UniqueChunkId, WorkerChunk> = new Map();
+    chunks: Map<ChunkId, WorkerChunk> = new Map();
     snakes: Map<SnakeId, Snake> = new Map();
 
     constructor(socket: WebSocket, gameConfig: GameConfig) {
@@ -31,10 +30,22 @@ export default class Game {
 
         if (rawData instanceof ArrayBuffer) {
             const data = GUD.decode(this.config, rawData);
+
+            data.chunkData.forEach((chunkData) => {
+                let chunk = this.chunks.get(chunkData.chunkId);
+                if (chunk) {
+                    // update chunk
+                } else {
+                    const snake = this.snakes.get(chunkData.snakeId);
+                    assert(snake !== undefined);
+                    chunk = new WorkerChunk(snake!, chunkData);
+                    this.chunks.set(chunkData.chunkId, chunk);
+                }
+            });
         } else {
             const json = JSON.parse(rawData) as ServerToClientJSONMessage;
 
-            switch(json.tag) {
+            switch (json.tag) {
                 case "SpawnInfo": {
                     break;
                 }
@@ -48,5 +59,5 @@ export default class Game {
     }
 }
 
-type UniqueChunkId = number;
+type ChunkId = number;
 type SnakeId = number;

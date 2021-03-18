@@ -62,9 +62,3 @@ export type SnakeInfo = {
         y: number;
     };
 };
-
-export type GameUpdateData = {
-    snakeInfos: SnakeInfo[];
-    chunkData: SnakeChunkData[];
-    gameConfig: GameConfig;
-};

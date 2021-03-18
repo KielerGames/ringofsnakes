@@ -12,7 +12,7 @@ const VERTEX_SIZE = 4;
 
 export default class WorkerChunk {
     private snake: Snake;
-    private chunkId: number;
+    private id: number;
     private _full: boolean;
     private pathData: Float32Array;
     private pathLength: number;
@@ -24,6 +24,7 @@ export default class WorkerChunk {
 
     public constructor(snake: Snake, data: DecodedSnakeChunk) {
         assert(snake.id === data.snakeId);
+        this.id = data.chunkId;
         this.snake = snake;
         this._full = data.full;
         this.numPoints = data.points;
@@ -54,6 +55,7 @@ export default class WorkerChunk {
         const buffer = new Float32Array(2 * VERTEX_SIZE * vertices);
         const snakeWidth = this.snake.width;
 
+        // create triangle strip vertices
         for (let i = 0; i < vertices; i++) {
             const pdo = 4 * i;
             const x = this.pathData[pdo + 0];
@@ -64,7 +66,7 @@ export default class WorkerChunk {
         }
 
         return {
-            id: this.uniqueId,
+            id: this.id,
 
             buffer: buffer.buffer,
             vertices,
@@ -79,19 +81,15 @@ export default class WorkerChunk {
     }
 
     /**
-     * Combination of snake & chunk id. Unique within the game.
-     */
-    public get uniqueId(): number {
-        return (this.snake.id << 16) + this.chunkId;
-    }
-
-    /**
      * A chunk is final if it is full and all predictions have been corrected.
      */
     public get final(): boolean {
         return this._final;
     }
 
+    /**
+     * A chunk is full if numPoints has reached the maximum number of points.
+     */
     public get full(): boolean {
         return this._full;
     }

@@ -1,19 +1,20 @@
 precision mediump float;
 
 attribute vec2 vPosition;
-attribute float vLength;
-attribute float vCenterOffset;
+attribute vec2 vNormal;
+attribute float vNormalOffset;
+attribute float vRelativePathOffset;
 
 uniform mat4 uTransform;
-uniform mediump vec3 uColor;
-uniform float uHeadOffset;
-uniform float uChunkLength;
+uniform float uSnakeWidth;
+uniform float uChunkPathOffset;
 
 varying float pathOffset;
-varying float sideOffset;
+varying float normalOffset;
 
 void main(void) {
-    sideOffset = vCenterOffset;
-    pathOffset = uHeadOffset + uChunkLength - vLength;
-    gl_Position = uTransform * vec4(vPosition, 1.0, 1.0);
+    normalOffset = vNormalOffset;
+    pathOffset = uChunkPathOffset + vRelativePathOffset;
+    position = vPosition + (vNormalOffset * uSnakeWidth) * vNormal;
+    gl_Position = uTransform * vec4(position, 0.0, 1.0);
 }

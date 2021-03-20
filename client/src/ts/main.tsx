@@ -1,7 +1,6 @@
 import {
     GameUpdateData,
     MessageFromMain,
-    SnakeChunkData,
 } from "./protocol/main-worker";
 import * as Renderer from "./renderer/test";
 import Matrix from "./webgl/Matrix";
@@ -38,10 +37,15 @@ const vertexBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
 const program = Renderer.createSnakeShaderProgram(gl);
-program.bufferLayout = ["vPosition", "vLength", "vCenterOffset"];
+program.bufferLayout = [
+    "vPosition",
+    "vNormal",
+    "vNormalOffset",
+    "vRelativePathOffset",
+];
 console.log(program.bufferLayout);
 program.use();
-program.setUniform("uColor", [0.1, 0.2, 0.5]);
+program.setUniform("uColor", [0.5, 0.75, 1.0]);
 gl.clear(gl.COLOR_BUFFER_BIT);
 
 const worker = new Worker("worker.bundle.js", { name: "SnakeWorker" });
@@ -68,9 +72,9 @@ worker.addEventListener("message", (event) => {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     data.forEachChunk((chunk) => {
-        program.setUniform("uHeadOffset", chunk.data.offset);
-        program.setUniform("uChunkLength", chunk.length);
+        program.setUniform("uChunkPathOffset", chunk.data.offset);
         program.setUniform("uSnakeLength", chunk.snake.length);
+        program.setUniform("uSnakeWidth", 0.5);
         gl.bufferData(
             gl.ARRAY_BUFFER,
             chunk.data.glVertexBuffer,

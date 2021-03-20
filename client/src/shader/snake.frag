@@ -3,18 +3,18 @@ precision mediump float;
 uniform mediump vec3 uColor;
 uniform float uSnakeLength;
 
-varying float sideOffset;
 varying float pathOffset;
+varying float normalOffset;
 
-const vec3 CENTER  = vec3(0.5, 0.75, 1.0);
+const vec3 darkColor = mix(uColor, vec(0.1, 0.1, 0.1), 0.5);
 
 void main(void) {
-	float co = abs(sideOffset);
+	float co = abs(normalOffset);
 	co = co * co;
 	co = co * (1.0 + 0.2*sin(2.0*pathOffset));
-	if(pathOffset < uSnakeLength) {
-		gl_FragColor = vec4(mix(CENTER, uColor.rgb, co), 1.0);
-	} else {
-		gl_FragColor = vec4(0.0, 0.0, 0.0, 0.5);
-	}
+
+	float alpha = (pathOffset < uSnakeLength) ? 1.0 : 0.0;
+	vec3 color = mix(uColor, darkColor, co);
+
+	gl_FragColor = vec4(color, alpha);
 }

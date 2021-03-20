@@ -5,7 +5,7 @@ import {
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
 import WorkerChunk from "./WorkerChunk";
-import Snake from "./Snake";
+import Snake from "./WorkerSnake";
 
 export default class Game {
     socket: WebSocket;

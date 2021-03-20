@@ -16,4 +16,8 @@ export default class Snake {
     public get width():number {
         return 0.5; //TODO
     }
+
+    public update(info: SnakeInfo):void {
+        
+    }
 }

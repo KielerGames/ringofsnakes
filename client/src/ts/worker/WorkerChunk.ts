@@ -6,7 +6,8 @@ import {
     DecodedSnakeChunk,
     FULL_CHUNK_NUM_POINTS,
 } from "./decoder/SnakeChunkDecoder";
-import Snake from "./Snake";
+import SnakeChunkVertexBufferBuilder from "./SnakeChunkVertexBufferBuilder";
+import Snake from "./WorkerSnake";
 
 const VERTEX_SIZE = 4;
 
@@ -51,25 +52,25 @@ export default class WorkerChunk {
     }
 
     public createWebGlData(): SnakeChunkData {
-        const vertices = this.numPoints;
-        const buffer = new Float32Array(2 * VERTEX_SIZE * vertices);
-        const snakeWidth = this.snake.width;
+        const points = this.numPoints;
+        const buffer = new SnakeChunkVertexBufferBuilder(points);
 
         // create triangle strip vertices
-        for (let i = 0; i < vertices; i++) {
+        for (let i = 0; i < points; i++) {
             const pdo = 4 * i;
             const x = this.pathData[pdo + 0];
             const y = this.pathData[pdo + 1];
-            const offset = this.pathData[pdo + 2];
+            const endOffset = this.pathData[pdo + 2];
+            const startOffset = this.pathLength - endOffset;
             const alpha = this.pathData[pdo + 3];
-            addPointToVertexBuffer(buffer, i, x, y, alpha, snakeWidth, offset);
+            buffer.addPoint(x, y, alpha, startOffset);
         }
 
         return {
             id: this.id,
 
-            buffer: buffer.buffer,
-            vertices,
+            buffer: buffer.finalize(),
+            vertices: points,
             viewBox: this.box.createTransferable(0.5 * this.snake.width),
 
             end: this.endPoint.createTransferable(),
@@ -95,47 +96,16 @@ export default class WorkerChunk {
     }
 }
 
-function addPointToVertexBuffer(
-    vb: Float32Array,
-    k: number,
-    x: number,
-    y: number,
-    alpha: number,
-    width: number,
-    pathOffset: number
-): void {
-    const normalAlpha = alpha - 0.5 * Math.PI;
-
-    // compute normal vector
-    const nx = Math.cos(normalAlpha);
-    const ny = Math.sin(normalAlpha);
-
-    // vertex buffer offset
-    const vbo = 2 * VERTEX_SIZE * k;
-
-    // right vertex
-    vb[vbo + 0] = x + width * nx;
-    vb[vbo + 1] = y + width * ny;
-    vb[vbo + 2] = pathOffset;
-    vb[vbo + 3] = 1.0;
-
-    // left vertex
-    vb[vbo + 4] = x - width * nx;
-    vb[vbo + 5] = y - width * ny;
-    vb[vbo + 6] = pathOffset;
-    vb[vbo + 7] = -1.0;
-}
-
-function createBoundingBox(pathData: Float32Array):BoundingBox {
+function createBoundingBox(pathData: Float32Array): BoundingBox {
     assert(pathData.length > 0);
 
     let minX, maxX, minY, maxY;
     minX = maxX = pathData[0];
     minY = maxY = pathData[1];
 
-    for(let i=1; i<pathData.length; i++) {
-        const x = pathData[4*i];
-        const y = pathData[4*i+1];
+    for (let i = 1; i < pathData.length; i++) {
+        const x = pathData[4 * i];
+        const y = pathData[4 * i + 1];
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x);
         minY = Math.min(minY, y);

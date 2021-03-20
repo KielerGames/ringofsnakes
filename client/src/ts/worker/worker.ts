@@ -1,4 +1,3 @@
-import * as GUD from "./decoder/GameUpdateDecoder";
 import { MessageFromMain, ConnectToServer } from "../protocol/main-worker";
 import {
     ClientToServerMessage,
@@ -12,8 +11,6 @@ const ctx: Worker = self as any;
 let websocket: WebSocket | undefined = undefined;
 let targetAlpha = 0.0;
 let wantsToBeFast = false;
-let gameConfig: GameConfig | undefined = undefined;
-let snakeId: number = -1;
 
 // Respond to message from parent thread
 ctx.addEventListener("message", (event) => {
@@ -30,7 +27,7 @@ ctx.addEventListener("message", (event) => {
             const request = msg as ConnectToServer;
             websocket = new WebSocket("ws://127.0.0.1:8080/game");
             websocket.binaryType = "arraybuffer";
-            websocket.onmessage = handleServerMessageEvent;
+            //websocket.onmessage = handleServerMessageEvent;
             websocket.onclose = () => {
                 console.log("Connection closed.");
                 websocket = undefined;
@@ -52,36 +49,6 @@ ctx.addEventListener("message", (event) => {
         }
     }
 });
-
-function handleServerMessageEvent(event: MessageEvent): void {
-    const data = event.data as ArrayBuffer | string;
-
-    if (data instanceof ArrayBuffer) {
-        if (gameConfig === undefined) {
-            console.warn("GameConfig not yet defined.");
-            return;
-        }
-
-        const updateData = GUD.decode(snakeId, gameConfig, data);
-        transferAll(ctx, { tag: "GameUpdateData", data: updateData });
-    } else {
-        const msg = JSON.parse(data) as ServerToClientJSONMessage;
-
-        switch (msg.tag) {
-            case "SpawnInfo": {
-                console.log("Spawn info: ", msg);
-                gameConfig = msg.gameConfig;
-                snakeId = msg.snakeId;
-                break;
-            }
-            default: {
-                throw new Error(
-                    `Unknown message from server. (tag = ${msg.tag})`
-                );
-            }
-        }
-    }
-}
 
 function sendInputs(): void {
     if (websocket && websocket.readyState === WebSocket.OPEN) {

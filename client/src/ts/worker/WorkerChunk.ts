@@ -1,4 +1,4 @@
-import BoundingBox from "../math/BoundingBox";
+import Rectangle from "../math/Rectangle";
 import Vector from "../math/Vector";
 import { SnakeChunkData } from "../protocol/main-worker";
 import assert from "../utilities/assert";
@@ -21,7 +21,7 @@ export default class WorkerChunk {
     private numPoints: number;
     private endPoint: Vector;
     private _final: boolean;
-    private box: BoundingBox;
+    private box: Rectangle;
 
     public constructor(snake: Snake, data: DecodedSnakeChunk) {
         assert(snake.id === data.snakeId);
@@ -96,7 +96,7 @@ export default class WorkerChunk {
     }
 }
 
-function createBoundingBox(pathData: Float32Array): BoundingBox {
+function createBoundingBox(pathData: Float32Array): Rectangle {
     assert(pathData.length > 0);
 
     let minX, maxX, minY, maxY;
@@ -112,5 +112,5 @@ function createBoundingBox(pathData: Float32Array): BoundingBox {
         maxY = Math.max(maxX, y);
     }
 
-    return new BoundingBox(minX, maxX, minY, maxY);
+    return new Rectangle(minX, maxX, minY, maxY);
 }

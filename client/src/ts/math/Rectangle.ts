@@ -1,7 +1,7 @@
 /**
  * Represents an axis-aligned rectangle.
  */
-export default class BoundingBox {
+export default class Rectangle {
     public minX: number;
     public maxX: number;
     public minY: number;
@@ -31,17 +31,17 @@ export default class BoundingBox {
         };
     }
 
-    public static fromTransferable(obj: TransferableBox): BoundingBox {
-        return new BoundingBox(obj.minX, obj.maxX, obj.minY, obj.maxY);
+    public static fromTransferable(obj: TransferableBox): Rectangle {
+        return new Rectangle(obj.minX, obj.maxX, obj.minY, obj.maxY);
     }
 
     /**
-     * Computes the squared distance between two BoundingBox instances.
-     * @param a A BoundingBox
-     * @param b Another BoundingBox
+     * Computes the squared distance between two `Rectangle` instances.
+     * @param a A `Rectangle`
+     * @param b Another `Rectangle`
      * @returns Squared distance
      */
-    public static distance2(a: BoundingBox, b: BoundingBox): number {
+    public static distance2(a: Rectangle, b: Rectangle): number {
         let dx = 0.0,
             dy = 0.0;
 
@@ -57,7 +57,7 @@ export default class BoundingBox {
             dy = a.minY - b.maxY;
         }
 
-        return dx*dx + dy*dy;
+        return dx * dx + dy * dy;
     }
 }
 

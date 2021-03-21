@@ -93,11 +93,12 @@ public class SnakeServer {
                 });
 
                 // TODO: measure time and adapt
-                sleep(1000 / 25);
+                sleep(game.config.tickDuration);
             }
         }
 
-        private void sleep(int time) {
+        private void sleep(double seconds) {
+            int time = (int) Math.floor(1000 * seconds);
             try {
                 Thread.sleep(time);
             } catch (InterruptedException ignored) {

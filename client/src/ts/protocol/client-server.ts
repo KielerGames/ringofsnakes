@@ -16,4 +16,5 @@ export type GameConfig = {
     snakeSpeed: number;
     fastSnakeSpeed: number;
     maxTurnDelta: number;
+    tickDuration: number;
 };

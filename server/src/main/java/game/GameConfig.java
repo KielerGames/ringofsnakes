@@ -1,6 +1,7 @@
 package game;
 
 public final class GameConfig {
+    public final double tickDuration = 1.0/25.0; // in seconds
     public final double snakeSpeed;
     public final double fastSnakeSpeed;
     public final double maxTurnDelta;

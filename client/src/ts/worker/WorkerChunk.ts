@@ -7,12 +7,12 @@ import {
     FULL_CHUNK_NUM_POINTS,
 } from "./decoder/SnakeChunkDecoder";
 import SnakeChunkVertexBufferBuilder from "./SnakeChunkVertexBufferBuilder";
-import Snake from "./WorkerSnake";
+import WorkerSnake from "./WorkerSnake";
 
 const VERTEX_SIZE = 4;
 
 export default class WorkerChunk {
-    private snake: Snake;
+    private snake: WorkerSnake;
     private id: number;
     private _full: boolean;
     private pathData: Float32Array;
@@ -23,7 +23,7 @@ export default class WorkerChunk {
     private _final: boolean;
     private box: Rectangle;
 
-    public constructor(snake: Snake, data: DecodedSnakeChunk) {
+    public constructor(snake: WorkerSnake, data: DecodedSnakeChunk) {
         assert(snake.id === data.snakeId);
         this.id = data.chunkId;
         this.snake = snake;
@@ -71,9 +71,7 @@ export default class WorkerChunk {
 
             buffer: buffer.finalize(),
             vertices: points,
-            viewBox: this.box.createTransferable(0.5 * this.snake.width),
-
-            end: this.endPoint.createTransferable(),
+            boundingBox: this.box.createTransferable(0.5 * this.snake.width),
 
             length: this.pathLength,
             offset: this.offset,

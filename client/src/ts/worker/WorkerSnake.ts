@@ -2,7 +2,7 @@ import Vector from "../math/Vector";
 import { SnakeInfo } from "../protocol/main-worker";
 import WorkerChunk from "./WorkerChunk";
 
-export default class Snake {
+export default class WorkerSnake {
     public readonly id:number;
 
     private chunks: WorkerChunk[];

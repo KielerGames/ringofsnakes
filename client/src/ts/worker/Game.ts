@@ -5,7 +5,7 @@ import {
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
 import WorkerChunk from "./WorkerChunk";
-import Snake from "./WorkerSnake";
+import WorkerSnake from "./WorkerSnake";
 
 export default class Game {
     socket: WebSocket;
@@ -13,7 +13,7 @@ export default class Game {
     targetPlayerId: number;
     config: GameConfig;
     chunks: Map<ChunkId, WorkerChunk> = new Map();
-    snakes: Map<SnakeId, Snake> = new Map();
+    snakes: Map<SnakeId, WorkerSnake> = new Map();
 
     constructor(socket: WebSocket, gameConfig: GameConfig) {
         this.socket = socket;

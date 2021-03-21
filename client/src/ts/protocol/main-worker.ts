@@ -2,7 +2,7 @@ import { GameConfig } from "./client-server";
 
 export type MessageFromMain = ConnectToServer | UpdateUserInput;
 
-export type MessageFromWorker = { tag: "GameUpdateData"; data: GameUpdateData };
+export type MessageFromWorker = { tag: "GameUpdateData"; data: any };
 
 // ======================================
 // Messages from Main Thread to Worker:
@@ -34,16 +34,11 @@ export type SnakeChunkData = {
 
     buffer: ArrayBuffer;
     vertices: number;
-    viewBox: {
+    boundingBox: {
         minX: number;
         maxX: number;
         minY: number;
         maxY: number;
-    };
-
-    end: {
-        x: number;
-        y: number;
     };
 
     length: number;

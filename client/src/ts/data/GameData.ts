@@ -1,6 +1,4 @@
 import { GameConfig } from "../protocol/client-server";
-import { GameUpdateData } from "../protocol/main-worker";
-import { Snake, SnakeChunk } from "./Snake";
 
 type ChunkConsumer = (chunk: SnakeChunk) => any;
 

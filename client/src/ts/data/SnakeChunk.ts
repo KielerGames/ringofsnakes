@@ -10,6 +10,7 @@ export default class SnakeChunk {
 
     public readonly buffer: ArrayBuffer;
     public readonly vertices: number;
+    public readonly final: boolean;
     private _offset: number;
     private _lastOffset: number;
     private time: number;
@@ -25,6 +26,7 @@ export default class SnakeChunk {
         this.boundingBox = Rectangle.fromTransferable(data.boundingBox);
         this.buffer = data.buffer;
         this.vertices = data.vertices;
+        this.final = data.final;
     }
 
     public computeOffset(config: GameConfig, time: number): number {

@@ -1,4 +1,6 @@
 import { GameConfig } from "../protocol/client-server";
+import Snake from "./Snake";
+import SnakeChunk from "./SnakeChunk";
 
 type ChunkConsumer = (chunk: SnakeChunk) => any;
 
@@ -29,11 +31,8 @@ export default class GameData {
                 throw new Error(`No data for snake ${chunkData.snakeId}!`);
             }
             const chunk = new SnakeChunk(snake, chunkData);
-            if(chunk.data.full) {
-                console.log(`chunk ${chunk.getUniqueId()} is full (length ${chunk.length})`);
-            }
-            snake.chunks.set(chunk.id, chunk);
-            this.chunks.set(chunk.getUniqueId(), chunk);
+            snake.addChunk(chunk);
+            this.chunks.set(chunk.id, chunk);
         });
 
         this.garbageCollectChunks();
@@ -47,14 +46,14 @@ export default class GameData {
         let deleteChunks:SnakeChunk[] = [];
 
         this.chunks.forEach(chunk => {
-            if(chunk.data.offset >= chunk.snake.data.length) {
+            if(chunk.lastOffset >= chunk.snake.length) {
                 deleteChunks.push(chunk);
             }
         });
 
         deleteChunks.forEach(chunk => {
-            this.chunks.delete(chunk.getUniqueId());
-            chunk.snake.chunks.delete(chunk.id);
+            this.chunks.delete(chunk.id);
+            chunk.snake.removeChunk(chunk.id);
         });
 
         if(deleteChunks.length > 0) {

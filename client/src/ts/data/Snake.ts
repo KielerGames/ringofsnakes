@@ -15,4 +15,12 @@ export default class Snake {
     public get width(): number {
         return 0.5;
     }
+
+    public addChunk(chunk: SnakeChunk):void {
+        this.chunks.set(chunk.id, chunk);
+    }
+
+    public removeChunk(id: number):void {
+        this.chunks.delete(id);
+    }
 }

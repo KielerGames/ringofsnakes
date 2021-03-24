@@ -7,7 +7,7 @@ declare const __VERTEXSHADER_SNAKE__: string;
 declare const __FRAGMENTSHADER_SNAKE__: string;
 type Color = [number, number, number];
 
-let gl:WebGLRenderingContext;
+let gl: WebGLRenderingContext;
 let basicMaterialShader: WebGLShaderProgram;
 let buffer: WebGLBuffer;
 
@@ -25,6 +25,12 @@ export function init(glCtx: WebGLRenderingContext): void {
         __VERTEXSHADER_SNAKE__,
         __FRAGMENTSHADER_SNAKE__
     );
+    basicMaterialShader.bufferLayout = [
+        "vPosition",
+        "vNormal",
+        "vNormalOffset",
+        "vRelativePathOffset",
+    ];
 
     buffer = gl.createBuffer()!;
 

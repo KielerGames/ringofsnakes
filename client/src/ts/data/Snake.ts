@@ -1,3 +1,4 @@
+import Vector from "../math/Vector";
 import SnakeChunk from "./SnakeChunk";
 
 export default class Snake {
@@ -5,6 +6,7 @@ export default class Snake {
     public readonly skin: number;
     private chunks: Map<number, SnakeChunk> = new Map();
     public length: number;
+    private position:Vector;
 
     public constructor(data: any) {}
 
@@ -14,6 +16,14 @@ export default class Snake {
 
     public get width(): number {
         return 0.5;
+    }
+
+    public get x(): number {
+        return this.position.x;
+    }
+
+    public get y(): number {
+        return this.position.y;
     }
 
     public addChunk(chunk: SnakeChunk):void {

@@ -1,8 +1,8 @@
 import { GameConfig } from "./client-server";
 
-export type MessageFromMain = ConnectToServer | UpdateUserInput;
+export type MessageFromMain = ConnectToServer | UpdateUserInput | RequestFrameData;
 
-export type MessageFromWorker = { tag: "GameUpdateData"; data: any };
+export type MessageFromWorker = { tag: "GameUpdateData"; data: any } | FrameDataResponse;
 
 // ======================================
 // Messages from Main Thread to Worker:
@@ -57,3 +57,15 @@ export type SnakeInfo = {
         y: number;
     };
 };
+
+export type RequestFrameData {
+    tag: "RequestFrameData";
+    time: number;
+    id: number;
+}
+
+export type FrameDataResponse {
+    tag: "FrameDataResponse";
+    id: number;
+    data: any;
+}

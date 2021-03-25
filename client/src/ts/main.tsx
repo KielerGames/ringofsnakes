@@ -1,27 +1,30 @@
 import {
-    MessageFromMain,
+    MessageFromMain
 } from "./protocol/main-worker";
 import ReactDOM from "react-dom";
 import React from "react";
 import UserInput from "./components/UserInput";
 import GameData from "./data/GameData";
 import * as GameRenderer from "./renderer/GameRenderer";
+import WorkerManager from "./WorkerManager";
 
 document.body.style.backgroundColor = "black";
 GameRenderer.init(document.body);
 
-const worker = new Worker("worker.bundle.js", { name: "SnakeWorker" });
+const worker = new WorkerManager();
+
 worker.postMessage({
     tag: "ConnectToServer",
     playerName: "SnakeForceOne",
-} as MessageFromMain);
+});
 
 const data = new GameData();
 
-worker.addEventListener("message", (event) => {
-    data.update(event.data.data as GameUpdateData);
-    //TODO
-});
+async function renderLoop() {
+    const frameData = await worker.requestFrameData(42.0);
+    data.update(frameData);
+    window.requestAnimationFrame(renderLoop);
+}
 
 // react
 const root = document.createElement("div");

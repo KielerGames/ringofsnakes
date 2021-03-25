@@ -1,5 +1,5 @@
 import GameData from "../data/GameData";
-import Matrix from "../webgl/Matrix";
+import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 
 let gl:WebGLRenderingContext;
@@ -43,5 +43,5 @@ export function render(data: GameData):void {
         translate
     );
     
-    SnakeChunkRenderer.render([/* TODO */], transform);
+    SnakeChunkRenderer.render(data.getChunks(), transform);
 }

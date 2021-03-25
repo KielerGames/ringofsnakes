@@ -2,8 +2,6 @@ import { GameConfig } from "../protocol/client-server";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
 
-type ChunkConsumer = (chunk: SnakeChunk) => any;
-
 export default class GameData {
     private gameConfig: GameConfig; //TODO
     private snakes: Map<number, Snake> = new Map();
@@ -38,8 +36,8 @@ export default class GameData {
         this.garbageCollectChunks();
     }
 
-    public forEachChunk(consumer: ChunkConsumer): void {
-        this.chunks.forEach(consumer);
+    public getChunks():IterableIterator<SnakeChunk> {
+        return this.chunks.values();
     }
 
     private garbageCollectChunks():void {

@@ -1,6 +1,6 @@
 import SnakeChunk from "../data/SnakeChunk";
 import assert from "../utilities/assert";
-import Matrix from "../webgl/Matrix";
+import Matrix from "../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 
 declare const __VERTEXSHADER_SNAKE__: string;
@@ -37,12 +37,12 @@ export function init(glCtx: WebGLRenderingContext): void {
     assert(snakeColors.length > 0);
 }
 
-export function render(chunks: SnakeChunk[], transform: Matrix): void {
+export function render(chunks: Iterable<SnakeChunk>, transform: Matrix): void {
     const shader = basicMaterialShader;
     shader.use();
     shader.setUniform("uTransform", transform.data);
 
-    chunks.forEach((chunk) => {
+    for (const chunk of chunks) {
         const snake = chunk.snake;
         setSkin(snake.skin);
         shader.setUniform("uChunkPathOffset", chunk.lastOffset);
@@ -51,7 +51,7 @@ export function render(chunks: SnakeChunk[], transform: Matrix): void {
 
         gl.bufferData(gl.ARRAY_BUFFER, chunk.buffer, gl.STREAM_DRAW);
         shader.run(gl.TRIANGLE_STRIP, 0, chunk.vertices);
-    });
+    }
 }
 
 function setSkin(skin: number): void {

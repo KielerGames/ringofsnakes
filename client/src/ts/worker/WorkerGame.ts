@@ -7,7 +7,7 @@ import * as GUD from "./decoder/GameUpdateDecoder";
 import WorkerChunk from "./WorkerChunk";
 import WorkerSnake from "./WorkerSnake";
 
-export default class Game {
+export default class WorkerGame {
     socket: WebSocket;
 
     targetPlayerId: number;
@@ -15,14 +15,19 @@ export default class Game {
     chunks: Map<ChunkId, WorkerChunk> = new Map();
     snakes: Map<SnakeId, WorkerSnake> = new Map();
 
-    constructor(socket: WebSocket, gameConfig: GameConfig) {
+    targetAlpha: number = 0.0;
+    wantsToBeFast: boolean = false;
+
+    constructor(socket: WebSocket, snakeId: number, gameConfig: GameConfig) {
         this.socket = socket;
         this.config = gameConfig;
+        this.targetPlayerId = snakeId;
 
         assert(socket.readyState === WebSocket.OPEN);
         assert(socket.binaryType === "arraybuffer");
 
         socket.onmessage = this.onMessageFromServer.bind(this);
+        socket.onclose = () => console.log("Connection closed.");
     }
 
     private onMessageFromServer(event: MessageEvent) {
@@ -46,15 +51,31 @@ export default class Game {
             const json = JSON.parse(rawData) as ServerToClientJSONMessage;
 
             switch (json.tag) {
-                case "SpawnInfo": {
-                    break;
-                }
+                // case "SpawnInfo": {
+                //     break;
+                // }
                 default: {
                     throw new Error(
                         `Unknown message from server. (tag = ${json.tag})`
                     );
                 }
             }
+        }
+    }
+
+    public updateUserInput(alpha: number, fast: boolean): void {
+        this.targetAlpha = alpha;
+        this.wantsToBeFast = fast;
+
+        // send to server
+        const ws = this.socket;
+        if (ws.readyState === WebSocket.OPEN) {
+            let buffer = new ArrayBuffer(10);
+            let view = new DataView(buffer);
+            view.setFloat64(0, this.targetAlpha, false);
+            view.setUint8(8, this.wantsToBeFast ? 1 : 0);
+            view.setUint8(9, 42);
+            ws.send(buffer);
         }
     }
 }

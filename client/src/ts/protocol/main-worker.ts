@@ -1,5 +1,3 @@
-import { GameConfig } from "./client-server";
-
 /* Vertex buffer triangle strip:
  *   3--2
  *   | /|

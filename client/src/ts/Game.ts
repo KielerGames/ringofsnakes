@@ -6,14 +6,18 @@ export default class Game {
     private worker: Comlink.Remote<WorkerAPI>;
     public data: GameData;
 
-    public constructor(name: string) {
+    private constructor() {
         this.worker = Comlink.wrap<WorkerAPI>(
             new Worker("worker.bundle.js", { name: "SnakeWorker" })
         );
 
         this.data = new GameData();
+    }
 
-        this.worker.init(name);
+    public static async joinAs(name: string): Promise<Game> {
+        const game = new Game();
+        await game.worker.init(name);
+        return game;
     }
 
     public async update(): Promise<void> {

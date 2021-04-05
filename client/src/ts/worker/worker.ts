@@ -1,9 +1,10 @@
 import * as Comlink from "comlink";
 import {
     ClientToServerMessage,
+    GameConfig,
     ServerToClientJSONMessage,
 } from "../protocol";
-import { TickUpdateData } from "./TickDataUpdate";
+import { TickDataUpdate } from "./TickDataUpdate";
 import WorkerGame from "./WorkerGame";
 
 let game: WorkerGame | null = null;
@@ -59,8 +60,15 @@ export class WorkerAPI {
         }
     }
 
-    public requestFrameData(time: number): TickUpdateData {
+    public getNextTickData(): TickDataUpdate {
         return null as never; //TODO
+    }
+
+    public getConfig(): GameConfig {
+        if(!game) {
+            throw new Error("No game config. (Game not fully initialized)");
+        }
+        return game.config;
     }
 }
 

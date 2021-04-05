@@ -1,5 +1,5 @@
 import Vector from "../math/Vector";
-import { TickUpdateData } from "../worker/TickDataUpdate";
+import { TickDataUpdate } from "../worker/TickDataUpdate";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
 
@@ -8,7 +8,7 @@ export default class GameData {
     private chunks: Map<number, SnakeChunk> = new Map();
     public cameraPosition: Vector = new Vector(0, 0);
 
-    public update(data: TickUpdateData): void {
+    public update(data: TickDataUpdate): void {
         this.cameraPosition.set(data.cameraPosition);
 
         // update & add new snakes

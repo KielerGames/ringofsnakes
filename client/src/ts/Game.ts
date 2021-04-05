@@ -5,6 +5,7 @@ import { WorkerAPI } from "./worker/worker";
 export default class Game {
     private worker: Comlink.Remote<WorkerAPI>;
     public data: GameData;
+    private updateInterval: number = -1;
 
     private constructor() {
         this.worker = Comlink.wrap<WorkerAPI>(
@@ -17,12 +18,21 @@ export default class Game {
     public static async joinAs(name: string): Promise<Game> {
         const game = new Game();
         await game.worker.init(name);
+        const config = await game.worker.getConfig();
+        game.updateInterval = window.setInterval(
+            game.updateData.bind(game),
+            config.tickDuration
+        );
         return game;
     }
 
-    public async update(): Promise<void> {
-        const frameData = await this.worker.requestFrameData(42.0);
-        this.data.update(frameData);
+    private async updateData(): Promise<void> {
+        const tickData = await this.worker.getNextTickData();
+        this.data.update(tickData);
+    }
+
+    private async update(): Promise<void> {
+        //TODO
     }
 
     public async updateUserInput(alpha: number, fast: boolean): Promise<void> {

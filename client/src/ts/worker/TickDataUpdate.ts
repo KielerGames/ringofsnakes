@@ -1,4 +1,4 @@
-export type TickUpdateData = {
+export type TickDataUpdate = {
     time: number;
     newChunks: SnakeChunkData[];
     chunkOffsets: Map<ChunkId, number>;

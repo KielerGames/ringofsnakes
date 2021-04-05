@@ -17,7 +17,6 @@ document.body.appendChild(root);
     const game = await Game.joinAs("SnakeForceOne");
 
     async function renderLoop() {
-        await game.update();
         GameRenderer.render(game.data);
         window.requestAnimationFrame(renderLoop);
     }

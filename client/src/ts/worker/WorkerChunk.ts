@@ -1,6 +1,5 @@
 import Rectangle from "../math/Rectangle";
 import Vector from "../math/Vector";
-import { SnakeChunkData } from "../protocol/main-worker";
 import assert from "../utilities/assert";
 import {
     DecodedSnakeChunk,
@@ -112,3 +111,26 @@ function createBoundingBox(pathData: Float32Array): Rectangle {
 
     return new Rectangle(minX, maxX, minY, maxY);
 }
+
+/* Vertex buffer triangle strip:
+ *   3--2
+ *   | /|
+ *   |/ |
+ *   2--1
+ */
+export type SnakeChunkData = {
+    id: number;
+
+    buffer: ArrayBuffer;
+    vertices: number;
+    boundingBox: {
+        minX: number;
+        maxX: number;
+        minY: number;
+        maxY: number;
+    };
+
+    length: number;
+    offset: number;
+    final: boolean;
+};

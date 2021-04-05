@@ -1,4 +1,5 @@
 import Vector from "../math/Vector";
+import { SnakeInfo } from "../worker/decoder/GameUpdateDecoder";
 import SnakeChunk from "./SnakeChunk";
 
 export default class Snake {
@@ -8,7 +9,17 @@ export default class Snake {
     public length: number;
     private position:Vector;
 
-    public constructor(data: any) {}
+    public constructor(data: SnakeInfo) {
+        this.id = data.snakeId;
+        this.skin = data.skin;
+        this.length = data.length;
+        this.position = //new Vector(data.position.x)
+    }
+
+    public update(data: SnakeInfo): void {
+        this.length = data.length;
+        //TODO position
+    }
 
     public get fast(): boolean {
         return false;

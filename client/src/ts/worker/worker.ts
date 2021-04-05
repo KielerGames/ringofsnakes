@@ -1,10 +1,8 @@
 import * as Comlink from "comlink";
-import Game from "../Game";
 import {
     ClientToServerMessage,
-    GameConfig,
     ServerToClientJSONMessage,
-} from "../protocol/client-server";
+} from "../protocol";
 import WorkerGame from "./WorkerGame";
 
 let game: WorkerGame | null = null;

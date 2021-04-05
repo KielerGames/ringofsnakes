@@ -1,5 +1,5 @@
 import { DecodeResult } from "./DecodeResult";
-import { GameConfig } from "../../protocol/client-server";
+import { GameConfig } from "../../protocol";
 import { normalizeAngle } from "../../math/utils";
 
 const SNAKE_CHUNK_MAX_BYTES = 128;

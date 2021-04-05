@@ -1,7 +1,7 @@
 import {
     GameConfig,
     ServerToClientJSONMessage,
-} from "../protocol/client-server";
+} from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
 import WorkerChunk from "./WorkerChunk";
@@ -56,7 +56,7 @@ export default class WorkerGame {
                 // }
                 default: {
                     throw new Error(
-                        `Unknown message from server. (tag = ${json.tag})`
+                        `Unexpected message from server. (tag = ${json.tag})`
                     );
                 }
             }
@@ -68,6 +68,7 @@ export default class WorkerGame {
         this.wantsToBeFast = fast;
 
         // send to server
+        // TODO: limit update rate
         const ws = this.socket;
         if (ws.readyState === WebSocket.OPEN) {
             let buffer = new ArrayBuffer(10);

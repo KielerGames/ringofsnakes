@@ -1,21 +1,17 @@
-import { GameConfig } from "../protocol/client-server";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
 
 export default class GameData {
-    private gameConfig: GameConfig; //TODO
     private snakes: Map<number, Snake> = new Map();
     private chunks: Map<number, SnakeChunk> = new Map();
     public targetSnake: Snake;
 
-    public update(data: GameUpdateData): void {
-        this.gameConfig = data.gameConfig;
-
+    public update(data: any): void {
         // update snakes
         data.snakeInfos.forEach((snakeInfo) => {
             const snake = this.snakes.get(snakeInfo.snakeId);
             if (snake) {
-                snake.update(snakeInfo, this.gameConfig);
+                snake.update(snakeInfo);
             } else {
                 this.snakes.set(snakeInfo.snakeId, new Snake(snakeInfo));
             }

@@ -1,25 +1,28 @@
+import Vector from "../math/Vector";
+import { TickUpdateData } from "../worker/TickDataUpdate";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
 
 export default class GameData {
     private snakes: Map<number, Snake> = new Map();
     private chunks: Map<number, SnakeChunk> = new Map();
-    public targetSnake: Snake;
+    public cameraPosition: Vector = new Vector(0, 0);
 
-    public update(data: any): void {
-        // update snakes
-        data.snakeInfos.forEach((snakeInfo) => {
-            const snake = this.snakes.get(snakeInfo.snakeId);
+    public update(data: TickUpdateData): void {
+        this.cameraPosition.set(data.cameraPosition);
+
+        // update & add new snakes
+        data.snakes.forEach((snakeData) => {
+            const snake = this.snakes.get(snakeData.id);
             if (snake) {
-                snake.update(snakeInfo);
+                snake.update(snakeData);
             } else {
-                this.snakes.set(snakeInfo.snakeId, new Snake(snakeInfo));
+                this.snakes.set(snakeData.id, new Snake(snakeData));
             }
         });
-        this.targetSnake = this.snakes.get(data.targetSnakeId)!;
 
-        // update chunks
-        data.chunkData.forEach((chunkData) => {
+        // add new chunks
+        data.newChunks.forEach((chunkData) => {
             const snake = this.snakes.get(chunkData.snakeId);
             if (snake === undefined) {
                 throw new Error(`No data for snake ${chunkData.snakeId}!`);
@@ -29,28 +32,33 @@ export default class GameData {
             this.chunks.set(chunk.id, chunk);
         });
 
+        // update existing chunks
+        data.chunkOffsets.forEach((offset, chunkId) => {
+            this.chunks.get(chunkId)!.updateOffset(offset);
+        });
+
         this.garbageCollectChunks();
     }
 
-    public getChunks():IterableIterator<SnakeChunk> {
+    public getChunks(): IterableIterator<SnakeChunk> {
         return this.chunks.values();
     }
 
-    private garbageCollectChunks():void {
-        let deleteChunks:SnakeChunk[] = [];
+    private garbageCollectChunks(): void {
+        let deleteChunks: SnakeChunk[] = [];
 
-        this.chunks.forEach(chunk => {
-            if(chunk.lastOffset >= chunk.snake.length) {
+        this.chunks.forEach((chunk) => {
+            if (chunk.offset() >= chunk.snake.length) {
                 deleteChunks.push(chunk);
             }
         });
 
-        deleteChunks.forEach(chunk => {
+        deleteChunks.forEach((chunk) => {
             this.chunks.delete(chunk.id);
             chunk.snake.removeChunk(chunk.id);
         });
 
-        if(deleteChunks.length > 0) {
+        if (deleteChunks.length > 0) {
             console.log(`Garbage-collected ${deleteChunks.length} chunk(s).`);
         }
     }

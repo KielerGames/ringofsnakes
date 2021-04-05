@@ -1,4 +1,3 @@
-import { SnakeInfo } from "../../protocol/main-worker";
 import { DecodeResult } from "./DecodeResult";
 
 export const SNAKE_INFO_SIZE = 20;
@@ -30,3 +29,15 @@ export function decode(
         nextByteOffset: offset + SNAKE_INFO_SIZE,
     };
 }
+
+export type SnakeInfo = {
+    snakeId: number;
+    skin: number;
+    fast: boolean;
+    length: number;
+    direction: number;
+    position: {
+        x: number;
+        y: number;
+    };
+};

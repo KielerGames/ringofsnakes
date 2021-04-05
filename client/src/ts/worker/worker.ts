@@ -3,6 +3,7 @@ import {
     ClientToServerMessage,
     ServerToClientJSONMessage,
 } from "../protocol";
+import { TickUpdateData } from "./TickDataUpdate";
 import WorkerGame from "./WorkerGame";
 
 let game: WorkerGame | null = null;
@@ -58,8 +59,8 @@ export class WorkerAPI {
         }
     }
 
-    public requestFrameData(time: number): any {
-        return null; //TODO
+    public requestFrameData(time: number): TickUpdateData {
+        return null as never; //TODO
     }
 }
 

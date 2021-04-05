@@ -1,5 +1,5 @@
 import Vector from "../math/Vector";
-import { SnakeInfo } from "../worker/decoder/GameUpdateDecoder";
+import { SnakeData } from "../worker/TickDataUpdate";
 import SnakeChunk from "./SnakeChunk";
 
 export default class Snake {
@@ -8,21 +8,19 @@ export default class Snake {
     private chunks: Map<number, SnakeChunk> = new Map();
     public length: number;
     private position:Vector;
+    public speed: number;
 
-    public constructor(data: SnakeInfo) {
-        this.id = data.snakeId;
+    public constructor(data: SnakeData) {
+        this.id = data.id;
         this.skin = data.skin;
         this.length = data.length;
-        this.position = //new Vector(data.position.x)
+        this.position = Vector.fromObject(data.position);
+        this.speed = data.speed;
     }
 
-    public update(data: SnakeInfo): void {
+    public update(data: SnakeData): void {
         this.length = data.length;
-        //TODO position
-    }
-
-    public get fast(): boolean {
-        return false;
+        this.position.set(data.position);
     }
 
     public get width(): number {

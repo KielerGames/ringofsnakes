@@ -44,18 +44,6 @@ export function decode(
 }
 
 export type GameUpdateData = {
-    snakeInfos: SnakeInfo[];
+    snakeInfos: SID.SnakeInfo[];
     chunkData: SCD.DecodedSnakeChunk[];
-};
-
-export type SnakeInfo = {
-    snakeId: number;
-    skin: number;
-    fast: boolean;
-    length: number;
-    direction: number;
-    position: {
-        x: number;
-        y: number;
-    };
 };

@@ -1,5 +1,5 @@
 import Vector from "../math/Vector";
-import { SnakeInfo } from "../protocol/main-worker";
+import { SnakeInfo } from "./decoder/SnakeInfoDecoder";
 import WorkerChunk from "./WorkerChunk";
 
 export default class WorkerSnake {

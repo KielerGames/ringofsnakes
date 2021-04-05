@@ -5,6 +5,7 @@ import {
     DecodedSnakeChunk,
     FULL_CHUNK_NUM_POINTS,
 } from "./decoder/SnakeChunkDecoder";
+import { SnakeChunkData } from "./TickDataUpdate";
 import SnakeChunkVertexBufferBuilder from "./SnakeChunkVertexBufferBuilder";
 import WorkerSnake from "./WorkerSnake";
 
@@ -67,6 +68,7 @@ export default class WorkerChunk {
 
         return {
             id: this.id,
+            snakeId: this.snake.id,
 
             buffer: buffer.finalize(),
             vertices: points,
@@ -111,26 +113,3 @@ function createBoundingBox(pathData: Float32Array): Rectangle {
 
     return new Rectangle(minX, maxX, minY, maxY);
 }
-
-/* Vertex buffer triangle strip:
- *   3--2
- *   | /|
- *   |/ |
- *   2--1
- */
-export type SnakeChunkData = {
-    id: number;
-
-    buffer: ArrayBuffer;
-    vertices: number;
-    boundingBox: {
-        minX: number;
-        maxX: number;
-        minY: number;
-        maxY: number;
-    };
-
-    length: number;
-    offset: number;
-    final: boolean;
-};

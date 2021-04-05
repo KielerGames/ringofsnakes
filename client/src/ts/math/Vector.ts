@@ -19,6 +19,11 @@ export default class Vector {
     public createTransferable(): PointLike {
         return { x: this.x, y: this.y };
     }
+
+    public set(data: PointLike): void {
+        this.x = data.x;
+        this.y = data.y;
+    }
 }
 
 type PointLike = {

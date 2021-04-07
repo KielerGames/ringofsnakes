@@ -1,7 +1,7 @@
 export type TickDataUpdate = {
     time: number;
     newChunks: SnakeChunkData[];
-    chunkOffsets: Map<ChunkId, number>;
+    //chunkOffsets: Map<ChunkId, number>;
     snakes: SnakeData[];
     cameraPosition: { x: number; y: number };
 };

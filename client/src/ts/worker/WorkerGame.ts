@@ -1,7 +1,4 @@
-import {
-    GameConfig,
-    ServerToClientJSONMessage,
-} from "../protocol";
+import { GameConfig, ServerToClientJSONMessage } from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
 import WorkerChunk from "./WorkerChunk";
@@ -14,6 +11,7 @@ export default class WorkerGame {
     config: GameConfig;
     chunks: Map<ChunkId, WorkerChunk> = new Map();
     snakes: Map<SnakeId, WorkerSnake> = new Map();
+    time: number;
 
     targetAlpha: number = 0.0;
     wantsToBeFast: boolean = false;
@@ -28,6 +26,8 @@ export default class WorkerGame {
 
         socket.onmessage = this.onMessageFromServer.bind(this);
         socket.onclose = () => console.log("Connection closed.");
+
+        this.time = performance.now();
     }
 
     private onMessageFromServer(event: MessageEvent) {
@@ -39,7 +39,7 @@ export default class WorkerGame {
             data.chunkData.forEach((chunkData) => {
                 let chunk = this.chunks.get(chunkData.chunkId);
                 if (chunk) {
-                    // update chunk
+                    chunk.update(chunkData);
                 } else {
                     const snake = this.snakes.get(chunkData.snakeId);
                     assert(snake !== undefined);
@@ -47,13 +47,13 @@ export default class WorkerGame {
                     this.chunks.set(chunkData.chunkId, chunk);
                 }
             });
+
+            this.time = performance.now();
         } else {
             const json = JSON.parse(rawData) as ServerToClientJSONMessage;
 
             switch (json.tag) {
-                // case "SpawnInfo": {
-                //     break;
-                // }
+                // TODO
                 default: {
                     throw new Error(
                         `Unexpected message from server. (tag = ${json.tag})`
@@ -78,6 +78,12 @@ export default class WorkerGame {
             view.setUint8(9, 42);
             ws.send(buffer);
         }
+    }
+
+    public get cameraPosition(): { x: number; y: number } {
+        return this.snakes
+            .get(this.targetPlayerId)!
+            .position.createTransferable();
     }
 }
 

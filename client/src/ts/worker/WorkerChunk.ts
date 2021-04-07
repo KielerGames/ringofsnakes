@@ -51,6 +51,12 @@ export default class WorkerChunk {
         this.box = createBoundingBox(this.pathData);
     }
 
+    public update(data: DecodedSnakeChunk): void {
+        assert(data.points >= this.numPoints);
+        this.pathData.set(data.pathData, 0); // TODO: copy only new data
+        this.numPoints = data.points;
+    }
+
     public createWebGlData(): SnakeChunkData {
         const points = this.numPoints;
         const buffer = new SnakeChunkVertexBufferBuilder(points);

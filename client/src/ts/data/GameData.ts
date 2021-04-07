@@ -33,9 +33,10 @@ export default class GameData {
         });
 
         // update existing chunks
-        data.chunkOffsets.forEach((offset, chunkId) => {
-            this.chunks.get(chunkId)!.updateOffset(offset);
-        });
+        // data.chunkOffsets.forEach((offset, chunkId) => {
+        //     this.chunks.get(chunkId)!.updateOffset(offset);
+        // });
+        // TODO
 
         this.garbageCollectChunks();
     }

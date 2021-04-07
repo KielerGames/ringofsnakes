@@ -61,11 +61,26 @@ export class WorkerAPI {
     }
 
     public getNextTickData(): TickDataUpdate {
-        return null as never; //TODO
+        if (game === null) {
+            throw new Error("Not initialized.");
+        }
+
+        const chunks = Array.from(game.chunks.values()).map((chunk) =>
+            chunk.createWebGlData()
+        );
+
+        return {
+            time: game.time,
+            newChunks: chunks,
+            snakes: Array.from(game.snakes.values()).map((snake) =>
+                snake.getTransferData(game!.config)
+            ),
+            cameraPosition: game.cameraPosition,
+        };
     }
 
     public getConfig(): GameConfig {
-        if(!game) {
+        if (!game) {
             throw new Error("No game config. (Game not fully initialized)");
         }
         return game.config;

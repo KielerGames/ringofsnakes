@@ -15,8 +15,11 @@ document.body.appendChild(root);
 
 (async () => {
     const game = await Game.joinAs("SnakeForceOne");
+    const start = performance.now();
 
-    async function renderLoop() {
+    async function renderLoop(time: number) {
+        const elapsed = time - start;
+        
         GameRenderer.render(game.data);
         window.requestAnimationFrame(renderLoop);
     }

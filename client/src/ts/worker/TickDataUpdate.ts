@@ -18,7 +18,7 @@ export type SnakeChunkData = {
     id: number;
     snakeId: number;
 
-    buffer: ArrayBuffer;
+    data: Float32Array;
     vertices: number;
     boundingBox: {
         minX: number;

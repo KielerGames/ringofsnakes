@@ -20,7 +20,7 @@ export default class SnakeChunk {
         this.snake = snake;
         this.lastTickOffset = data.offset;
         this.boundingBox = Rectangle.fromTransferable(data.boundingBox);
-        this.buffer = data.buffer;
+        this.buffer = data.data;
         this.vertices = data.vertices;
         this.final = data.final;
     }

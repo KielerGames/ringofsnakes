@@ -4,7 +4,7 @@ const VERTEX_SIZE = 6;
 
 export default class SnakeChunkVertexBufferBuilder {
     private vertices: number;
-    private buffer: Float32Array | undefined;
+    private buffer: Float32Array;
     private position: number = 0;
 
     public constructor(numPoints: number) {
@@ -22,7 +22,7 @@ export default class SnakeChunkVertexBufferBuilder {
         pathOffset: number
     ): void {
         const vb = this.buffer;
-        if(vb === undefined) {
+        if(this.position >= vb.length) {
             throw new Error("Cannot add another point to vertex buffer!");
         }
 
@@ -56,12 +56,7 @@ export default class SnakeChunkVertexBufferBuilder {
         vb[vbo + 5] = pathOffset;
     }
 
-    public finalize(): Float32Array {
-        const vb = this.buffer;
-        if(vb === undefined) {
-            throw new Error("finalize() may only be called once.");
-        }
-        this.buffer = undefined;
-        return vb;        
+    public getBuffer(): Float32Array {
+        return this.buffer;        
     }
 }

@@ -59,7 +59,7 @@ export default class WorkerChunk {
 
     public createWebGlData(): SnakeChunkData {
         const points = this.numPoints;
-        const buffer = new SnakeChunkVertexBufferBuilder(points);
+        const builder = new SnakeChunkVertexBufferBuilder(points);
 
         // create triangle strip vertices
         for (let i = 0; i < points; i++) {
@@ -69,14 +69,14 @@ export default class WorkerChunk {
             const endOffset = this.pathData[pdo + 2];
             const startOffset = this.pathLength - endOffset;
             const alpha = this.pathData[pdo + 3];
-            buffer.addPoint(x, y, alpha, startOffset);
+            builder.addPoint(x, y, alpha, startOffset);
         }
 
         return {
             id: this.id,
             snakeId: this.snake.id,
 
-            buffer: buffer.finalize(),
+            data: builder.getBuffer(),
             vertices: points,
             boundingBox: this.box.createTransferable(0.5 * this.snake.width),
 

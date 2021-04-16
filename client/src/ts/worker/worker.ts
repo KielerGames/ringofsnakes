@@ -69,14 +69,16 @@ export class WorkerAPI {
             chunk.createWebGlData()
         );
 
-        return {
+        const transferables = chunks.map(chunk => chunk.data.buffer);
+
+        return Comlink.transfer({
             time: game.time,
             newChunks: chunks,
             snakes: Array.from(game.snakes.values()).map((snake) =>
                 snake.getTransferData(game!.config)
             ),
             cameraPosition: game.cameraPosition,
-        };
+        }, transferables);
     }
 
     public getConfig(): GameConfig {

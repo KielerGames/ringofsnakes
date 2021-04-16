@@ -6,9 +6,11 @@ uniform float uSnakeLength;
 varying float pathOffset;
 varying float normalOffset;
 
-const vec3 darkColor = mix(uColor, vec(0.1, 0.1, 0.1), 0.5);
+const vec3 darkGrey = vec3(0.1, 0.1, 0.1);
 
 void main(void) {
+	vec3 darkColor = mix(uColor, darkGrey, 0.5);
+
 	float co = abs(normalOffset);
 	co = co * co;
 	co = co * (1.0 + 0.2*sin(2.0*pathOffset));

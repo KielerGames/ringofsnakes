@@ -90,6 +90,14 @@ export class WorkerAPI {
         }
         return game.config;
     }
+
+    public onEnd(callback: () => void): void {
+        if(game === null) {
+            throw new Error("No game.");
+        }
+
+        game.socket.addEventListener("close", callback);
+    }
 }
 
 Comlink.expose(new WorkerAPI());

@@ -21,7 +21,10 @@ document.body.appendChild(root);
         const elapsed = time - start;
         
         GameRenderer.render(game.data);
-        window.requestAnimationFrame(renderLoop);
+        
+        if(!game.ended) {
+            window.requestAnimationFrame(renderLoop);
+        }
     }
 
     window.requestAnimationFrame(renderLoop);

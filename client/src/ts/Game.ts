@@ -6,6 +6,7 @@ export default class Game {
     private worker: Comlink.Remote<WorkerAPI>;
     public data: GameData;
     private updateInterval: number = -1;
+    private _ended: boolean = false;
 
     private constructor() {
         this.worker = Comlink.wrap<WorkerAPI>(
@@ -18,11 +19,14 @@ export default class Game {
     public static async joinAs(name: string): Promise<Game> {
         const game = new Game();
         await game.worker.init(name);
+
         const config = await game.worker.getConfig();
         game.updateInterval = window.setInterval(
             game.updateData.bind(game),
             config.tickDuration
         );
+        game.worker.onEnd(Comlink.proxy(() => (game._ended = true)));
+
         return game;
     }
 
@@ -37,5 +41,9 @@ export default class Game {
 
     public async updateUserInput(alpha: number, fast: boolean): Promise<void> {
         this.worker.updateUserInput(alpha, fast);
+    }
+
+    public get ended(): boolean {
+        return this._ended;
     }
 }

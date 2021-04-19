@@ -36,13 +36,22 @@ export default class WorkerGame {
         if (rawData instanceof ArrayBuffer) {
             const data = GUD.decode(this.config, rawData);
 
+            data.snakeInfos.forEach((info) => {
+                const snake = this.snakes.get(info.snakeId);
+                if (snake) {
+                    snake.update(info);
+                } else {
+                    this.snakes.set(info.snakeId, new WorkerSnake(info));
+                }
+            });
+
             data.chunkData.forEach((chunkData) => {
                 let chunk = this.chunks.get(chunkData.chunkId);
                 if (chunk) {
                     chunk.update(chunkData);
                 } else {
                     const snake = this.snakes.get(chunkData.snakeId);
-                    assert(snake !== undefined);
+                    assert(snake !== undefined, "Data for unknown snake.");
                     chunk = new WorkerChunk(snake!, chunkData);
                     this.chunks.set(chunkData.chunkId, chunk);
                 }
@@ -81,9 +90,8 @@ export default class WorkerGame {
     }
 
     public get cameraPosition(): { x: number; y: number } {
-        return this.snakes
-            .get(this.targetPlayerId)!
-            .position.createTransferable();
+        const player = this.snakes.get(this.targetPlayerId);
+        return player ? player.position.createTransferable() : { x: 0, y: 0 };
     }
 }
 

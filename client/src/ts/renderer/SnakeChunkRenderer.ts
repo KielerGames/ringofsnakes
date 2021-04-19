@@ -41,6 +41,7 @@ export function render(chunks: Iterable<SnakeChunk>, transform: Matrix): void {
     const shader = basicMaterialShader;
     shader.use();
     shader.setUniform("uTransform", transform.data);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
     for (const chunk of chunks) {
         const snake = chunk.snake;

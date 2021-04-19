@@ -8,7 +8,7 @@ export default class SnakeChunk {
     public readonly id: number;
     public readonly snake: Snake;
 
-    public readonly buffer: ArrayBuffer;
+    public readonly buffer: Float32Array;
     public readonly vertices: number;
     public readonly final: boolean;
     private lastTickOffset: number;

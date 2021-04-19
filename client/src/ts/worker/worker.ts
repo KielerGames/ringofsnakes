@@ -38,9 +38,12 @@ export class WorkerAPI {
                                 json.gameConfig
                             )
                         );
+                        // this was the expected message
+                        return;
                     }
                 }
-                console.warn("Unexpected websocket message from server.");
+
+                console.warn("GameInit: Unexpected websocket message from server.");
             };
 
             websocket.send(
@@ -97,6 +100,12 @@ export class WorkerAPI {
         }
 
         game.socket.addEventListener("close", callback);
+    }
+
+    public quitCurrentGame(): void {
+        if(game) {
+            game.socket.close();
+        }
     }
 }
 

@@ -17,7 +17,7 @@ document.body.appendChild(root);
     const game = await Game.joinAs("SnakeForceOne");
     const start = performance.now();
 
-    async function renderLoop(time: number) {
+    function renderLoop(time: number) {
         const elapsed = time - start;
         
         GameRenderer.render(game.data);
@@ -27,8 +27,10 @@ document.body.appendChild(root);
         }
     }
 
+    // start render loop
     window.requestAnimationFrame(renderLoop);
 
+    // render user interface
     ReactDOM.render(
         <UserInput initial={0.0} onChange={game.updateUserInput.bind(game)} />,
         root

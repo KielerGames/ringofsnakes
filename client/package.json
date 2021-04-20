@@ -14,10 +14,11 @@
   },
   "author": "Tim Weißenfels",
   "devDependencies": {
+    "@types/chai": "^4.2.16",
     "@types/mocha": "^8.2.2",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",
-    "assert": "^2.0.0",
+    "chai": "^4.3.4",
     "mocha": "^8.3.2",
     "ts-loader": "^8.1.0",
     "ts-node": "^9.1.1",

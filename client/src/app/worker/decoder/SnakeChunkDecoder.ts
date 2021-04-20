@@ -3,7 +3,7 @@ import { GameConfig } from "../../protocol";
 import { normalizeAngle } from "../../math/utils";
 
 const SNAKE_CHUNK_MAX_BYTES = 128;
-const SNAKE_CHUNK_HEADER_SIZE = 21;
+export const SNAKE_CHUNK_HEADER_SIZE = 21;
 export const FULL_CHUNK_NUM_POINTS =
     SNAKE_CHUNK_MAX_BYTES - SNAKE_CHUNK_HEADER_SIZE + 1;
 
@@ -52,7 +52,7 @@ export function decode(
     const view = new DataView(buffer, byteOffset);
 
     if (view.byteLength < SNAKE_CHUNK_HEADER_SIZE) {
-        throw new Error("Invalid buffer (too small for header)");
+        throw new RangeError("Invalid buffer (too small for header)");
     }
 
     // read chunk header
@@ -71,7 +71,7 @@ export function decode(
         throw new Error(`Invalid chunk offset value: ${chunkOffset}`);
     }
     if (view.byteLength < SNAKE_CHUNK_HEADER_SIZE + n) {
-        throw new Error("Invalid buffer (too small)");
+        throw new RangeError("Invalid buffer (too small)");
     }
 
     // initialize variables

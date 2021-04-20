@@ -28,6 +28,8 @@ export default class WorkerGame {
         socket.onclose = () => console.log("Connection closed.");
 
         this.time = performance.now();
+
+        console.log(`Snake id: ${snakeId}`);
     }
 
     private onMessageFromServer(event: MessageEvent) {
@@ -91,6 +93,9 @@ export default class WorkerGame {
 
     public get cameraPosition(): { x: number; y: number } {
         const player = this.snakes.get(this.targetPlayerId);
+        if(!player) {
+            console.warn(`No snake info for ${this.targetPlayerId}`);
+        }
         return player ? player.position.createTransferable() : { x: 0, y: 0 };
     }
 }

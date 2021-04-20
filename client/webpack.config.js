@@ -25,8 +25,8 @@ console.log("Done.");
 module.exports = {
     mode: "development",
     entry: {
-        main: path.join(__dirname, "src", "ts", "main.tsx"),
-        worker: path.join(__dirname, "src", "ts", "worker", "worker.ts")
+        main: path.join(__dirname, "src", "app", "main.tsx"),
+        worker: path.join(__dirname, "src", "app", "worker", "worker.ts")
     },
     target: "web",
     devtool: "eval-cheap-module-source-map",

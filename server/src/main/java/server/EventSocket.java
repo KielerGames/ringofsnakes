@@ -4,7 +4,6 @@ import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Locale;
 
 @ClientEndpoint
 @ServerEndpoint(value = "/game")
@@ -14,15 +13,12 @@ public class EventSocket {
         System.out.println("Socket Connected: " + session);
 
         SnakeServer.createPlayer(session);
+
+        //session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
     }
 
     @OnMessage
     public void onWebSocketText(Session session, String message) throws IOException {
-        System.out.println("Received TEXT message: " + message);
-
-        if (message.toLowerCase(Locale.US).contains("bye")) {
-            session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
-        }
     }
 
     @OnMessage

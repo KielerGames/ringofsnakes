@@ -5,10 +5,10 @@ import { GameConfig } from "../app/protocol";
 
 
 const cfg: GameConfig = {
-    snakeSpeed: 0.2,
-    fastSnakeSpeed: 0.4,
-    maxTurnDelta: 0.1,
-    tickDuration: 1000/20
+    snakeSpeed: 0.24,
+    fastSnakeSpeed: 0.48,
+    maxTurnDelta: Math.PI / 30,
+    tickDuration: 1.0/25
 };
 
 describe("SnakeChunkDecoder", () => {

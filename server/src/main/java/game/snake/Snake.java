@@ -33,7 +33,7 @@ public class Snake {
 
     public Snake(double startX, double startY) {
         id = nextSnakeId++;
-        skin = (byte) (random.nextInt(100) % 2);
+        skin = (byte) (random.nextInt(100) % 3);
 
         snakeInfoBuffer = ByteBuffer.allocate(INFO_BYTE_SIZE);
         snakeInfoBuffer.putShort(0, id);

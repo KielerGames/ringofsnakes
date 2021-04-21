@@ -7,6 +7,8 @@ import {
 import { TickDataUpdate } from "./TickDataUpdate";
 import WorkerGame from "./WorkerGame";
 
+declare const __DEBUG__: boolean;
+
 let game: WorkerGame | null = null;
 
 export class WorkerAPI {
@@ -97,6 +99,13 @@ export class WorkerAPI {
     public onEnd(callback: () => void): void {
         if(game === null) {
             throw new Error("No game.");
+        }
+
+        if(__DEBUG__) {
+            setTimeout(() => {
+                console.info("Stopping...");
+                callback();
+            }, 3141);
         }
 
         game.socket.addEventListener("close", callback);

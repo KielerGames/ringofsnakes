@@ -93,10 +93,13 @@ export default class WorkerGame {
 
     public get cameraPosition(): { x: number; y: number } {
         const player = this.snakes.get(this.targetPlayerId);
-        if(!player) {
+
+        if(player) {
+            return player.position.createTransferable();
+        } else {
             console.warn(`No snake info for ${this.targetPlayerId}`);
+            return { x: 0, y: 0 };
         }
-        return player ? player.position.createTransferable() : { x: 0, y: 0 };
     }
 }
 

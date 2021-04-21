@@ -19,6 +19,7 @@ export default class WorkerSnake {
 
     public update(info: SnakeInfo): void {
         this.data = info;
+        this.headPosition.set(info.position);
     }
 
     public get width(): number {

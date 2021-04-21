@@ -59,9 +59,9 @@ export function render(chunks: Iterable<SnakeChunk>, transform: Matrix): void {
         nv += chunk.vertices;
     }
 
-    if (__DEBUG__) {
-        console.info(`Rendered ${nc} chunks (${nv} vertices).`);
-    }
+    // if (__DEBUG__) {
+    //     console.info(`Rendered ${nc} chunks (${nv} vertices).`);
+    // }
 }
 
 function setSkin(skin: number): void {

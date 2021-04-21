@@ -105,7 +105,7 @@ export class WorkerAPI {
             setTimeout(() => {
                 console.info("Stopping...");
                 callback();
-            }, 3141);
+            }, 20*1000);
         }
 
         game.socket.addEventListener("close", callback);

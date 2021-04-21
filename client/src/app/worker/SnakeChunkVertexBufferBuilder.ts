@@ -23,7 +23,7 @@ export default class SnakeChunkVertexBufferBuilder {
     ): void {
         const vb = this.buffer;
         if(this.position >= vb.length) {
-            throw new Error("Cannot add another point to vertex buffer!");
+            throw new RangeError("Cannot add another point to vertex buffer!");
         }
 
         // current position in vertex buffer
@@ -36,24 +36,28 @@ export default class SnakeChunkVertexBufferBuilder {
         const nx = Math.cos(normalAlpha);
         const ny = Math.sin(normalAlpha);
 
-        // vertex buffer offset
-        const vbo = 2 * VERTEX_SIZE * pos;
 
         // right vertex
-        vb[vbo + 0] = x;
-        vb[vbo + 1] = y;
-        vb[vbo + 2] = nx;
-        vb[vbo + 3] = ny;
-        vb[vbo + 4] = 1.0;
-        vb[vbo + 5] = pathOffset;
+        {
+            const vbo = 2 * VERTEX_SIZE * pos;
+            vb[vbo + 0] = x;
+            vb[vbo + 1] = y;
+            vb[vbo + 2] = nx;
+            vb[vbo + 3] = ny;
+            vb[vbo + 4] = 1.0;
+            vb[vbo + 5] = pathOffset;
+        }
 
         // left vertex
-        vb[vbo + 0] = x;
-        vb[vbo + 1] = y;
-        vb[vbo + 2] = nx;
-        vb[vbo + 3] = ny;
-        vb[vbo + 4] = -1.0;
-        vb[vbo + 5] = pathOffset;
+        {
+            const vbo = 2 * VERTEX_SIZE * pos + VERTEX_SIZE;
+            vb[vbo + 0] = x;
+            vb[vbo + 1] = y;
+            vb[vbo + 2] = nx;
+            vb[vbo + 3] = ny;
+            vb[vbo + 4] = -1.0;
+            vb[vbo + 5] = pathOffset;
+        }
     }
 
     public getBuffer(): Float32Array {

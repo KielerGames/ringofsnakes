@@ -23,7 +23,7 @@ export default class Game {
         const config = await game.worker.getConfig();
         game.updateInterval = window.setInterval(
             game.updateData.bind(game),
-            config.tickDuration
+            1000 * config.tickDuration
         );
         game.worker.onEnd(Comlink.proxy(() => (game._ended = true)));
 

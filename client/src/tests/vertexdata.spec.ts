@@ -76,6 +76,12 @@ describe("ChunkVertexData", () => {
                 assert.equal(x1, x2);
                 assert.equal(y1, y2);
             }
-        })
+        });
+
+        it("a vertex buffer may not be empty", () => {
+            assert.throws(() => {
+                let vb = new VBBuilder(0);
+            });
+        });
     });
 });

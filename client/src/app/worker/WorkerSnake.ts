@@ -1,15 +1,14 @@
 import Vector from "../math/Vector";
 import { GameConfig } from "../protocol";
 import { SnakeInfo } from "./decoder/SnakeInfoDecoder";
-import { SnakeData } from "./TickDataUpdate";
-import WorkerChunk from "./WorkerChunk";
+import { SnakeData } from "./GameDataUpdate";
 
 export default class WorkerSnake {
     public readonly id: number;
 
-    //private chunks: WorkerChunk[];
     private headPosition: Vector;
     private data: SnakeInfo;
+    private offsetCorrection: number = 0.0;
 
     public constructor(info: SnakeInfo) {
         this.id = info.snakeId;
@@ -17,7 +16,7 @@ export default class WorkerSnake {
         this.data = info;
     }
 
-    public update(info: SnakeInfo): void {
+    public updateFromServer(info: SnakeInfo): void {
         this.data = info;
         this.headPosition.set(info.position);
     }

@@ -1,7 +1,7 @@
 import Rectangle from "../math/Rectangle";
 import { GameConfig } from "../protocol";
 import assert from "../utilities/assert";
-import { SnakeChunkData } from "../worker/TickDataUpdate";
+import { SnakeChunkData } from "../worker/GameDataUpdate";
 import Snake from "./Snake";
 
 export default class SnakeChunk {

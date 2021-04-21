@@ -1,5 +1,5 @@
 import Vector from "../math/Vector";
-import { TickDataUpdate } from "../worker/TickDataUpdate";
+import { GameDataUpdate } from "../worker/GameDataUpdate";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
 
@@ -9,7 +9,7 @@ export default class GameData {
     public cameraPosition: Vector = new Vector(0, 0);
     private lastUpdateTime: number = performance.now();
 
-    public update(data: TickDataUpdate): void {
+    public update(data: GameDataUpdate): void {
         this.lastUpdateTime = performance.now();
         this.cameraPosition.set(data.cameraPosition);
 

@@ -4,8 +4,8 @@ import * as GUD from "./decoder/GameUpdateDecoder";
 import {
     SnakeChunkData,
     SnakeData,
-    TickDataUpdate as GameDataUpdate,
-} from "./TickDataUpdate";
+    GameDataUpdate,
+} from "./GameDataUpdate";
 import WorkerChunk from "./WorkerChunk";
 import WorkerSnake from "./WorkerSnake";
 
@@ -17,6 +17,7 @@ export default class WorkerGame {
     chunks: Map<ChunkId, WorkerChunk> = new Map();
     snakes: Map<SnakeId, WorkerSnake> = new Map();
     lastUpdateTime: number;
+    ticks: number = 0;
 
     targetAlpha: number = 0.0;
     wantsToBeFast: boolean = false;
@@ -46,7 +47,7 @@ export default class WorkerGame {
             data.snakeInfos.forEach((info) => {
                 const snake = this.snakes.get(info.snakeId);
                 if (snake) {
-                    snake.update(info);
+                    snake.updateFromServer(info);
                 } else {
                     this.snakes.set(info.snakeId, new WorkerSnake(info));
                 }
@@ -64,6 +65,7 @@ export default class WorkerGame {
                 }
             });
 
+            this.ticks++;
             this.lastUpdateTime = performance.now();
         } else {
             const json = JSON.parse(rawData) as ServerToClientJSONMessage;
@@ -111,6 +113,7 @@ export default class WorkerGame {
         const chunks: SnakeChunkData[] = new Array(this.chunks.size);
         const snakes: SnakeData[] = new Array(this.snakes.size);
 
+        // chunk updates
         {
             let i = 0;
             let gc: number[] = [];
@@ -126,6 +129,7 @@ export default class WorkerGame {
             gc.forEach((chunkId) => this.chunks.delete(chunkId));
         }
 
+        // snake updates
         {
             let i = 0;
             for (const snake of this.snakes.values()) {
@@ -134,8 +138,12 @@ export default class WorkerGame {
             }
         }
 
+        const ticks = this.ticks;
+        this.ticks = 0;
+
         return {
-            time: this.lastUpdateTime,
+            timeSinceLastTick: performance.now() - this.lastUpdateTime,
+            ticksSinceLastUpdate: ticks,
             newChunks: chunks,
             snakes,
             cameraPosition: this.cameraPosition,

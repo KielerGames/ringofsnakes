@@ -1,7 +1,7 @@
-export type TickDataUpdate = {
-    time: number;
+export type GameDataUpdate = {
+    timeSinceLastTick: number;
+    ticksSinceLastUpdate: number;
     newChunks: SnakeChunkData[];
-    //chunkOffsets: Map<ChunkId, number>;
     snakes: SnakeData[];
     cameraPosition: { x: number; y: number };
 };

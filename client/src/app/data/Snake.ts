@@ -1,5 +1,5 @@
 import Vector from "../math/Vector";
-import { SnakeData } from "../worker/TickDataUpdate";
+import { SnakeData } from "../worker/GameDataUpdate";
 import SnakeChunk from "./SnakeChunk";
 
 export default class Snake {

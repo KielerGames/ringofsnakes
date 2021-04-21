@@ -4,7 +4,7 @@ import {
     GameConfig,
     ServerToClientJSONMessage,
 } from "../protocol";
-import { TickDataUpdate } from "./TickDataUpdate";
+import { GameDataUpdate } from "./GameDataUpdate";
 import WorkerGame from "./WorkerGame";
 
 declare const __DEBUG__: boolean;
@@ -67,7 +67,7 @@ export class WorkerAPI {
         }
     }
 
-    public getGameDataUpdate(): TickDataUpdate {
+    public getGameDataUpdate(): GameDataUpdate {
         if (game === null) {
             throw new Error("Not initialized.");
         }

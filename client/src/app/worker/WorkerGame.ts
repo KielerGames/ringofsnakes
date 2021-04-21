@@ -1,6 +1,7 @@
 import { GameConfig, ServerToClientJSONMessage } from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
+import { TickDataUpdate as GameDataUpdate } from "./TickDataUpdate";
 import WorkerChunk from "./WorkerChunk";
 import WorkerSnake from "./WorkerSnake";
 
@@ -11,7 +12,7 @@ export default class WorkerGame {
     config: GameConfig;
     chunks: Map<ChunkId, WorkerChunk> = new Map();
     snakes: Map<SnakeId, WorkerSnake> = new Map();
-    time: number;
+    lastUpdateTime: number;
 
     targetAlpha: number = 0.0;
     wantsToBeFast: boolean = false;
@@ -27,7 +28,7 @@ export default class WorkerGame {
         socket.onmessage = this.onMessageFromServer.bind(this);
         socket.onclose = () => console.log("Connection closed.");
 
-        this.time = performance.now();
+        this.lastUpdateTime = performance.now();
 
         console.log(`Snake id: ${snakeId}`);
     }
@@ -59,7 +60,7 @@ export default class WorkerGame {
                 }
             });
 
-            this.time = performance.now();
+            this.lastUpdateTime = performance.now();
         } else {
             const json = JSON.parse(rawData) as ServerToClientJSONMessage;
 
@@ -94,12 +95,40 @@ export default class WorkerGame {
     public get cameraPosition(): { x: number; y: number } {
         const player = this.snakes.get(this.targetPlayerId);
 
-        if(player) {
+        if (player) {
             return player.position.createTransferable();
         } else {
             console.warn(`No snake info for ${this.targetPlayerId}`);
             return { x: 0, y: 0 };
         }
+    }
+
+    public getDataUpdate(): GameDataUpdate {
+        const chunks = new Array(this.chunks.size);
+        const snakes = new Array(this.snakes.size);
+
+        {
+            let i = 0;
+            for (const chunk of this.chunks.values()) {
+                chunks[i] = chunk.createTransferData();
+                i++;
+            }
+        }
+
+        {
+            let i = 0;
+            for (const snake of this.snakes.values()) {
+                snakes[i] = snake.getTransferData(this.config);
+                i++;
+            }
+        }
+
+        return {
+            time: this.lastUpdateTime,
+            newChunks: chunks,
+            snakes,
+            cameraPosition: this.cameraPosition,
+        };
     }
 }
 

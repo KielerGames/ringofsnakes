@@ -57,9 +57,9 @@ export default class WorkerChunk {
         this.numPoints = data.points;
     }
 
-    public createWebGlData(): SnakeChunkData {
+    public createTransferData(): SnakeChunkData {
         const points = this.numPoints;
-        const builder = new SnakeChunkVertexBufferBuilder(points);
+        const builder = new SnakeChunkVertexBufferBuilder(points + 1);
 
         // create triangle strip vertices
         for (let i = 0; i < points; i++) {

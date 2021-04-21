@@ -7,8 +7,10 @@ export default class GameData {
     private snakes: Map<number, Snake> = new Map();
     private chunks: Map<number, SnakeChunk> = new Map();
     public cameraPosition: Vector = new Vector(0, 0);
+    private lastUpdateTime: number = performance.now();
 
     public update(data: TickDataUpdate): void {
+        this.lastUpdateTime = performance.now();
         this.cameraPosition.set(data.cameraPosition);
 
         // update & add new snakes
@@ -21,6 +23,11 @@ export default class GameData {
             }
         });
 
+        // update existing chunks
+        // data.chunkOffsets.forEach((offset, chunkId) => {
+        //     this.chunks.get(chunkId)!.updateOffset(offset);
+        // });
+
         // add new chunks
         data.newChunks.forEach((chunkData) => {
             const snake = this.snakes.get(chunkData.snakeId);
@@ -31,12 +38,6 @@ export default class GameData {
             snake.addChunk(chunk);
             this.chunks.set(chunk.id, chunk);
         });
-
-        // update existing chunks
-        // data.chunkOffsets.forEach((offset, chunkId) => {
-        //     this.chunks.get(chunkId)!.updateOffset(offset);
-        // });
-        // TODO
 
         this.garbageCollectChunks();
     }
@@ -62,5 +63,9 @@ export default class GameData {
         if (deleteChunks.length > 0) {
             console.log(`Garbage-collected ${deleteChunks.length} chunk(s).`);
         }
+    }
+
+    public timeSinceLastUpdate(): number {
+        return 0.001 * (performance.now() - this.lastUpdateTime);
     }
 }

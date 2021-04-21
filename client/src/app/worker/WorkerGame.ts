@@ -1,7 +1,11 @@
 import { GameConfig, ServerToClientJSONMessage } from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
-import { TickDataUpdate as GameDataUpdate } from "./TickDataUpdate";
+import {
+    SnakeChunkData,
+    SnakeData,
+    TickDataUpdate as GameDataUpdate,
+} from "./TickDataUpdate";
 import WorkerChunk from "./WorkerChunk";
 import WorkerSnake from "./WorkerSnake";
 
@@ -104,15 +108,22 @@ export default class WorkerGame {
     }
 
     public getDataUpdate(): GameDataUpdate {
-        const chunks = new Array(this.chunks.size);
-        const snakes = new Array(this.snakes.size);
+        const chunks: SnakeChunkData[] = new Array(this.chunks.size);
+        const snakes: SnakeData[] = new Array(this.snakes.size);
 
         {
             let i = 0;
+            let gc: number[] = [];
             for (const chunk of this.chunks.values()) {
                 chunks[i] = chunk.createTransferData();
+                if (chunks[i].final) {
+                    gc.push(chunks[i].id);
+                }
                 i++;
             }
+
+            // garbage-collect chunks
+            gc.forEach((chunkId) => this.chunks.delete(chunkId));
         }
 
         {

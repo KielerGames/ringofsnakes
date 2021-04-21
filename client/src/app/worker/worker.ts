@@ -101,12 +101,12 @@ export class WorkerAPI {
             throw new Error("No game.");
         }
 
-        if(__DEBUG__) {
-            setTimeout(() => {
-                console.info("Stopping...");
-                callback();
-            }, 20*1000);
-        }
+        // if(__DEBUG__) {
+        //     setTimeout(() => {
+        //         console.info("Stopping...");
+        //         callback();
+        //     }, 20*1000);
+        // }
 
         game.socket.addEventListener("close", callback);
     }

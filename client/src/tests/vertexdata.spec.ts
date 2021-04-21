@@ -41,6 +41,12 @@ describe("ChunkVertexData", () => {
             const data = chunk.createWebGlData();
             assert.equal(data.data.length % 6, 0, "Not a multiple of 6!");
         });
+
+        it("the number of vertices should match data.data", () => {
+            const chunk = createWorkerChunk(13);
+            const data = chunk.createWebGlData();
+            assert.equal(data.data.length / 6, data.vertices);
+        });
     });
 
     describe("SnakeChunkVertexBufferBuilder", () => {

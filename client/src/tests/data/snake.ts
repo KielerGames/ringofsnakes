@@ -1,4 +1,5 @@
 import Rand from "rand-seed";
+import { GameConfig } from "../../app/protocol";
 
 import * as SCD from "../../app/worker/decoder/SnakeChunkDecoder";
 import WorkerChunk from "../../app/worker/WorkerChunk";
@@ -30,18 +31,30 @@ export function createSnakeChunkBuffer(
     return data.buffer;
 }
 
+export function createGameConfig(speed: number = 0.24): GameConfig {
+    return {
+        snakeSpeed: speed,
+        fastSnakeSpeed: 2 * speed,
+        maxTurnDelta: Math.PI / 30,
+        tickDuration: 1.0 / 25,
+    };
+}
+
 export function createWorkerSnake(): WorkerSnake {
-    return new WorkerSnake({
-        snakeId: 0,
-        skin: 0,
-        fast: false,
-        length: 42.0,
-        direction: 0.0,
-        position: {
-            x: 0,
-            y: 0,
+    return new WorkerSnake(
+        {
+            snakeId: 0,
+            skin: 0,
+            fast: false,
+            length: 42.0,
+            direction: 0.0,
+            position: {
+                x: 0,
+                y: 0,
+            },
         },
-    });
+        createGameConfig()
+    );
 }
 
 export function createWorkerChunk(n: number): WorkerChunk {
@@ -49,11 +62,6 @@ export function createWorkerChunk(n: number): WorkerChunk {
     const snake = createWorkerSnake();
     return new WorkerChunk(
         snake,
-        SCD.decode(chunkData, 0, {
-            snakeSpeed: 0.24,
-            fastSnakeSpeed: 0.48,
-            maxTurnDelta: Math.PI / 30,
-            tickDuration: 1.0 / 25,
-        }).data
+        SCD.decode(chunkData, 0, createGameConfig()).data
     );
 }

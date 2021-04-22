@@ -31,8 +31,8 @@ export default class Game {
     }
 
     private async updateData(): Promise<void> {
-        const tickData = await this.worker.getGameDataUpdate();
-        this.data.update(tickData);
+        const diff = await this.worker.getGameDataUpdate();
+        this.data.update(diff);
     }
 
     private async update(): Promise<void> {

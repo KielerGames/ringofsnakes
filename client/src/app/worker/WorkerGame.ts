@@ -47,9 +47,9 @@ export default class WorkerGame {
             data.snakeInfos.forEach((info) => {
                 const snake = this.snakes.get(info.snakeId);
                 if (snake) {
-                    snake.updateFromServer(info);
+                    snake.updateFromServer(info, this.config);
                 } else {
-                    this.snakes.set(info.snakeId, new WorkerSnake(info));
+                    this.snakes.set(info.snakeId, new WorkerSnake(info, this.config));
                 }
             });
 
@@ -133,7 +133,7 @@ export default class WorkerGame {
         {
             let i = 0;
             for (const snake of this.snakes.values()) {
-                snakes[i] = snake.getTransferData(this.config);
+                snakes[i] = snake.createTransferData(this.config);
                 i++;
             }
         }

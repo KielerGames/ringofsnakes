@@ -4,6 +4,7 @@ import assert from "../utilities/assert";
 import { SnakeChunkData } from "../worker/GameDataUpdate";
 import Snake from "./Snake";
 
+declare const __DEBUG__: boolean;
 export default class SnakeChunk {
     public readonly id: number;
     public readonly snake: Snake;
@@ -25,8 +26,13 @@ export default class SnakeChunk {
         this.final = data.final;
     }
 
-    public updateOffset(newOffset: number): void {
-        this.lastTickOffset = newOffset;
+    public addToOffset(diff: number): void {
+        if(__DEBUG__) {
+            if(diff < 0) {
+                console.warn(`Negative offset correction by ${diff}.`);
+            }
+        }
+        this.lastTickOffset = diff;
     }
 
     public offset(timeSinceLastTick: number = 0.0): number {

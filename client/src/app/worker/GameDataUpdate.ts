@@ -39,4 +39,5 @@ export type SnakeData = {
     position: { x: number; y: number; };
     direction: number;
     speed: number;
+    offsetCorrection: number;
 }

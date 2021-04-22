@@ -1,4 +1,5 @@
 import Vector from "../math/Vector";
+import { GameConfig } from "../protocol";
 import { GameDataUpdate } from "../worker/GameDataUpdate";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
@@ -10,23 +11,23 @@ export default class GameData {
     private lastUpdateTime: number = performance.now();
 
     public update(data: GameDataUpdate): void {
-        this.lastUpdateTime = performance.now();
+        // time stuff
+        const now = performance.now();
+        const timeSinceLastUpdate = now - this.lastUpdateTime;
+        this.lastUpdateTime = now;
+
+        // camera
         this.cameraPosition.set(data.cameraPosition);
 
         // update & add new snakes
         data.snakes.forEach((snakeData) => {
             const snake = this.snakes.get(snakeData.id);
             if (snake) {
-                snake.update(snakeData);
+                snake.update(snakeData, data.ticksSinceLastUpdate);
             } else {
                 this.snakes.set(snakeData.id, new Snake(snakeData));
             }
         });
-
-        // update existing chunks
-        // data.chunkOffsets.forEach((offset, chunkId) => {
-        //     this.chunks.get(chunkId)!.updateOffset(offset);
-        // });
 
         // add new chunks
         data.newChunks.forEach((chunkData) => {

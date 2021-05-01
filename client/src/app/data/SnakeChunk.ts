@@ -31,8 +31,11 @@ export default class SnakeChunk {
             if(diff < 0) {
                 console.warn(`Negative offset correction by ${diff}.`);
             }
+            if(!this.final) {
+                console.warn(`Offset change on non-final chunk`);
+            }
         }
-        this.lastTickOffset = diff;
+        this.lastTickOffset += diff;
     }
 
     public offset(timeSinceLastTick: number = 0.0): number {

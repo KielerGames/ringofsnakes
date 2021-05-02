@@ -1,5 +1,4 @@
 import Rectangle from "../math/Rectangle";
-import Vector from "../math/Vector";
 import assert from "../utilities/assert";
 import {
     DecodedSnakeChunk,
@@ -9,7 +8,7 @@ import { SnakeChunkData } from "./GameDataUpdate";
 import SnakeChunkVertexBufferBuilder from "./SnakeChunkVertexBufferBuilder";
 import WorkerSnake from "./WorkerSnake";
 
-const VERTEX_SIZE = 4;
+const PATH_VERTEX_SIZE = 4;
 
 export default class WorkerChunk {
     private snake: WorkerSnake;
@@ -19,7 +18,6 @@ export default class WorkerChunk {
     private pathLength: number;
     private offset: number;
     private numPoints: number;
-    private endPoint: Vector;
     private _final: boolean;
     private box: Rectangle;
 
@@ -40,13 +38,15 @@ export default class WorkerChunk {
             this._final = false;
 
             // allocate memory once
-            this.pathData = new Float32Array(FULL_CHUNK_NUM_POINTS * 4);
+            this.pathData = new Float32Array(
+                FULL_CHUNK_NUM_POINTS * PATH_VERTEX_SIZE
+            );
             // copy data
             this.pathData.set(data.pathData, 0);
         }
 
         assert(this.pathData instanceof Float32Array);
-        assert(this.pathData.length % 4 === 0);
+        assert(this.pathData.length % PATH_VERTEX_SIZE === 0);
 
         this.box = createBoundingBox(this.pathData);
     }
@@ -60,23 +60,34 @@ export default class WorkerChunk {
     public createTransferData(): SnakeChunkData {
         const points = this.numPoints;
         const bufferPoints = this.final ? points : points + 1;
-        const builder = new SnakeChunkVertexBufferBuilder(bufferPoints);
+        const builder = new SnakeChunkVertexBufferBuilder(
+            bufferPoints,
+            this.pathLength
+        );
 
         // create triangle strip vertices
         for (let i = 0; i < points; i++) {
-            const pdo = 4 * i;
+            const pdo = PATH_VERTEX_SIZE * i;
+
             const x = this.pathData[pdo + 0];
             const y = this.pathData[pdo + 1];
-            const endOffset = this.pathData[pdo + 2];
-            const startOffset = this.pathLength - endOffset;
+
+            // start is the point where the path data starts
+            const currentPathLength = this.pathData[pdo + 2];
+
             const alpha = this.pathData[pdo + 3];
-            builder.addPoint(x, y, alpha, startOffset);
+            builder.addPoint(x, y, alpha, currentPathLength);
         }
 
-        if(!this.final) {
+        if (!this.final) {
             // continue line in direction of the snake
             const position = this.snake.position;
-            builder.addPoint(position.x, position.y, this.snake.direction, 0);
+            builder.addPoint(
+                position.x,
+                position.y,
+                this.snake.direction,
+                this.pathLength
+            );
         }
 
         return {
@@ -84,7 +95,7 @@ export default class WorkerChunk {
             snakeId: this.snake.id,
 
             data: builder.getBuffer(),
-            vertices: 2*points,
+            vertices: 2 * points,
             boundingBox: this.box.createTransferable(0.5 * this.snake.width),
 
             length: this.pathLength,
@@ -110,14 +121,15 @@ export default class WorkerChunk {
 
 function createBoundingBox(pathData: Float32Array): Rectangle {
     assert(pathData.length > 0);
+    const N = PATH_VERTEX_SIZE;
 
     let minX, maxX, minY, maxY;
     minX = maxX = pathData[0];
     minY = maxY = pathData[1];
 
     for (let i = 1; i < pathData.length; i++) {
-        const x = pathData[4 * i];
-        const y = pathData[4 * i + 1];
+        const x = pathData[N * i];
+        const y = pathData[N * i + 1];
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x);
         minY = Math.min(minY, y);

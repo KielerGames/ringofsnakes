@@ -55,7 +55,7 @@ describe("Decoder", () => {
             assert.approximately(
                 SCD.decode(buffer, 0, fasterCfg).data.pathLength,
                 4.2 * pathLength,
-                1e-8
+                1e-5
             );
         });
     

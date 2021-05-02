@@ -112,6 +112,10 @@ export function decode(
 
     pathData[pathData.length - 1] = alpha;
 
+    // avoid f32 rounding issues later
+    // this way pathData[idx + 2] is always less or equal to length
+    length = pathData[pathData.length - 2];
+
     return {
         data: {
             snakeId,

@@ -114,7 +114,7 @@ export function decode(
 
     // avoid f32 rounding issues later
     // this way pathData[idx + 2] is always less or equal to length
-    length = pathData[pathData.length - 2];
+    length = Math.max(length, pathData[pathData.length - 2]);
 
     return {
         data: {

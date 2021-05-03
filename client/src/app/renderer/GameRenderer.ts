@@ -20,6 +20,8 @@ export function init(parentNode: HTMLElement = document.body): void {
         preserveDrawingBuffer: false,
     })!;
 
+    gl.disable(gl.DEPTH_TEST);
+
     parentNode.appendChild(canvas);
 
     SnakeChunkRenderer.init(gl);

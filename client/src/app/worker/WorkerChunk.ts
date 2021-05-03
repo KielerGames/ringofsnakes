@@ -53,8 +53,13 @@ export default class WorkerChunk {
 
     public update(data: DecodedSnakeChunk): void {
         assert(data.points >= this.numPoints);
+        assert(data.pathLength >= data.pathLength);
+
         this.pathData.set(data.pathData, 0); // TODO: copy only new data
         this.numPoints = data.points;
+        
+        this.pathLength = data.pathLength;
+        this.offset = data.pathOffset;
     }
 
     public createTransferData(): SnakeChunkData {
@@ -65,18 +70,18 @@ export default class WorkerChunk {
             this.pathLength
         );
 
+        const data = this.pathData;
+
         // create triangle strip vertices
         for (let i = 0; i < points; i++) {
             const pdo = PATH_VERTEX_SIZE * i;
 
-            const x = this.pathData[pdo + 0];
-            const y = this.pathData[pdo + 1];
-
-            // start is the point where the path data starts
-            const currentPathLength = this.pathData[pdo + 2];
-
-            const alpha = this.pathData[pdo + 3];
-            builder.addPoint(x, y, alpha, currentPathLength);
+            builder.addPoint(
+                data[pdo + 0], // x
+                data[pdo + 1], // y
+                data[pdo + 3], // alpha
+                data[pdo + 2]  // path offset
+            );
         }
 
         if (!this.final) {

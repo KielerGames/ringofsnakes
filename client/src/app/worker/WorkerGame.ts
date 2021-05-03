@@ -44,6 +44,7 @@ export default class WorkerGame {
         if (rawData instanceof ArrayBuffer) {
             const data = GUD.decode(this.config, rawData);
 
+            // update snakes
             data.snakeInfos.forEach((info) => {
                 const snake = this.snakes.get(info.snakeId);
                 if (snake) {
@@ -53,6 +54,7 @@ export default class WorkerGame {
                 }
             });
 
+            // update chunks
             data.chunkData.forEach((chunkData) => {
                 let chunk = this.chunks.get(chunkData.chunkId);
                 if (chunk) {
@@ -136,6 +138,7 @@ export default class WorkerGame {
                 snakes[i] = snake.createTransferData(this.config);
                 i++;
             }
+            //TODO: gc snakes
         }
 
         const ticks = this.ticks;

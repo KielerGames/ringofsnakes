@@ -50,12 +50,14 @@ export default class GameData {
     private garbageCollectChunks(): void {
         let deleteChunks: SnakeChunk[] = [];
 
+        // collect "garbage" chunks
         this.chunks.forEach((chunk) => {
             if (chunk.offset() >= chunk.snake.length) {
                 deleteChunks.push(chunk);
             }
         });
 
+        // remove collected chunks
         deleteChunks.forEach((chunk) => {
             this.chunks.delete(chunk.id);
             chunk.snake.removeChunk(chunk.id);

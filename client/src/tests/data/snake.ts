@@ -57,8 +57,11 @@ export function createWorkerSnake(): WorkerSnake {
     );
 }
 
-export function createWorkerChunk(n: number): WorkerChunk {
-    const chunkData = createSnakeChunkBuffer(n);
+export function createWorkerChunk(
+    n: number,
+    rand = new Rand("workerchunk")
+): WorkerChunk {
+    const chunkData = createSnakeChunkBuffer(n, undefined, rand);
     const snake = createWorkerSnake();
     return new WorkerChunk(
         snake,

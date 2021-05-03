@@ -25,14 +25,19 @@ export default class Game {
             game.updateData.bind(game),
             1000 * config.tickDuration
         );
-        game.worker.onEnd(Comlink.proxy(() => (game._ended = true)));
+        game.worker.onEnd(Comlink.proxy(() => game.stop()));
 
         return game;
     }
 
     private async updateData(): Promise<void> {
-        const diff = await this.worker.getGameDataUpdate();
-        this.data.update(diff);
+        try {
+            const diff = await this.worker.getGameDataUpdate();
+            this.data.update(diff);
+        } catch (e) {
+            console.error(e);
+            this.stop();
+        }
     }
 
     private async update(): Promise<void> {
@@ -45,5 +50,10 @@ export default class Game {
 
     public get ended(): boolean {
         return this._ended;
+    }
+
+    public stop(): void {
+        this._ended = true;
+        window.clearInterval(this.updateInterval);
     }
 }

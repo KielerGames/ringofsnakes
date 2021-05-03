@@ -1,6 +1,11 @@
 import { GameConfig, ServerToClientJSONMessage } from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
+import {
+    SnakeChunkData,
+    SnakeData,
+    GameDataUpdate,
+} from "./GameDataUpdate";
 import WorkerChunk from "./WorkerChunk";
 import WorkerSnake from "./WorkerSnake";
 
@@ -11,7 +16,8 @@ export default class WorkerGame {
     config: GameConfig;
     chunks: Map<ChunkId, WorkerChunk> = new Map();
     snakes: Map<SnakeId, WorkerSnake> = new Map();
-    time: number;
+    lastUpdateTime: number;
+    ticks: number = 0;
 
     targetAlpha: number = 0.0;
     wantsToBeFast: boolean = false;
@@ -27,7 +33,7 @@ export default class WorkerGame {
         socket.onmessage = this.onMessageFromServer.bind(this);
         socket.onclose = () => console.log("Connection closed.");
 
-        this.time = performance.now();
+        this.lastUpdateTime = performance.now();
 
         console.log(`Snake id: ${snakeId}`);
     }
@@ -38,15 +44,17 @@ export default class WorkerGame {
         if (rawData instanceof ArrayBuffer) {
             const data = GUD.decode(this.config, rawData);
 
+            // update snakes
             data.snakeInfos.forEach((info) => {
                 const snake = this.snakes.get(info.snakeId);
                 if (snake) {
-                    snake.update(info);
+                    snake.updateFromServer(info, this.config);
                 } else {
-                    this.snakes.set(info.snakeId, new WorkerSnake(info));
+                    this.snakes.set(info.snakeId, new WorkerSnake(info, this.config));
                 }
             });
 
+            // update chunks
             data.chunkData.forEach((chunkData) => {
                 let chunk = this.chunks.get(chunkData.chunkId);
                 if (chunk) {
@@ -59,7 +67,8 @@ export default class WorkerGame {
                 }
             });
 
-            this.time = performance.now();
+            this.ticks++;
+            this.lastUpdateTime = performance.now();
         } else {
             const json = JSON.parse(rawData) as ServerToClientJSONMessage;
 
@@ -94,12 +103,54 @@ export default class WorkerGame {
     public get cameraPosition(): { x: number; y: number } {
         const player = this.snakes.get(this.targetPlayerId);
 
-        if(player) {
+        if (player) {
             return player.position.createTransferable();
         } else {
             console.warn(`No snake info for ${this.targetPlayerId}`);
             return { x: 0, y: 0 };
         }
+    }
+
+    public getDataUpdate(): GameDataUpdate {
+        const chunks: SnakeChunkData[] = new Array(this.chunks.size);
+        const snakes: SnakeData[] = new Array(this.snakes.size);
+
+        // chunk updates
+        {
+            let i = 0;
+            let gc: number[] = [];
+            for (const chunk of this.chunks.values()) {
+                chunks[i] = chunk.createTransferData();
+                if (chunks[i].final) {
+                    gc.push(chunks[i].id);
+                }
+                i++;
+            }
+
+            // garbage-collect chunks
+            gc.forEach((chunkId) => this.chunks.delete(chunkId));
+        }
+
+        // snake updates
+        {
+            let i = 0;
+            for (const snake of this.snakes.values()) {
+                snakes[i] = snake.createTransferData(this.config);
+                i++;
+            }
+            //TODO: gc snakes
+        }
+
+        const ticks = this.ticks;
+        this.ticks = 0;
+
+        return {
+            timeSinceLastTick: performance.now() - this.lastUpdateTime,
+            ticksSinceLastUpdate: ticks,
+            newChunks: chunks,
+            snakes,
+            cameraPosition: this.cameraPosition,
+        };
     }
 }
 

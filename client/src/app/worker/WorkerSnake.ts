@@ -1,25 +1,29 @@
 import Vector from "../math/Vector";
 import { GameConfig } from "../protocol";
 import { SnakeInfo } from "./decoder/SnakeInfoDecoder";
-import { SnakeData } from "./TickDataUpdate";
-import WorkerChunk from "./WorkerChunk";
+import { SnakeData } from "./GameDataUpdate";
 
 export default class WorkerSnake {
     public readonly id: number;
 
-    //private chunks: WorkerChunk[];
     private headPosition: Vector;
     private data: SnakeInfo;
+    private lastKnownSpeed: number = 0.0;
+    private offsetPrediction: number = 0.0;
+    private correctOffset: number = 0.0;
 
-    public constructor(info: SnakeInfo) {
+    public constructor(info: SnakeInfo, cfg: GameConfig) {
         this.id = info.snakeId;
         this.headPosition = Vector.fromObject(info.position);
         this.data = info;
+        this.lastKnownSpeed = this.speed(cfg);
     }
 
-    public update(info: SnakeInfo): void {
+    public updateFromServer(info: SnakeInfo, cfg: GameConfig): void {
         this.data = info;
         this.headPosition.set(info.position);
+        this.correctOffset += this.speed(cfg);
+        this.offsetPrediction += this.lastKnownSpeed;
     }
 
     public get width(): number {
@@ -46,14 +50,27 @@ export default class WorkerSnake {
         return this.data.direction;
     }
 
-    public getTransferData(cfg: GameConfig): SnakeData {
+    private speed(cfg: GameConfig): number {
+        return this.fast ? cfg.fastSnakeSpeed : cfg.snakeSpeed;
+    }
+
+    public createTransferData(cfg: GameConfig): SnakeData {
+        const currentSpeed = this.speed(cfg);
+        // correction for the main thread prediction
+        const offsetCorrection = this.correctOffset - this.offsetPrediction;
+        // reset for next correction
+        this.lastKnownSpeed = currentSpeed;
+        this.offsetPrediction = 0.0;
+        this.correctOffset = 0.0;
+
         return {
             id: this.id,
             length: this.length,
             skin: this.skin,
             position: this.position.createTransferable(),
             direction: this.direction,
-            speed: this.fast ? cfg.fastSnakeSpeed : cfg.snakeSpeed,
+            speed: currentSpeed,
+            offsetCorrection
         };
     }
 }

@@ -36,9 +36,9 @@ export type DecodedSnakeChunk = {
  * 0-1       snake id (short)
  * 2-3       chunk id (short)
  * 4         n: number of chain codes in this chunk (byte)
- * 5-8       end direction (float)
- * 9-12      end position x (float)
- * 13-16     end position y (float)
+ * 5-8       start direction (float)
+ * 9-12      start position x (float)
+ * 13-16     start position y (float)
  * 17-20     offset within snake (float)
  * ================== BODY ====================
  * 21-(21+n) n ChainCodes (n bytes), 21+n < 128
@@ -77,13 +77,15 @@ export function decode(
     // initialize variables
     let length = 0.0;
     let pathData = new Float32Array(4 * (n + 1));
+    // start vertex
     pathData[0] = x;
     pathData[1] = y;
     pathData[2] = length;
     pathData[3] = alpha;
 
-    // decode body
+    // decode body (n vertices)
     for (let i = 0; i < n; i++) {
+        // get chaincode i
         const data = view.getUint8(SNAKE_CHUNK_HEADER_SIZE + i);
 
         // decode chaincode
@@ -110,6 +112,10 @@ export function decode(
 
     pathData[pathData.length - 1] = alpha;
 
+    // avoid f32 rounding issues later
+    // this way pathData[idx + 2] is always less or equal to length
+    length = Math.max(length, pathData[pathData.length - 2]);
+
     return {
         data: {
             snakeId,
@@ -118,15 +124,17 @@ export function decode(
             pathOffset: chunkOffset,
             full,
             points: n + 1,
+            // the end point where pathData starts (further away from snake head)
             start: {
+                x: pathData[0],
+                y: pathData[1],
+                alpha: pathData[3],
+            },
+            // the end point closest to the snake head
+            end: {
                 x,
                 y,
                 alpha,
-            },
-            end: {
-                x: pathData[0],
-                y: pathData[1],
-                alpha: pathData[2],
             },
             pathData,
         },

@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import Rand from "rand-seed";
 
 import * as SCD from "../app/worker/decoder/SnakeChunkDecoder";
 import * as SID from "../app/worker/decoder/SnakeInfoDecoder";
@@ -18,13 +19,13 @@ describe("Decoder", () => {
             const buffer = createSnakeChunkBuffer(1);
             assert.doesNotThrow(() => SCD.decode(buffer, 0, cfg));
         });
-    
+
         it("should reject buffers that are too small", () => {
             assert.throws(() => {
                 const buffer = new Uint8Array(1).buffer;
                 SCD.decode(buffer, 0, cfg);
             }, RangeError);
-    
+
             assert.throws(() => {
                 const numberOfChainCodes = 2;
                 // create a buffer that is too small...
@@ -34,19 +35,19 @@ describe("Decoder", () => {
                 data[4] = numberOfChainCodes;
                 SCD.decode(data.buffer, 0, cfg);
             }, RangeError);
-    
+
             assert.throws(() => {
                 const buffer = createSnakeChunkBuffer(1);
                 SCD.decode(buffer, 13, cfg);
             }, RangeError);
         });
-    
+
         it("pathLength should behave linearly", () => {
             const n = 42;
             const buffer = createSnakeChunkBuffer(n);
             const pathLength = SCD.decode(buffer, 0, cfg).data.pathLength;
             assert.isAtLeast(pathLength, n * cfg.snakeSpeed);
-    
+
             const s = 4.2;
             const fasterCfg: GameConfig = Object.assign({}, cfg, {
                 snakeSpeed: s * cfg.snakeSpeed,
@@ -55,10 +56,10 @@ describe("Decoder", () => {
             assert.approximately(
                 SCD.decode(buffer, 0, fasterCfg).data.pathLength,
                 4.2 * pathLength,
-                1e-8
+                1e-5
             );
         });
-    
+
         it("pathData length component should increase monotonically", () => {
             const buffer = createSnakeChunkBuffer(42);
             const pathData = SCD.decode(buffer, 0, cfg).data.pathData;
@@ -67,7 +68,7 @@ describe("Decoder", () => {
                 0,
                 "pathData length should be a multiple of 4"
             );
-    
+
             let last = -1.0;
             for (let i = 0; i < pathData.length; i += 4) {
                 const lc = pathData[i + 2];
@@ -75,17 +76,37 @@ describe("Decoder", () => {
                 last = lc;
             }
         });
-    
+
+        it("pathOffset should be upper bounded by pathLength", () => {
+            const rand = new Rand("pathOffset seed");
+            for (let i = 0; i < 42; i++) {
+                const n = 1 + Math.floor(63 * rand.next());
+                const buffer = createSnakeChunkBuffer(n, undefined, rand);
+                const decoded = SCD.decode(buffer, 0, cfg).data;
+                const pathData = decoded.pathData;
+                assert.equal(pathData.length % 4, 0);
+
+                for (let j = 0; j < pathData.length; j += 4) {
+                    const pathOffset = pathData[j + 2];
+                    assert.isAtMost(pathOffset, decoded.pathLength);
+                }
+            }
+        });
+
         it("should be a straight line", () => {
-            const buffer = createSnakeChunkBuffer(13, { x: 0, y: 0, alpha: 0 }, null);
-    
+            const buffer = createSnakeChunkBuffer(
+                13,
+                { x: 0, y: 0, alpha: 0 },
+                null
+            );
+
             const pathData = SCD.decode(buffer, 0, cfg).data.pathData;
             assert.equal(
                 pathData.length % 4,
                 0,
                 "pathData length should be a multiple of 4"
             );
-    
+
             let lastX = -1.0;
             for (let i = 0; i < pathData.length; i += 4) {
                 let x = pathData[i];

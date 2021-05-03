@@ -4,7 +4,7 @@ import {
     GameConfig,
     ServerToClientJSONMessage,
 } from "../protocol";
-import { TickDataUpdate } from "./TickDataUpdate";
+import { GameDataUpdate } from "./GameDataUpdate";
 import WorkerGame from "./WorkerGame";
 
 declare const __DEBUG__: boolean;
@@ -45,7 +45,9 @@ export class WorkerAPI {
                     }
                 }
 
-                console.warn("GameInit: Unexpected websocket message from server.");
+                console.warn(
+                    `Game init: Unexpected websocket message from server. (${typeof event.data})`
+                );
             };
 
             websocket.send(
@@ -65,28 +67,17 @@ export class WorkerAPI {
         }
     }
 
-    public getNextTickData(): TickDataUpdate {
+    public getGameDataUpdate(): GameDataUpdate {
         if (game === null) {
             throw new Error("Not initialized.");
         }
 
-        const chunks = Array.from(game.chunks.values()).map((chunk) =>
-            chunk.createWebGlData()
+        const update = game.getDataUpdate();
+        const transferables = update.newChunks.map(
+            (chunk) => chunk.data.buffer
         );
 
-        const transferables = chunks.map((chunk) => chunk.data.buffer);
-
-        return Comlink.transfer(
-            {
-                time: game.time,
-                newChunks: chunks,
-                snakes: Array.from(game.snakes.values()).map((snake) =>
-                    snake.getTransferData(game!.config)
-                ),
-                cameraPosition: game.cameraPosition,
-            },
-            transferables
-        );
+        return Comlink.transfer(update, transferables);
     }
 
     public getConfig(): GameConfig {
@@ -97,7 +88,7 @@ export class WorkerAPI {
     }
 
     public onEnd(callback: () => void): void {
-        if(game === null) {
+        if (game === null) {
             throw new Error("No game.");
         }
 
@@ -112,7 +103,7 @@ export class WorkerAPI {
     }
 
     public quitCurrentGame(): void {
-        if(game) {
+        if (game) {
             game.socket.close();
         }
     }

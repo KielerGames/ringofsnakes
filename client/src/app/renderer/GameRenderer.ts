@@ -2,13 +2,13 @@ import GameData from "../data/GameData";
 import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 
-let gl:WebGLRenderingContext;
+let gl: WebGLRenderingContext;
 
 const unstretch = new Matrix();
 const scale = new Matrix();
 const translate = new Matrix();
 
-export function init(parentNode:HTMLElement = document.body):void {
+export function init(parentNode: HTMLElement = document.body): void {
     const canvas = document.createElement("canvas");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -20,12 +20,14 @@ export function init(parentNode:HTMLElement = document.body):void {
         preserveDrawingBuffer: false,
     })!;
 
+    gl.disable(gl.DEPTH_TEST);
+
     parentNode.appendChild(canvas);
 
     SnakeChunkRenderer.init(gl);
 }
 
-export function render(data: GameData):void {
+export function render(data: GameData): void {
     // background color
     gl.clearColor(0.1, 0.1, 0.1, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -42,6 +44,10 @@ export function render(data: GameData):void {
         Matrix.compose(unstretch, scale),
         translate
     );
-    
-    SnakeChunkRenderer.render(data.getChunks(), transform);
+
+    SnakeChunkRenderer.render(
+        data.getChunks(),
+        transform,
+        data.timeSinceLastUpdate()
+    );
 }

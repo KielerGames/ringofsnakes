@@ -38,7 +38,11 @@ export function init(glCtx: WebGLRenderingContext): void {
     assert(snakeColors.length > 0);
 }
 
-export function render(chunks: Iterable<SnakeChunk>, transform: Matrix): void {
+export function render(
+    chunks: Iterable<SnakeChunk>,
+    transform: Matrix,
+    timeSinceLastTick: number
+): void {
     const shader = basicMaterialShader;
     shader.use();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -49,7 +53,7 @@ export function render(chunks: Iterable<SnakeChunk>, transform: Matrix): void {
     for (const chunk of chunks) {
         const snake = chunk.snake;
         setSkin(snake.skin);
-        shader.setUniform("uChunkPathOffset", chunk.offset(0));
+        shader.setUniform("uChunkPathOffset", chunk.offset(timeSinceLastTick));
         shader.setUniform("uSnakeLength", snake.length);
         shader.setUniform("uSnakeWidth", snake.width);
 

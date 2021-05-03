@@ -1,5 +1,6 @@
 import Vector from "../math/Vector";
-import { TickDataUpdate } from "../worker/TickDataUpdate";
+import { GameConfig } from "../protocol";
+import { GameDataUpdate } from "../worker/GameDataUpdate";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
 
@@ -7,15 +8,22 @@ export default class GameData {
     private snakes: Map<number, Snake> = new Map();
     private chunks: Map<number, SnakeChunk> = new Map();
     public cameraPosition: Vector = new Vector(0, 0);
+    private lastUpdateTime: number = performance.now();
 
-    public update(data: TickDataUpdate): void {
+    public update(data: GameDataUpdate): void {
+        // time stuff
+        const now = performance.now();
+        const timeSinceLastUpdate = now - this.lastUpdateTime;
+        this.lastUpdateTime = now;
+
+        // camera
         this.cameraPosition.set(data.cameraPosition);
 
         // update & add new snakes
         data.snakes.forEach((snakeData) => {
             const snake = this.snakes.get(snakeData.id);
             if (snake) {
-                snake.update(snakeData);
+                snake.update(snakeData, data.ticksSinceLastUpdate);
             } else {
                 this.snakes.set(snakeData.id, new Snake(snakeData));
             }
@@ -32,12 +40,6 @@ export default class GameData {
             this.chunks.set(chunk.id, chunk);
         });
 
-        // update existing chunks
-        // data.chunkOffsets.forEach((offset, chunkId) => {
-        //     this.chunks.get(chunkId)!.updateOffset(offset);
-        // });
-        // TODO
-
         this.garbageCollectChunks();
     }
 
@@ -48,12 +50,14 @@ export default class GameData {
     private garbageCollectChunks(): void {
         let deleteChunks: SnakeChunk[] = [];
 
+        // collect "garbage" chunks
         this.chunks.forEach((chunk) => {
             if (chunk.offset() >= chunk.snake.length) {
                 deleteChunks.push(chunk);
             }
         });
 
+        // remove collected chunks
         deleteChunks.forEach((chunk) => {
             this.chunks.delete(chunk.id);
             chunk.snake.removeChunk(chunk.id);
@@ -62,5 +66,9 @@ export default class GameData {
         if (deleteChunks.length > 0) {
             console.log(`Garbage-collected ${deleteChunks.length} chunk(s).`);
         }
+    }
+
+    public timeSinceLastUpdate(): number {
+        return 0.001 * (performance.now() - this.lastUpdateTime);
     }
 }

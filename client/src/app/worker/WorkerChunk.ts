@@ -60,6 +60,10 @@ export default class WorkerChunk {
         
         this.pathLength = data.pathLength;
         this.offset = data.pathOffset;
+        this._full = data.full;
+        this._final = data.full; // TODO
+
+        // TODO: update bounding box
     }
 
     public createTransferData(): SnakeChunkData {

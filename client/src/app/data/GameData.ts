@@ -1,13 +1,12 @@
-import Vector from "../math/Vector";
-import { GameConfig } from "../protocol";
 import { GameDataUpdate } from "../worker/GameDataUpdate";
+import Camera from "./Camera";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
 
 export default class GameData {
     private snakes: Map<number, Snake> = new Map();
     private chunks: Map<number, SnakeChunk> = new Map();
-    public cameraPosition: Vector = new Vector(0, 0);
+    public camera: Camera = new Camera(0.0, 0.0);
     private lastUpdateTime: number = performance.now();
 
     public update(data: GameDataUpdate): void {
@@ -17,7 +16,7 @@ export default class GameData {
         this.lastUpdateTime = now;
 
         // camera
-        this.cameraPosition.set(data.cameraPosition);
+        this.camera.setTargetPosition(data.cameraPosition);
 
         // update & add new snakes
         data.snakes.forEach((snakeData) => {

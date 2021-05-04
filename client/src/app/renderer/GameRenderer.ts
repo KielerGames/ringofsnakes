@@ -37,8 +37,8 @@ export function render(data: GameData): void {
     scale.setEntry(1, 1, 0.042);
 
     // move camera to target snake
-    translate.setEntry(0, 3, -data.cameraPosition.x);
-    translate.setEntry(1, 3, -data.cameraPosition.y);
+    translate.setEntry(0, 3, -data.camera.position.x);
+    translate.setEntry(1, 3, -data.camera.position.y);
 
     const transform = Matrix.compose(
         Matrix.compose(unstretch, scale),

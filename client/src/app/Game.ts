@@ -40,8 +40,8 @@ export default class Game {
         }
     }
 
-    private async update(): Promise<void> {
-        //TODO
+    public async frameTick(deltaTime: number): Promise<void> {
+        this.data.camera.update(deltaTime);
     }
 
     public async updateUserInput(alpha: number, fast: boolean): Promise<void> {

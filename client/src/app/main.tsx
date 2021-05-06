@@ -16,13 +16,16 @@ document.body.appendChild(root);
 (async () => {
     const game = await Game.joinAs("SnakeForceOne");
     const start = performance.now();
+    const lastTime = start;
 
     function renderLoop(time: number) {
-        const elapsed = time - start;
-        
+        const elapsed = (time - start) / 1000;
+        const deltaTime = (time - lastTime) / 1000;
+
+        game.frameTick(deltaTime);
         GameRenderer.render(game.data);
-        
-        if(!game.ended) {
+
+        if (!game.ended) {
             window.requestAnimationFrame(renderLoop);
         }
     }

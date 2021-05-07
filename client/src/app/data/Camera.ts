@@ -3,10 +3,12 @@ import Vector from "../math/Vector";
 export default class Camera {
     private lastPosition: Vector;
     private targetPosition: Vector;
+    private maxSpeed2: number;
 
-    public constructor(x: number, y: number) {
+    public constructor(x: number, y: number, maxSpeed:number = 14) {
         this.lastPosition = new Vector(x, y);
         this.targetPosition = new Vector(x, y);
+        this.maxSpeed2 = maxSpeed * maxSpeed;
     }
 
     public setTargetPosition(target: { x: number; y: number }): void {
@@ -18,21 +20,24 @@ export default class Camera {
     }
 
     public update(timeSinceLastUpdate: number): void {
-        const t = timeSinceLastUpdate;
-
         // position delta
         const dx = this.targetPosition.x - this.lastPosition.x;
         const dy = this.targetPosition.y - this.lastPosition.y;
 
-        // const len = Math.sqrt(dx*dx + dy*dy);
+        const c = 0.1;
+        let mx = c * dx;
+        let my = c * dy;
 
-        // const sx = len < 1e-5 ? 0.0 : dx/len;
-        // const sy = len < 1e-5 ? 0.0 : dy/len;
+        // limit speed
+        const t2 = timeSinceLastUpdate * timeSinceLastUpdate;
+        const len2 = mx*mx + my*my;
+        if(len2 > this.maxSpeed2 * t2) {
+            let s = Math.sqrt(this.maxSpeed2/len2);
+            mx = mx * s;
+            my = my * s;
+        }
 
-        const c = 0.25;
-        //const s = 0.24 * 25;
-
-        this.lastPosition.x = (1.0 - c) * this.lastPosition.x + c * dx;
-        this.lastPosition.y = (1.0 - c) * this.lastPosition.y + c * dy;
+        this.lastPosition.x += mx;
+        this.lastPosition.y += my;
     }
 }

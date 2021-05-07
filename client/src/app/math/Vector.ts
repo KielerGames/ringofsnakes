@@ -24,6 +24,16 @@ export default class Vector {
         this.x = data.x;
         this.y = data.y;
     }
+
+    public clone(): Vector {
+        return new Vector(this.x, this.y);
+    }
+
+    public static distance(a: Vector, b: Vector): number {
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        return Math.sqrt(dx*dx + dy*dy);
+    }
 }
 
 type PointLike = {

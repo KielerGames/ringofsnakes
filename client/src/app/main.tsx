@@ -23,7 +23,7 @@ document.body.appendChild(root);
         const deltaTime = (time - lastTime) / 1000;
 
         game.frameTick(deltaTime);
-        GameRenderer.render(game.data);
+        GameRenderer.render(game.data, game.camera, time);
 
         if (!game.ended) {
             window.requestAnimationFrame(renderLoop);

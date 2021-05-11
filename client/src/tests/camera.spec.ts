@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import Rand from "rand-seed";
-import Camera from "../app/data/Camera";
+import { SnakeCamera, TargetCamera } from "../app/data/Camera";
+import Snake from "../app/data/Snake";
 import Vector from "../app/math/Vector";
 
 function createRandomPoint(rand: Rand, maxValue: number): Vector {
@@ -10,38 +11,68 @@ function createRandomPoint(rand: Rand, maxValue: number): Vector {
 }
 
 describe("Camera", () => {
-    it("should not move", () => {
-        const rand = new Rand("stationary seed");
-        const cam = Camera.createAt(createRandomPoint(rand, 42.0));
-        const { x, y } = cam.position;
+    describe("TargetCamera", () => {
+        it("should not move", () => {
+            const rand = new Rand("stationary seed");
+            const cam = TargetCamera.createAt(createRandomPoint(rand, 42.0));
+            const { x, y } = cam.position;
 
-        for (let i = 0; i < 100; i++) {
-            cam.update(rand.next());
-            assert.equal(cam.position.x, x);
-            assert.equal(cam.position.y, y);
-        }
+            for (let i = 0; i < 100; i++) {
+                cam.update(rand.next());
+                assert.equal(cam.position.x, x);
+                assert.equal(cam.position.y, y);
+            }
 
-        cam.setTargetPosition({ x, y });
-        for (let i = 0; i < 100; i++) {
-            cam.update(rand.next());
-            assert.equal(cam.position.x, x);
-            assert.equal(cam.position.y, y);
-        }
+            cam.setTargetPosition({ x, y });
+            for (let i = 0; i < 100; i++) {
+                cam.update(rand.next());
+                assert.equal(cam.position.x, x);
+                assert.equal(cam.position.y, y);
+            }
+        });
+
+        it("should move towards the target", () => {
+            const rand = new Rand("moving seed");
+            const cam = TargetCamera.createAt(
+                createRandomPoint(rand, 42.0),
+                2.71828
+            );
+            const target = createRandomPoint(rand, 100);
+
+            let distance = Vector.distance(cam.position, target);
+            cam.setTargetPosition(target);
+
+            for (let i = 0; i < 42; i++) {
+                cam.update(1 / 60);
+                const d = Vector.distance(cam.position, target);
+                assert.isBelow(d, distance);
+                distance = d;
+            }
+        });
     });
 
-    it("should move towards the target", () => {
-        const rand = new Rand("moving seed");
-        const cam = Camera.createAt(createRandomPoint(rand, 42.0), 2.71828);
-        const target = createRandomPoint(rand, 100);
+    describe("SnakeCamera", () => {
+        it("should follow the snake", () => {
+            const rand = new Rand("follow seed");
 
-        let distance = Vector.distance(cam.position, target);
-        cam.setTargetPosition(target);
+            const snake = new Snake({
+                id: 0,
+                skin: 0,
+                speed: 6.66,
+                offsetCorrection: 0,
+                length: 42.0,
+                position: { x: 10 * rand.next(), y: 10 * rand.next() },
+                direction: 2 * Math.PI * rand.next(),
+            });
 
-        for(let i=0; i<42; i++) {
-            cam.update(1/60);
-            const d = Vector.distance(cam.position, target);
-            assert.isBelow(d, distance);
-            distance = d;
-        }
+            const cam = new SnakeCamera(snake);
+
+            for (let i = 0; i < 100; i++) {
+                const t = 2 * rand.next();
+                cam.update(t);
+                assert.equal(cam.position.x, snake.getPredictedPosition(t).x);
+                assert.equal(cam.position.y, snake.getPredictedPosition(t).y);
+            }
+        });
     });
 });

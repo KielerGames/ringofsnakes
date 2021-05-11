@@ -3,10 +3,8 @@ export type GameDataUpdate = {
     ticksSinceLastUpdate: number;
     newChunks: SnakeChunkData[];
     snakes: SnakeData[];
-    cameraPosition: { x: number; y: number };
+    cameraTarget: number;
 };
-
-type ChunkId = number;
 
 /* Vertex buffer triangle strip:
  *   3--2

@@ -9,7 +9,6 @@ import WorkerChunk from "../app/worker/WorkerChunk";
 import {
     createGameConfig,
     createSnakeChunkBuffer,
-    createWorkerChunk,
     createWorkerSnake,
 } from "./data/snake";
 import * as SCD from "../app/worker/decoder/SnakeChunkDecoder";
@@ -39,7 +38,7 @@ describe("MT Snake Chunk", () => {
 
         const chunk = new SnakeChunk(snake, data);
 
-        snake.addChunk(chunk);
+        snake.setChunk(chunk);
 
         assert.equal(chunk.offset(0.0), 0.0);
         assert.isAbove(chunk.offset(1.0), 0.0);

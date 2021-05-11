@@ -1,3 +1,4 @@
+import { Camera } from "../data/Camera";
 import GameData from "../data/GameData";
 import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
@@ -27,7 +28,7 @@ export function init(parentNode: HTMLElement = document.body): void {
     SnakeChunkRenderer.init(gl);
 }
 
-export function render(data: GameData): void {
+export function render(data: GameData, camera: Camera, time: number): void {
     // background color
     gl.clearColor(0.1, 0.1, 0.1, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -37,8 +38,8 @@ export function render(data: GameData): void {
     scale.setEntry(1, 1, 0.042);
 
     // move camera to target snake
-    translate.setEntry(0, 3, -data.camera.position.x);
-    translate.setEntry(1, 3, -data.camera.position.y);
+    translate.setEntry(0, 3, -camera.position.x);
+    translate.setEntry(1, 3, -camera.position.y);
 
     const transform = Matrix.compose(
         Matrix.compose(unstretch, scale),
@@ -48,6 +49,6 @@ export function render(data: GameData): void {
     SnakeChunkRenderer.render(
         data.getChunks(),
         transform,
-        data.timeSinceLastUpdate()
+        data.timeSinceLastUpdate(time)
     );
 }

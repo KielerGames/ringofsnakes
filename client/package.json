@@ -10,7 +10,8 @@
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha",
     "build:js": "webpack --config webpack.config.js",
     "build:js:watch": "webpack --watch --config webpack.config.js",
-    "build": "npm run build:js"
+    "build": "npm run build:js",
+    "build:production": "webpack --config webpack.config.production.js"
   },
   "author": "Tim Weißenfels",
   "devDependencies": {

@@ -104,7 +104,7 @@ export default class WorkerChunk {
             snakeId: this.snake.id,
 
             data: builder.getBuffer(),
-            vertices: 2 * points,
+            vertices: 2 * bufferPoints,
             boundingBox: this.box.createTransferable(0.5 * this.snake.width),
 
             length: this.pathLength,

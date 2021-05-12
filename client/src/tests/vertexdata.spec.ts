@@ -46,8 +46,7 @@ describe("ChunkVertexData", () => {
             const chunk = createWorkerChunk(13);
             const data = chunk.createTransferData();
             // non-final chunks have room for 2 extra vertices (for client-side-prediciton)
-            const expected = data.final ? data.vertices : data.vertices + 2;
-            assert.equal(data.data.length / 6, expected);
+            assert.equal(data.data.length / 6, data.vertices);
         });
     });
 

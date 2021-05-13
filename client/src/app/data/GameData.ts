@@ -45,6 +45,10 @@ export default class GameData {
         return this.chunks.values();
     }
 
+    public getSnakes(): IterableIterator<Snake> {
+        return this.snakes.values();
+    }
+
     private garbageCollectChunks(): void {
         let deleteChunks: SnakeChunk[] = [];
 

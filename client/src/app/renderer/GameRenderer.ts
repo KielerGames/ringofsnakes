@@ -2,6 +2,7 @@ import { Camera } from "../data/Camera";
 import GameData from "../data/GameData";
 import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
+import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
 
 let gl: WebGLRenderingContext;
 
@@ -26,6 +27,7 @@ export function init(parentNode: HTMLElement = document.body): void {
     parentNode.appendChild(canvas);
 
     SnakeChunkRenderer.init(gl);
+    SnakeHeadRenderer.init(gl);
 }
 
 export function render(data: GameData, camera: Camera, time: number): void {
@@ -46,9 +48,11 @@ export function render(data: GameData, camera: Camera, time: number): void {
         translate
     );
 
-    SnakeChunkRenderer.render(
-        data.getChunks(),
-        transform,
-        data.timeSinceLastUpdate(time)
-    );
+    const pTime = data.timeSinceLastUpdate(time);
+
+    // render snake bodies
+    SnakeChunkRenderer.render(data.getChunks(), transform, pTime);
+
+    // render snake heads
+    SnakeHeadRenderer.render(data.getSnakes(), transform, pTime);
 }

@@ -1,6 +1,8 @@
+import { Camera } from "../data/Camera";
 import GameData from "../data/GameData";
 import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
+import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
 
 let gl: WebGLRenderingContext;
 
@@ -25,29 +27,33 @@ export function init(parentNode: HTMLElement = document.body): void {
     parentNode.appendChild(canvas);
 
     SnakeChunkRenderer.init(gl);
+    SnakeHeadRenderer.init(gl);
 }
 
-export function render(data: GameData): void {
+export function render(data: GameData, camera: Camera, time: number): void {
     // background color
     gl.clearColor(0.1, 0.1, 0.1, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     // world scale
-    scale.setEntry(0, 0, 0.042);
-    scale.setEntry(1, 1, 0.042);
+    const s = 0.042;
+    scale.setEntry(0, 0, s);
+    scale.setEntry(1, 1, s);
 
     // move camera to target snake
-    translate.setEntry(0, 3, -data.cameraPosition.x);
-    translate.setEntry(1, 3, -data.cameraPosition.y);
+    translate.setEntry(0, 2, -camera.position.x);
+    translate.setEntry(1, 2, -camera.position.y);
 
     const transform = Matrix.compose(
         Matrix.compose(unstretch, scale),
         translate
     );
 
-    SnakeChunkRenderer.render(
-        data.getChunks(),
-        transform,
-        data.timeSinceLastUpdate()
-    );
+    const pTime = data.timeSinceLastUpdate(time);
+
+    // render snake bodies
+    SnakeChunkRenderer.render(data.getChunks(), transform, pTime);
+
+    // render snake heads
+    SnakeHeadRenderer.render(data.getSnakes(), transform, pTime);
 }

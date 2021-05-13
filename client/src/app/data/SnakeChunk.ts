@@ -1,4 +1,5 @@
 import Rectangle from "../math/Rectangle";
+import Vector from "../math/Vector";
 import { GameConfig } from "../protocol";
 import assert from "../utilities/assert";
 import { SnakeChunkData } from "../worker/GameDataUpdate";
@@ -27,11 +28,11 @@ export default class SnakeChunk {
     }
 
     public addToOffset(diff: number): void {
-        if(__DEBUG__) {
-            if(diff < 0) {
+        if (__DEBUG__) {
+            if (diff < 0) {
                 console.warn(`Negative offset correction by ${diff}.`);
             }
-            if(!this.final) {
+            if (!this.final) {
                 console.warn(`Offset change on non-final chunk`);
             }
         }
@@ -40,7 +41,18 @@ export default class SnakeChunk {
 
     public offset(timeSinceLastTick: number = 0.0): number {
         const t = timeSinceLastTick;
-        assert(t >= 0.0);
+        //assert(t >= 0.0);
         return this.lastTickOffset + t * this.snake.speed;
+    }
+
+    public updateEndPoint(end: Vector): void {
+        //TODO: update bounding box
+        const n = this.buffer.length;
+        if(n > 12) {
+            this.buffer[n - 6] = end.x;
+            this.buffer[n - 5] = end.y;
+            this.buffer[n - 12] = end.x;
+            this.buffer[n - 11] = end.y;
+        }
     }
 }

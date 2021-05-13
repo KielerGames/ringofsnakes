@@ -7,20 +7,24 @@ export default class Snake {
     public readonly skin: number;
     private chunks: Map<number, SnakeChunk> = new Map();
     public length: number;
-    private position: Vector;
+    private lastPosition: Vector;
     public speed: number;
+    public direction: number;
+    private currentChunk: SnakeChunk | null = null;
 
     public constructor(data: SnakeData) {
         this.id = data.id;
         this.skin = data.skin;
         this.length = data.length;
-        this.position = Vector.fromObject(data.position);
+        this.lastPosition = Vector.fromObject(data.position);
         this.speed = data.speed;
+        this.direction = data.direction;
     }
 
     public update(data: SnakeData, ticksSinceLastUpdate: number): void {
         this.length = data.length;
-        this.position.set(data.position);
+        this.lastPosition.set(data.position);
+        this.direction = data.direction;
 
         if (ticksSinceLastUpdate > 0) {
             // update chunk offsets
@@ -28,25 +32,42 @@ export default class Snake {
                 ticksSinceLastUpdate * this.speed + data.offsetCorrection;
             this.chunks.forEach((chunk) => chunk.addToOffset(diff));
         }
+
+        this.speed = data.speed;
     }
 
     public get width(): number {
         return 0.5;
     }
 
-    public get x(): number {
-        return this.position.x;
+    public getPredictedPosition(timeSinceLastTick: number): Vector {
+        const pos = this.lastPosition.clone();
+        pos.addPolar(this.direction, timeSinceLastTick * this.speed);
+        return pos;
     }
 
-    public get y(): number {
-        return this.position.y;
-    }
-
-    public addChunk(chunk: SnakeChunk): void {
+    public setChunk(chunk: SnakeChunk): void {
         this.chunks.set(chunk.id, chunk);
+
+        if (!chunk.final) {
+            this.currentChunk = chunk;
+        }
+        // else if (this.currentChunk) {
+        //     if (this.currentChunk.id === chunk.id) {
+        //         this.currentChunk = null;
+        //     }
+        // }
     }
 
     public removeChunk(id: number): void {
         this.chunks.delete(id);
+
+        if (this.currentChunk && this.currentChunk.id === id) {
+            this.currentChunk = null;
+        }
+    }
+
+    public getCurrentChunk(): SnakeChunk | null {
+        return this.currentChunk;
     }
 }

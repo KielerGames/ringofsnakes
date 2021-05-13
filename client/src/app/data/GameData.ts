@@ -1,5 +1,3 @@
-import Vector from "../math/Vector";
-import { GameConfig } from "../protocol";
 import { GameDataUpdate } from "../worker/GameDataUpdate";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
@@ -7,7 +5,7 @@ import SnakeChunk from "./SnakeChunk";
 export default class GameData {
     private snakes: Map<number, Snake> = new Map();
     private chunks: Map<number, SnakeChunk> = new Map();
-    public cameraPosition: Vector = new Vector(0, 0);
+    private cameraTargetId: number = -1;
     private lastUpdateTime: number = performance.now();
 
     public update(data: GameDataUpdate): void {
@@ -17,7 +15,7 @@ export default class GameData {
         this.lastUpdateTime = now;
 
         // camera
-        this.cameraPosition.set(data.cameraPosition);
+        this.cameraTargetId = data.cameraTarget;
 
         // update & add new snakes
         data.snakes.forEach((snakeData) => {
@@ -36,7 +34,7 @@ export default class GameData {
                 throw new Error(`No data for snake ${chunkData.snakeId}!`);
             }
             const chunk = new SnakeChunk(snake, chunkData);
-            snake.addChunk(chunk);
+            snake.setChunk(chunk);
             this.chunks.set(chunk.id, chunk);
         });
 
@@ -45,6 +43,10 @@ export default class GameData {
 
     public getChunks(): IterableIterator<SnakeChunk> {
         return this.chunks.values();
+    }
+
+    public getSnakes(): IterableIterator<Snake> {
+        return this.snakes.values();
     }
 
     private garbageCollectChunks(): void {
@@ -68,7 +70,29 @@ export default class GameData {
         }
     }
 
-    public timeSinceLastUpdate(): number {
-        return 0.001 * (performance.now() - this.lastUpdateTime);
+    /**
+     * Computes time elapsed between now and the last update.
+     * @param now timestamp in ms
+     * @returns delta time in seconds
+     */
+    public timeSinceLastUpdate(now: number = performance.now()): number {
+        return 0.001 * (now - this.lastUpdateTime);
+    }
+
+    public predict(timeSinceLastTick: number): void {
+        this.snakes.forEach(snake => {
+            const currentChunk = snake.getCurrentChunk();
+
+            if(currentChunk) {
+                const pos = snake.getPredictedPosition(timeSinceLastTick);
+                currentChunk.updateEndPoint(pos);
+            }
+        });
+    }
+
+    public get cameraTarget(): Snake | undefined {
+        if(this.cameraTargetId >= 0) {
+            return this.snakes.get(this.cameraTargetId);
+        }
     }
 }

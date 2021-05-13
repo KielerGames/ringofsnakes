@@ -149,7 +149,7 @@ export default class WorkerGame {
             ticksSinceLastUpdate: ticks,
             newChunks: chunks,
             snakes,
-            cameraPosition: this.cameraPosition,
+            cameraTarget: this.targetPlayerId,
         };
     }
 }

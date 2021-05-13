@@ -8,7 +8,6 @@ export default class SnakeChunkVertexBufferBuilder {
     private buffer: Float32Array;
     private position: number = 0;
     private chunkPathLength: number;
-    private lastPathOffset: number = -1.0;
 
     public constructor(numPoints: number, chunkLength: number) {
         assert(numPoints > 0);
@@ -44,7 +43,6 @@ export default class SnakeChunkVertexBufferBuilder {
 
         // path distance to chunk end (end point closest to snake head)
         const pathDist = this.chunkPathLength - pathOffset;
-        this.lastPathOffset = pathOffset;
 
         // right vertex
         {

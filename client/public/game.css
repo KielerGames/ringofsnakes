@@ -29,7 +29,7 @@ canvas {
     display: flex;
     justify-content: center;
     align-items: center;
-    --ring-radius: 150px;
+    --ring-radius: 200px;
     --ring-width: 12px;
 }
 

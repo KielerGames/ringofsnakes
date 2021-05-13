@@ -1,5 +1,4 @@
-import ReactDOM from "react-dom";
-import React from "react";
+import * as Preact from "preact";
 import UserInput from "./components/UserInput";
 import * as GameRenderer from "./renderer/GameRenderer";
 import Game from "./Game";
@@ -34,7 +33,7 @@ document.body.appendChild(root);
     window.requestAnimationFrame(renderLoop);
 
     // render user interface
-    ReactDOM.render(
+    Preact.render(
         <UserInput initial={0.0} onChange={game.updateUserInput.bind(game)} />,
         root
     );

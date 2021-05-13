@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import { Component, createRef } from "preact";
 
 declare const __DEBUG__: boolean;
 
@@ -14,7 +14,7 @@ type State = {
 };
 
 export default class UserInput extends Component<Props, State> {
-    private ref = React.createRef<HTMLDivElement>();
+    private ref = createRef<HTMLDivElement>();
     private timeout: number | undefined;
 
     public constructor(props: Props) {

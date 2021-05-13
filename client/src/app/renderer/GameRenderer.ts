@@ -36,12 +36,13 @@ export function render(data: GameData, camera: Camera, time: number): void {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     // world scale
-    scale.setEntry(0, 0, 0.042);
-    scale.setEntry(1, 1, 0.042);
+    const s = 0.042;
+    scale.setEntry(0, 0, s);
+    scale.setEntry(1, 1, s);
 
     // move camera to target snake
-    translate.setEntry(0, 3, -camera.position.x);
-    translate.setEntry(1, 3, -camera.position.y);
+    translate.setEntry(0, 2, -camera.position.x);
+    translate.setEntry(1, 2, -camera.position.y);
 
     const transform = Matrix.compose(
         Matrix.compose(unstretch, scale),

@@ -116,10 +116,12 @@ export default class WebGLShaderProgram {
                     gl.uniform3fv(uniform.location, uniform.value as number[]);
                 } else if(uniform.type === gl.FLOAT_VEC4) {
                     gl.uniform4fv(uniform.location, uniform.value as number[]);
+                } else if(uniform.type === gl.FLOAT_MAT3) {
+                    gl.uniformMatrix3fv(uniform.location, false, uniform.value as number[]);
                 } else if(uniform.type === gl.FLOAT_MAT4) {
                     gl.uniformMatrix4fv(uniform.location, false, uniform.value as number[]);
                 } else {
-                    throw new Error(`Type ${uniform.type} not implemented.`);
+                    throw new Error(`Uniform type ${uniform.type} not implemented.`);
                 }
             }
         });

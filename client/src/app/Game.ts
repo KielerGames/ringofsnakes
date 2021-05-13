@@ -43,10 +43,10 @@ export default class Game {
         }
     }
 
-    public async frameTick(deltaTime: number, time: number): Promise<void> {
-        this.camera.update(deltaTime);
-
-        this.data.predict(this.data.timeSinceLastUpdate(time));
+    public async frameTick(time: number): Promise<void> {
+        const t = this.data.timeSinceLastUpdate(time);
+        this.camera.update(t);
+        this.data.predict(t);
     }
 
     public async updateUserInput(alpha: number, fast: boolean): Promise<void> {

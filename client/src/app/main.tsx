@@ -22,7 +22,7 @@ document.body.appendChild(root);
         const elapsed = (time - start) / 1000;
         const deltaTime = (time - lastTime) / 1000;
 
-        game.frameTick(deltaTime, time);
+        game.frameTick(time);
         GameRenderer.render(game.data, game.camera, time);
 
         if (!game.ended) {

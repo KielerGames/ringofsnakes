@@ -48,6 +48,7 @@ export function createWorkerSnake(): WorkerSnake {
             fast: false,
             length: 42.0,
             direction: 0.0,
+            targetDirection: 0.0,
             position: {
                 x: 0,
                 y: 0,

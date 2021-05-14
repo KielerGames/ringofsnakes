@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Random;
 
 public class Snake {
-    public static final int INFO_BYTE_SIZE = 20;
-    public static final float START_LENGTH = 42f;
+    public static final int INFO_BYTE_SIZE = 24;
+    public static final float START_LENGTH = 33f;
     private static Random random = new Random();
     private static short nextSnakeId = 0;
     public final GameConfig config = new GameConfig();
@@ -21,7 +21,7 @@ public class Snake {
     public List<SnakeChunk> chunks = new LinkedList<>();
     float headDirection;
     private short nextChunkId = 0;
-    private double targetDirection;
+    private float targetDirection;
     private boolean fast = false;
     private float length = START_LENGTH;
     public SnakeChunkBuilder chunkBuilder;
@@ -48,7 +48,7 @@ public class Snake {
         beginChunk();
     }
 
-    public void setTargetDirection(double alpha) {
+    public void setTargetDirection(float alpha) {
         if (Math.abs(alpha) > Math.PI) {
             System.err.println("Alpha out of range: " + alpha);
         } else {
@@ -123,8 +123,9 @@ public class Snake {
         buffer.put(3, (byte) (fast ? 1 : 0));
         buffer.putFloat(4, length);
         buffer.putFloat(8, headDirection);
-        buffer.putFloat(12, (float) headPosition.x);
-        buffer.putFloat(16, (float) headPosition.y);
+        buffer.putFloat(12, targetDirection);
+        buffer.putFloat(16, (float) headPosition.x);
+        buffer.putFloat(20, (float) headPosition.y);
         buffer.position(INFO_BYTE_SIZE);
 
         return buffer.asReadOnlyBuffer().flip();

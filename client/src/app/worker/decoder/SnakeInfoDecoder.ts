@@ -1,6 +1,6 @@
 import { DecodeResult } from "./DecodeResult";
 
-export const SNAKE_INFO_SIZE = 20;
+export const SNAKE_INFO_SIZE = 24;
 
 export function decode(
     buffer: ArrayBuffer,
@@ -18,9 +18,10 @@ export function decode(
         fast: view.getUint8(3) !== 0,
         length: view.getFloat32(4, false),
         direction: view.getFloat32(8, false),
+        targetDirection: view.getFloat32(12, false),
         position: {
-            x: view.getFloat32(12, false),
-            y: view.getFloat32(16, false),
+            x: view.getFloat32(16, false),
+            y: view.getFloat32(20, false),
         },
     };
 
@@ -36,6 +37,7 @@ export type SnakeInfo = {
     fast: boolean;
     length: number;
     direction: number;
+    targetDirection: number;
     position: {
         x: number;
         y: number;

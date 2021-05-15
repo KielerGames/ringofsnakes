@@ -69,6 +69,7 @@ export default class WorkerSnake {
             skin: this.skin,
             position: this.position.createTransferable(),
             direction: this.direction,
+            targetDirection: this.data.targetDirection,
             speed: currentSpeed,
             offsetCorrection
         };

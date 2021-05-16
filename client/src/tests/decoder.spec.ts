@@ -124,7 +124,7 @@ describe("Decoder", () => {
 
     describe("SnakeInfoDecoder", () => {
         it("should accept valid buffers", () => {
-            const buffer = new Uint8Array(20).buffer;
+            const buffer = new Uint8Array(SID.SNAKE_INFO_SIZE).buffer;
             assert.doesNotThrow(() => SID.decode(buffer, 0));
         });
     });

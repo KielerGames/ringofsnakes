@@ -67,7 +67,7 @@ public class SnakeServer {
         players.remove(session.getId());
     }
 
-    public static void updateUserInput(Session session, double alpha, boolean fast) {
+    public static void updateUserInput(Session session, float alpha, boolean fast) {
         var player = players.get(session.getId());
 
         if(player != null) {

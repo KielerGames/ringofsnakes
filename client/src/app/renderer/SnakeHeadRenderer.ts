@@ -16,7 +16,7 @@ const data = mirror([
     [1.0, 0.0],
     [0.4, 2.0],
 ]);
-const rotOffset = -0.5*Math.PI;
+const rotOffset = -0.5 * Math.PI;
 
 let snakeColors: Color[] = [
     [0.5, 0.75, 1.0],
@@ -50,10 +50,13 @@ export function render(
     shader.setUniform("uTransform", transform.data);
 
     for (const snake of snakes) {
-        const {x,y} = snake.getPredictedPosition(timeSinceLastTick);
+        const { x, y } = snake.getPredictedPosition(timeSinceLastTick);
         shader.setUniform("uSnakeWidth", 1.25 * snake.width);
-        shader.setUniform("uHeadPosition", [x,y]);
-        shader.setUniform("uHeadRotation", snake.direction + rotOffset);
+        shader.setUniform("uHeadPosition", [x, y]);
+        shader.setUniform(
+            "uHeadRotation",
+            snake.direction.predict(timeSinceLastTick) + rotOffset
+        );
         setSkin(snake.skin);
         shader.run(gl.TRIANGLE_STRIP, 0, data.length / VERTEX_SIZE);
     }

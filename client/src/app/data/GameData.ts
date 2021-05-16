@@ -21,7 +21,7 @@ export default class GameData {
         data.snakes.forEach((snakeData) => {
             const snake = this.snakes.get(snakeData.id);
             if (snake) {
-                snake.update(snakeData, data.ticksSinceLastUpdate);
+                snake.update(snakeData, data.ticksSinceLastUpdate, now);
             } else {
                 this.snakes.set(snakeData.id, new Snake(snakeData));
             }

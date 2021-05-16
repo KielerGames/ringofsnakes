@@ -14,6 +14,13 @@ import {
 import * as SCD from "../app/worker/decoder/SnakeChunkDecoder";
 
 describe("MT Snake Chunk", () => {
+    beforeEach(() => {
+        // @ts-ignore
+        global.performance = {
+            now: () => 0.0
+        }
+    });
+
     it("should change the path offset", () => {
         const data: SnakeChunkData = {
             id: 0,
@@ -33,6 +40,7 @@ describe("MT Snake Chunk", () => {
             speed: 1.0,
             position: { x: 0, y: 0 },
             direction: 0.0,
+            targetDirection: 0.0,
             offsetCorrection: 0,
         });
 

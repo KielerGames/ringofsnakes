@@ -11,6 +11,13 @@ function createRandomPoint(rand: Rand, maxValue: number): Vector {
 }
 
 describe("Camera", () => {
+    beforeEach(() => {
+        // @ts-ignore
+        global.performance = {
+            now: () => 0.0
+        }
+    });
+    
     describe("TargetCamera", () => {
         it("should not move", () => {
             const rand = new Rand("stationary seed");
@@ -63,6 +70,7 @@ describe("Camera", () => {
                 length: 42.0,
                 position: { x: 10 * rand.next(), y: 10 * rand.next() },
                 direction: 2 * Math.PI * rand.next(),
+                targetDirection: 2 * Math.PI * rand.next(),
             });
 
             const cam = new SnakeCamera(snake);

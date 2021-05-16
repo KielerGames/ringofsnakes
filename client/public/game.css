@@ -63,3 +63,58 @@ canvas {
 #input-viz-ring.hide > #input-viz-marker {
     opacity: 0;
 }
+
+#snake-list {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding: 5px;
+    background-color: rgb(64,64,64);
+    color: white;
+    font-size: 12px;
+    min-width: 230px;
+}
+
+#snake-list .snake {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    overflow: hidden;
+    padding: 2px;
+}
+
+#snake-list .snake:last-child {
+    margin-bottom: 0;
+}
+
+#snake-list .snake .snake-info {
+    color: black;
+}
+
+#snake-list .snake.skin0 {
+    background-color: rgb(128, 191, 255);
+}
+
+#snake-list .snake.skin1 {
+    background-color: rgb(255, 191, 128);
+}
+
+#snake-list .snake.skin2 {
+    background-color: rgb(191, 255, 128);
+}
+
+#snake-list .snake .chunks {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    margin-left: 5px;
+}
+
+#snake-list .snake .chunks .chunk-info {
+    background-color: rgb(94, 94, 94);
+    border-radius: 4px;
+    min-width: 80px;
+    text-align: center;
+    padding: 0px 2px;
+}

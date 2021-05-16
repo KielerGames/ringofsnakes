@@ -1,7 +1,5 @@
 import Rectangle from "../math/Rectangle";
 import Vector from "../math/Vector";
-import { GameConfig } from "../protocol";
-import assert from "../utilities/assert";
 import { SnakeChunkData } from "../worker/GameDataUpdate";
 import Snake from "./Snake";
 
@@ -13,6 +11,7 @@ export default class SnakeChunk {
     public readonly buffer: Float32Array;
     public readonly vertices: number;
     public readonly final: boolean;
+    public readonly length: number;
     private lastTickOffset: number;
 
     private boundingBox: Rectangle;
@@ -25,6 +24,7 @@ export default class SnakeChunk {
         this.buffer = data.data;
         this.vertices = data.vertices;
         this.final = data.final;
+        this.length = data.length;
     }
 
     public addToOffset(diff: number): void {

@@ -80,10 +80,10 @@ export default class GameData {
     }
 
     public predict(timeSinceLastTick: number): void {
-        this.snakes.forEach(snake => {
+        this.snakes.forEach((snake) => {
             const currentChunk = snake.getCurrentChunk();
 
-            if(currentChunk) {
+            if (currentChunk) {
                 const pos = snake.getPredictedPosition(timeSinceLastTick);
                 currentChunk.updateEndPoint(pos);
             }
@@ -91,7 +91,7 @@ export default class GameData {
     }
 
     public get cameraTarget(): Snake | undefined {
-        if(this.cameraTargetId >= 0) {
+        if (this.cameraTargetId >= 0) {
             return this.snakes.get(this.cameraTargetId);
         }
     }

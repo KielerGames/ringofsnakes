@@ -75,4 +75,8 @@ export default class Snake {
     public getCurrentChunk(): SnakeChunk | null {
         return this.currentChunk;
     }
+
+    public getChunks(): SnakeChunk[] {
+        return Array.from(this.chunks.values());
+    }
 }

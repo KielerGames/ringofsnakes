@@ -59,9 +59,11 @@ export default class UserInput extends Component<Props, State> {
         return false;
     }
 
-    private clickHandler() {
+    private clickHandler(e: MouseEvent) {
         if (__DEBUG__) {
-            return;
+            if (!e.ctrlKey) {
+                return;
+            }
         }
 
         if (document.pointerLockElement !== this.ref.current) {

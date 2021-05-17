@@ -1,5 +1,3 @@
-declare const __DEBUG__: boolean;
-
 function checkAndThrow(condition: boolean, msg:string = ""):void {
     if(!condition) {
         throw new Error(`AssertionError: ${msg}`);

@@ -3,7 +3,7 @@ import Vector from "../math/Vector";
 import { SnakeChunkData } from "../worker/GameDataUpdate";
 import Snake from "./Snake";
 
-declare const __DEBUG__: boolean;
+
 export default class SnakeChunk {
     public readonly id: number;
     public readonly snake: Snake;

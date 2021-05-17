@@ -7,8 +7,6 @@ import {
 import { GameDataUpdate } from "./GameDataUpdate";
 import WorkerGame from "./WorkerGame";
 
-declare const __DEBUG__: boolean;
-
 let game: WorkerGame | null = null;
 
 export class WorkerAPI {

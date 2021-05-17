@@ -3,7 +3,6 @@ import assert from "../utilities/assert";
 import Matrix from "../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 
-declare const __DEBUG__: boolean;
 declare const __VERTEXSHADER_SNAKE__: string;
 declare const __FRAGMENTSHADER_SNAKE__: string;
 type Color = [number, number, number];

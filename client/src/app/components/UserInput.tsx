@@ -1,7 +1,5 @@
 import { Component, createRef } from "preact";
 
-declare const __DEBUG__: boolean;
-
 type Props = {
     initial?: number;
     onChange: (newAlpha: number, newFast: boolean) => void;

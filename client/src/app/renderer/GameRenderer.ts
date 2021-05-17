@@ -4,8 +4,6 @@ import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
 
-declare const __DEBUG__: boolean;
-
 let gl: WebGLRenderingContext;
 
 const unstretch = new Matrix();

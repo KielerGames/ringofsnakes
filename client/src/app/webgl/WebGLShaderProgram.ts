@@ -1,5 +1,3 @@
-declare const __DEBUG__: boolean;
-
 type FloatData = null | number | number[] | Float32Array;
 
 export default class WebGLShaderProgram {

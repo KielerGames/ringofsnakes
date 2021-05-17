@@ -1,6 +1,5 @@
 import assert from "../utilities/assert";
 
-declare const __DEBUG__:boolean;
 const VERTEX_SIZE = 6;
 
 export default class SnakeChunkVertexBufferBuilder {

@@ -1,8 +1,7 @@
 import * as Preact from "preact";
-import UserInput from "./components/UserInput";
 import * as GameRenderer from "./renderer/GameRenderer";
 import Game from "./Game";
-import SnakeList from "./components/debug/SnakeList";
+import GameUI from "./components/GameUI";
 
 // init
 document.body.style.backgroundColor = "black";
@@ -34,14 +33,5 @@ document.body.appendChild(root);
     window.requestAnimationFrame(renderLoop);
 
     // render user interface
-    Preact.render(
-        <>
-            <SnakeList data={game.data} />
-            <UserInput
-                initial={0.0}
-                onChange={game.updateUserInput.bind(game)}
-            />
-        </>,
-        root
-    );
+    Preact.render(<GameUI game={game} />, root);
 })();

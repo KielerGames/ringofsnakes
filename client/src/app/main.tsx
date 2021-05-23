@@ -3,6 +3,9 @@ import * as GameRenderer from "./renderer/GameRenderer";
 import Game from "./Game";
 import GameUI from "./components/GameUI";
 
+// create styles (in <head>)
+import "../styles/game.less";
+
 // init
 document.body.style.backgroundColor = "black";
 GameRenderer.init(document.body);

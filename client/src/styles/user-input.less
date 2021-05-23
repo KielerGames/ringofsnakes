@@ -1,0 +1,43 @@
+#input-container {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    --ring-radius: 200px;
+    --ring-width: 12px;
+}
+
+#input-viz-ring {
+    position: relative;
+    width: var(--ring-radius);
+    height: var(--ring-radius);
+    border-radius: 50%;
+    box-shadow: 0px 0px 0px var(--ring-width) rgba(128,128,128,0.2);
+    transition: 0.33s;
+}
+
+#input-viz-ring.hide {
+    box-shadow: 0px 0px 0px 5px transparent;
+    transition: 0.64s;
+}
+
+#input-viz-marker {
+    position: absolute;
+    top: calc(0px - var(--ring-width));
+    left: calc(0px - var(--ring-width));
+    width: var(--ring-radius);
+    height: var(--ring-radius);
+    border-radius: 50%;
+    border: var(--ring-width) solid rgba(255,255,255,0.85);
+    clip-path: polygon(50% 50%, 100% 40%, 100% 60%);
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+
+#input-viz-ring.hide > #input-viz-marker {
+    opacity: 0;
+}

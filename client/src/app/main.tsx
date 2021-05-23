@@ -4,7 +4,7 @@ import Game from "./Game";
 import GameUI from "./components/GameUI";
 
 // create styles (in <head>)
-import "../styles/game.less";
+import "../styles/main.less";
 
 // init
 document.body.style.backgroundColor = "black";

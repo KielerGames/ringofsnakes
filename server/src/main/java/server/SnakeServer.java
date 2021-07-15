@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SnakeServer {
-    private static Map<String, Player> players = new HashMap<>();
+    private static Map<String, Client> players = new HashMap<>();
     private static Gson gson = new Gson();
     private static Game game = new Game();
 
@@ -28,8 +28,6 @@ public class SnakeServer {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         server.setHandler(context);
-
-        var ticker = new Thread(new Ticker());
 
         try {
             // Initialize javax.websocket layer
@@ -48,7 +46,7 @@ public class SnakeServer {
                     });
 
             server.start();
-            ticker.start();
+            game.start();
             server.join();
         } catch (Throwable t) {
             t.printStackTrace(System.err);
@@ -57,7 +55,7 @@ public class SnakeServer {
 
     public static void createPlayer(Session session) {
         var snake = game.addSnake();
-        var player = new Player(snake, session);
+        var player = new Client(snake, session);
         players.put(session.getId(), player);
         String data = gson.toJson(new SpawnInfo(game.config, snake));
         player.sendSync(data);
@@ -76,33 +74,6 @@ public class SnakeServer {
             player.snake.setFast(fast);
         } else {
             System.err.println("Illegal request from client.");
-        }
-    }
-
-    private static class Ticker implements Runnable {
-        public void run() {
-            while (true) {
-                game.tick();
-
-                players.forEach((id, player) -> {
-                    //TODO: filter visible chunks
-                    game.snakes.forEach(snake ->
-                            snake.chunks.forEach(player::updateChunk)
-                    );
-                    player.sendUpdate();
-                });
-
-                // TODO: measure time and adapt
-                sleep(game.config.tickDuration);
-            }
-        }
-
-        private void sleep(double seconds) {
-            int time = (int) Math.floor(1000 * seconds);
-            try {
-                Thread.sleep(time);
-            } catch (InterruptedException ignored) {
-            }
         }
     }
 }

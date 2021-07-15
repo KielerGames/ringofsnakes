@@ -1,7 +1,6 @@
 package server;
 
 import game.snake.Snake;
-import game.snake.SnakeChunk;
 import game.snake.SnakeChunkData;
 import math.BoundingBox;
 import server.protocol.GameUpdate;
@@ -12,13 +11,13 @@ import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Player {
+public class Client {
     public Snake snake;
     public Session session;
     private Set<Integer> knownChunks = new HashSet<>();
     private GameUpdate nextUpdate;
 
-    public Player(Snake snake, Session session) {
+    public Client(Snake snake, Session session) {
         this.snake = snake;
         this.session = session;
         nextUpdate = new GameUpdate();

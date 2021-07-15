@@ -43,10 +43,10 @@ public class SnakeChunk implements SnakeChunkData {
         //some primitive testing of the collision detection, needs to be deleted later
         HashSet<List<Vector>> set = new HashSet<>();
         set.add(points);
-        assert (doesCollideWith(snake.headPosition, 10) == doesCollideWith(snake.headPosition, set, 10));
-        if (doesCollideWith(snake.headPosition, 10)) {
+        //assert (doesCollideWith(snake.headPosition, 10) == doesCollideWith(snake.headPosition, set, 10));
+        /*if (doesCollideWith(snake.headPosition, 10)) {
             System.out.println("Collision");
-        }
+        }*/
 
     }
 

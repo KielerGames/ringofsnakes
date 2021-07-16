@@ -4,25 +4,35 @@ import game.snake.Snake;
 import game.world.World;
 import math.Vector;
 import server.Client;
+import server.Player;
+import server.protocol.SpawnInfo;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import com.google.gson.Gson;
+import javax.websocket.Session;
+import java.util.*;
 
 public class Game {
     public int id;
     public GameConfig config = new GameConfig();
     public List<Snake> snakes = new LinkedList<>();
-    private Set<Client> clients = new HashSet<>();
+    private Map<String, Client> clients = new HashMap<>();
     public World world;
     private Thread tickerThread;
+    private static Gson gson = new Gson();
 
-    public Snake addSnake() {
+    public void createPlayer(Session session) {
         var spawnPos = findSpawnPosition();
-        Snake snake = new Snake(spawnPos.x, spawnPos.y);
+        var snake = new Snake(spawnPos.x, spawnPos.y);
         snakes.add(snake);
-        return snake;
+
+        var player = new Player(snake, session);
+        clients.put(session.getId(), player);
+        var data = gson.toJson(new SpawnInfo(config, snake));
+        player.sendSync(data);
+    }
+
+    public void removeClient(String sessionId) {
+        clients.remove(sessionId);
     }
 
     public void start() {
@@ -47,10 +57,10 @@ public class Game {
     private class Ticker implements Runnable {
         @Override
         public void run() {
-            while (snakes.size() > 0) {
+            while (true) {
                 tick();
 
-                clients.forEach(client -> {
+                clients.forEach((__, client) -> {
                     //TODO: filter visible chunks
                     snakes.forEach(snake ->
                             snake.chunks.forEach(client::updateChunk)

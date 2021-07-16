@@ -1,20 +1,14 @@
 package server;
 
-import com.google.gson.Gson;
 import game.Game;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
-import server.protocol.SpawnInfo;
 
 import javax.websocket.Session;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SnakeServer {
-    private static Map<String, Client> players = new HashMap<>();
-    private static Gson gson = new Gson();
     private static Game game = new Game();
 
     public static void main(String[] args) {
@@ -53,27 +47,23 @@ public class SnakeServer {
         }
     }
 
-    public static void createPlayer(Session session) {
-        var snake = game.addSnake();
-        var player = new Client(snake, session);
-        players.put(session.getId(), player);
-        String data = gson.toJson(new SpawnInfo(game.config, snake));
-        player.sendSync(data);
+    public static void onNewClientConnected(Session session) {
+        System.out.println("A new client has connected.");
+        game.createPlayer(session);
     }
 
     public static void removePlayer(Session session) {
-        players.remove(session.getId());
+        game.removeClient(session.getId());
     }
 
-    public static void updateUserInput(Session session, float alpha, boolean fast) {
-        var player = players.get(session.getId());
+    public static void onUserInputUpdate(Session session, float alpha, boolean fast) {
+        /*var player = players.get(session.getId());
 
         if(player != null) {
-            player.session = session;
             player.snake.setTargetDirection(alpha);
             player.snake.setFast(fast);
         } else {
             System.err.println("Illegal request from client.");
-        }
+        }*/
     }
 }

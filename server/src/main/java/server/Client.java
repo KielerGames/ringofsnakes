@@ -12,13 +12,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Client {
-    public Snake snake;
     public Session session;
     private Set<Integer> knownChunks = new HashSet<>();
     private GameUpdate nextUpdate;
 
-    public Client(Snake snake, Session session) {
-        this.snake = snake;
+    public Client(Session session) {
         this.session = session;
         nextUpdate = new GameUpdate();
     }
@@ -34,14 +32,12 @@ public class Client {
         }
     }
 
+    protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {}
+
     public void sendUpdate() {
         var update = this.nextUpdate;
         this.nextUpdate = new GameUpdate();
-        var wasEmpty = update.isEmpty();
-        update.addSnakeChunk(snake.chunkBuilder);
-        if(!wasEmpty) {
-            //System.out.println("Sending " + update);
-        }
+        onBeforeUpdateBufferIsCreated(update);
         send(update.createBuffer());
     }
 

@@ -1,21 +1,18 @@
 package server;
 
-import com.google.gson.Gson;
 import game.Game;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
-import server.protocol.SpawnInfo;
 
 import javax.websocket.Session;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SnakeServer {
-    private static Map<String, Player> players = new HashMap<>();
-    private static Gson gson = new Gson();
     private static Game game = new Game();
+    private static Map<String, Player> players = new HashMap<>(64);
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -28,8 +25,6 @@ public class SnakeServer {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         server.setHandler(context);
-
-        var ticker = new Thread(new Ticker());
 
         try {
             // Initialize javax.websocket layer
@@ -48,61 +43,35 @@ public class SnakeServer {
                     });
 
             server.start();
-            ticker.start();
+            game.start();
             server.join();
         } catch (Throwable t) {
             t.printStackTrace(System.err);
         }
     }
 
-    public static void createPlayer(Session session) {
-        var snake = game.addSnake();
-        var player = new Player(snake, session);
+    public static void onNewClientConnected(Session session) {
+        System.out.println("A new client has connected.");
+        var player = game.createPlayer(session);
+
         players.put(session.getId(), player);
-        String data = gson.toJson(new SpawnInfo(game.config, snake));
-        player.sendSync(data);
     }
 
     public static void removePlayer(Session session) {
-        players.remove(session.getId());
+        var sessionId = session.getId();
+        players.remove(sessionId);
+        game.removeClient(sessionId);
+        System.out.println("Player has been removed. (" + sessionId + ")");
     }
 
-    public static void updateUserInput(Session session, float alpha, boolean fast) {
+    public static void onUserInputUpdate(Session session, float alpha, boolean fast) {
         var player = players.get(session.getId());
 
         if(player != null) {
-            player.session = session;
             player.snake.setTargetDirection(alpha);
             player.snake.setFast(fast);
         } else {
             System.err.println("Illegal request from client.");
-        }
-    }
-
-    private static class Ticker implements Runnable {
-        public void run() {
-            while (true) {
-                game.tick();
-
-                players.forEach((id, player) -> {
-                    //TODO: filter visible chunks
-                    game.snakes.forEach(snake ->
-                            snake.chunks.forEach(player::updateChunk)
-                    );
-                    player.sendUpdate();
-                });
-
-                // TODO: measure time and adapt
-                sleep(game.config.tickDuration);
-            }
-        }
-
-        private void sleep(double seconds) {
-            int time = (int) Math.floor(1000 * seconds);
-            try {
-                Thread.sleep(time);
-            } catch (InterruptedException ignored) {
-            }
         }
     }
 }

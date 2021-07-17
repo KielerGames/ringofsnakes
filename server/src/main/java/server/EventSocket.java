@@ -2,7 +2,6 @@ package server;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 @ClientEndpoint
@@ -12,13 +11,13 @@ public class EventSocket {
     public void onWebSocketConnect(Session session) {
         System.out.println("Socket Connected: " + session);
 
-        SnakeServer.createPlayer(session);
+        SnakeServer.onNewClientConnected(session);
 
         //session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
     }
 
     @OnMessage
-    public void onWebSocketText(Session session, String message) throws IOException {
+    public void onWebSocketText(Session session, String message) {
     }
 
     @OnMessage
@@ -26,7 +25,7 @@ public class EventSocket {
         float alpha = (float) buffer.getDouble(0); // TODO
         boolean fast = buffer.get(8) != 0;
         assert(buffer.get(9) == 42);
-        SnakeServer.updateUserInput(session, alpha, fast);
+        SnakeServer.onUserInputUpdate(session, alpha, fast);
     }
 
     @OnClose

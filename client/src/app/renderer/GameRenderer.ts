@@ -13,6 +13,7 @@ const translate = new Matrix();
 export function init(parentNode: HTMLElement = document.body): void {
     // create canvas element
     const canvas = document.createElement("canvas");
+    canvas.id = "main-canvas";
     parentNode.appendChild(canvas);
 
     // init gl context

@@ -1,5 +1,6 @@
 import { Component } from "preact";
 import Game from "../Game";
+import FPSStats from "./debug/FPSStats";
 import SnakeList from "./debug/SnakeList";
 import UserInput from "./UserInput";
 
@@ -13,6 +14,7 @@ export default class GameUI extends Component<Props> {
 
         return (
             <>
+                <FPSStats />
                 {__DEBUG__ ? <SnakeList data={game.data} /> : null}
                 <UserInput
                     initial={0.0}

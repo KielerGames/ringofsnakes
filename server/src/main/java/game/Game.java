@@ -12,15 +12,15 @@ import javax.websocket.Session;
 import java.util.*;
 
 public class Game {
-    public int id;
+    public final int id = 1; //TODO
     public GameConfig config = new GameConfig();
     public List<Snake> snakes = new LinkedList<>();
-    private Map<String, Client> clients = new HashMap<>();
+    private Map<String, Client> clients = new HashMap<>(64);
     public World world;
     private Thread tickerThread;
     private static Gson gson = new Gson();
 
-    public void createPlayer(Session session) {
+    public Player createPlayer(Session session) {
         var spawnPos = findSpawnPosition();
         var snake = new Snake(spawnPos.x, spawnPos.y);
         snakes.add(snake);
@@ -29,6 +29,8 @@ public class Game {
         clients.put(session.getId(), player);
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
+
+        return player;
     }
 
     public void removeClient(String sessionId) {

@@ -1,6 +1,5 @@
 package server;
 
-import game.snake.Snake;
 import game.snake.SnakeChunkData;
 import math.BoundingBox;
 import server.protocol.GameUpdate;

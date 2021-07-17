@@ -7,9 +7,12 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
 import javax.websocket.Session;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SnakeServer {
     private static Game game = new Game();
+    private static Map<String, Player> players = new HashMap<>(64);
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -49,21 +52,26 @@ public class SnakeServer {
 
     public static void onNewClientConnected(Session session) {
         System.out.println("A new client has connected.");
-        game.createPlayer(session);
+        var player = game.createPlayer(session);
+
+        players.put(session.getId(), player);
     }
 
     public static void removePlayer(Session session) {
-        game.removeClient(session.getId());
+        var sessionId = session.getId();
+        players.remove(sessionId);
+        game.removeClient(sessionId);
+        System.out.println("Player has been removed. (" + sessionId + ")");
     }
 
     public static void onUserInputUpdate(Session session, float alpha, boolean fast) {
-        /*var player = players.get(session.getId());
+        var player = players.get(session.getId());
 
         if(player != null) {
             player.snake.setTargetDirection(alpha);
             player.snake.setFast(fast);
         } else {
             System.err.println("Illegal request from client.");
-        }*/
+        }
     }
 }

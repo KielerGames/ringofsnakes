@@ -1,5 +1,6 @@
 package game;
 
+import com.google.gson.Gson;
 import game.snake.Snake;
 import game.world.World;
 import math.Vector;
@@ -7,18 +8,20 @@ import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
 
-import com.google.gson.Gson;
 import javax.websocket.Session;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class Game {
+    private static Gson gson = new Gson();
     public final int id = 1; //TODO
     public GameConfig config = new GameConfig();
     public List<Snake> snakes = new LinkedList<>();
-    private Map<String, Client> clients = new HashMap<>(64);
     public World world;
+    private Map<String, Client> clients = new HashMap<>(64);
     private Thread tickerThread;
-    private static Gson gson = new Gson();
 
     public Player createPlayer(Session session) {
         var spawnPos = findSpawnPosition();
@@ -34,11 +37,16 @@ public class Game {
     }
 
     public void removeClient(String sessionId) {
-        clients.remove(sessionId);
+        var client = clients.remove(sessionId);
+        if (client instanceof Player) {
+            var snake = ((Player) client).snake;
+            // TODO: generate food (?), consider changing list to another data structure
+            snakes.remove(snake);
+        }
     }
 
     public void start() {
-        if(tickerThread != null) {
+        if (tickerThread != null) {
             throw new IllegalStateException("Game tick thread already started.");
         }
 
@@ -47,7 +55,7 @@ public class Game {
     }
 
     private Vector findSpawnPosition() {
-        return new Vector(0.0,0.0); //TODO
+        return new Vector(0.0, 0.0); //TODO
     }
 
     private void tick() {

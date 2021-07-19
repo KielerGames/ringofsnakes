@@ -52,6 +52,8 @@ public class Game {
 
         tickerThread = new Thread(new Ticker());
         tickerThread.start();
+
+        System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
 
     private Vector findSpawnPosition() {

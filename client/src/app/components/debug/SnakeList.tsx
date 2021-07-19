@@ -7,7 +7,7 @@ type SLProps = {
 };
 
 export default class SnakeList extends Component<SLProps> {
-    private timer:number;
+    private timer: number;
 
     public constructor(props: SLProps) {
         super(props);
@@ -28,9 +28,11 @@ export default class SnakeList extends Component<SLProps> {
 
         return (
             <div id="snake-list" class="debug-ui">
-                {snakes.map((snake) => (
-                    <SnakeOverview key={snake.id} data={snake} />
-                ))}
+                {snakes.length > 0
+                    ? snakes.map((snake) => (
+                          <SnakeOverview key={snake.id} data={snake} />
+                      ))
+                    : "No snake data."}
             </div>
         );
     }

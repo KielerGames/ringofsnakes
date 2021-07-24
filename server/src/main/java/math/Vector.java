@@ -1,5 +1,7 @@
 package math;
 
+import java.util.Random;
+
 public class Vector {
     public double x;
     public double y;
@@ -14,23 +16,9 @@ public class Vector {
         this.y = Math.sin(alpha);
     }
 
-    public double getAlpha() {
-        return Math.atan2(this.y, this.x);
-    }
-
-    public void addDirection(double alpha, double stepSize) {
-        x += stepSize * Math.cos(alpha);
-        y += stepSize * Math.sin(alpha);
-    }
-
-    public void add(Vector v, double s) {
-        this.x = s * v.x;
-        this.y = s * v.y;
-    }
-
-    @Override
-    public Vector clone() {
-        return new Vector(this.x, this.y);
+    public Vector(Random rand, double maxValue) {
+        this.x = (2.0 * rand.nextDouble() - 1.0) * maxValue;
+        this.y = (2.0 * rand.nextDouble() - 1.0) * maxValue;
     }
 
     public static double distance(Vector a, Vector b) {
@@ -56,5 +44,24 @@ public class Vector {
                 a.x * r + b.x * t,
                 a.y * r + b.y * t
         );
+    }
+
+    public double getAlpha() {
+        return Math.atan2(this.y, this.x);
+    }
+
+    public void addDirection(double alpha, double stepSize) {
+        x += stepSize * Math.cos(alpha);
+        y += stepSize * Math.sin(alpha);
+    }
+
+    public void add(Vector v, double s) {
+        this.x = s * v.x;
+        this.y = s * v.y;
+    }
+
+    @Override
+    public Vector clone() {
+        return new Vector(this.x, this.y);
     }
 }

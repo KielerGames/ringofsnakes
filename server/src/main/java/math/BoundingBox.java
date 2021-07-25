@@ -14,9 +14,35 @@ public class BoundingBox {
         this.maxY = maxY;
     }
 
+    /**
+     * Check if two BoundingBox instances intersect.
+     *
+     * @param a
+     * @param b
+     * @return {@code true} if BoundingBox a and b intersect
+     */
     public static boolean intersect(BoundingBox a, BoundingBox b) {
-        //TODO: implement
-        throw new UnsupportedOperationException("Not implemented (yet)");
+        final boolean intersectX = intervalsIntersect(a.minX, a.maxX, b.minX, b.maxX);
+        final boolean intersectY = intervalsIntersect(a.minY, a.maxY, b.minY, b.maxY);
+        return intersectX && intersectY;
+    }
+
+    /**
+     * @param lb1 Lower bound of interval 1
+     * @param ub1 Upper bound of interval 1
+     * @param lb2 Lower bound of interval 2
+     * @param ub2 Upper bound of interval 2
+     * @return {@code true} if [lb1, ub1] and [lb2, ub2] intersect
+     */
+    private static boolean intervalsIntersect(
+            double lb1, double ub1,
+            double lb2, double ub2
+    ) {
+        assert (lb1 <= ub1);
+        assert (lb2 <= ub2);
+
+        final boolean separate = ub1 <= lb2 || ub2 <= lb1;
+        return !separate;
     }
 
     /**
@@ -51,5 +77,17 @@ public class BoundingBox {
 
     public double distance(Vector p) {
         return Math.sqrt(distance2(p));
+    }
+
+    /**
+     * Checks if a given point is within a certain range or inside this rectangle.
+     *
+     * @param p     A point
+     * @param range The maximum min-distance between rect and point
+     * @return {@code true} if p is within the given range
+     */
+    public boolean isWithinRange(Vector p, double range) {
+        assert (range >= 0.0);
+        return distance2(p) < range * range;
     }
 }

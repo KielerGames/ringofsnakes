@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BoundingBoxTest {
 
@@ -16,14 +15,17 @@ public class BoundingBoxTest {
         var origin = new Vector(0.0, 0.0);
         assertEquals(0.0, box.distance(origin));
         assertEquals(0.0, box.distance2(origin));
+        assertTrue(box.isWithinRange(origin, 0.2));
 
         var point = new Vector(-0.5, 0.73);
         assertEquals(0.0, box.distance(point));
         assertEquals(0.0, box.distance2(point));
+        assertTrue(box.isWithinRange(point, 0.25));
 
         var corner = new Vector(1.0, 1.0);
         assertEquals(0.0, box.distance(corner), 1e-8);
         assertEquals(0.0, box.distance2(corner), 1e-8);
+        assertTrue(box.isWithinRange(corner, 0.2));
     }
 
     @Test
@@ -45,5 +47,19 @@ public class BoundingBoxTest {
             assertTrue(box.distance(point) >= 0.0);
             assertTrue(box.distance2(point) >= 0.0);
         }
+    }
+
+    @Test
+    void testIntersection() {
+        var a = new BoundingBox(-1.0, 1.0, -1.0, 1.0);
+        var b = new BoundingBox(-0.5, 0.5, -0.5, 0.5);
+        assertTrue(BoundingBox.intersect(a, b));
+    }
+
+    @Test
+    void testNonIntersection() {
+        var a = new BoundingBox(-1.0, -0.25, -1.0, 1.0);
+        var b = new BoundingBox(0.25, 1.0, -1.0, 1.0);
+        assertFalse(BoundingBox.intersect(a, b));
     }
 }

@@ -38,7 +38,7 @@ public class WorldChunkTest {
 
         var outerChunks = 4 * (m - 1);
         var innerChunks = n - outerChunks;
-        var has4Neighbors = children.stream().filter(cc -> cc.getNeighbors().size() == 4).count();
+        var has4Neighbors = children.stream().filter(cc -> cc.getNeighbors().size() == 8).count();
         assertEquals(innerChunks, has4Neighbors);
     }
 }

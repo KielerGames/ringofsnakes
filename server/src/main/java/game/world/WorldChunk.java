@@ -22,7 +22,7 @@ public class WorldChunk {
         if (subdivisions > 0) {
             subdivide(subdivisions);
         }
-        setNeighbors(null, null, null, null);
+        setNeighbors(null, null, null, null, null, null, null, null);
     }
 
     private WorldChunk(double left, double bottom, double width, double height) {
@@ -55,36 +55,77 @@ public class WorldChunk {
         }
     }
 
-    private void setNeighbors(WorldChunk top, WorldChunk bottom, WorldChunk left, WorldChunk right) {
-        neighbors.top = top != null ? top : neighbors.top;
-        neighbors.bottom = bottom != null ? bottom : neighbors.bottom;
-        neighbors.left = left != null ? left : neighbors.left;
-        neighbors.right = right != null ? right : neighbors.right;
+    /**
+     *
+     ┌──┬──┬──┬──┬──┬──┐
+     │ 2│3 │ 2│3 │ 2│3 │
+     ├─NW──┼──N──┼─NE──┤
+     │ 0│1 │ 0│1 │ 0│1 │
+     ├──┼──┼──┼──┼──┼──┤
+     │ 2│3 │ 2│3 │ 2│3 │
+     ├──W──┼──X──┼──E──┤
+     │ 0│1 │ 0│1 │ 0│1 │
+     ├──┼──┼──┼──┼──┼──┤
+     │ 2│3 │ 2│3 │ 2│3 │
+     ├─SW──┼──S──┼─SE──┤
+     │ 0│1 │ 0│1 │ 0│1 │
+     └──┴──┴──┴──┴──┴──┘
+     */
+    private void setNeighbors(WorldChunk east, WorldChunk northEast, WorldChunk north, WorldChunk northWest,
+                              WorldChunk west, WorldChunk southWest, WorldChunk south, WorldChunk southEast) {
+        neighbors.east = east != null ? east : neighbors.east;
+        neighbors.northEast = northEast != null ? northEast : neighbors.northEast;
+        neighbors.north = north != null ? north : neighbors.north;
+        neighbors.northWest = northWest != null ? northWest : neighbors.northWest;
+        neighbors.west = west != null ? west : neighbors.west;
+        neighbors.southWest = southWest != null ? southWest : neighbors.southWest;
+        neighbors.south = south != null ? south : neighbors.south;
+        neighbors.southEast = southEast != null ? southEast : neighbors.southEast;
 
         if (children.length == 4) {
             // outer neighbors
-            if (left != null) {
-                children[0].neighbors.left = left.children[1];
-                children[2].neighbors.left = left.children[3];
+            if (east != null) {
+                children[1].neighbors.east = east.children[0];
+                children[1].neighbors.northEast = east.children[2];
+                children[3].neighbors.east = east.children[2];
+                children[3].neighbors.southEast = east.children[0];
             }
-            if (right != null) {
-                children[1].neighbors.right = right.children[0];
-                children[3].neighbors.right = right.children[2];
+            if (northEast != null) {
+                children[3].neighbors.northEast = northEast.children[0];
             }
-            if (bottom != null) {
-                children[0].neighbors.bottom = bottom.children[2];
-                children[1].neighbors.bottom = bottom.children[3];
+            if (north != null) {
+                children[3].neighbors.north = north.children[1];
+                children[3].neighbors.northWest = north.children[0];
+                children[2].neighbors.north = north.children[0];
+                children[2].neighbors.northEast = north.children[1];
             }
-            if (top != null) {
-                children[2].neighbors.top = top.children[0];
-                children[3].neighbors.top = top.children[1];
+            if (northWest != null) {
+                children[2].neighbors.northWest = northWest.children[1];
+            }
+            if (west != null) {
+                children[2].neighbors.west = west.children[3];
+                children[2].neighbors.southWest = west.children[1];
+                children[0].neighbors.west = west.children[1];
+                children[0].neighbors.northWest = west.children[3];
+            }
+            if (southWest != null) {
+                children[0].neighbors.southWest = southWest.children[3];
+            }
+            if (south != null) {
+                children[0].neighbors.south = south.children[2];
+                children[0].neighbors.southEast = south.children[3];
+                children[1].neighbors.south = south.children[3];
+                children[1].neighbors.southWest = south.children[2];
+            }
+            if (southEast != null) {
+                children[1].neighbors.southEast = southEast.children[2];
             }
 
             // inner neighbors
-            children[0].setNeighbors(children[2], null, null, children[1]);
-            children[1].setNeighbors(children[3], null, children[0], null);
-            children[2].setNeighbors(null, children[0], null, children[3]);
-            children[3].setNeighbors(null, children[1], children[2], null);
+            children[0].setNeighbors(children[1],children[3],children[2],null,null,null,null,null );
+            children[1].setNeighbors(null, null, children[3], children[2], children[0],null, null, null);
+            children[2].setNeighbors(children[3],null,null,null, null, null, children[0],children[1]);
+            children[3].setNeighbors(null, null, null, null, children[2], children[0], children[1], null );
         }
     }
 
@@ -93,12 +134,13 @@ public class WorldChunk {
     }
 
     public List<WorldChunk> getNeighbors() {
-        return Stream.of(neighbors.top, neighbors.bottom, neighbors.left, neighbors.right)
+        return Stream.of(neighbors.east, neighbors.northEast, neighbors.north, neighbors.northWest,
+                neighbors.west, neighbors.southWest, neighbors.south, neighbors.southEast)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableList());
     }
 
     private static class NeighborList {
-        public WorldChunk top, bottom, left, right;
+        public WorldChunk east, northEast, north, northWest, west, southWest, south, southEast;
     }
 }

@@ -19,7 +19,7 @@ public class Game {
     public final int id = 1; //TODO
     public GameConfig config = new GameConfig();
     public List<Snake> snakes = new LinkedList<>();
-    public World world;
+    public World world = new World();
     private Map<String, Client> clients = new HashMap<>(64);
     private Thread tickerThread;
 

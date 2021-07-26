@@ -7,28 +7,44 @@ import java.util.Optional;
 public class WorldChunk {
     private NeighborList neighbors;
     private BoundingBox box;
-    private Optional<WorldChunk[]> children;
+    private WorldChunk[] children;
 
-    public WorldChunk(double left, double bottom, double width, double height) {
-        this(new BoundingBox(left, left + width, bottom, bottom + height));
+    public WorldChunk(double width, double height, int subdivisions) {
+        this(-0.5 * width, -0.5 * height, width, height);
+        subdivide(subdivisions);
     }
 
-    public WorldChunk(BoundingBox box) {
-        this.box = box;
-        this.children = Optional.empty();
+    private WorldChunk(double left, double bottom, double width, double height) {
+        assert (width > 0.0);
+        assert (height > 0.0);
+
+        box = new BoundingBox(left, left + width, bottom, bottom + height);
+        children = new WorldChunk[0];
     }
 
-    public void subdivide(int levels) {
-        assert (levels > 0);
+    private void subdivide(int subdivisions) {
+        assert (subdivisions >= 0);
 
-/*        WorldChunk[] children = new WorldChunk[4];
-        final double width = box.getWidth(), height = box.getHeight();
+        final double left = box.minX, bottom = box.minY;
+        final double width = 0.5 * box.getWidth();
+        final double height = 0.5 * box.getHeight();
 
-        children[0] = new WorldChunk(new BoundingBox(box.minX, ))
+        /* create children:
+         * 2, 3
+         * 0, 1
+         */
+        children = new WorldChunk[4];
+        children[0] = new WorldChunk(left, bottom, width, height);
+        children[1] = new WorldChunk(left + width, bottom, width, height);
+        children[2] = new WorldChunk(left, bottom + height, width, height);
+        children[3] = new WorldChunk(left + width, bottom + height, width, height);
 
-        this.children = Optional.of(children);*/
-
-        throw new UnsupportedOperationException("Not yet implemented.");
+        // link neighbors
+        children[0].setNeighbors(children[2], null, null, children[1]);
+        children[1].setNeighbors(children[3], null, children[0], null);
+        children[2].setNeighbors(null, children[0], null, children[3]);
+        children[3].setNeighbors(null, children[1], children[2], null);
+        // TODO: outer neighbors
     }
 
     public void setNeighbors(WorldChunk top, WorldChunk bottom, WorldChunk left, WorldChunk right) {

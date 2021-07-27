@@ -25,8 +25,9 @@ public class Game {
 
     public Player createPlayer(Session session) {
         var spawnPos = findSpawnPosition();
-        var snake = new Snake(spawnPos.x, spawnPos.y);
+        var snake = new Snake(spawnPos, world);
         snakes.add(snake);
+        world.addSnake(snake);
 
         var player = new Player(snake, session);
         clients.put(session.getId(), player);

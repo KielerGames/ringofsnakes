@@ -158,7 +158,13 @@ public class WorldChunk {
             assert (n > 0);
         } else {
             snakeChunks.add(snakeChunk);
+            snakeChunk.linkWorldChunk(this);
         }
+    }
+
+    public void removeSnakeChunk(SnakeChunkData snakeChunk) {
+        assert (children.length == 0);
+        snakeChunks.remove(snakeChunk);
     }
 
     private static class NeighborList {

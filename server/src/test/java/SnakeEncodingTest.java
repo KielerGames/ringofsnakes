@@ -3,6 +3,8 @@ import game.snake.ChainCodeCoder;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.snake.SnakeChunkBuilder;
+import game.world.World;
+import math.Vector;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
@@ -16,13 +18,14 @@ public class SnakeEncodingTest {
     void testValidityOfConstants() {
         final int HEADER_SIZE = SnakeChunk.HEADER_BYTE_SIZE;
         assertTrue(HEADER_SIZE < SnakeChunk.BYTE_SIZE);
-        assertTrue(SnakeChunk.BUFFER_N_POS <= HEADER_SIZE-1);
-        assertTrue(SnakeChunk.BUFFER_OFFSET_POS <= HEADER_SIZE-4);
+        assertTrue(SnakeChunk.BUFFER_N_POS <= HEADER_SIZE - 1);
+        assertTrue(SnakeChunk.BUFFER_OFFSET_POS <= HEADER_SIZE - 4);
     }
 
     @Test
     void testEarlyChunkBuilding() {
-        Snake snake = new Snake();
+        World world = new World();
+        Snake snake = new Snake(new Vector(0, 0), world);
         final short chunkId = 42;
         SnakeChunkBuilder builder = new SnakeChunkBuilder(coder, snake, chunkId);
         assertFalse(builder.isFull());
@@ -34,7 +37,8 @@ public class SnakeEncodingTest {
 
     @Test
     void testSnakeInfoBuffer() {
-        var snake = new Snake();
+        World world = new World();
+        Snake snake = new Snake(new Vector(0, 0), world);
         var snakeInfo = snake.getInfo();
         assertEquals(Snake.INFO_BYTE_SIZE, snakeInfo.capacity());
         var buffer = ByteBuffer.allocate(1 + Snake.INFO_BYTE_SIZE);
@@ -46,15 +50,17 @@ public class SnakeEncodingTest {
 
     @Test
     void testSnakeChunkBuffer() {
-        var snake = new Snake();
+        World world = new World();
+        Snake snake = new Snake(new Vector(0, 0), world);
         var n = snake.chunks.size();
         var i = 0;
 
+
         // fill a chunk
-        while(snake.chunks.size() == n) {
+        while (snake.chunks.size() == n) {
             snake.tick();
 
-            if(i++ > 4096) {
+            if (i++ > 4096) {
                 throw new IllegalStateException();
             }
         }

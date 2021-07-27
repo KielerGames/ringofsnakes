@@ -41,7 +41,7 @@ public class BoundingBox {
         assert (lb1 <= ub1);
         assert (lb2 <= ub2);
 
-        final boolean separate = ub1 <= lb2 || ub2 <= lb1;
+        final boolean separate = ub1 < lb2 || ub2 < lb1;
         return !separate;
     }
 

@@ -1,6 +1,7 @@
 package game.snake;
 
 import game.GameConfig;
+import game.world.World;
 import math.Vector;
 
 import java.nio.ByteBuffer;
@@ -26,12 +27,10 @@ public class Snake {
     private float length = START_LENGTH;
     public SnakeChunkBuilder chunkBuilder;
     private ByteBuffer snakeInfoBuffer;
+    private final World world;
 
-    public Snake() {
-        this(0.0, 0.0);
-    }
-
-    public Snake(double startX, double startY) {
+    public Snake(Vector position, World world) {
+        this.world = world;
         id = nextSnakeId++;
         skin = (byte) (random.nextInt(100) % 3);
 
@@ -40,7 +39,7 @@ public class Snake {
         snakeInfoBuffer.put(2, skin);
 
         // start position & rotation
-        headPosition = new Vector(startX, startY);
+        headPosition = position.clone();
         headDirection = (float) ((random.nextDouble() * 2.0 - 1.0) * Math.PI);
         targetDirection = headDirection;
 
@@ -88,7 +87,8 @@ public class Snake {
         if(chunks.size() > 0) {
             SnakeChunk lastChunk = chunks.get(chunks.size()-1);
             if(lastChunk.isJunk()) {
-                chunks.remove(chunks.size()-1);
+                var removedChunk = chunks.remove(chunks.size() - 1);
+                removedChunk.destroy();
             }
         }
     }
@@ -97,10 +97,14 @@ public class Snake {
         if (chunkBuilder != null) {
             assert chunkBuilder.isFull();
 
-            chunks.add(0, chunkBuilder.build());
+            var snakeChunk = chunkBuilder.build();
+            chunks.add(0, snakeChunk);
+            //world.removeSnakeChunk(chunkBuilder);
+            world.addSnakeChunk(snakeChunk);
         }
 
         chunkBuilder = new SnakeChunkBuilder(coder, this, nextChunkId++);
+        world.addSnakeChunk(chunkBuilder);
     }
 
     public ByteBuffer getLatestMeaningfulBuffer() {

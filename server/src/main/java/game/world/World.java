@@ -5,7 +5,7 @@ import game.snake.SnakeChunkData;
 import math.Vector;
 
 public class World {
-    private WorldChunk superChunk = new WorldChunk(64.0, 64.0, 2);
+    private WorldChunk superChunk = new WorldChunk(512.0, 512.0, 2);
 
     public Vector findSpawnPosition() {
         return new Vector(0.0, 0.0); //TODO

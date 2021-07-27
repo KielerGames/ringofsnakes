@@ -1,5 +1,6 @@
 package game.snake;
 
+import game.world.WorldChunk;
 import math.BoundingBox;
 
 import java.nio.ByteBuffer;
@@ -13,6 +14,7 @@ public interface SnakeChunkData {
 
     /**
      * The id is a combination of snake id and chunk id
+     *
      * @return An id that is unique within the game
      */
     int getUniqueId();
@@ -20,4 +22,8 @@ public interface SnakeChunkData {
     float getLength();
 
     BoundingBox getBoundingBox();
+
+    void linkWorldChunk(WorldChunk worldChunk);
+
+    void destroy();
 }

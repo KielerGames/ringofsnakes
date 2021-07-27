@@ -1,5 +1,6 @@
 package game.snake;
 
+import game.world.WorldChunk;
 import math.BoundingBox;
 import math.Vector;
 
@@ -22,6 +23,7 @@ public class SnakeChunkBuilder implements SnakeChunkData {
     private int lastSteps = 0;
     private boolean lastFast = false;
     private int lastDirDelta = 0;
+    private List<WorldChunk> linkedWorldChunks = new LinkedList<>();
 
     private ByteBuffer chunkByteBuffer;
     private List<Vector> points = new LinkedList<>();
@@ -168,5 +170,15 @@ public class SnakeChunkBuilder implements SnakeChunkData {
     @Override
     public BoundingBox getBoundingBox() {
         return new BoundingBox(minX, maxX, minY, maxY);
+    }
+
+    @Override
+    public void linkWorldChunk(WorldChunk worldChunk) {
+        linkedWorldChunks.add((worldChunk));
+    }
+
+    @Override
+    public void destroy() {
+        linkedWorldChunks.forEach(lwc -> lwc.removeSnakeChunk(this));
     }
 }

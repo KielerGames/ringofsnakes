@@ -148,4 +148,8 @@ public class SnakeChunk implements SnakeChunkData {
     public boolean isJunk() {
         return chunkByteBuffer.getFloat(BUFFER_OFFSET_POS) >= snake.getLength();
     }
+
+    public BoundingBox getBoundingBox(){
+        return boundingBox;
+    }
 }

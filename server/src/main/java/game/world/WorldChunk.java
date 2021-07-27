@@ -1,5 +1,7 @@
 package game.world;
 
+import game.snake.SnakeChunk;
+import game.snake.SnakeChunkData;
 import math.BoundingBox;
 
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.stream.Stream;
 public class WorldChunk {
     private NeighborList neighbors;
     private BoundingBox box;
+    private List<SnakeChunkData> snakeChunks;
+
     /**
      * children indices:
      * 2, 3

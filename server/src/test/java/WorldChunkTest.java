@@ -1,6 +1,7 @@
 import game.world.WorldChunk;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +39,14 @@ public class WorldChunkTest {
 
         var outerChunks = 4 * (m - 1);
         var innerChunks = n - outerChunks;
-        var has4Neighbors = children.stream().filter(cc -> cc.getNeighbors().size() == 8).count();
-        assertEquals(innerChunks, has4Neighbors);
+        var has8Neighbors = children.stream().filter(cc -> cc.getNeighbors().size() == 8).count();
+        assertEquals(innerChunks, has8Neighbors);
+
+        for(WorldChunk childChunk : children) {
+            var neighbors = childChunk.getNeighbors();
+            var neighborSet = new HashSet<>(neighbors);
+
+            assertSame(neighbors.size(), neighborSet.size());
+        }
     }
 }

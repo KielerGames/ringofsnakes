@@ -63,6 +63,14 @@ public class BoundingBox {
         return 0.0;
     }
 
+    public double getWidth() {
+        return maxX - minX;
+    }
+
+    public double getHeight() {
+        return maxY - minY;
+    }
+
     /**
      * Computes the squared distance between this rectangle and a given point p.
      * The distance is 0 if the point is within the rectangle.

@@ -1,5 +1,6 @@
 package game.snake;
 
+import math.BoundingBox;
 import math.Vector;
 
 import java.nio.ByteBuffer;

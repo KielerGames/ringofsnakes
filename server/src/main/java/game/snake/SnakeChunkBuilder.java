@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SnakeChunkBuilder implements SnakeChunkData{
+public class SnakeChunkBuilder implements SnakeChunkData {
     private final Snake snake;
     private final short id;
     private final ChainCodeCoder coder;
@@ -118,7 +118,7 @@ public class SnakeChunkBuilder implements SnakeChunkData{
     }
 
     public SnakeChunk build() {
-        if(!isFull()) {
+        if (!isFull()) {
             throw new IllegalStateException();
         }
 
@@ -165,9 +165,8 @@ public class SnakeChunkBuilder implements SnakeChunkData{
         return (float) this.length;
     }
 
-    public boolean doesCollideWith(Vector position, double radius) {
-        //TODO: implement
-        // use point list, check every point
-        return false;
+    @Override
+    public BoundingBox getBoundingBox() {
+        return new BoundingBox(minX, maxX, minY, maxY);
     }
 }

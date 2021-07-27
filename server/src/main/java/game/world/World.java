@@ -1,5 +1,21 @@
 package game.world;
 
+import game.snake.Snake;
+import game.snake.SnakeChunkData;
+import math.Vector;
+
 public class World {
-    private WorldChunk chunk = new WorldChunk(64.0, 64.0, 2);
+    private WorldChunk superChunk = new WorldChunk(64.0, 64.0, 2);
+
+    public Vector findSpawnPosition() {
+        return new Vector(0.0, 0.0); //TODO
+    }
+
+    public void addSnake(Snake snake) {
+        snake.chunks.forEach(this::addSnakeChunk);
+    }
+
+    public void addSnakeChunk(SnakeChunkData snakeChunk) {
+        superChunk.addSnakeChunk(snakeChunk);
+    }
 }

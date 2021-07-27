@@ -1,9 +1,9 @@
 package game.world;
 
-import game.snake.SnakeChunk;
 import game.snake.SnakeChunkData;
 import math.BoundingBox;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,6 +33,7 @@ public class WorldChunk {
         assert (width > 0.0);
         assert (height > 0.0);
 
+        snakeChunks = new LinkedList<>();
         neighbors = new NeighborList();
         box = new BoundingBox(left, left + width, bottom, bottom + height);
         children = new WorldChunk[0];
@@ -60,20 +61,19 @@ public class WorldChunk {
     }
 
     /**
-     *
-     ┌──┬──┬──┬──┬──┬──┐
-     │ 2│3 │ 2│3 │ 2│3 │
-     ├─NW──┼──N──┼─NE──┤
-     │ 0│1 │ 0│1 │ 0│1 │
-     ├──┼──┼──┼──┼──┼──┤
-     │ 2│3 │ 2│3 │ 2│3 │
-     ├──W──┼──X──┼──E──┤
-     │ 0│1 │ 0│1 │ 0│1 │
-     ├──┼──┼──┼──┼──┼──┤
-     │ 2│3 │ 2│3 │ 2│3 │
-     ├─SW──┼──S──┼─SE──┤
-     │ 0│1 │ 0│1 │ 0│1 │
-     └──┴──┴──┴──┴──┴──┘
+     * ┌──┬──┬──┬──┬──┬──┐
+     * │ 2│3 │ 2│3 │ 2│3 │
+     * ├─NW──┼──N──┼─NE──┤
+     * │ 0│1 │ 0│1 │ 0│1 │
+     * ├──┼──┼──┼──┼──┼──┤
+     * │ 2│3 │ 2│3 │ 2│3 │
+     * ├──W──┼──X──┼──E──┤
+     * │ 0│1 │ 0│1 │ 0│1 │
+     * ├──┼──┼──┼──┼──┼──┤
+     * │ 2│3 │ 2│3 │ 2│3 │
+     * ├─SW──┼──S──┼─SE──┤
+     * │ 0│1 │ 0│1 │ 0│1 │
+     * └──┴──┴──┴──┴──┴──┘
      */
     private void setNeighbors(WorldChunk east, WorldChunk northEast, WorldChunk north, WorldChunk northWest,
                               WorldChunk west, WorldChunk southWest, WorldChunk south, WorldChunk southEast) {
@@ -126,10 +126,10 @@ public class WorldChunk {
             }
 
             // inner neighbors
-            children[0].setNeighbors(children[1],children[3],children[2],null,null,null,null,null );
-            children[1].setNeighbors(null, null, children[3], children[2], children[0],null, null, null);
-            children[2].setNeighbors(children[3],null,null,null, null, null, children[0],children[1]);
-            children[3].setNeighbors(null, null, null, null, children[2], children[0], children[1], null );
+            children[0].setNeighbors(children[1], children[3], children[2], null, null, null, null, null);
+            children[1].setNeighbors(null, null, children[3], children[2], children[0], null, null, null);
+            children[2].setNeighbors(children[3], null, null, null, null, null, children[0], children[1]);
+            children[3].setNeighbors(null, null, null, null, children[2], children[0], children[1], null);
         }
     }
 
@@ -139,9 +139,26 @@ public class WorldChunk {
 
     public List<WorldChunk> getNeighbors() {
         return Stream.of(neighbors.east, neighbors.northEast, neighbors.north, neighbors.northWest,
-                neighbors.west, neighbors.southWest, neighbors.south, neighbors.southEast)
+                        neighbors.west, neighbors.southWest, neighbors.south, neighbors.southEast)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    public void addSnakeChunk(SnakeChunkData snakeChunk) {
+        if (children.length > 0) {
+            int n = 0;
+
+            for (WorldChunk childChunk : children) {
+                if (BoundingBox.intersect(childChunk.box, snakeChunk.getBoundingBox())) {
+                    childChunk.addSnakeChunk(snakeChunk);
+                    n++;
+                }
+            }
+
+            assert (n > 0);
+        } else {
+            snakeChunks.add(snakeChunk);
+        }
     }
 
     private static class NeighborList {

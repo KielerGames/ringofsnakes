@@ -57,6 +57,7 @@ public class Game {
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
 
+
     private void tick() {
         snakes.forEach(Snake::tick);
 
@@ -66,8 +67,16 @@ public class Game {
     private class Ticker implements Runnable {
         @Override
         public void run() {
+            int noFoodTicks = 0;
             while (true) {
                 tick();
+                noFoodTicks++;
+
+                if (noFoodTicks > 25) {
+                    world.spawnFood();
+                    noFoodTicks = 0;
+                    // TODO: make nice
+                }
 
                 clients.forEach((__, client) -> {
                     //TODO: filter visible chunks

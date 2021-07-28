@@ -3,6 +3,7 @@ package game.world;
 import game.snake.SnakeChunkData;
 import math.BoundingBox;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -10,9 +11,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class WorldChunk {
+    public final BoundingBox box;
     private final NeighborList neighbors;
-    private final BoundingBox box;
     private final List<SnakeChunkData> snakeChunks;
+    private List<Food> foodList = new LinkedList<>();
 
     /**
      * children indices:
@@ -52,6 +54,8 @@ public class WorldChunk {
         children[1] = new WorldChunk(left + width, bottom, width, height);
         children[2] = new WorldChunk(left, bottom + height, width, height);
         children[3] = new WorldChunk(left + width, bottom + height, width, height);
+
+        foodList = null;
 
         if (subdivisions > 1) {
             for (WorldChunk childChunk : children) {
@@ -133,8 +137,27 @@ public class WorldChunk {
         }
     }
 
+    public void addFood() {
+        Food food = new Food(this);
+        foodList.add(food);
+    }
+
+    public void removeFood(Food food) {
+        // TODO: implement
+    }
+
     public List<WorldChunk> getChildren() {
         return List.of(children);
+    }
+
+    public void collectChildren(List<WorldChunk> chunkList) {
+        if (children.length > 0) {
+            for (WorldChunk childChunk : children) {
+                childChunk.collectChildren(chunkList);
+            }
+        } else {
+            chunkList.add(this);
+        }
     }
 
     public List<WorldChunk> getNeighbors() {
@@ -159,6 +182,14 @@ public class WorldChunk {
         } else {
             snakeChunks.add(snakeChunk);
             snakeChunk.linkWorldChunk(this);
+        }
+    }
+
+    public int getFoodCount() {
+        if (children.length > 0) {
+            return Arrays.stream(children).mapToInt(childChunk -> childChunk.getFoodCount()).sum();
+        } else {
+            return foodList.size();
         }
     }
 

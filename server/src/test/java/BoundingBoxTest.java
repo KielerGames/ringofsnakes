@@ -71,7 +71,7 @@ public class BoundingBoxTest {
     }
 
     @Test
-    void testCommutativity() {
+    void testSymmetry() {
         var rand = new Random(6969);
 
         for (int i = 0; i < 100; i++) {

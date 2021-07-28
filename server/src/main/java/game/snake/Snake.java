@@ -47,6 +47,10 @@ public class Snake {
         beginChunk();
     }
 
+    public void destroy() {
+        chunks.forEach(chunk -> chunk.destroy());
+    }
+
     public void setTargetDirection(float alpha) {
         if (Math.abs(alpha) > Math.PI) {
             System.err.println("Alpha out of range: " + alpha);
@@ -134,32 +138,4 @@ public class Snake {
 
         return buffer.asReadOnlyBuffer().flip();
     }
-
-    /*public void debug() {
-
-        for (SnakeChunk chunk : chunks) {
-            System.out.println("Snake chunk data:");
-
-            ByteBuffer b = chunk.chunkByteBuffer;
-            double endDirection = b.getDouble(1); //Get float from Byte Index 1 to 4
-            double endY = b.getDouble(9); //Get float from Byte Index 5 to 8
-            double endX = b.getDouble(17); //Get float from Byte Index 9 to 12
-            System.out.println("Snake head direction: " + this.headDirection);
-            System.out.println("Number of chaincode in chunk: " + chunk.numberOfChainCodes);
-            System.out.println("---Begin of chunk header---");
-            System.out.println("End direction: " + endDirection);
-            System.out.println("End.Y: " + endY);
-            System.out.println("End.X: " + endX);
-            System.out.println("---End of chunk header---\n");
-
-            System.out.println("---Begin of chaincode list---\n");
-            for (int i = 25; i < 25 + chunk.numberOfChainCodes; i++) {
-                System.out.println("Chaincode at Byte " + i);
-                var d = coder.decode(b.get(i));
-                System.out.println(d.toString());
-
-            }
-            System.out.println("---End of chaincode---\n");
-        }
-    }*/
 }

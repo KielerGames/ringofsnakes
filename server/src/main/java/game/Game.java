@@ -3,7 +3,6 @@ package game;
 import com.google.gson.Gson;
 import game.snake.Snake;
 import game.world.World;
-import math.Vector;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
@@ -24,7 +23,7 @@ public class Game {
     private Thread tickerThread;
 
     public Player createPlayer(Session session) {
-        var spawnPos = findSpawnPosition();
+        var spawnPos = world.findSpawnPosition();
         var snake = new Snake(spawnPos, world);
         snakes.add(snake);
         world.addSnake(snake);
@@ -43,6 +42,7 @@ public class Game {
             var snake = ((Player) client).snake;
             // TODO: generate food (?), consider changing list to another data structure
             snakes.remove(snake);
+            snake.destroy();
         }
     }
 
@@ -55,10 +55,6 @@ public class Game {
         tickerThread.start();
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
-    }
-
-    private Vector findSpawnPosition() {
-        return new Vector(0.0, 0.0); //TODO
     }
 
     private void tick() {

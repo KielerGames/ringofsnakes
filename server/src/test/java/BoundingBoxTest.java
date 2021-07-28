@@ -62,4 +62,26 @@ public class BoundingBoxTest {
         var b = new BoundingBox(0.25, 1.0, -1.0, 1.0);
         assertFalse(BoundingBox.intersect(a, b));
     }
+
+    @Test
+    void testEmptyBoxIntersection() {
+        var a = new BoundingBox(-1.0, 1.0, -1.0, 1.0);
+        var b = new BoundingBox(0, 0, 0, 0);
+        assertTrue(BoundingBox.intersect(a, b));
+    }
+
+    @Test
+    void testCommutativity() {
+        var rand = new Random(6969);
+
+        for (int i = 0; i < 100; i++) {
+            var a = new BoundingBox(rand);
+            var b = new BoundingBox(rand);
+
+            var ab = BoundingBox.intersect(a, b);
+            var ba = BoundingBox.intersect(b, a);
+
+            assertEquals(ab, ba);
+        }
+    }
 }

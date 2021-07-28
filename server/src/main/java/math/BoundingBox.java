@@ -1,5 +1,7 @@
 package math;
 
+import java.util.Random;
+
 public class BoundingBox {
     public final double minX, maxX, minY, maxY;
 
@@ -14,11 +16,18 @@ public class BoundingBox {
         this.maxY = maxY;
     }
 
+    public BoundingBox(Random rand) {
+        minX = rand.nextDouble();
+        minY = rand.nextDouble();
+        maxX = minX + rand.nextDouble();
+        maxY = minY + rand.nextDouble();
+    }
+
     /**
      * Check if two BoundingBox instances intersect.
      *
-     * @param a
-     * @param b
+     * @param a A BoundingBox instance
+     * @param b A BoundingBox instance
      * @return {@code true} if BoundingBox a and b intersect
      */
     public static boolean intersect(BoundingBox a, BoundingBox b) {
@@ -83,6 +92,13 @@ public class BoundingBox {
         return dx * dx + dy * dy;
     }
 
+    /**
+     * Computes the minimum distance between a point and this rectangle.
+     * In performance critical section use the distance2 method instead.
+     *
+     * @param p The point to measure distance to.
+     * @return The distance, {@code 0} if the point is inside.
+     */
     public double distance(Vector p) {
         return Math.sqrt(distance2(p));
     }

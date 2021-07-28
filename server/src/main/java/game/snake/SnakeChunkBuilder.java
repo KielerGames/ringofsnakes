@@ -13,8 +13,8 @@ public class SnakeChunkBuilder implements SnakeChunkData {
     private final short id;
     private final ChainCodeCoder coder;
 
-    private Vector end;
-    private float endDirection;
+    private final Vector end;
+    private final float endDirection;
     private int numberOfChainCodes = 0;
     private double x, y;
     private float direction;
@@ -23,10 +23,10 @@ public class SnakeChunkBuilder implements SnakeChunkData {
     private int lastSteps = 0;
     private boolean lastFast = false;
     private int lastDirDelta = 0;
-    private List<WorldChunk> linkedWorldChunks = new LinkedList<>();
+    private final List<WorldChunk> linkedWorldChunks = new LinkedList<>();
 
-    private ByteBuffer chunkByteBuffer;
-    private List<Vector> points = new LinkedList<>();
+    private final ByteBuffer chunkByteBuffer;
+    private final List<Vector> points = new LinkedList<>();
 
     public SnakeChunkBuilder(ChainCodeCoder coder, Snake snake, short chunkId) {
         this.snake = snake;

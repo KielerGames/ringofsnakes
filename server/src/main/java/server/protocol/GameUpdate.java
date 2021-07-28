@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 public class GameUpdate {
     private static final int HEADER_SIZE = 2;
     private int snakeChunkBufferSize = 0;
-    private List<ByteBuffer> snakeChunkBuffers = new LinkedList<>();
-    private Set<Snake> snakes = new HashSet<>();
+    private final List<ByteBuffer> snakeChunkBuffers = new LinkedList<>();
+    private final Set<Snake> snakes = new HashSet<>();
 
     public void addSnakeChunk(SnakeChunkData chunk) {
-        if(chunk.isEmpty()) {
+        if (chunk.isEmpty()) {
             return;
         }
 

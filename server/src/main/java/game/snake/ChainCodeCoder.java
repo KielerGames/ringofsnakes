@@ -26,7 +26,7 @@ public class ChainCodeCoder {
         // encode steps
         int stepBits = (steps - 1) << 4;
 
-        // encode everything into a 8 bit
+        // encode everything into 8 bit
         int data = stepBits | direction;
         if (fast) {
             data |= FAST_BIT;
@@ -67,9 +67,9 @@ public class ChainCodeCoder {
     }
 
     public static class DecodedData {
-        public int direction;
-        public boolean fast;
-        public int steps;
+        public final int direction;
+        public final boolean fast;
+        public final int steps;
 
         DecodedData(int direction, boolean fast, int steps) {
             this.direction = direction;

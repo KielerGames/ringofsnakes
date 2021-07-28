@@ -12,7 +12,7 @@ import java.util.Random;
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
     public static final float START_LENGTH = 33f;
-    private static Random random = new Random();
+    private static final Random random = new Random();
     private static short nextSnakeId = 0;
     public final GameConfig config = new GameConfig();
     public final short id;
@@ -24,9 +24,9 @@ public class Snake {
     private short nextChunkId = 0;
     private float targetDirection;
     private boolean fast = false;
-    private float length = START_LENGTH;
+    private final float length = START_LENGTH;
     public SnakeChunkBuilder chunkBuilder;
-    private ByteBuffer snakeInfoBuffer;
+    private final ByteBuffer snakeInfoBuffer;
     private final World world;
 
     public Snake(Vector position, World world) {

@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 public class Game {
-    private static Gson gson = new Gson();
+    private static final Gson gson = new Gson();
     public final int id = 1; //TODO
     public GameConfig config = new GameConfig();
     public List<Snake> snakes = new LinkedList<>();
     public World world = new World();
-    private Map<String, Client> clients = new HashMap<>(64);
+    private final Map<String, Client> clients = new HashMap<>(64);
     private Thread tickerThread;
 
     public Player createPlayer(Session session) {

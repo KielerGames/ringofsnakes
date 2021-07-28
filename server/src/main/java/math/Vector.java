@@ -35,6 +35,7 @@ public class Vector {
         return dx * dx + dy * dy;
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     public static Vector lerp(Vector a, Vector b, double t) {
         assert !Double.isNaN(t);
         assert Double.isFinite(t);

@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class ChainCodeEncodingTest {
 
-    ChainCodeCoder coder = new ChainCodeCoder(new GameConfig());
+    final ChainCodeCoder coder = new ChainCodeCoder(new GameConfig());
 
     @Test
     void testAllEncodings() {

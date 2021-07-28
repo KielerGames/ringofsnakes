@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class WorldChunk {
-    private NeighborList neighbors;
-    private BoundingBox box;
-    private List<SnakeChunkData> snakeChunks;
+    private final NeighborList neighbors;
+    private final BoundingBox box;
+    private final List<SnakeChunkData> snakeChunks;
 
     /**
      * children indices:

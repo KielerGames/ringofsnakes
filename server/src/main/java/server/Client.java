@@ -11,8 +11,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Client {
-    public Session session;
-    private Set<Integer> knownChunks = new HashSet<>();
+    public final Session session;
+    private final Set<Integer> knownChunks = new HashSet<>();
     private GameUpdate nextUpdate;
 
     public Client(Session session) {
@@ -21,7 +21,7 @@ public class Client {
     }
 
     public void updateChunk(SnakeChunkData chunk) {
-        if(knownChunks.contains(chunk.getUniqueId())) {
+        if (knownChunks.contains(chunk.getUniqueId())) {
             nextUpdate.addSnake(chunk.getSnake());
         } else {
             nextUpdate.addSnakeChunk(chunk);

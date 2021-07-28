@@ -12,8 +12,9 @@ import java.nio.ByteBuffer;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SnakeEncodingTest {
-    private static ChainCodeCoder coder = new ChainCodeCoder(new GameConfig());
+    private static final ChainCodeCoder coder = new ChainCodeCoder(new GameConfig());
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void testValidityOfConstants() {
         final int HEADER_SIZE = SnakeChunk.HEADER_BYTE_SIZE;

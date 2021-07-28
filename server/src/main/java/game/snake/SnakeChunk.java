@@ -17,12 +17,12 @@ public class SnakeChunk implements SnakeChunkData {
     public final static int BUFFER_OFFSET_POS = 17;
 
     private final Snake snake;
-    private ByteBuffer chunkByteBuffer;
-    private float length;
-    private int uniqueId;
-    private Map<Byte, List<Vector>> pointData;
-    private List<WorldChunk> linkedWorldChunks;
-    private BoundingBox boundingBox;
+    private final ByteBuffer chunkByteBuffer;
+    private final float length;
+    private final int uniqueId;
+    private final Map<Byte, List<Vector>> pointData;
+    private final List<WorldChunk> linkedWorldChunks;
+    private final BoundingBox boundingBox;
 
 
     protected SnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, float length,

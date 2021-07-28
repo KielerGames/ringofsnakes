@@ -11,8 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SnakeServer {
+    @SuppressWarnings("FieldMayBeFinal")
     private static Game game = new Game();
-    private static Map<String, Player> players = new HashMap<>(64);
+    private final static Map<String, Player> players = new HashMap<>(64);
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -20,7 +21,7 @@ public class SnakeServer {
         connector.setPort(8080);
         server.addConnector(connector);
 
-        // Setup the basic application "context" for this application at "/"
+        // Set up the basic application "context" for this application at "/"
         // This is also known as the handler tree (in jetty speak)
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");

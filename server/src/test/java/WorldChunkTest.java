@@ -1,52 +1,44 @@
-import game.world.WorldChunk;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
+import static game.world.WorldChunkFactory.createChunks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WorldChunkTest {
     @Test
-    void testNoSubDivisions() {
-        var chunk = new WorldChunk(42.0, 42.0, 0);
-        assertEquals(0, chunk.getChildren().size());
+    void testNumberOfChunks() {
+        int n = 4;
+        int m = 4;
+        var chunks = createChunks(32.0, n, m);
+
+        assertEquals(n * m, chunks.size());
     }
 
     @Test
-    void testSubdivide() {
-        var chunk = new WorldChunk(32, 32, 1);
-        assertEquals(4, chunk.getChildren().size());
-
-        for (WorldChunk childChunk : chunk.getChildren()) {
-            assertEquals(0, childChunk.getChildren().size());
-        }
+    void testNoNulls() {
+        int n = 6;
+        int m = 6;
+        var chunks = createChunks(16.0, n, m);
+        chunks.forEach(Assertions::assertNotNull);
     }
 
     @Test
     void testNeighbors() {
-        int sd = 2;
-        var chunk = new WorldChunk(32, 32, sd);
+        int m = 4;
+        var chunks = createChunks(32.0, m, m);
 
-        // get all child chunks at the lowest level
-        var children = chunk.getChildren().stream()
-                .flatMap(cc -> cc.getChildren().stream())
-                .collect(Collectors.toUnmodifiableList());
-
-        int n = (int) Math.pow(4, sd);
-        int m = (int) Math.sqrt(n);
-        assertEquals(n, children.size());
+        int n = chunks.size();
 
         var outerChunks = 4 * (m - 1);
         var innerChunks = n - outerChunks;
-        var has8Neighbors = children.stream().filter(cc -> cc.getNeighbors().size() == 8).count();
+        var has8Neighbors = chunks.stream().filter(c -> c.neighbors.size() == 8).count();
         assertEquals(innerChunks, has8Neighbors);
 
-        for(WorldChunk childChunk : children) {
-            var neighbors = childChunk.getNeighbors();
-            var neighborSet = new HashSet<>(neighbors);
-
-            assertEquals(neighbors.size(), neighborSet.size());
-        }
+        chunks.forEach(chunk -> {
+            var neighborSet = new HashSet<>(chunk.neighbors);
+            assertEquals(chunk.neighbors.size(), neighborSet.size());
+        });
     }
 }

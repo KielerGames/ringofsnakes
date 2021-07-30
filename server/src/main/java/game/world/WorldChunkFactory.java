@@ -1,13 +1,12 @@
 package game.world;
 
-import java.util.Arrays;
-import java.util.List;
+import math.Vector;
 
 public class WorldChunkFactory {
     private WorldChunkFactory() {
     }
 
-    public static List<WorldChunk> createChunks(double chunkSize, int n, int m) {
+    public static WorldChunkCollection createChunks(double chunkSize, int n, int m) {
         assert (chunkSize > 0.0);
         assert (n > 0 && m > 0);
 
@@ -53,7 +52,22 @@ public class WorldChunkFactory {
             }
         }
 
-        return Arrays.asList(chunks);
+        final double width = m * chunkSize;
+        final double height = n * chunkSize;
+
+        return new WorldChunkCollection(chunks) {
+            @Override
+            protected int findChunkIndex(Vector point) {
+                int x = (int) ((point.x - offsetX) / chunkSize);
+                int y = (int) ((point.y - offsetY) / chunkSize);
+
+                if (x < 0 || y < 0 || x >= m || y >= n) {
+                    throw new IllegalArgumentException("Point is out of bounds.");
+                }
+
+                return getIndex(y, x, m);
+            }
+        };
     }
 
     private static int getIndex(int row, int col, int columns) {

@@ -46,6 +46,10 @@ public class WorldChunk {
         return foodList.size();
     }
 
+    public int getSnakeChunkCount() {
+        return snakeChunks.size();
+    }
+
     public void removeSnakeChunk(SnakeChunkData snakeChunk) {
         snakeChunks.remove(snakeChunk);
     }

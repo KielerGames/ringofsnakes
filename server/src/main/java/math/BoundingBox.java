@@ -114,4 +114,11 @@ public class BoundingBox {
         assert (range >= 0.0);
         return distance2(p) < range * range;
     }
+
+    public Vector getCenter() {
+        return new Vector(
+                minX + 0.5 * (maxX - minX),
+                minY + 0.5 * (maxY - minY)
+        );
+    }
 }

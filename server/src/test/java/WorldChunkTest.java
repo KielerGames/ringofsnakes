@@ -1,3 +1,6 @@
+import game.snake.Snake;
+import game.world.World;
+import math.Vector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +16,7 @@ public class WorldChunkTest {
         int m = 4;
         var chunks = createChunks(32.0, n, m);
 
-        assertEquals(n * m, chunks.size());
+        assertEquals(n * m, chunks.numberOfChunks());
     }
 
     @Test
@@ -29,7 +32,7 @@ public class WorldChunkTest {
         int m = 4;
         var chunks = createChunks(32.0, m, m);
 
-        int n = chunks.size();
+        int n = chunks.numberOfChunks();
 
         var outerChunks = 4 * (m - 1);
         var innerChunks = n - outerChunks;
@@ -40,5 +43,23 @@ public class WorldChunkTest {
             var neighborSet = new HashSet<>(chunk.neighbors);
             assertEquals(chunk.neighbors.size(), neighborSet.size());
         });
+    }
+
+    @Test
+    void testAddASnake() {
+        var world = new World();
+
+        // TODO: consider SnakeFactory
+        var snake = new Snake(new Vector(0, 0), world);
+        world.addSnake(snake);
+
+        for (int i = 0; i < 512; i++) {
+            snake.tick();
+        }
+
+        world.chunks.stream()
+                .filter(wc -> wc.getSnakeChunkCount() > 0)
+                .findFirst()
+                .orElseThrow();
     }
 }

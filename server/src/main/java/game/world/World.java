@@ -2,15 +2,13 @@ package game.world;
 
 import game.snake.Snake;
 import game.snake.SnakeChunkData;
-import math.BoundingBox;
 import math.Vector;
 
 import java.util.Comparator;
-import java.util.List;
 
 public class World {
     private static final int FOOD_THRESHOLD = 12;
-    private final List<WorldChunk> chunks;
+    public final WorldChunkCollection chunks;
 
     public World() {
         chunks = WorldChunkFactory.createChunks(128.0, 8, 8);
@@ -25,9 +23,7 @@ public class World {
     }
 
     public void addSnakeChunk(SnakeChunkData snakeChunk) {
-        // TODO: improve
-        chunks.stream()
-                .filter(chunk -> BoundingBox.intersect(chunk.box, snakeChunk.getBoundingBox()))
+        chunks.findIntersectingChunks(snakeChunk.getBoundingBox())
                 .forEach(chunk -> chunk.addSnakeChunk(snakeChunk));
     }
 

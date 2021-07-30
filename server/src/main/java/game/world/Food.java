@@ -15,11 +15,14 @@ public class Food {
     public final Size size = Size.SMALL;
     public final byte color;
     private final byte[] bytePosition = new byte[2];
+    private final WorldChunk chunk;
 
-    public Food(Vector position, byte color) {
+    public Food(WorldChunk chunk, Vector position, byte color) {
         this.color = color;
         this.position = position;
         // TODO: round to nearest byte position & store byte position
+
+        this.chunk = chunk;
     }
 
     public Food(WorldChunk chunk) {
@@ -34,6 +37,7 @@ public class Food {
         double x = chunk.box.minX + toNormalizedDouble(data[0]) * chunk.box.getWidth();
         double y = chunk.box.minY + toNormalizedDouble(data[1]) * chunk.box.getHeight();
         position = new Vector(x, y);
+        this.chunk = chunk;
     }
 
     public boolean isWithinRange(Vector p, double range) {
@@ -46,6 +50,10 @@ public class Food {
 
         int colorAndSizeData = (size.byteValue << 6) | color;
         buffer.put((byte) colorAndSizeData);
+    }
+
+    public void destroy() {
+        chunk.removeFood(this);
     }
 
     public enum Size {

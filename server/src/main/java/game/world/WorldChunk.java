@@ -13,6 +13,8 @@ public class WorldChunk {
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
     private final List<SnakeChunkData> snakeChunks = new LinkedList<>();
     private final byte x, y;
+
+    // TODO: consider different data structures
     private List<Food> foodList = new LinkedList<>();
 
     public WorldChunk(double left, double bottom, double width, double height, int x, int y) {
@@ -37,7 +39,7 @@ public class WorldChunk {
     }
 
     public void removeFood(Food food) {
-        // TODO: implement
+        foodList.remove(food);
     }
 
     public void addSnakeChunk(SnakeChunkData snakeChunk) {

@@ -10,8 +10,12 @@ public class World {
     private static final int FOOD_THRESHOLD = 12;
     public final WorldChunkCollection chunks;
 
+    public World(double chunkSize, int repetitions) {
+        chunks = WorldChunkFactory.createChunks(chunkSize, repetitions, repetitions);
+    }
+
     public World() {
-        chunks = WorldChunkFactory.createChunks(32.0, 16, 16);
+        this(32.0, 16);
     }
 
     public Vector findSpawnPosition() {

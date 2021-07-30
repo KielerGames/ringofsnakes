@@ -16,10 +16,10 @@ import java.util.Map;
 public class Game {
     private static final Gson gson = new Gson();
     public final int id = 1; //TODO
+    public final World world = new World();
+    private final Map<String, Client> clients = new HashMap<>(64);
     public GameConfig config = new GameConfig();
     public List<Snake> snakes = new LinkedList<>();
-    public World world = new World();
-    private final Map<String, Client> clients = new HashMap<>(64);
     private Thread tickerThread;
 
     public Player createPlayer(Session session) {
@@ -54,6 +54,8 @@ public class Game {
         tickerThread = new Thread(new Ticker());
         tickerThread.start();
 
+        new Thread(new DebugThread()).start();
+
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
 
@@ -72,7 +74,7 @@ public class Game {
                 tick();
                 noFoodTicks++;
 
-                if (noFoodTicks > 25) {
+                if (noFoodTicks > 5) {
                     world.spawnFood();
                     noFoodTicks = 0;
                     // TODO: make nice
@@ -96,6 +98,24 @@ public class Game {
             try {
                 Thread.sleep(time);
             } catch (InterruptedException ignored) {
+            }
+        }
+    }
+
+    private class DebugThread implements Runnable {
+
+        @Override
+        public void run() {
+            while (true) {
+                if (!snakes.isEmpty()) {
+                    var snake = snakes.get(0);
+                    var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
+                    System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
             }
         }
     }

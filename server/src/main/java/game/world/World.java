@@ -11,7 +11,7 @@ public class World {
     public final WorldChunkCollection chunks;
 
     public World() {
-        chunks = WorldChunkFactory.createChunks(128.0, 8, 8);
+        chunks = WorldChunkFactory.createChunks(32.0, 16, 16);
     }
 
     public Vector findSpawnPosition() {
@@ -28,7 +28,7 @@ public class World {
     }
 
     public void spawnFood() {
-        int numberOfChunksToSpawnSimultaneously = 1;
+        int numberOfChunksToSpawnSimultaneously = 16;
 
         chunks.stream()
                 .filter(c -> c.getFoodCount() < FOOD_THRESHOLD)

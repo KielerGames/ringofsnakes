@@ -8,42 +8,55 @@ import java.util.Random;
 import static util.ByteUtilities.toNormalizedDouble;
 
 public class Food {
+    public static final int BYTE_SIZE = 3;
     private static final Random rand = new Random();
 
     public final Vector position;
     public final Size size = Size.SMALL;
-    public final Color color = Color.RED;
+    public final byte color;
     private final byte[] bytePosition = new byte[2];
 
-    public Food(Vector position) {
+    public Food(Vector position, byte color) {
+        this.color = color;
         this.position = position;
         // TODO: round to nearest byte position & store byte position
     }
 
     public Food(WorldChunk chunk) {
+        // generate random position
         var data = bytePosition;
         rand.nextBytes(data);
+
+        color = (byte) rand.nextInt(64);
+
+        // TODO: pick random size (?)
 
         double x = chunk.box.minX + toNormalizedDouble(data[0]) * chunk.box.getWidth();
         double y = chunk.box.minY + toNormalizedDouble(data[1]) * chunk.box.getHeight();
         position = new Vector(x, y);
     }
 
+    public boolean isWithinRange(Vector p, double range) {
+        return Vector.distance2(position, p) <= range * range;
+    }
+
     public void addToByteBuffer(ByteBuffer buffer) {
-        // TODO: implement
+        buffer.put(bytePosition[0]);
+        buffer.put(bytePosition[1]);
+
+        int colorAndSizeData = (size.byteValue << 6) | color;
+        buffer.put((byte) colorAndSizeData);
     }
 
     public enum Size {
-        SMALL(0.2), MEDIUM(0.42), LARGE(1.0);
+        SMALL(0.2, 0), MEDIUM(0.42, 1), LARGE(1.0, 2);
 
-        private double value;
+        public final double value;
+        public final byte byteValue;
 
-        Size(double value) {
+        Size(double value, int bv) {
             this.value = value;
+            this.byteValue = (byte) bv;
         }
-    }
-
-    public enum Color {
-        RED, GREEN, BLUE, YELLOW, WHITE
     }
 }

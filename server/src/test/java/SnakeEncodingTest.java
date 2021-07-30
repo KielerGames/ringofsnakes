@@ -51,7 +51,7 @@ public class SnakeEncodingTest {
 
     @Test
     void testSnakeChunkBuffer() {
-        World world = new World();
+        World world = new World(64.0, 20);
         Snake snake = new Snake(new Vector(0, 0), world);
         var n = snake.chunks.size();
         var i = 0;

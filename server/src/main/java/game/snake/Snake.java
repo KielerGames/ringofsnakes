@@ -19,15 +19,15 @@ public class Snake {
     public final byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);
     final Vector headPosition;
+    private final float length = START_LENGTH;
+    private final ByteBuffer snakeInfoBuffer;
+    private final World world;
     public List<SnakeChunk> chunks = new LinkedList<>();
+    public SnakeChunkBuilder chunkBuilder;
     float headDirection;
     private short nextChunkId = 0;
     private float targetDirection;
     private boolean fast = false;
-    private final float length = START_LENGTH;
-    public SnakeChunkBuilder chunkBuilder;
-    private final ByteBuffer snakeInfoBuffer;
-    private final World world;
 
     public Snake(Vector position, World world) {
         this.world = world;
@@ -48,7 +48,7 @@ public class Snake {
     }
 
     public void destroy() {
-        chunks.forEach(chunk -> chunk.destroy());
+        chunks.forEach(SnakeChunk::destroy);
     }
 
     public void setTargetDirection(float alpha) {
@@ -84,13 +84,13 @@ public class Snake {
             beginChunk();
         }
         float offset = chunkBuilder.getLength();
-        for(SnakeChunk chunk : chunks) {
+        for (SnakeChunk chunk : chunks) {
             chunk.setOffset(offset);
             offset += chunk.getLength();
         }
-        if(chunks.size() > 0) {
-            SnakeChunk lastChunk = chunks.get(chunks.size()-1);
-            if(lastChunk.isJunk()) {
+        if (chunks.size() > 0) {
+            SnakeChunk lastChunk = chunks.get(chunks.size() - 1);
+            if (lastChunk.isJunk()) {
                 var removedChunk = chunks.remove(chunks.size() - 1);
                 removedChunk.destroy();
             }
@@ -112,8 +112,8 @@ public class Snake {
     }
 
     public ByteBuffer getLatestMeaningfulBuffer() {
-        if(chunkBuilder.isEmpty() && chunks.size() > 0) {
-            return chunks.get(chunks.size()-1).getBuffer();
+        if (chunkBuilder.isEmpty() && chunks.size() > 0) {
+            return chunks.get(chunks.size() - 1).getBuffer();
         }
         return chunkBuilder.getBuffer();
     }
@@ -137,5 +137,9 @@ public class Snake {
         buffer.position(INFO_BYTE_SIZE);
 
         return buffer.asReadOnlyBuffer().flip();
+    }
+
+    public Vector getHeadPosition() {
+        return headPosition;
     }
 }

@@ -1,4 +1,4 @@
-import FoodChunk from "../../data/FoodChunk";
+import FoodChunk, { Food } from "../../data/FoodChunk";
 import { GameConfig } from "../../protocol";
 import { DecodeResult } from "./DecodeResult";
 
@@ -21,15 +21,24 @@ export function decode(
     const yOffset =
         (row - 0.5 * config.chunkInfo.rows) * config.chunkInfo.chunkSize;
 
+    const foods: Food[] = new Array(n);
 
-    for(let i=0; i<n; i++) {
+    for (let i = 0; i < n; i++) {
         const foodOffset = FOOD_CHUNK_HEADER_SIZE + i * FOOD_SIZE;
         const bx = view.getUint8(foodOffset + 0);
         const by = view.getUint8(foodOffset + 1);
         const colorAndSize = view.getUint8(foodOffset + 3);
 
         // TODO: decode color and size
+
+        const x = xOffset + (bx / 256) * config.chunkInfo.chunkSize;
+        const y = yOffset + (by / 256) * config.chunkInfo.chunkSize;
+
+        foods[i] = new Food(x, y, 1, 1);
     }
 
-    // TODO
+    return {
+        data: new FoodChunk(foods),
+        nextByteOffset: 0,
+    };
 }

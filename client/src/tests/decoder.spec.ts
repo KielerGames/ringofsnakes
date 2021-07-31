@@ -11,6 +11,12 @@ const cfg: GameConfig = {
     fastSnakeSpeed: 0.48,
     maxTurnDelta: Math.PI / 30,
     tickDuration: 1.0 / 25,
+    selfCollision: false,
+    chunkInfo: {
+        chunkSize: 32,
+        columns: 16,
+        rows: 16,
+    },
 };
 
 describe("Decoder", () => {

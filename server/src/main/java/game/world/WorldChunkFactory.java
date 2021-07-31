@@ -1,9 +1,14 @@
 package game.world;
 
+import game.GameConfig;
 import math.Vector;
 
 public class WorldChunkFactory {
     private WorldChunkFactory() {
+    }
+
+    public static WorldChunkCollection createChunks(GameConfig.ChunkInfo info) {
+        return createChunks(info.chunkSize, info.rows, info.columns);
     }
 
     public static WorldChunkCollection createChunks(double chunkSize, int rows, int columns) {

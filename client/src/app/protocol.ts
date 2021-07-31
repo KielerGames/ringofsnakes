@@ -17,4 +17,10 @@ export type GameConfig = {
     fastSnakeSpeed: number;
     maxTurnDelta: number;
     tickDuration: number;
+    selfCollision: boolean;
+    chunkInfo: {
+        chunkSize: number;
+        columns: number;
+        rows: number;
+    };
 };

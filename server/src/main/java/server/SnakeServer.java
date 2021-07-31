@@ -7,6 +7,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
 import javax.websocket.Session;
+import javax.websocket.server.ServerEndpointConfig;
 import java.util.HashMap;
 import java.util.Map;
 

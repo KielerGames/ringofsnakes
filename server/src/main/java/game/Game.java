@@ -15,12 +15,20 @@ import java.util.Map;
 
 public class Game {
     private static final Gson gson = new Gson();
+
     public final int id = 1; //TODO
-    public final World world = new World();
-    private final Map<String, Client> clients = new HashMap<>(64);
-    public GameConfig config = new GameConfig();
+
+    public final GameConfig config;
+    public final World world;
     public List<Snake> snakes = new LinkedList<>();
+
+    private final Map<String, Client> clients = new HashMap<>(64);
     private Thread tickerThread;
+
+    public Game() {
+        config = new GameConfig();
+        world = new World(config);
+    }
 
     public Player createPlayer(Session session) {
         var spawnPos = world.findSpawnPosition();

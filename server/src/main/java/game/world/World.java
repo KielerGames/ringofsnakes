@@ -1,5 +1,6 @@
 package game.world;
 
+import game.GameConfig;
 import game.snake.Snake;
 import game.snake.SnakeChunkData;
 import math.Vector;
@@ -16,6 +17,10 @@ public class World {
 
     public World() {
         this(32.0, 16);
+    }
+
+    public World(GameConfig config) {
+        chunks = WorldChunkFactory.createChunks(config.chunkInfo);
     }
 
     public Vector findSpawnPosition() {

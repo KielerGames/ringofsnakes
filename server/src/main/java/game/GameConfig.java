@@ -6,6 +6,7 @@ public final class GameConfig {
     public final double fastSnakeSpeed;
     public final double maxTurnDelta;
     public final boolean selfCollision = false;
+    public final ChunkInfo chunkInfo;
 
     public GameConfig() {
         snakeSpeed = 0.24;
@@ -13,5 +14,23 @@ public final class GameConfig {
 
         // max degrees per tick
         maxTurnDelta = Math.toRadians(6);
+
+        chunkInfo = new ChunkInfo(32.0, 16);
+    }
+
+    public static class ChunkInfo {
+        public final double chunkSize;
+        public final int columns;
+        public final int rows;
+
+        ChunkInfo(double size, int n) {
+            if(size <= 0.0 || n <= 0) {
+                throw new IllegalArgumentException();
+            }
+
+            chunkSize = size;
+            columns = n;
+            rows = n;
+        }
     }
 }

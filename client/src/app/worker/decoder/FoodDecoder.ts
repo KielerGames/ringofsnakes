@@ -4,6 +4,8 @@ import { DecodeResult } from "./DecodeResult";
 
 const FOOD_SIZE = 3;
 const FOOD_CHUNK_HEADER_SIZE = 4;
+const SIZE_BIT_OFFSET = 4;
+const COLOR_BIT_MASK = (1 << SIZE_BIT_OFFSET) - 1;
 
 export function decode(
     buffer: ArrayBuffer,
@@ -29,16 +31,17 @@ export function decode(
         const by = view.getUint8(foodOffset + 1);
         const colorAndSize = view.getUint8(foodOffset + 3);
 
-        // TODO: decode color and size
+        const size = colorAndSize >> SIZE_BIT_OFFSET;
+        const color = colorAndSize & COLOR_BIT_MASK;
 
         const x = xOffset + (bx / 256) * config.chunkInfo.chunkSize;
         const y = yOffset + (by / 256) * config.chunkInfo.chunkSize;
 
-        foods[i] = new Food(x, y, 1, 1);
+        foods[i] = new Food(x, y, size, color);
     }
 
     return {
         data: new FoodChunk(foods),
-        nextByteOffset: 0,
+        nextByteOffset: offset + FOOD_CHUNK_HEADER_SIZE + n * FOOD_SIZE,
     };
 }

@@ -3,6 +3,7 @@ import GameData from "../data/GameData";
 import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
+import * as FoodRenderer from "./FoodRenderer";
 
 let gl: WebGLRenderingContext;
 
@@ -29,6 +30,7 @@ export function init(parentNode: HTMLElement = document.body): void {
     // init other render modules
     SnakeChunkRenderer.init(gl);
     SnakeHeadRenderer.init(gl);
+    FoodRenderer.init(gl);
 }
 
 export function render(data: GameData, camera: Camera, time: number): void {

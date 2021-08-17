@@ -11,10 +11,15 @@ import javax.websocket.server.ServerEndpointConfig;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SnakeServer {
+public class SnakeServer extends Thread{
     @SuppressWarnings("FieldMayBeFinal")
     private static Game game = new Game();
     private final static Map<String, Player> players = new HashMap<>(64);
+
+    @Override
+    public void run(){
+        SnakeServer.main(null);
+    }
 
     public static void main(String[] args) {
         Server server = new Server();

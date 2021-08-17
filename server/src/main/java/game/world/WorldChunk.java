@@ -14,6 +14,8 @@ public class WorldChunk {
     private final List<SnakeChunkData> snakeChunks = new LinkedList<>();
     private final byte x, y;
 
+
+
     // TODO: consider different data structures
     private List<Food> foodList = new LinkedList<>();
 
@@ -68,6 +70,10 @@ public class WorldChunk {
 
     public int getSnakeChunkCount() {
         return snakeChunks.size();
+    }
+
+    public List<Food> getFoodList() {
+        return foodList;
     }
 
     public void removeSnakeChunk(SnakeChunkData snakeChunk) {

@@ -46,7 +46,16 @@ public class TestClient extends Application implements Runnable{
                     double x = game.snakes.get(0).getHeadPosition().x;
                     double y = game.snakes.get(0).getHeadPosition().y;
 
-                    gc.fillOval(x + 400, y + 300, 3, 3);
+                    gc.setFill(Color.BLACK);
+                    gc.setStroke(Color.BLACK);
+                    gc.fillOval(x + 400,  300 -y, 3, 3);
+                    gc.setFill(Color.RED);
+                    gc.setStroke(Color.RED);
+                    game.world.chunks.findChunk(game.snakes.get(0).getHeadPosition())
+                            .getFoodList().forEach(food -> gc.fillOval(
+                                    food.position.x + 400,  300 - food.position.y, 2, 2));
+
+
 
                 }
             }

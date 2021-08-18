@@ -16,6 +16,7 @@ public class Food {
     public final byte color;
     private final byte[] bytePosition = new byte[2];
     private final WorldChunk chunk;
+    public Boolean isAlive = true;
 
     public Food(WorldChunk chunk, Vector position, byte color) {
         this.color = color;

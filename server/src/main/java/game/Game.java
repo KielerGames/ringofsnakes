@@ -2,6 +2,7 @@ package game;
 
 import com.google.gson.Gson;
 import game.snake.Snake;
+import game.world.Food;
 import game.world.World;
 import server.Client;
 import server.Player;
@@ -74,6 +75,19 @@ public class Game {
     private void tick() {
         snakes.forEach(Snake::tick);
         //TODO: check collisions
+        eatFood();
+    }
+
+    private void eatFood(){
+        snakes.forEach(snake -> {
+            List<Food> foodList = world.chunks.findChunk(snake.getHeadPosition()).getFoodList();
+            foodList.forEach(food -> {
+                if(food.isWithinRange(snake.getHeadPosition(), 4.0)){
+                    //TODO: Better solution for this?
+                    food.isAlive = false;
+                }
+            });
+        });
     }
 
     private class Ticker implements Runnable {

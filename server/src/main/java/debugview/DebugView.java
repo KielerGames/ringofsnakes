@@ -41,6 +41,7 @@ public class DebugView extends Application {
             @Override
             public void handle(long now) {
                 if (game != null && game.snakes.size() != 0) {
+                    gc.clearRect(0,0,800, 600);
                     drawSnakes(gc);
                     drawFood(gc);
                 }
@@ -54,9 +55,12 @@ public class DebugView extends Application {
         g.setFill(Color.RED);
         g.setStroke(Color.RED);
         game.world.chunks.findChunk(game.snakes.get(0).getHeadPosition())
-                .getFoodList().forEach(food -> g.fillOval(
-                        food.position.x * zoom + 400, 300 - food.position.y * zoom, 2 * zoom, 2 * zoom));
-
+                .getFoodList().forEach(food -> {
+                    if (food.isAlive){
+                        g.fillOval(food.position.x * zoom + 400,
+                                300 - food.position.y * zoom, 2 * zoom, 2 * zoom);
+                    }
+        });
     }
 
     private void drawSnakes(GraphicsContext g) {

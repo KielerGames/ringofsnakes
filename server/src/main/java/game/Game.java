@@ -80,7 +80,10 @@ public class Game {
         @Override
         public void run() {
             int noFoodTicks = 0;
+            long startTime;
+            long deltaTime;
             while (true) {
+                startTime = System.currentTimeMillis();
                 tick();
                 noFoodTicks++;
 
@@ -98,8 +101,8 @@ public class Game {
                     client.sendUpdate();
                 });
 
-                // TODO: measure time and adapt
-                sleep(config.tickDuration);
+                deltaTime = System.currentTimeMillis() - startTime;
+                sleep(config.tickDuration - deltaTime/1000.0);
             }
         }
 

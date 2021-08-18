@@ -1,4 +1,4 @@
-package testclient;
+package debugview;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -6,14 +6,13 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import game.Game;
 
 
 
-public class TestClient extends Application implements Runnable{
+public class DebugView extends Application implements Runnable{
 
     private static Game game;
     private static final double zoom = 4.0;
@@ -68,7 +67,7 @@ public class TestClient extends Application implements Runnable{
 
     @Override
     public void run() {
-        TestClient.main(null);
+        DebugView.main(null);
 
     }
 }

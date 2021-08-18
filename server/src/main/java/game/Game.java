@@ -6,7 +6,7 @@ import game.world.World;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
-import testclient.TestClient;
+import debugview.DebugView;
 
 import javax.websocket.Session;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ public class Game {
     public Game() {
         config = new GameConfig();
         world = new World(config);
-        TestClient.setGame(this);
+        DebugView.setGame(this);
     }
 
     public Player createPlayer(Session session) {

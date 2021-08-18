@@ -1,12 +1,12 @@
-package testclient;
+package debugview;
 
 import server.SnakeServer;
 
-public class LauncherHelper {
+public class DebugViewLauncher {
     public static void main(String[] args){
 
-        TestClient testClient = new TestClient();
-        Thread testClientThread = new Thread((testClient));
+        DebugView debugView = new DebugView();
+        Thread testClientThread = new Thread((debugView));
         testClientThread.start();
 
         SnakeServer serverThread = new SnakeServer();

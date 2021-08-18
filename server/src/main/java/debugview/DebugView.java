@@ -9,13 +9,17 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import game.Game;
-
+import server.SnakeServer;
 
 
 public class DebugView extends Application implements Runnable{
 
     private static Game game;
     private static final double zoom = 4.0;
+
+    public static void main(String[] args) {
+        Application.launch(args);
+    }
 
 
     @Override
@@ -58,9 +62,7 @@ public class DebugView extends Application implements Runnable{
         g.fillOval(x*zoom + 400,  300 -y*zoom, 3*zoom, 3*zoom);
     }
 
-    public static void main(String[] args) {
-        Application.launch(args);
-    }
+
     public static void setGame(Game g){
         game = g;
     }

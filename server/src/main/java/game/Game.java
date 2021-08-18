@@ -102,7 +102,9 @@ public class Game {
                 });
 
                 deltaTime = System.currentTimeMillis() - startTime;
-                sleep(config.tickDuration - deltaTime/1000.0);
+                if(deltaTime < config.tickDuration){
+                    sleep(config.tickDuration - deltaTime/1000.0);
+                }
             }
         }
 

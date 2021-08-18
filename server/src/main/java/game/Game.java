@@ -6,6 +6,7 @@ import game.world.World;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
+import testclient.TestClient;
 
 import javax.websocket.Session;
 import java.util.HashMap;
@@ -22,12 +23,14 @@ public class Game {
     public final World world;
     public List<Snake> snakes = new LinkedList<>();
 
+
     private final Map<String, Client> clients = new HashMap<>(64);
     private Thread tickerThread;
 
     public Game() {
         config = new GameConfig();
         world = new World(config);
+        TestClient.setGame(this);
     }
 
     public Player createPlayer(Session session) {
@@ -70,7 +73,6 @@ public class Game {
 
     private void tick() {
         snakes.forEach(Snake::tick);
-
         //TODO: check collisions
     }
 

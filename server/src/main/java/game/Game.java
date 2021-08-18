@@ -6,6 +6,7 @@ import game.world.World;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
+import debugview.DebugView;
 
 import javax.websocket.Session;
 import java.util.HashMap;
@@ -22,12 +23,14 @@ public class Game {
     public final World world;
     public List<Snake> snakes = new LinkedList<>();
 
+
     private final Map<String, Client> clients = new HashMap<>(64);
     private Thread tickerThread;
 
     public Game() {
         config = new GameConfig();
         world = new World(config);
+        DebugView.setGame(this);
     }
 
     public Player createPlayer(Session session) {
@@ -70,7 +73,6 @@ public class Game {
 
     private void tick() {
         snakes.forEach(Snake::tick);
-
         //TODO: check collisions
     }
 
@@ -78,7 +80,10 @@ public class Game {
         @Override
         public void run() {
             int noFoodTicks = 0;
+            long startTime;
+            long deltaTime;
             while (true) {
+                startTime = System.currentTimeMillis();
                 tick();
                 noFoodTicks++;
 
@@ -96,8 +101,10 @@ public class Game {
                     client.sendUpdate();
                 });
 
-                // TODO: measure time and adapt
-                sleep(config.tickDuration);
+                deltaTime = System.currentTimeMillis() - startTime;
+                if(deltaTime < config.tickDuration){
+                    sleep(config.tickDuration - deltaTime/1000.0);
+                }
             }
         }
 

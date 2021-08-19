@@ -19,7 +19,7 @@ public class DebugView extends Application {
 
     public static void main(String[] args) {
         // start game server
-        new Thread(new SnakeServer()).start();
+        new Thread(() -> SnakeServer.main(null)).start();
 
         // create debug window
         launch(args);
@@ -37,7 +37,7 @@ public class DebugView extends Application {
         primaryStage.setTitle("SnakeRoyal Debug GUI");
         Group root = new Group();
         Canvas canvas = new Canvas(800, 600);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+        GraphicsContext ctx = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root));
 
@@ -45,8 +45,8 @@ public class DebugView extends Application {
             @Override
             public void handle(long now) {
                 if (game != null && game.snakes.size() != 0) {
-                    drawSnakes(gc);
-                    drawFood(gc);
+                    drawSnakes(ctx);
+                    drawFood(ctx);
                 }
             }
         };

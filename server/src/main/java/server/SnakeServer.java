@@ -10,7 +10,7 @@ import javax.websocket.Session;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SnakeServer implements Runnable {
+public class SnakeServer {
     private final static Map<String, Player> players = new HashMap<>(64);
     @SuppressWarnings("FieldMayBeFinal")
     private static Game game = new Game();
@@ -74,10 +74,5 @@ public class SnakeServer implements Runnable {
         } else {
             System.err.println("Illegal request from client.");
         }
-    }
-
-    @Override
-    public void run() {
-        SnakeServer.main(null);
     }
 }

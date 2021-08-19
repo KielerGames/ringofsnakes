@@ -43,10 +43,13 @@ public class DebugView extends Application {
 
         AnimationTimer t = new AnimationTimer() {
             @Override
+            @SuppressWarnings("SynchronizeOnNonFinalField")
             public void handle(long now) {
                 if (game != null && game.snakes.size() != 0) {
-                    drawSnakes(ctx);
-                    drawFood(ctx);
+                    synchronized (game) {
+                        drawSnakes(ctx);
+                        drawFood(ctx);
+                    }
                 }
             }
         };

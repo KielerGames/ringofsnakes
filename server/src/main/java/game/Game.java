@@ -1,12 +1,12 @@
 package game;
 
 import com.google.gson.Gson;
+import debugview.DebugView;
 import game.snake.Snake;
 import game.world.World;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
-import debugview.DebugView;
 
 import javax.websocket.Session;
 import java.util.HashMap;
@@ -72,8 +72,10 @@ public class Game {
 
 
     private void tick() {
-        snakes.forEach(Snake::tick);
-        //TODO: check collisions
+        synchronized (this) {
+            snakes.forEach(Snake::tick);
+            //TODO: check collisions
+        }
     }
 
     private class Ticker implements Runnable {

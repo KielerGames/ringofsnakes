@@ -1,19 +1,21 @@
 package game;
 
 import com.google.gson.Gson;
+import debugview.DebugView;
 import game.snake.Snake;
 import game.world.Food;
 import game.world.World;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
-import debugview.DebugView;
 
 import javax.websocket.Session;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Game {
     private static final Gson gson = new Gson();
@@ -22,10 +24,8 @@ public class Game {
 
     public final GameConfig config;
     public final World world;
-    public List<Snake> snakes = new LinkedList<>();
-
-
     private final Map<String, Client> clients = new HashMap<>(64);
+    public List<Snake> snakes = new LinkedList<>();
     private Thread tickerThread;
 
     public Game() {
@@ -73,9 +73,11 @@ public class Game {
 
 
     private void tick() {
-        snakes.forEach(Snake::tick);
-        //TODO: check collisions
-        eatFood();
+        synchronized(game) {
+            snakes.forEach(Snake::tick);
+            //TODO: check collisions
+            eatFood();
+        }
     }
 
     private void eatFood(){
@@ -93,19 +95,10 @@ public class Game {
     private class Ticker implements Runnable {
         @Override
         public void run() {
-            int noFoodTicks = 0;
-            long startTime;
-            long deltaTime;
-            while (true) {
-                startTime = System.currentTimeMillis();
-                tick();
-                noFoodTicks++;
+            var executor = Executors.newSingleThreadScheduledExecutor();
 
-                if (noFoodTicks > 5) {
-                    world.spawnFood();
-                    noFoodTicks = 0;
-                    // TODO: make nice
-                }
+            executor.scheduleAtFixedRate(() -> {
+                tick();
 
                 clients.forEach((__, client) -> {
                     //TODO: filter visible chunks
@@ -114,38 +107,23 @@ public class Game {
                     );
                     client.sendUpdate();
                 });
+            }, 0, (long) (1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 
-                deltaTime = System.currentTimeMillis() - startTime;
-                if(deltaTime < config.tickDuration){
-                    sleep(config.tickDuration - deltaTime/1000.0);
-                }
-            }
-        }
-
-        private void sleep(double seconds) {
-            int time = (int) Math.floor(1000 * seconds);
-            try {
-                Thread.sleep(time);
-            } catch (InterruptedException ignored) {
-            }
+            executor.scheduleAtFixedRate(world::spawnFood, 100, (long) (1000 * 5 * config.tickDuration), TimeUnit.MILLISECONDS);
         }
     }
 
     private class DebugThread implements Runnable {
-
         @Override
         public void run() {
-            while (true) {
+            var executor = Executors.newSingleThreadScheduledExecutor();
+            executor.scheduleAtFixedRate(() -> {
                 if (!snakes.isEmpty()) {
                     var snake = snakes.get(0);
                     var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
                     System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
                 }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                }
-            }
+            }, 0, 1, TimeUnit.SECONDS);
         }
     }
 }

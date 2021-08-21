@@ -53,10 +53,6 @@ public class Food {
         buffer.put((byte) colorAndSizeData);
     }
 
-    public void destroy() {
-        chunk.removeFood(this);
-    }
-
     public enum Size {
         SMALL(0.2, 0), MEDIUM(0.42, 1), LARGE(1.0, 2);
 

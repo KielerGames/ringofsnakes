@@ -3,7 +3,6 @@ package game;
 import com.google.gson.Gson;
 import debugview.DebugView;
 import game.snake.Snake;
-import game.world.Food;
 import game.world.World;
 import server.Client;
 import server.Player;
@@ -17,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Game {
     private static final Gson gson = new Gson();
@@ -75,15 +75,17 @@ public class Game {
             synchronized (this) {
                 world.spawnFood();
             }
-        }, 100, (long) (1000 * 5 * config.tickDuration), TimeUnit.MILLISECONDS);
+        }, 100, (long) (1000 * 25 * config.tickDuration), TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
             if (!snakes.isEmpty()) {
                 var snake = snakes.get(0);
                 var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
-                System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
+                synchronized (this) {
+                    System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
+                }
             }
-        }, 0, 1, TimeUnit.SECONDS);
+        }, 0, 5, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
@@ -93,20 +95,20 @@ public class Game {
         synchronized (this) {
             snakes.forEach(Snake::tick);
             //TODO: check collisions
-            eatFood();
         }
+
+        eatFood();
     }
 
-    private void eatFood() {
+    private synchronized void eatFood() {
         snakes.forEach(snake -> {
-            List<Food> foodList = world.chunks.findChunk(snake.getHeadPosition()).getFoodList();
-            foodList.forEach(food -> {
-                if (food.isWithinRange(snake.getHeadPosition(), 4.0)) {
-                    //TODO: Better solution for this?
-                    //food.isAlive = false;
-                    food.destroy();
-                }
-            });
+            var headPosition = snake.getHeadPosition();
+            var worldChunk = world.chunks.findChunk(headPosition);
+            var foodList = worldChunk.getFoodList();
+            var collectedFood = foodList.stream()
+                    .filter(food -> food.isWithinRange(headPosition, 4.0))
+                    .collect(Collectors.toList());
+            worldChunk.removeFood(collectedFood);
         });
     }
 }

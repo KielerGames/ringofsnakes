@@ -45,9 +45,10 @@ public class DebugView extends Application {
             @Override
             @SuppressWarnings("SynchronizeOnNonFinalField")
             public void handle(long now) {
+                ctx.clearRect(0, 0, 800, 600);
+
                 if (game != null && game.snakes.size() != 0) {
-                    synchronized(game) {
-                        ctx.clearRect(0, 0, 800, 600);
+                    synchronized (game) {
                         drawSnakes(ctx);
                         drawFood(ctx);
                     }

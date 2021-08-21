@@ -15,22 +15,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Game {
     private static final Gson gson = new Gson();
-
     public final int id = 1; //TODO
-
     public final GameConfig config;
     public final World world;
+    private final ScheduledExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
     public List<Snake> snakes = new LinkedList<>();
-    private Thread tickerThread;
 
     public Game() {
         config = new GameConfig();
         world = new World(config);
+        executor = Executors.newSingleThreadScheduledExecutor();
         DebugView.setGame(this);
     }
 
@@ -59,14 +59,31 @@ public class Game {
     }
 
     public void start() {
-        if (tickerThread != null) {
-            throw new IllegalStateException("Game tick thread already started.");
-        }
+        executor.scheduleAtFixedRate(() -> {
+            tick();
 
-        tickerThread = new Thread(new Ticker());
-        tickerThread.start();
+            clients.forEach((__, client) -> {
+                //TODO: filter visible chunks
+                snakes.forEach(snake ->
+                        snake.chunks.forEach(client::updateChunk)
+                );
+                client.sendUpdate();
+            });
+        }, 0, (long) (1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 
-        new Thread(new DebugThread()).start();
+        executor.scheduleAtFixedRate(() -> {
+            synchronized (this) {
+                world.spawnFood();
+            }
+        }, 100, (long) (1000 * 5 * config.tickDuration), TimeUnit.MILLISECONDS);
+
+        executor.scheduleAtFixedRate(() -> {
+            if (!snakes.isEmpty()) {
+                var snake = snakes.get(0);
+                var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
+                System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
+            }
+        }, 0, 1, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
@@ -80,7 +97,7 @@ public class Game {
         }
     }
 
-    private void eatFood(){
+    private void eatFood() {
         snakes.forEach(snake -> {
             List<Food> foodList = world.chunks.findChunk(snake.getHeadPosition()).getFoodList();
             foodList.forEach(food -> {
@@ -91,40 +108,5 @@ public class Game {
                 }
             });
         });
-    }
-
-    private class Ticker implements Runnable {
-        @Override
-        public void run() {
-            var executor = Executors.newSingleThreadScheduledExecutor();
-
-            executor.scheduleAtFixedRate(() -> {
-                tick();
-
-                clients.forEach((__, client) -> {
-                    //TODO: filter visible chunks
-                    snakes.forEach(snake ->
-                            snake.chunks.forEach(client::updateChunk)
-                    );
-                    client.sendUpdate();
-                });
-            }, 0, (long) (1000 * config.tickDuration), TimeUnit.MILLISECONDS);
-
-            executor.scheduleAtFixedRate(world::spawnFood, 100, (long) (1000 * 5 * config.tickDuration), TimeUnit.MILLISECONDS);
-        }
-    }
-
-    private class DebugThread implements Runnable {
-        @Override
-        public void run() {
-            var executor = Executors.newSingleThreadScheduledExecutor();
-            executor.scheduleAtFixedRate(() -> {
-                if (!snakes.isEmpty()) {
-                    var snake = snakes.get(0);
-                    var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
-                    System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
-                }
-            }, 0, 1, TimeUnit.SECONDS);
-        }
     }
 }

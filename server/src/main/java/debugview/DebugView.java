@@ -47,9 +47,9 @@ public class DebugView extends Application {
             public void handle(long now) {
                 if (game != null && game.snakes.size() != 0) {
                     synchronized(game) {
-                        gc.clearRect(0,0,800, 600);
-                        drawSnakes(gc);
-                        drawFood(gc);
+                        ctx.clearRect(0, 0, 800, 600);
+                        drawSnakes(ctx);
+                        drawFood(ctx);
                     }
                 }
             }
@@ -61,14 +61,12 @@ public class DebugView extends Application {
     private void drawFood(GraphicsContext g) {
         g.setFill(Color.RED);
         g.setStroke(Color.RED);
-        game.world.chunks.forEach(chunk -> {
-            chunk.getFoodList().forEach(food -> {
-                if (food.isAlive){
-                    g.fillOval(food.position.x * zoom + 400,
-                            300 - food.position.y * zoom, 2 * zoom, 2 * zoom);
-                }
-            });
-        });
+        game.world.chunks.forEach(chunk -> chunk.getFoodList().forEach(food -> {
+            if (food.isAlive) {
+                g.fillOval(food.position.x * zoom + 400,
+                        300 - food.position.y * zoom, 2 * zoom, 2 * zoom);
+            }
+        }));
     }
 
     private void drawSnakes(GraphicsContext g) {

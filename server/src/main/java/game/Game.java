@@ -73,7 +73,7 @@ public class Game {
 
 
     private void tick() {
-        synchronized(game) {
+        synchronized (this) {
             snakes.forEach(Snake::tick);
             //TODO: check collisions
             eatFood();
@@ -84,9 +84,10 @@ public class Game {
         snakes.forEach(snake -> {
             List<Food> foodList = world.chunks.findChunk(snake.getHeadPosition()).getFoodList();
             foodList.forEach(food -> {
-                if(food.isWithinRange(snake.getHeadPosition(), 4.0)){
+                if (food.isWithinRange(snake.getHeadPosition(), 4.0)) {
                     //TODO: Better solution for this?
-                    food.isAlive = false;
+                    //food.isAlive = false;
+                    food.destroy();
                 }
             });
         });

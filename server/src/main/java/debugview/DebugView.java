@@ -17,11 +17,15 @@ public class DebugView extends Application {
     private static final double zoom = 4.0;
     private static Game game;
 
-    public static void main(String[] args) throws InterruptedException {
-        SnakeServer serverThread = new SnakeServer();
-        serverThread.start();
+    public static void main(String[] args) {
+        // start game server
+        new Thread(() -> SnakeServer.main(null)).start();
+
+        // create debug window
         launch(args);
-        serverThread.join();
+
+        // stop everything after the debug view is closed
+        System.exit(0);
     }
 
     public static void setGame(Game g) {
@@ -29,20 +33,23 @@ public class DebugView extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         primaryStage.setTitle("SnakeRoyal Debug GUI");
         Group root = new Group();
         Canvas canvas = new Canvas(800, 600);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+        GraphicsContext ctx = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root));
 
         AnimationTimer t = new AnimationTimer() {
             @Override
+            @SuppressWarnings("SynchronizeOnNonFinalField")
             public void handle(long now) {
                 if (game != null && game.snakes.size() != 0) {
-                    drawSnakes(gc);
-                    drawFood(gc);
+                    synchronized (game) {
+                        drawSnakes(ctx);
+                        drawFood(ctx);
+                    }
                 }
             }
         };

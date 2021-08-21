@@ -7,19 +7,13 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
 import javax.websocket.Session;
-import javax.websocket.server.ServerEndpointConfig;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SnakeServer extends Thread{
+public class SnakeServer {
+    private final static Map<String, Player> players = new HashMap<>(64);
     @SuppressWarnings("FieldMayBeFinal")
     private static Game game = new Game();
-    private final static Map<String, Player> players = new HashMap<>(64);
-
-    @Override
-    public void run(){
-        SnakeServer.main(null);
-    }
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -74,7 +68,7 @@ public class SnakeServer extends Thread{
     public static void onUserInputUpdate(Session session, float alpha, boolean fast) {
         var player = players.get(session.getId());
 
-        if(player != null) {
+        if (player != null) {
             player.snake.setTargetDirection(alpha);
             player.snake.setFast(fast);
         } else {

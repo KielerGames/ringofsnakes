@@ -19,12 +19,12 @@ public class Snake {
     public final byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);
     final Vector headPosition;
-    private float length = START_LENGTH;
     private final ByteBuffer snakeInfoBuffer;
     private final World world;
     public List<SnakeChunk> chunks = new LinkedList<>();
     public SnakeChunkBuilder chunkBuilder;
     float headDirection;
+    private float length = START_LENGTH;
     private short nextChunkId = 0;
     private float targetDirection;
     private boolean fast = false;
@@ -74,15 +74,12 @@ public class Snake {
         }
 
         // move head & handle boosting
-        if(fast && length >= config.minLength){
+        if (fast && length >= config.minLength) {
             headPosition.addDirection(headDirection, config.fastSnakeSpeed);
-            this.grow(-1*config.burnRate);
-        }else{
+            this.grow(-1 * config.burnRate);
+        } else {
             headPosition.addDirection(headDirection, config.snakeSpeed);
         }
-
-
-
 
         // update chunks
         chunkBuilder.append(encDirDelta, fast);
@@ -152,13 +149,7 @@ public class Snake {
         return headPosition;
     }
 
-    public void grow(float amount){
-        if(amount < 0){
-            if(length > GameConfig.minLength && length + amount > 0){
-                this.length = this.length + amount < GameConfig.minLength ? GameConfig.minLength : this.length + amount;
-            }
-        }else{
-            this.length += amount;
-        }
+    public void grow(float amount) {
+        length = Math.max(config.minLength, length + amount);
     }
 }

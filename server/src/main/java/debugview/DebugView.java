@@ -63,10 +63,9 @@ public class DebugView extends Application {
         g.setFill(Color.RED);
         g.setStroke(Color.RED);
         game.world.chunks.forEach(chunk -> chunk.getFoodList().forEach(food -> {
-            if (food.isAlive) {
                 g.fillOval(food.position.x * zoom + 400,
                         300 - food.position.y * zoom, 2 * zoom, 2 * zoom);
-            }
+
         }));
     }
 

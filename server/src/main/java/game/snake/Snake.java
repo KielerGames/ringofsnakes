@@ -14,7 +14,7 @@ public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
     public static final float START_LENGTH = 8f;
     public static final float MAX_WIDTH = 12f;
-    public static final int GETTING_FATTER_UNTIL_LENGTH = 42;
+    public static final float GETTING_FATTER_UNTIL_LENGTH = 42f;
 
 
     private static final Random random = new Random();
@@ -162,6 +162,7 @@ public class Snake {
     }
 
     public float getWidth(){
-        return MAX_WIDTH*(length/GETTING_FATTER_UNTIL_LENGTH);
+        float width = MAX_WIDTH*(length/GETTING_FATTER_UNTIL_LENGTH)
+        return length <= GETTING_FATTER_UNTIL_LENGTH ? width : MAX_WIDTH
     }
 }

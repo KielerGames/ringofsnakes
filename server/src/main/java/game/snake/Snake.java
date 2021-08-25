@@ -74,7 +74,7 @@ public class Snake {
         }
 
         // move head & handle boosting
-        if(fast && length >= config.minBoostLength){
+        if(fast && length >= config.minLength){
             headPosition.addDirection(headDirection, config.fastSnakeSpeed);
             this.grow(-1*config.burnRate);
         }else{
@@ -154,8 +154,8 @@ public class Snake {
 
     public void grow(float amount){
         if(amount < 0){
-            if(length > GameConfig.minBoostLength && length + amount > 0){
-                this.length += amount;
+            if(length > GameConfig.minLength && length + amount > 0){
+                this.length = this.length + amount < GameConfig.minLength ? GameConfig.minLength : this.length + amount;
             }
         }else{
             this.length += amount;

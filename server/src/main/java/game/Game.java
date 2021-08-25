@@ -3,6 +3,7 @@ package game;
 import com.google.gson.Gson;
 import debugview.DebugView;
 import game.snake.Snake;
+import game.world.Food;
 import game.world.World;
 import server.Client;
 import server.Player;
@@ -108,6 +109,7 @@ public class Game {
             var collectedFood = foodList.stream()
                     .filter(food -> food.isWithinRange(headPosition, 4.0))
                     .collect(Collectors.toList());
+            snake.grow(collectedFood.size() * Food.nutritionalValue);
             worldChunk.removeFood(collectedFood);
         });
     }

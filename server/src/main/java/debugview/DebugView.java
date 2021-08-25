@@ -72,10 +72,11 @@ public class DebugView extends Application {
     private void drawSnakes(GraphicsContext g) {
         double x = game.snakes.get(0).getHeadPosition().x;
         double y = game.snakes.get(0).getHeadPosition().y;
+        float snakeSize = game.snakes.get(0).getWidth();
 
         g.setFill(Color.BLACK);
         g.setStroke(Color.BLACK);
-        g.fillOval(x * zoom + 400, 300 - y * zoom, 3 * zoom, 3 * zoom);
+        g.fillOval(x * zoom + 400 - snakeSize, 300 - y * zoom - snakeSize, snakeSize * zoom, snakeSize * zoom);
     }
 }
 

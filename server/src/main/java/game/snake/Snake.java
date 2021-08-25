@@ -4,6 +4,7 @@ import game.GameConfig;
 import game.world.World;
 import math.Vector;
 
+
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +13,10 @@ import java.util.Random;
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
     public static final float START_LENGTH = 8f;
+    public static final float MAX_WIDTH = 12f;
+    public static final int GETTING_FATTER_UNTIL_LENGTH = 42;
+
+
     private static final Random random = new Random();
     private static short nextSnakeId = 0;
     public final GameConfig config = new GameConfig();
@@ -81,9 +86,6 @@ public class Snake {
             headPosition.addDirection(headDirection, config.snakeSpeed);
         }
 
-
-
-
         // update chunks
         chunkBuilder.append(encDirDelta, fast);
         // after an update a chunk might be full
@@ -127,9 +129,6 @@ public class Snake {
         return chunkBuilder.getBuffer();
     }
 
-    public float getWidth() {
-        return 0.2f;
-    }
 
     public float getLength() {
         return this.length;
@@ -160,5 +159,9 @@ public class Snake {
         }else{
             this.length += amount;
         }
+    }
+
+    public float getWidth(){
+        return MAX_WIDTH*(length/GETTING_FATTER_UNTIL_LENGTH);
     }
 }

@@ -7,7 +7,6 @@ public final class GameConfig {
     public final double snakeSpeed;
     public final double fastSnakeSpeed;
     public final double maxTurnDelta;
-    public final boolean selfCollision = false;
     public final ChunkInfo chunkInfo;
 
     public GameConfig() {

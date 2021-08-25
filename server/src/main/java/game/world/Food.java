@@ -9,6 +9,7 @@ import static util.ByteUtilities.toNormalizedDouble;
 
 public class Food {
     public static final int BYTE_SIZE = 3;
+    public static final float nutritionalValue = 2f;
     private static final Random rand = new Random();
 
     public final Vector position;
@@ -50,10 +51,6 @@ public class Food {
 
         int colorAndSizeData = (size.byteValue << 6) | color;
         buffer.put((byte) colorAndSizeData);
-    }
-
-    public void destroy() {
-        chunk.removeFood(this);
     }
 
     public enum Size {

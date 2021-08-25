@@ -21,10 +21,14 @@ export function init(parentNode: HTMLElement = document.body): void {
     // init gl context
     gl = canvas.getContext("webgl", {
         alpha: false,
+        depth: false,
         antialias: true,
         preserveDrawingBuffer: false,
+        premultipliedAlpha: false
     })!;
     gl.disable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     resize(true);
 

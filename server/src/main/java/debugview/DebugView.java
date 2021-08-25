@@ -45,6 +45,8 @@ public class DebugView extends Application {
             @Override
             @SuppressWarnings("SynchronizeOnNonFinalField")
             public void handle(long now) {
+                ctx.clearRect(0, 0, 800, 600);
+
                 if (game != null && game.snakes.size() != 0) {
                     synchronized (game) {
                         drawSnakes(ctx);
@@ -60,10 +62,11 @@ public class DebugView extends Application {
     private void drawFood(GraphicsContext g) {
         g.setFill(Color.RED);
         g.setStroke(Color.RED);
-        game.world.chunks.findChunk(game.snakes.get(0).getHeadPosition())
-                .getFoodList().forEach(food -> g.fillOval(
-                        food.position.x * zoom + 400, 300 - food.position.y * zoom, 2 * zoom, 2 * zoom));
+        game.world.chunks.forEach(chunk -> chunk.getFoodList().forEach(food -> {
+                g.fillOval(food.position.x * zoom + 400,
+                        300 - food.position.y * zoom, 2 * zoom, 2 * zoom);
 
+        }));
     }
 
     private void drawSnakes(GraphicsContext g) {

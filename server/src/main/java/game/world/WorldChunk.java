@@ -40,8 +40,8 @@ public class WorldChunk {
         foodList.add(food);
     }
 
-    public void removeFood(Food food) {
-        foodList.remove(food);
+    public void removeFood(List<Food> foodToRemove) {
+        foodList.removeAll(foodToRemove);
     }
 
     public void addSnakeChunk(SnakeChunkData snakeChunk) {
@@ -83,4 +83,5 @@ public class WorldChunk {
     public String toString() {
         return "WorldChunk(" + x + "," + y + ")";
     }
+
 }

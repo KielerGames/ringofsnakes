@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
-    public static final float START_LENGTH = 33f;
+    public static final float START_LENGTH = 3f;
     private static final Random random = new Random();
     private static short nextSnakeId = 0;
     public final GameConfig config = new GameConfig();
@@ -19,7 +19,7 @@ public class Snake {
     public final byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);
     final Vector headPosition;
-    private final float length = START_LENGTH;
+    private float length = START_LENGTH;
     private final ByteBuffer snakeInfoBuffer;
     private final World world;
     public List<SnakeChunk> chunks = new LinkedList<>();
@@ -141,5 +141,9 @@ public class Snake {
 
     public Vector getHeadPosition() {
         return headPosition;
+    }
+
+    public void grow(float amount){
+        this.length += amount;
     }
 }

@@ -14,14 +14,14 @@ const VERTEX_SIZE = 2;
 const data = mirror([
     [0.5, -1.0],
     [1.0, 0.0],
-    [0.4, 2.0],
+    [0.4, 2.0]
 ]);
 const rotOffset = -0.5 * Math.PI;
 
 let snakeColors: Color[] = [
     [0.5, 0.75, 1.0],
     [1.0, 0.75, 0.5],
-    [0.75, 1.0, 0.5],
+    [0.75, 1.0, 0.5]
 ];
 
 export function init(glCtx: WebGLRenderingContext): void {

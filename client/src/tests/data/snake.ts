@@ -41,8 +41,8 @@ export function createGameConfig(speed: number = 0.24): GameConfig {
         chunkInfo: {
             chunkSize: 32,
             columns: 16,
-            rows: 16,
-        },
+            rows: 16
+        }
     };
 }
 
@@ -57,8 +57,8 @@ export function createWorkerSnake(): WorkerSnake {
             targetDirection: 0.0,
             position: {
                 x: 0,
-                y: 0,
-            },
+                y: 0
+            }
         },
         createGameConfig()
     );

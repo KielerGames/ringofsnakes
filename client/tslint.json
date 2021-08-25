@@ -1,0 +1,8 @@
+{
+    "extends": ["tslint:recommended", "tslint-config-prettier"],
+    "rules": {
+        "prefer-for-of": true,
+        "no-console": false,
+        "no-bitwise": false
+    }
+}

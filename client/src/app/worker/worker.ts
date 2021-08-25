@@ -2,7 +2,7 @@ import * as Comlink from "comlink";
 import {
     ClientToServerMessage,
     GameConfig,
-    ServerToClientJSONMessage,
+    ServerToClientJSONMessage
 } from "../protocol";
 import { GameDataUpdate } from "./GameDataUpdate";
 import WorkerGame from "./WorkerGame";
@@ -51,7 +51,7 @@ export class WorkerAPI {
             websocket.send(
                 JSON.stringify({
                     tag: "UpdatePlayerName",
-                    name,
+                    name
                 } as ClientToServerMessage)
             );
         });

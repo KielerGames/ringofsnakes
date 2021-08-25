@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
-    public static final float START_LENGTH = 3f;
+    public static final float START_LENGTH = 8f;
     private static final Random random = new Random();
     private static short nextSnakeId = 0;
     public final GameConfig config = new GameConfig();
@@ -19,12 +19,12 @@ public class Snake {
     public final byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);
     final Vector headPosition;
-    private float length = START_LENGTH;
     private final ByteBuffer snakeInfoBuffer;
     private final World world;
     public List<SnakeChunk> chunks = new LinkedList<>();
     public SnakeChunkBuilder chunkBuilder;
     float headDirection;
+    private float length = START_LENGTH;
     private short nextChunkId = 0;
     private float targetDirection;
     private boolean fast = false;
@@ -73,8 +73,13 @@ public class Snake {
             headDirection -= Math.signum(headDirection) * 2.0 * Math.PI;
         }
 
-        // move head
-        headPosition.addDirection(headDirection, fast ? config.fastSnakeSpeed : config.snakeSpeed);
+        // move head & handle boosting
+        if (fast && length >= config.minLength) {
+            headPosition.addDirection(headDirection, config.fastSnakeSpeed);
+            this.grow(-1 * config.burnRate);
+        } else {
+            headPosition.addDirection(headDirection, config.snakeSpeed);
+        }
 
         // update chunks
         chunkBuilder.append(encDirDelta, fast);
@@ -96,6 +101,7 @@ public class Snake {
             }
         }
     }
+
 
     private void beginChunk() {
         if (chunkBuilder != null) {
@@ -143,7 +149,7 @@ public class Snake {
         return headPosition;
     }
 
-    public void grow(float amount){
-        this.length += amount;
+    public void grow(float amount) {
+        length = Math.max(config.minLength, length + amount);
     }
 }

@@ -4,7 +4,6 @@ import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
 import * as FoodRenderer from "./FoodRenderer";
-import FoodChunk from "../data/FoodChunk";
 
 let gl: WebGLRenderingContext;
 
@@ -24,7 +23,7 @@ export function init(parentNode: HTMLElement = document.body): void {
         depth: false,
         antialias: true,
         preserveDrawingBuffer: false,
-        premultipliedAlpha: false
+        premultipliedAlpha: false,
     })!;
     gl.disable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);

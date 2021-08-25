@@ -4,6 +4,7 @@ import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
 import * as FoodRenderer from "./FoodRenderer";
+import FoodChunk from "../data/FoodChunk";
 
 let gl: WebGLRenderingContext;
 
@@ -56,6 +57,8 @@ export function render(data: GameData, camera: Camera, time: number): void {
     );
 
     const pTime = data.timeSinceLastUpdate(time);
+
+    FoodRenderer.render(new FoodChunk([]), transform);
 
     // render snake bodies
     SnakeChunkRenderer.render(data.getChunks(), transform, pTime);

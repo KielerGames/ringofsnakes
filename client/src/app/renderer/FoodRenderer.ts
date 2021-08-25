@@ -9,16 +9,16 @@ let gl: WebGLRenderingContext;
 let buffer: WebGLBuffer;
 let shader: WebGLShaderProgram;
 
-const boxCoords = new Float32Array([
+const boxCoords = [
     // triangle 1
-    -1.0,  1.0, // top-left
-     1.0,  1.0, // top-right
-    -1.0, -1.0, // bottom-left
+    [-1.0,  1.0], // top-left
+    [ 1.0,  1.0], // top-right
+    [-1.0, -1.0], // bottom-left
     // triangle 2
-    -1.0, -1.0, // bottom-left
-     1.0,  1.0, // top-right
-     1.0, -1.0  // bottom-right
-]);
+    [-1.0, -1.0], // bottom-left
+    [ 1.0,  1.0], // top-right
+    [ 1.0, -1.0]  // bottom-right
+];
 
 export function init(glCtx: WebGLRenderingContext): void {
     gl = glCtx;
@@ -31,7 +31,7 @@ export function init(glCtx: WebGLRenderingContext): void {
     );
 }
 
-export function render(transform: Matrix, foodChunk: FoodChunk) {
+export function render(foodChunk: FoodChunk, transform: Matrix) {
     shader.use();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -40,19 +40,29 @@ export function render(transform: Matrix, foodChunk: FoodChunk) {
     //TODO
 }
 
-let foodGPUData: Float32Array = new Float32Array(16 * boxCoords.length);
+let foodGPUData: Float32Array = new Float32Array(32 * boxCoords.length);
 
 function createGPUData(foods: Food[]): Float32Array {
-    const n = foods.length * 2 * boxCoords.length;
+    const m = 2 * boxCoords.length;
+    const n = foods.length * 2 * m;
 
     if(foodGPUData.length < n) {
         foodGPUData = new Float32Array(n);
     }
 
-    for(let i=0; i<foods.length; i++) {
-        const { x, y } = foods[i];
-        const offset = i * 2 * boxCoords.length;
-        // TODO
+    for(let fi=0; fi<foods.length; fi++) {
+        const f = foods[fi];
+        const offset = fi * 2 * m;
+        
+        for(let bi=0; bi<boxCoords.length; bi++) {     
+            const [u, v] = boxCoords[bi];
+
+            // [x,y,u,v]
+            foodGPUData[offset + 4 * bi + 0] = f.size * u + f.x;
+            foodGPUData[offset + 4 * bi + 1] = f.size * v + f.y;
+            foodGPUData[offset + 4 * bi + 2] = u;
+            foodGPUData[offset + 4 * bi + 3] = v;
+        }
     } 
 
     return foodGPUData;

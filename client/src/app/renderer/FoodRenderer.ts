@@ -1,4 +1,5 @@
-import FoodChunk, { Food } from "../data/FoodChunk";
+import Food from "../data/Food";
+import FoodChunk from "../data/FoodChunk";
 import Matrix from "../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 
@@ -20,6 +21,8 @@ const boxCoords = [
     [ 1.0, -1.0]  // bottom-right
 ];
 
+const foodChunk = FoodChunk.createRandom();
+
 export function init(glCtx: WebGLRenderingContext): void {
     gl = glCtx;
     buffer = gl.createBuffer()!;
@@ -31,13 +34,17 @@ export function init(glCtx: WebGLRenderingContext): void {
     );
 }
 
-export function render(foodChunk: FoodChunk, transform: Matrix) {
+export function render(transform: Matrix) {
     shader.use();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     const data = createGPUData(foodChunk.food);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STREAM_DRAW);
-    //TODO
+
+    shader.setUniform("uTransform", transform.data);
+    shader.setUniform("uColor", [1.0, 0.1, 0.0]);
+
+    shader.run(gl.TRIANGLES, 0, foodChunk.food.length * boxCoords.length);
 }
 
 let foodGPUData: Float32Array = new Float32Array(32 * boxCoords.length);

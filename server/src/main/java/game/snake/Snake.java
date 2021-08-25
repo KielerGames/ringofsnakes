@@ -162,7 +162,7 @@ public class Snake {
     }
 
     public float getWidth(){
-        float width = MAX_WIDTH*(length/GETTING_FATTER_UNTIL_LENGTH)
+        float width = MAX_WIDTH*(length/GETTING_FATTER_UNTIL_LENGTH);
         return length <= GETTING_FATTER_UNTIL_LENGTH ? width : MAX_WIDTH;
     }
 }

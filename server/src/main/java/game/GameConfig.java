@@ -1,6 +1,8 @@
 package game;
 
 public final class GameConfig {
+    public static float minBoostLength = 6f;
+    public static float burnRate = 1/10f;
     public final double tickDuration = 1.0/25.0; // in seconds
     public final double snakeSpeed;
     public final double fastSnakeSpeed;

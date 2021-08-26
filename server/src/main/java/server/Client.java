@@ -7,12 +7,13 @@ import server.protocol.GameUpdate;
 import javax.websocket.Session;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 public class Client {
     public final Session session;
-    private final Set<Integer> knownSnakeChunks = new HashSet<>();
+    private final Set<SnakeChunkData> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private GameUpdate nextUpdate;
 
     public Client(Session session) {
@@ -21,12 +22,12 @@ public class Client {
     }
 
     public void updateChunk(SnakeChunkData chunk) {
-        if (knownSnakeChunks.contains(chunk.getUniqueId())) {
+        if (knownSnakeChunks.contains(chunk)) {
             nextUpdate.addSnake(chunk.getSnake());
         } else {
             nextUpdate.addSnakeChunk(chunk);
             if (chunk.isFull()) {
-                knownSnakeChunks.add(chunk.getUniqueId());
+                knownSnakeChunks.add(chunk);
             }
         }
     }

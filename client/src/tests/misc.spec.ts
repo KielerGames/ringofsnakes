@@ -9,7 +9,7 @@ import WorkerChunk from "../app/worker/WorkerChunk";
 import {
     createGameConfig,
     createSnakeChunkBuffer,
-    createWorkerSnake,
+    createWorkerSnake
 } from "./data/snake";
 import * as SCD from "../app/worker/decoder/SnakeChunkDecoder";
 
@@ -18,7 +18,7 @@ describe("MT Snake Chunk", () => {
         // @ts-ignore
         global.performance = {
             now: () => 0.0
-        }
+        };
     });
 
     it("should change the path offset", () => {
@@ -30,7 +30,7 @@ describe("MT Snake Chunk", () => {
             data: new Float32Array(0),
             length: 0.0,
             boundingBox: new Rectangle(0, 1, 0, 1),
-            offset: 0.0,
+            offset: 0.0
         };
 
         const snake = new Snake({
@@ -41,7 +41,7 @@ describe("MT Snake Chunk", () => {
             position: { x: 0, y: 0 },
             direction: 0.0,
             targetDirection: 0.0,
-            offsetCorrection: 0,
+            offsetCorrection: 0
         });
 
         const chunk = new SnakeChunk(snake, data);

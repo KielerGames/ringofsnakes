@@ -117,13 +117,6 @@ public class Snake {
         world.addSnakeChunk(chunkBuilder);
     }
 
-    public ByteBuffer getLatestMeaningfulBuffer() {
-        if (chunkBuilder.isEmpty() && chunks.size() > 0) {
-            return chunks.get(chunks.size() - 1).getBuffer();
-        }
-        return chunkBuilder.getBuffer();
-    }
-
     public float getWidth() {
         return 0.2f;
     }

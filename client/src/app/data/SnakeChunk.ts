@@ -3,7 +3,6 @@ import Vector from "../math/Vector";
 import { SnakeChunkData } from "../worker/GameDataUpdate";
 import Snake from "./Snake";
 
-
 export default class SnakeChunk {
     public readonly id: number;
     public readonly snake: Snake;
@@ -41,14 +40,13 @@ export default class SnakeChunk {
 
     public offset(timeSinceLastTick: number = 0.0): number {
         const t = timeSinceLastTick;
-        //assert(t >= 0.0);
         return this.lastTickOffset + t * this.snake.speed;
     }
 
     public updateEndPoint(end: Vector): void {
-        //TODO: update bounding box
+        // TODO: update bounding box
         const n = this.buffer.length;
-        if(n > 12) {
+        if (n > 12) {
             this.buffer[n - 6] = end.x;
             this.buffer[n - 5] = end.y;
             this.buffer[n - 12] = end.x;

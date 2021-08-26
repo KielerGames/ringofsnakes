@@ -14,7 +14,7 @@ let buffer: WebGLBuffer;
 let snakeColors: Color[] = [
     [0.5, 0.75, 1.0],
     [1.0, 0.75, 0.5],
-    [0.75, 1.0, 0.5],
+    [0.75, 1.0, 0.5]
 ];
 
 export function init(glCtx: WebGLRenderingContext): void {
@@ -29,7 +29,7 @@ export function init(glCtx: WebGLRenderingContext): void {
         "vPosition",
         "vNormal",
         "vNormalOffset",
-        "vRelativePathOffset",
+        "vRelativePathOffset"
     ];
 
     buffer = gl.createBuffer()!;

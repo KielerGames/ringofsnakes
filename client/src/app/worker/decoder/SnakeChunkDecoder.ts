@@ -128,17 +128,17 @@ export function decode(
             start: {
                 x: pathData[0],
                 y: pathData[1],
-                alpha: pathData[3],
+                alpha: pathData[3]
             },
             // the end point closest to the snake head
             end: {
                 x,
                 y,
-                alpha,
+                alpha
             },
-            pathData,
+            pathData
         },
-        nextByteOffset: byteOffset + SNAKE_CHUNK_HEADER_SIZE + n,
+        nextByteOffset: byteOffset + SNAKE_CHUNK_HEADER_SIZE + n
     };
 }
 

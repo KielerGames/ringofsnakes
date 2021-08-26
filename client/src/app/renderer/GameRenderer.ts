@@ -23,7 +23,7 @@ export function init(parentNode: HTMLElement = document.body): void {
         depth: false,
         antialias: true,
         preserveDrawingBuffer: false,
-        premultipliedAlpha: false,
+        premultipliedAlpha: false
     })!;
     gl.disable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);

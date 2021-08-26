@@ -26,7 +26,7 @@ export default class SnakeChunkVertexBufferBuilder {
         pathOffset: number
     ): void {
         const vb = this.buffer;
-        if(this.position >= vb.length) {
+        if (this.position >= vb.length) {
             throw new RangeError("Cannot add another point to vertex buffer!");
         }
 
@@ -67,6 +67,6 @@ export default class SnakeChunkVertexBufferBuilder {
     }
 
     public getBuffer(): Float32Array {
-        return this.buffer;        
+        return this.buffer;
     }
 }

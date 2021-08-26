@@ -42,6 +42,6 @@ export function decode(
 
     return {
         data: new FoodChunk(foods),
-        nextByteOffset: offset + FOOD_CHUNK_HEADER_SIZE + n * FOOD_SIZE,
+        nextByteOffset: offset + FOOD_CHUNK_HEADER_SIZE + n * FOOD_SIZE
     };
 }

@@ -12,13 +12,13 @@ let shader: WebGLShaderProgram;
 
 const boxCoords = [
     // triangle 1
-    [-1.0,  1.0], // top-left
-    [ 1.0,  1.0], // top-right
+    [-1.0, 1.0], // top-left
+    [1.0, 1.0], // top-right
     [-1.0, -1.0], // bottom-left
     // triangle 2
     [-1.0, -1.0], // bottom-left
-    [ 1.0,  1.0], // top-right
-    [ 1.0, -1.0]  // bottom-right
+    [1.0, 1.0], // top-right
+    [1.0, -1.0] // bottom-right
 ];
 
 const foodChunk = FoodChunk.createRandom();
@@ -53,15 +53,15 @@ function createGPUData(foods: Food[]): Float32Array {
     const m = 2 * boxCoords.length;
     const n = foods.length * 2 * m;
 
-    if(foodGPUData.length < n) {
+    if (foodGPUData.length < n) {
         foodGPUData = new Float32Array(n);
     }
 
-    for(let fi=0; fi<foods.length; fi++) {
+    for (let fi = 0; fi < foods.length; fi++) {
         const f = foods[fi];
         const offset = fi * 2 * m;
-        
-        for(let bi=0; bi<boxCoords.length; bi++) {     
+
+        for (let bi = 0; bi < boxCoords.length; bi++) {
             const [u, v] = boxCoords[bi];
 
             // [x,y,u,v]
@@ -70,7 +70,7 @@ function createGPUData(foods: Food[]): Float32Array {
             foodGPUData[offset + 4 * bi + 2] = u;
             foodGPUData[offset + 4 * bi + 3] = v;
         }
-    } 
+    }
 
     return foodGPUData;
 }

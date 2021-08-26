@@ -181,4 +181,9 @@ public class SnakeChunkBuilder implements SnakeChunkData {
     public void destroy() {
         linkedWorldChunks.forEach(lwc -> lwc.removeSnakeChunk(this));
     }
+
+    @Override
+    public int hashCode() {
+        return this.getUniqueId();
+    }
 }

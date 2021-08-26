@@ -1,8 +1,8 @@
 import game.GameConfig;
 import game.snake.ChainCodeCoder;
+import game.snake.FinalSnakeChunk;
+import game.snake.GrowingSnakeChunk;
 import game.snake.Snake;
-import game.snake.SnakeChunk;
-import game.snake.SnakeChunkBuilder;
 import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Test;
@@ -17,10 +17,10 @@ public class SnakeEncodingTest {
     @SuppressWarnings("ConstantConditions")
     @Test
     void testValidityOfConstants() {
-        final int HEADER_SIZE = SnakeChunk.HEADER_BYTE_SIZE;
-        assertTrue(HEADER_SIZE < SnakeChunk.BYTE_SIZE);
-        assertTrue(SnakeChunk.BUFFER_N_POS <= HEADER_SIZE - 1);
-        assertTrue(SnakeChunk.BUFFER_OFFSET_POS <= HEADER_SIZE - 4);
+        final int HEADER_SIZE = FinalSnakeChunk.HEADER_BYTE_SIZE;
+        assertTrue(HEADER_SIZE < FinalSnakeChunk.BYTE_SIZE);
+        assertTrue(FinalSnakeChunk.BUFFER_N_POS <= HEADER_SIZE - 1);
+        assertTrue(FinalSnakeChunk.BUFFER_OFFSET_POS <= HEADER_SIZE - 4);
     }
 
     @Test
@@ -28,7 +28,7 @@ public class SnakeEncodingTest {
         World world = new World();
         Snake snake = new Snake(new Vector(0, 0), world);
         final short chunkId = 42;
-        SnakeChunkBuilder builder = new SnakeChunkBuilder(coder, snake, chunkId);
+        GrowingSnakeChunk builder = new GrowingSnakeChunk(coder, snake, chunkId);
         assertFalse(builder.isFull());
         builder.append(0, false);
         builder.append(0, true);
@@ -69,9 +69,9 @@ public class SnakeEncodingTest {
         var chunk = snake.chunks.get(n);
         assertFalse(chunk.isEmpty());
         var chunkBuffer = chunk.getBuffer();
-        assertEquals(SnakeChunk.BYTE_SIZE, chunkBuffer.capacity());
-        var testBuffer = ByteBuffer.allocate(SnakeChunk.BYTE_SIZE + 1);
+        assertEquals(FinalSnakeChunk.BYTE_SIZE, chunkBuffer.capacity());
+        var testBuffer = ByteBuffer.allocate(FinalSnakeChunk.BYTE_SIZE + 1);
         testBuffer.put(chunkBuffer);
-        assertEquals(SnakeChunk.BYTE_SIZE, testBuffer.position());
+        assertEquals(FinalSnakeChunk.BYTE_SIZE, testBuffer.position());
     }
 }

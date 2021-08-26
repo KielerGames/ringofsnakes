@@ -2,7 +2,7 @@ package game.world;
 
 import game.GameConfig;
 import game.snake.Snake;
-import game.snake.SnakeChunkData;
+import game.snake.SnakeChunk;
 import math.Vector;
 
 import java.util.Comparator;
@@ -31,7 +31,7 @@ public class World {
         snake.chunks.forEach(this::addSnakeChunk);
     }
 
-    public void addSnakeChunk(SnakeChunkData snakeChunk) {
+    public void addSnakeChunk(SnakeChunk snakeChunk) {
         chunks.findIntersectingChunks(snakeChunk.getBoundingBox())
                 .forEach(chunk -> chunk.addSnakeChunk(snakeChunk));
     }

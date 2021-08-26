@@ -1,6 +1,6 @@
 package game.world;
 
-import game.snake.SnakeChunkData;
+import game.snake.SnakeChunk;
 import math.BoundingBox;
 
 import java.nio.ByteBuffer;
@@ -11,7 +11,7 @@ import java.util.List;
 public class WorldChunk {
     public final BoundingBox box;
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
-    private final List<SnakeChunkData> snakeChunks = new LinkedList<>();
+    private final List<SnakeChunk> snakeChunks = new LinkedList<>();
     private final byte x, y;
 
 
@@ -44,7 +44,7 @@ public class WorldChunk {
         foodList.removeAll(foodToRemove);
     }
 
-    public void addSnakeChunk(SnakeChunkData snakeChunk) {
+    public void addSnakeChunk(SnakeChunk snakeChunk) {
         assert (BoundingBox.intersect(snakeChunk.getBoundingBox(), box));
 
         snakeChunks.add(snakeChunk);
@@ -76,7 +76,7 @@ public class WorldChunk {
         return foodList;
     }
 
-    public void removeSnakeChunk(SnakeChunkData snakeChunk) {
+    public void removeSnakeChunk(SnakeChunk snakeChunk) {
         snakeChunks.remove(snakeChunk);
     }
 

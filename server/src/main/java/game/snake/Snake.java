@@ -21,8 +21,8 @@ public class Snake {
     final Vector headPosition;
     private final ByteBuffer snakeInfoBuffer;
     private final World world;
-    public List<SnakeChunk> chunks = new LinkedList<>();
-    public SnakeChunkBuilder chunkBuilder;
+    public List<FinalSnakeChunk> chunks = new LinkedList<>();
+    public GrowingSnakeChunk chunkBuilder;
     float headDirection;
     private float length = START_LENGTH;
     private short nextChunkId = 0;
@@ -48,7 +48,7 @@ public class Snake {
     }
 
     public void destroy() {
-        chunks.forEach(SnakeChunk::destroy);
+        chunks.forEach(FinalSnakeChunk::destroy);
     }
 
     public void setTargetDirection(float alpha) {
@@ -89,12 +89,12 @@ public class Snake {
             beginChunk();
         }
         float offset = chunkBuilder.getLength();
-        for (SnakeChunk chunk : chunks) {
+        for (FinalSnakeChunk chunk : chunks) {
             chunk.setOffset(offset);
             offset += chunk.getLength();
         }
         if (chunks.size() > 0) {
-            SnakeChunk lastChunk = chunks.get(chunks.size() - 1);
+            FinalSnakeChunk lastChunk = chunks.get(chunks.size() - 1);
             if (lastChunk.isJunk()) {
                 var removedChunk = chunks.remove(chunks.size() - 1);
                 removedChunk.destroy();
@@ -113,7 +113,7 @@ public class Snake {
             world.addSnakeChunk(snakeChunk);
         }
 
-        chunkBuilder = new SnakeChunkBuilder(coder, this, nextChunkId++);
+        chunkBuilder = new GrowingSnakeChunk(coder, this, nextChunkId++);
         world.addSnakeChunk(chunkBuilder);
     }
 

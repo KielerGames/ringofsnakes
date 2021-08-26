@@ -1,6 +1,6 @@
 package server;
 
-import game.snake.SnakeChunkData;
+import game.snake.SnakeChunk;
 import math.BoundingBox;
 import server.protocol.GameUpdate;
 
@@ -13,7 +13,7 @@ import java.util.WeakHashMap;
 
 public class Client {
     public final Session session;
-    private final Set<SnakeChunkData> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private GameUpdate nextUpdate;
 
     public Client(Session session) {
@@ -21,7 +21,7 @@ public class Client {
         nextUpdate = new GameUpdate();
     }
 
-    public void updateChunk(SnakeChunkData chunk) {
+    public void updateChunk(SnakeChunk chunk) {
         if (knownSnakeChunks.contains(chunk)) {
             nextUpdate.addSnake(chunk.getSnake());
         } else {

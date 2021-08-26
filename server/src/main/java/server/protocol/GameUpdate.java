@@ -1,7 +1,7 @@
 package server.protocol;
 
 import game.snake.Snake;
-import game.snake.SnakeChunkData;
+import game.snake.SnakeChunk;
 
 import java.nio.ByteBuffer;
 import java.util.HashSet;
@@ -16,7 +16,7 @@ public class GameUpdate {
     private final List<ByteBuffer> snakeChunkBuffers = new LinkedList<>();
     private final Set<Snake> snakes = new HashSet<>();
 
-    public void addSnakeChunk(SnakeChunkData chunk) {
+    public void addSnakeChunk(SnakeChunk chunk) {
         if (chunk.isEmpty()) {
             return;
         }

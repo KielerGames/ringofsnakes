@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class Client {
     public final Session session;
-    private final Set<Integer> knownChunks = new HashSet<>();
+    private final Set<Integer> knownSnakeChunks = new HashSet<>();
     private GameUpdate nextUpdate;
 
     public Client(Session session) {
@@ -21,12 +21,12 @@ public class Client {
     }
 
     public void updateChunk(SnakeChunkData chunk) {
-        if (knownChunks.contains(chunk.getUniqueId())) {
+        if (knownSnakeChunks.contains(chunk.getUniqueId())) {
             nextUpdate.addSnake(chunk.getSnake());
         } else {
             nextUpdate.addSnakeChunk(chunk);
-            if(chunk.isFull()) {
-                knownChunks.add(chunk.getUniqueId());
+            if (chunk.isFull()) {
+                knownSnakeChunks.add(chunk.getUniqueId());
             }
         }
     }

@@ -8,7 +8,7 @@ import math.Vector;
 import java.util.Comparator;
 
 public class World {
-    private static final int FOOD_THRESHOLD = 12;
+    private static final int FOOD_THRESHOLD = 5;
     public final WorldChunkCollection chunks;
 
     public World(double chunkSize, int repetitions) {

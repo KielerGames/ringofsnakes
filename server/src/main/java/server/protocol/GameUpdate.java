@@ -46,6 +46,7 @@ public class GameUpdate {
 
         assert snakes.size() < 256; // TODO
         assert snakeChunkBuffers.size() < 256; // TODO
+        assert foodChunkBuffers.size() < 256; // TODO
 
         // update header
         buffer.put((byte) snakes.size());
@@ -70,9 +71,9 @@ public class GameUpdate {
         var snakes = this.snakes.stream()
                 .map(s -> String.valueOf(s.id))
                 .collect(Collectors.joining(","));
-        var chunks = snakeChunkBuffers.stream()
-                .map(c -> String.valueOf(c.getInt(0)))
-                .collect(Collectors.joining(","));
-        return "GameUpdate { snakes: " + snakes + ", chunks: " + chunks + " }";
+        var foodChunks = foodChunkBuffers.stream()
+                .map(fcb -> "(" + fcb.get(0) + "|" + fcb.get(1) + ":" + fcb.getShort(2) + ")")
+                .collect(Collectors.joining(", "));
+        return "GameUpdate { snakes: " + snakes + ", foodChunks: [" + foodChunks + "] }";
     }
 }

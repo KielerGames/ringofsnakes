@@ -47,8 +47,13 @@ public class WorldChunk {
     }
 
     public void removeFood(List<Food> foodToRemove) {
+        if(foodToRemove.isEmpty()) {
+            return;
+        }
+
         foodList.removeAll(foodToRemove);
         onFoodChange();
+        System.out.println("food removed from chunk (" + x + "|" + y + ")");
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {
@@ -67,6 +72,7 @@ public class WorldChunk {
         buffer.putShort((short) foodList.size());
 
         foodList.forEach(food -> food.addToByteBuffer(buffer));
+        assert (!buffer.hasRemaining());
 
         return buffer;
     }

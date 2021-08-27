@@ -8,6 +8,7 @@ import javax.websocket.Session;
 
 public class Player extends Client {
     public Snake snake;
+    private int updateCount = 0;
 
     public Player(Snake snake, Session session) {
         super(session);
@@ -18,6 +19,12 @@ public class Player extends Client {
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
         super.onBeforeUpdateBufferIsCreated(update);
         update.addSnakeChunk(snake.chunkBuilder);
+
+        if(updateCount % 20 == 0 && !update.isEmpty()) {
+            System.out.println(update);
+        }
+
+        updateCount++;
     }
 
     @Override

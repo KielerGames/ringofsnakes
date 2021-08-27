@@ -37,9 +37,11 @@ public class Client {
         if (knownVersion < 0 || knownVersion < chunk.getFoodVersion()) {
             nextUpdate.addFoodChunk(chunk);
         }
+        knownWorldChunks.put(chunk, chunk.getFoodVersion());
     }
 
-    protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {}
+    protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
+    }
 
     public void sendUpdate() {
         var update = this.nextUpdate;
@@ -49,19 +51,19 @@ public class Client {
     }
 
     public void send(ByteBuffer binaryData) {
-        if(session.isOpen()) {
+        if (session.isOpen()) {
             session.getAsyncRemote().sendBinary(binaryData);
         }
     }
 
     public void send(String textData) {
-        if(session.isOpen()) {
+        if (session.isOpen()) {
             session.getAsyncRemote().sendText(textData);
         }
     }
 
     public boolean sendSync(String textData) {
-        if(session.isOpen()) {
+        if (session.isOpen()) {
             try {
                 session.getBasicRemote().sendText(textData);
             } catch (IOException e) {

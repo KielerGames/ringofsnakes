@@ -20,12 +20,10 @@ public class GameUpdate {
     private int foodChunkBufferSize = 0;
 
     public void addSnakeChunk(SnakeChunk chunk) {
-        if (chunk.isEmpty()) {
-            return;
+        if (!chunk.isEmpty()) {
+            snakeChunkBuffers.add(chunk.getBuffer());
+            snakeChunkBufferSize += chunk.getByteSize();
         }
-
-        snakeChunkBuffers.add(chunk.getBuffer());
-        snakeChunkBufferSize += chunk.getByteSize();
         addSnake(chunk.getSnake());
     }
 

@@ -17,7 +17,7 @@ export function decode(
     // read snake infos
     let byteOffset = UPDATE_HEADER_SIZE;
     const snakeInfos = new Array(numSnakeInfos);
-    for(let i=0; i<numSnakeInfos; i++) {
+    for (let i = 0; i < numSnakeInfos; i++) {
         const result = SID.decode(buffer, byteOffset);
         snakeInfos[i] = result.data;
         byteOffset = result.nextByteOffset;

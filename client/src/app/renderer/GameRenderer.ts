@@ -20,7 +20,7 @@ export function init(parentNode: HTMLElement = document.body): void {
     gl = canvas.getContext("webgl", {
         alpha: false,
         antialias: true,
-        preserveDrawingBuffer: false,
+        preserveDrawingBuffer: false
     })!;
     gl.disable(gl.DEPTH_TEST);
 

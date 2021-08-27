@@ -27,7 +27,7 @@ export default class WorkerSnake {
     }
 
     public get width(): number {
-        return 0.5; //TODO
+        return 0.5; // TODO
     }
 
     public get skin(): number {

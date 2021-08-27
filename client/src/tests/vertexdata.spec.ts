@@ -11,7 +11,7 @@ function createRandomVB(rand: Rand) {
     const s = 0.2 + 1.8 * rand.next();
     const n = 10 + Math.floor(rand.next() * 20);
 
-    const builder = new VBBuilder(n, (n-1)*s);
+    const builder = new VBBuilder(n, (n - 1) * s);
     let x = 0,
         y = 0;
     let alpha = 2.0 * Math.PI * rand.next();

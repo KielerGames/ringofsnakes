@@ -24,12 +24,12 @@ public class Snake {
     public final byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);
     final Vector headPosition;
-    private float length = START_LENGTH;
     private final ByteBuffer snakeInfoBuffer;
     private final World world;
     public List<SnakeChunk> chunks = new LinkedList<>();
     public SnakeChunkBuilder chunkBuilder;
     float headDirection;
+    private float length = START_LENGTH;
     private short nextChunkId = 0;
     private float targetDirection;
     private boolean fast = false;
@@ -91,6 +91,7 @@ public class Snake {
             headPosition.addDirection(headDirection, config.fastSnakeSpeed);
         }else{
             handleLengthChange(config.snakeSpeed);
+
             headPosition.addDirection(headDirection, config.snakeSpeed);
         }
 
@@ -137,7 +138,6 @@ public class Snake {
         return chunkBuilder.getBuffer();
     }
 
-
     public float getLength() {
         return this.length;
     }
@@ -151,7 +151,6 @@ public class Snake {
         buffer.putFloat(16, (float) headPosition.x);
         buffer.putFloat(20, (float) headPosition.y);
         buffer.position(INFO_BYTE_SIZE);
-
         return buffer.asReadOnlyBuffer().flip();
     }
 

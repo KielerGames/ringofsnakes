@@ -27,7 +27,7 @@ export default class Rectangle {
             minX: this.minX - grow,
             maxX: this.maxX + grow,
             minY: this.minY - grow,
-            maxY: this.maxY + grow,
+            maxY: this.maxY + grow
         };
     }
 

@@ -2,7 +2,7 @@ import assert from "../utilities/assert";
 import { normalizeAngle } from "./utils";
 
 const MAX_PREDICTION_TIME = 1 / 15;
-const MAX_CHANGE = MAX_PREDICTION_TIME * (25 * 5 * Math.PI / 180);
+const MAX_CHANGE = MAX_PREDICTION_TIME * ((25 * 5 * Math.PI) / 180);
 const MAX_DIFF = 0.35;
 
 export default class PredictedAngle {
@@ -22,10 +22,10 @@ export default class PredictedAngle {
         const t =
             Math.min(timeSinceLastUpdate, MAX_PREDICTION_TIME) /
             MAX_PREDICTION_TIME;
-        const a =  (1 - t) * this.angle + t * this.targetAngle;
+        const a = (1 - t) * this.angle + t * this.targetAngle;
 
         const d = minDiff(a, this.lastKnownAngle);
-        if(Math.abs(d) > MAX_DIFF) {
+        if (Math.abs(d) > MAX_DIFF) {
             return this.lastKnownAngle + Math.sign(d) * MAX_DIFF;
         }
 

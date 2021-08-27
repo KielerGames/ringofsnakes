@@ -2,7 +2,7 @@ import Rectangle from "../math/Rectangle";
 import assert from "../utilities/assert";
 import {
     DecodedSnakeChunk,
-    FULL_CHUNK_NUM_POINTS,
+    FULL_CHUNK_NUM_POINTS
 } from "./decoder/SnakeChunkDecoder";
 import { SnakeChunkData } from "./GameDataUpdate";
 import SnakeChunkVertexBufferBuilder from "./SnakeChunkVertexBufferBuilder";
@@ -57,7 +57,7 @@ export default class WorkerChunk {
 
         this.pathData.set(data.pathData, 0); // TODO: copy only new data
         this.numPoints = data.points;
-        
+
         this.pathLength = data.pathLength;
         this.offset = data.pathOffset;
         this._full = data.full;
@@ -84,7 +84,7 @@ export default class WorkerChunk {
                 data[pdo + 0], // x
                 data[pdo + 1], // y
                 data[pdo + 3], // alpha
-                data[pdo + 2]  // path offset
+                data[pdo + 2] // path offset
             );
         }
 
@@ -109,7 +109,7 @@ export default class WorkerChunk {
 
             length: this.pathLength,
             offset: this.offset,
-            final: this.final,
+            final: this.final
         };
     }
 

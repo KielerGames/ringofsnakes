@@ -34,9 +34,9 @@ export type SnakeData = {
     id: number;
     length: number;
     skin: number;
-    position: { x: number; y: number; };
+    position: { x: number; y: number };
     direction: number;
     targetDirection: number;
     speed: number;
     offsetCorrection: number;
-}
+};

@@ -13,7 +13,7 @@ export default class Matrix {
         if (initialize) {
             // initialize as identity
             for (let i = 0; i < n; i++) {
-                this.data[(n+1) * i] = 1.0;
+                this.data[(n + 1) * i] = 1.0;
             }
         }
     }

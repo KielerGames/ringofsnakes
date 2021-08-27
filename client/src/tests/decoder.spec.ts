@@ -15,8 +15,8 @@ const cfg: GameConfig = {
     chunkInfo: {
         chunkSize: 32,
         columns: 16,
-        rows: 16,
-    },
+        rows: 16
+    }
 };
 
 describe("Decoder", () => {
@@ -57,7 +57,7 @@ describe("Decoder", () => {
             const s = 4.2;
             const fasterCfg: GameConfig = Object.assign({}, cfg, {
                 snakeSpeed: s * cfg.snakeSpeed,
-                fastSnakeSpeed: s * cfg.fastSnakeSpeed,
+                fastSnakeSpeed: s * cfg.fastSnakeSpeed
             });
             assert.approximately(
                 SCD.decode(buffer, 0, fasterCfg).data.pathLength,

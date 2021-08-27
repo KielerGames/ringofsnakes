@@ -21,13 +21,13 @@ export function decode(
         targetDirection: view.getFloat32(12, false),
         position: {
             x: view.getFloat32(16, false),
-            y: view.getFloat32(20, false),
-        },
+            y: view.getFloat32(20, false)
+        }
     };
 
     return {
         data,
-        nextByteOffset: offset + SNAKE_INFO_SIZE,
+        nextByteOffset: offset + SNAKE_INFO_SIZE
     };
 }
 

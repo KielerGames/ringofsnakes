@@ -1,11 +1,7 @@
 import { GameConfig, ServerToClientJSONMessage } from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
-import {
-    SnakeChunkData,
-    SnakeData,
-    GameDataUpdate,
-} from "./GameDataUpdate";
+import { SnakeChunkData, SnakeData, GameDataUpdate } from "./GameDataUpdate";
 import WorkerChunk from "./WorkerChunk";
 import WorkerSnake from "./WorkerSnake";
 
@@ -50,7 +46,10 @@ export default class WorkerGame {
                 if (snake) {
                     snake.updateFromServer(info, this.config);
                 } else {
-                    this.snakes.set(info.snakeId, new WorkerSnake(info, this.config));
+                    this.snakes.set(
+                        info.snakeId,
+                        new WorkerSnake(info, this.config)
+                    );
                 }
             });
 
@@ -138,7 +137,7 @@ export default class WorkerGame {
                 snakes[i] = snake.createTransferData(this.config);
                 i++;
             }
-            //TODO: gc snakes
+            // TODO: gc snakes
         }
 
         const ticks = this.ticks;
@@ -149,7 +148,7 @@ export default class WorkerGame {
             ticksSinceLastUpdate: ticks,
             newChunks: chunks,
             snakes,
-            cameraTarget: this.targetPlayerId,
+            cameraTarget: this.targetPlayerId
         };
     }
 }

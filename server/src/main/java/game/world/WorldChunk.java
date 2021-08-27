@@ -14,8 +14,7 @@ public class WorldChunk {
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
     private final List<SnakeChunk> snakeChunks = new LinkedList<>();
     private final byte x, y;
-
-
+    private int version = 0;
 
     // TODO: consider different data structures
     private List<Food> foodList = new LinkedList<>();
@@ -39,10 +38,12 @@ public class WorldChunk {
     public void addFood() {
         Food food = new Food(this);
         foodList.add(food);
+        version++;
     }
 
     public void removeFood(List<Food> foodToRemove) {
         foodList.removeAll(foodToRemove);
+        version++;
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {
@@ -89,4 +90,7 @@ public class WorldChunk {
         return snakeChunks.stream();
     }
 
+    public int getVersion() {
+        return version;
+    }
 }

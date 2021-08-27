@@ -54,7 +54,7 @@ export default class WorkerGame {
             });
 
             // update chunks
-            data.chunkData.forEach((chunkData) => {
+            data.snakeChunkData.forEach((chunkData) => {
                 let chunk = this.chunks.get(chunkData.chunkId);
                 if (chunk) {
                     chunk.update(chunkData);

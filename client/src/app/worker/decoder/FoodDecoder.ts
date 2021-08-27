@@ -1,4 +1,5 @@
-import FoodChunk, { Food } from "../../data/FoodChunk";
+import Food from "../../data/Food";
+import FoodChunk from "../../data/FoodChunk";
 import { GameConfig } from "../../protocol";
 import { DecodeResult } from "./DecodeResult";
 

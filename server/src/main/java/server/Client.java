@@ -21,7 +21,7 @@ public class Client {
         nextUpdate = new GameUpdate();
     }
 
-    public void updateChunk(SnakeChunk chunk) {
+    public void updateClientSnakeChunk(SnakeChunk chunk) {
         if (knownSnakeChunks.contains(chunk)) {
             nextUpdate.addSnake(chunk.getSnake());
         } else {
@@ -32,13 +32,20 @@ public class Client {
         }
     }
 
+    public void updateClientFoodChunk(WorldChunk chunk) {
+        int knownVersion = knownWorldChunks.getOrDefault(chunk, -1);
+        if(knownVersion < 0 || knownVersion < chunk.getVersion()) {
+            nextUpdate.addFoodChunk(chunk);
+        }
+    }
+
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {}
 
     public void sendUpdate() {
         var update = this.nextUpdate;
         this.nextUpdate = new GameUpdate();
         onBeforeUpdateBufferIsCreated(update);
-        send(update.createBuffer());
+        send(update.createUpdateBuffer());
     }
 
     public void send(ByteBuffer binaryData) {

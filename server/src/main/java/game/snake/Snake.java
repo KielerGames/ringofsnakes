@@ -91,7 +91,6 @@ public class Snake {
             headPosition.addDirection(headDirection, config.fastSnakeSpeed);
         }else{
             handleLengthChange(config.snakeSpeed);
-
             headPosition.addDirection(headDirection, config.snakeSpeed);
         }
 
@@ -180,6 +179,6 @@ public class Snake {
 
     public float getWidth(){
         float width = MAX_WIDTH*(length/GETTING_FATTER_UNTIL_LENGTH);
-        return Math.min(MAX_WIDTH, length/GETTING_FATTER_UNTIL_LENGTH);
+        return Math.min(MAX_WIDTH, width);
     }
 }

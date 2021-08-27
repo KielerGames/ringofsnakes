@@ -1,19 +1,19 @@
 package server;
 
 import game.snake.SnakeChunk;
+import game.world.WorldChunk;
 import math.BoundingBox;
 import server.protocol.GameUpdate;
 
 import javax.websocket.Session;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 
 public class Client {
     public final Session session;
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Map<WorldChunk, Integer> knownWorldChunks = new HashMap<>();
     private GameUpdate nextUpdate;
 
     public Client(Session session) {
@@ -66,8 +66,8 @@ public class Client {
         return true;
     }
 
-    public BoundingBox getViewBox() {
+    public BoundingBox getKnowledgeBox() {
         //TODO
-        return null;
+        return new BoundingBox(0.0, 0.0, 0.0, 0.0);
     }
 }

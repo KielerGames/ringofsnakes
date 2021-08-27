@@ -68,6 +68,7 @@ public class BoundingBoxTest {
         var a = new BoundingBox(-1.0, 1.0, -1.0, 1.0);
         var b = new BoundingBox(0, 0, 0, 0);
         assertTrue(BoundingBox.intersect(a, b));
+        assertTrue(BoundingBox.intersect(b, b));
     }
 
     @Test

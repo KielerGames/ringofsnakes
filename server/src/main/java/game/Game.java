@@ -5,6 +5,7 @@ import debugview.DebugView;
 import game.snake.Snake;
 import game.world.Food;
 import game.world.World;
+import game.world.WorldChunk;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
@@ -63,11 +64,10 @@ public class Game {
         executor.scheduleAtFixedRate(() -> {
             tick();
 
-            clients.forEach((__, client) -> {
-                //TODO: filter visible chunks
-                snakes.forEach(snake ->
-                        snake.chunks.forEach(client::updateChunk)
-                );
+            clients.forEach((id, client) -> {
+                var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
+                worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateChunk);
+
                 client.sendUpdate();
             });
         }, 0, (long) (1000 * config.tickDuration), TimeUnit.MILLISECONDS);

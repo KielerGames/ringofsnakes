@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class WorldChunk {
     public final BoundingBox box;
@@ -82,6 +83,10 @@ public class WorldChunk {
 
     public String toString() {
         return "WorldChunk(" + x + "," + y + ")";
+    }
+
+    public Stream<SnakeChunk> streamSnakeChunks() {
+        return snakeChunks.stream();
     }
 
 }

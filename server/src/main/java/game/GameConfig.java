@@ -1,8 +1,8 @@
 package game;
 
 public final class GameConfig {
-    public static final float minLength = 3f;
-    public static final float burnRate = 1 / 10f;
+    public final float minLength = 3f;
+    public final float burnRate = 1 / 10f;
     public final double tickDuration = 1.0 / 25.0; // in seconds
     public final double snakeSpeed;
     public final double fastSnakeSpeed;
@@ -25,7 +25,7 @@ public final class GameConfig {
         public final int rows;
 
         ChunkInfo(double size, int n) {
-            if(size <= 0.0 || n <= 0) {
+            if (size <= 0.0 || n <= 0) {
                 throw new IllegalArgumentException();
             }
 

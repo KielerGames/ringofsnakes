@@ -4,7 +4,6 @@ import game.GameConfig;
 import game.world.World;
 import math.Vector;
 
-
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,10 +65,9 @@ public class Snake {
     }
 
     public void setFast(boolean wantsFast) {
-        if(length > GameConfig.minLength) {
+        if (length > config.minLength) {
             this.fast = wantsFast;
-        }
-        else{
+        } else {
             this.fast = false;
         }
     }
@@ -85,11 +83,11 @@ public class Snake {
         }
 
         // move head & handle length change
-        if(fast){
-            shrink(GameConfig.burnRate);
+        if (fast) {
+            shrink(config.burnRate);
             handleLengthChange(config.fastSnakeSpeed);
             headPosition.addDirection(headDirection, config.fastSnakeSpeed);
-        }else{
+        } else {
             handleLengthChange(config.snakeSpeed);
             headPosition.addDirection(headDirection, config.snakeSpeed);
         }
@@ -158,27 +156,28 @@ public class Snake {
     }
 
     public void grow(float amount) {
-        assert(amount > 0);
+        assert (amount > 0);
         lengthBuffer += amount;
     }
+
     public void shrink(float amount) {
-        assert(amount > 0);
-            lengthBuffer -= amount;
+        assert (amount > 0);
+
+        var bufferAmount = Math.min(lengthBuffer, amount);
+        lengthBuffer -= bufferAmount;
+        var snakeAmount = amount - bufferAmount;
+        length = (float) Math.max(config.minLength, length - snakeAmount);
     }
 
     private void handleLengthChange(double snakeSpeed) {
-        if(lengthBuffer >= snakeSpeed){
-            this.length += Math.min(snakeSpeed, lengthBuffer);
-            lengthBuffer -= Math.min(snakeSpeed, lengthBuffer);;
-        }
-        if(lengthBuffer < 0){
-                length = (float) Math.max(GameConfig.minLength, length + lengthBuffer);
-                lengthBuffer = 0;
-        }
+        var lengthChange = Math.min(snakeSpeed, lengthBuffer);
+
+        length += lengthChange;
+        lengthBuffer -= lengthChange;
     }
 
-    public float getWidth(){
-        float width = MAX_WIDTH*(length/GETTING_FATTER_UNTIL_LENGTH);
+    public float getWidth() {
+        float width = MAX_WIDTH * (length / GETTING_FATTER_UNTIL_LENGTH);
         return Math.min(MAX_WIDTH, width);
     }
 }

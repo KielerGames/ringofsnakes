@@ -7,7 +7,6 @@ public final class GameConfig {
     public final double snakeSpeed;
     public final double fastSnakeSpeed;
     public final double maxTurnDelta;
-    public final boolean selfCollision = false;
     public final ChunkInfo chunkInfo;
 
     public GameConfig() {
@@ -26,7 +25,7 @@ public final class GameConfig {
         public final int rows;
 
         ChunkInfo(double size, int n) {
-            if(size <= 0.0 || n <= 0) {
+            if (size <= 0.0 || n <= 0) {
                 throw new IllegalArgumentException();
             }
 

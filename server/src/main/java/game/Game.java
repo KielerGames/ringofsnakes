@@ -111,11 +111,12 @@ public class Game {
 
     private void eatFood() {
         snakes.forEach(snake -> {
+            var snakeWidth = snake.getWidth();
             var headPosition = snake.getHeadPosition();
             var worldChunk = world.chunks.findChunk(headPosition);
             var foodList = worldChunk.getFoodList();
             var collectedFood = foodList.stream()
-                    .filter(food -> food.isWithinRange(headPosition, 4.0))
+                    .filter(food -> food.isWithinRange(headPosition, snakeWidth))
                     .collect(Collectors.toList());
             snake.grow(collectedFood.size() * Food.nutritionalValue);
 

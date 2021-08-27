@@ -33,6 +33,7 @@ public class Snake {
     private short nextChunkId = 0;
     private float targetDirection;
     private boolean fast = false;
+    private double lengthBuffer = 0;
 
     public Snake(Vector position, World world) {
         this.world = world;
@@ -65,7 +66,12 @@ public class Snake {
     }
 
     public void setFast(boolean wantsFast) {
-        this.fast = wantsFast;
+        if(length > GameConfig.minLength) {
+            this.fast = wantsFast;
+        }
+        else{
+            this.fast = false;
+        }
     }
 
     public void tick() {
@@ -78,11 +84,13 @@ public class Snake {
             headDirection -= Math.signum(headDirection) * 2.0 * Math.PI;
         }
 
-        // move head & handle boosting
-        if(fast && length >= config.minLength){
+        // move head & handle length change
+        if(fast){
+            shrink(GameConfig.burnRate);
+            handleLengthChange(config.fastSnakeSpeed);
             headPosition.addDirection(headDirection, config.fastSnakeSpeed);
-            this.grow(-1*config.burnRate);
         }else{
+            handleLengthChange(config.snakeSpeed);
             headPosition.addDirection(headDirection, config.snakeSpeed);
         }
 
@@ -151,13 +159,23 @@ public class Snake {
         return headPosition;
     }
 
-    public void grow(float amount){
-        if(amount < 0){
-            if(length > GameConfig.minLength && length + amount > 0){
-                this.length = this.length + amount < GameConfig.minLength ? GameConfig.minLength : this.length + amount;
-            }
-        }else{
-            this.length += amount;
+    public void grow(float amount) {
+        assert(amount > 0);
+        lengthBuffer += amount;
+    }
+    public void shrink(float amount) {
+        assert(amount > 0);
+            lengthBuffer -= amount;
+    }
+
+    private void handleLengthChange(double snakeSpeed) {
+        if(lengthBuffer >= snakeSpeed){
+            this.length += Math.min(snakeSpeed, lengthBuffer);
+            lengthBuffer -= Math.min(snakeSpeed, lengthBuffer);;
+        }
+        if(lengthBuffer < 0){
+                length = (float) Math.max(GameConfig.minLength, length + lengthBuffer);
+                lengthBuffer = 0;
         }
     }
 

@@ -9,21 +9,19 @@ import static util.ByteUtilities.toNormalizedDouble;
 
 public class Food {
     public static final int BYTE_SIZE = 3;
-    public static final float nutritionalValue = 2f;
+    public static final float nutritionalValue = 1f;
     private static final Random rand = new Random();
 
     public final Vector position;
     public final Size size = Size.SMALL;
     public final byte color;
     private final byte[] bytePosition = new byte[2];
-    private final WorldChunk chunk;
 
-    public Food(WorldChunk chunk, Vector position, byte color) {
+    public Food(Vector position, byte color) {
         this.color = color;
         this.position = position;
         // TODO: round to nearest byte position & store byte position
-
-        this.chunk = chunk;
+        throw new IllegalCallerException("Not yet implemented");
     }
 
     public Food(WorldChunk chunk) {
@@ -38,7 +36,6 @@ public class Food {
         double x = chunk.box.minX + toNormalizedDouble(data[0]) * chunk.box.getWidth();
         double y = chunk.box.minY + toNormalizedDouble(data[1]) * chunk.box.getHeight();
         position = new Vector(x, y);
-        this.chunk = chunk;
     }
 
     public boolean isWithinRange(Vector p, double range) {

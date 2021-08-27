@@ -12,6 +12,10 @@ import java.util.Random;
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
     public static final float START_LENGTH = 8f;
+    public static final float MAX_WIDTH = 12f;
+    public static final float GETTING_FATTER_UNTIL_LENGTH = 42f;
+
+
     private static final Random random = new Random();
     private static short nextSnakeId = 0;
     public final GameConfig config = new GameConfig();
@@ -28,6 +32,7 @@ public class Snake {
     private short nextChunkId = 0;
     private float targetDirection;
     private boolean fast = false;
+    private double lengthBuffer = 0;
 
     public Snake(Vector position, World world) {
         this.world = world;
@@ -60,7 +65,11 @@ public class Snake {
     }
 
     public void setFast(boolean wantsFast) {
-        this.fast = wantsFast;
+        if (length > config.minLength) {
+            this.fast = wantsFast;
+        } else {
+            this.fast = false;
+        }
     }
 
     public void tick() {
@@ -73,11 +82,13 @@ public class Snake {
             headDirection -= Math.signum(headDirection) * 2.0 * Math.PI;
         }
 
-        // move head & handle boosting
-        if (fast && length >= config.minLength) {
+        // move head & handle length change
+        if (fast) {
+            shrink(config.burnRate);
+            handleLengthChange(config.fastSnakeSpeed);
             headPosition.addDirection(headDirection, config.fastSnakeSpeed);
-            this.grow(-1 * config.burnRate);
         } else {
+            handleLengthChange(config.snakeSpeed);
             headPosition.addDirection(headDirection, config.snakeSpeed);
         }
 
@@ -117,8 +128,11 @@ public class Snake {
         world.addSnakeChunk(chunkBuilder);
     }
 
-    public float getWidth() {
-        return 0.2f;
+    public ByteBuffer getLatestMeaningfulBuffer() {
+        if (chunkBuilder.isEmpty() && chunks.size() > 0) {
+            return chunks.get(chunks.size() - 1).getBuffer();
+        }
+        return chunkBuilder.getBuffer();
     }
 
     public float getLength() {
@@ -134,7 +148,6 @@ public class Snake {
         buffer.putFloat(16, (float) headPosition.x);
         buffer.putFloat(20, (float) headPosition.y);
         buffer.position(INFO_BYTE_SIZE);
-
         return buffer.asReadOnlyBuffer().flip();
     }
 
@@ -143,6 +156,28 @@ public class Snake {
     }
 
     public void grow(float amount) {
-        length = Math.max(config.minLength, length + amount);
+        assert (amount > 0);
+        lengthBuffer += amount;
+    }
+
+    public void shrink(float amount) {
+        assert (amount > 0);
+
+        var bufferAmount = Math.min(lengthBuffer, amount);
+        lengthBuffer -= bufferAmount;
+        var snakeAmount = amount - bufferAmount;
+        length = (float) Math.max(config.minLength, length - snakeAmount);
+    }
+
+    private void handleLengthChange(double snakeSpeed) {
+        var lengthChange = Math.min(snakeSpeed, lengthBuffer);
+
+        length += lengthChange;
+        lengthBuffer -= lengthChange;
+    }
+
+    public float getWidth() {
+        float width = MAX_WIDTH * (length / GETTING_FATTER_UNTIL_LENGTH);
+        return Math.min(MAX_WIDTH, width);
     }
 }

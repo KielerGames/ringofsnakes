@@ -34,7 +34,7 @@ public class Client {
 
     public void updateClientFoodChunk(WorldChunk chunk) {
         int knownVersion = knownWorldChunks.getOrDefault(chunk, -1);
-        if (knownVersion < 0 || knownVersion < chunk.getFoodVersion()) {
+        if (knownVersion != chunk.getFoodVersion()) {
             nextUpdate.addFoodChunk(chunk);
         }
         knownWorldChunks.put(chunk, chunk.getFoodVersion());

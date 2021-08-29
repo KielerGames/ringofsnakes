@@ -74,7 +74,7 @@ public class WorldChunk {
         foodList.forEach(food -> food.addToByteBuffer(buffer));
         assert (!buffer.hasRemaining());
 
-        return buffer;
+        return buffer.asReadOnlyBuffer().flip();
     }
 
     public int getFoodCount() {
@@ -102,6 +102,7 @@ public class WorldChunk {
     }
 
     public int getFoodVersion() {
+        assert foodVersion >= 0;
         return foodVersion;
     }
 }

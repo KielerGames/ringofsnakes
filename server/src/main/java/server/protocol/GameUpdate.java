@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GameUpdate {
-    private static final int HEADER_SIZE = 3;
+    public static final int HEADER_SIZE = 3;
     private final List<ByteBuffer> snakeChunkBuffers = new LinkedList<>();
     private final List<ByteBuffer> foodChunkBuffers = new LinkedList<>();
     private final Set<Snake> snakes = new HashSet<>();

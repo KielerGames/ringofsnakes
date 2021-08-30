@@ -1,6 +1,4 @@
 import game.world.WorldChunk;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -72,14 +70,34 @@ public class GameUpdateTest {
     void testBinarySameChunkOnce() {
         var client = new Client(session);
         var chunk = new WorldChunk(0, 0, 42, 42, 0, 0);
+
         client.updateClientFoodChunk(chunk);
-
         var update1 = captureUpdateData(client);
-        var update2 = captureUpdateData(client);
-
         assertNotNull(update1);
+
+        client.updateClientFoodChunk(chunk);
+        var update2 = captureUpdateData(client);
         assertNotNull(update2);
+
         assertNotEquals(update1, update2);
         assertTrue(update1.capacity() > update2.capacity());
+    }
+
+    @Test
+    void testBinarySameChunkUpdated() {
+        var client = new Client(session);
+        var chunk = new WorldChunk(0, 0, 42, 42, 0, 0);
+        chunk.addFood();
+
+        client.updateClientFoodChunk(chunk);
+        var update1 = captureUpdateData(client);
+        assertNotNull(update1);
+        assertEquals(1, update1.get(2));
+
+        chunk.addFood();
+        client.updateClientFoodChunk(chunk);
+        var update2 = captureUpdateData(client);
+        assertNotNull(update2);
+        assertEquals(1, update2.get(2));
     }
 }

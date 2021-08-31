@@ -19,12 +19,12 @@ public class Snake {
     private static final Random random = new Random();
     private static short nextSnakeId = 0;
     public final GameConfig config = new GameConfig();
-    public final short id;
-    public final byte skin;
+    public short id;
+    public byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);
-    final Vector headPosition;
-    private final ByteBuffer snakeInfoBuffer;
-    private final World world;
+    Vector headPosition;
+    private ByteBuffer snakeInfoBuffer;
+    private World world;
     public List<SnakeChunk> chunks = new LinkedList<>();
     public SnakeChunkBuilder chunkBuilder;
     float headDirection;
@@ -34,22 +34,9 @@ public class Snake {
     private boolean fast = false;
     private double lengthBuffer = 0;
 
-    public Snake(Vector position, World world) {
-        this.world = world;
-        id = nextSnakeId++;
-        skin = (byte) (random.nextInt(100) % 3);
 
-        snakeInfoBuffer = ByteBuffer.allocate(INFO_BYTE_SIZE);
-        snakeInfoBuffer.putShort(0, id);
-        snakeInfoBuffer.put(2, skin);
+    public Snake(){
 
-        // start position & rotation
-        headPosition = position.clone();
-        headDirection = (float) ((random.nextDouble() * 2.0 - 1.0) * Math.PI);
-        targetDirection = headDirection;
-
-        // create first chunk
-        beginChunk();
     }
 
     public void destroy() {
@@ -114,7 +101,7 @@ public class Snake {
     }
 
 
-    private void beginChunk() {
+    public void beginChunk() {
         if (chunkBuilder != null) {
             assert chunkBuilder.isFull();
 
@@ -180,4 +167,28 @@ public class Snake {
         float width = MAX_WIDTH * (length / GETTING_FATTER_UNTIL_LENGTH);
         return Math.min(MAX_WIDTH, width);
     }
+
+    public void setSnakeInfoBuffer(ByteBuffer snakeInfoBuffer ) {
+        this.snakeInfoBuffer = snakeInfoBuffer;
+    }
+
+    public void setId(short id) {
+        this.id = id;
+    }
+
+    public void setSkin(byte skin) {
+        this.skin = skin;
+    }
+
+    public void setHeadPosition(Vector headPosition) {
+        this.headPosition = headPosition;
+    }
+
+    public void setWorld(World world) {
+        this.world = world;
+    }
+
+
+
+
 }

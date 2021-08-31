@@ -3,6 +3,7 @@ package game;
 import com.google.gson.Gson;
 import debugview.DebugView;
 import game.snake.Snake;
+import game.snake.SnakeFactory;
 import game.world.Food;
 import game.world.World;
 import server.Client;
@@ -37,7 +38,7 @@ public class Game {
 
     public Player createPlayer(Session session) {
         var spawnPos = world.findSpawnPosition();
-        var snake = new Snake(spawnPos, world);
+        var snake = SnakeFactory.createSnake(spawnPos, world);
         snakes.add(snake);
         world.addSnake(snake);
 

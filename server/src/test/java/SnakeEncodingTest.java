@@ -1,8 +1,5 @@
 import game.GameConfig;
-import game.snake.ChainCodeCoder;
-import game.snake.Snake;
-import game.snake.SnakeChunk;
-import game.snake.SnakeChunkBuilder;
+import game.snake.*;
 import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Test;
@@ -26,7 +23,7 @@ public class SnakeEncodingTest {
     @Test
     void testEarlyChunkBuilding() {
         World world = new World();
-        Snake snake = new Snake(new Vector(0, 0), world);
+        Snake snake = SnakeFactory.createSnake(new Vector(0, 0), world);
         final short chunkId = 42;
         SnakeChunkBuilder builder = new SnakeChunkBuilder(coder, snake, chunkId);
         assertFalse(builder.isFull());
@@ -39,7 +36,7 @@ public class SnakeEncodingTest {
     @Test
     void testSnakeInfoBuffer() {
         World world = new World();
-        Snake snake = new Snake(new Vector(0, 0), world);
+        Snake snake = SnakeFactory.createSnake(new Vector(0, 0), world);
         var snakeInfo = snake.getInfo();
         assertEquals(Snake.INFO_BYTE_SIZE, snakeInfo.capacity());
         var buffer = ByteBuffer.allocate(1 + Snake.INFO_BYTE_SIZE);
@@ -52,7 +49,7 @@ public class SnakeEncodingTest {
     @Test
     void testSnakeChunkBuffer() {
         World world = new World(64.0, 20);
-        Snake snake = new Snake(new Vector(0, 0), world);
+        Snake snake = SnakeFactory.createSnake(new Vector(0, 0), world);
         var n = snake.chunks.size();
         var i = 0;
 

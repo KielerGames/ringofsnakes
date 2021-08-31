@@ -35,7 +35,7 @@ public class Snake {
     private double lengthBuffer = 0;
 
 
-    public Snake(){
+    public Snake() {
 
     }
 
@@ -168,7 +168,7 @@ public class Snake {
         return Math.min(MAX_WIDTH, width);
     }
 
-    public void setSnakeInfoBuffer(ByteBuffer snakeInfoBuffer ) {
+    public void setSnakeInfoBuffer(ByteBuffer snakeInfoBuffer) {
         this.snakeInfoBuffer = snakeInfoBuffer;
     }
 
@@ -187,8 +187,6 @@ public class Snake {
     public void setWorld(World world) {
         this.world = world;
     }
-
-
 
 
 }

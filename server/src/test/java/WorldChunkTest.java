@@ -1,4 +1,5 @@
 import game.snake.Snake;
+import game.snake.SnakeFactory;
 import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Assertions;
@@ -50,7 +51,7 @@ public class WorldChunkTest {
         var world = new World();
 
         // TODO: consider SnakeFactory
-        var snake = new Snake(new Vector(0, 0), world);
+        var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
         world.addSnake(snake);
 
         for (int i = 0; i < 512; i++) {

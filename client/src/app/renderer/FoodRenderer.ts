@@ -21,8 +21,6 @@ const boxCoords = [
     [1.0, -1.0] // bottom-right
 ];
 
-const foodChunk = FoodChunk.createRandom();
-
 export function init(glCtx: WebGLRenderingContext): void {
     gl = glCtx;
     buffer = gl.createBuffer()!;
@@ -34,18 +32,19 @@ export function init(glCtx: WebGLRenderingContext): void {
     );
 }
 
-export function render(transform: Matrix) {
+export function render(foodChunks: Iterable<FoodChunk>, transform: Matrix) {
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    const data = createGPUData(foodChunk.food);
-    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STREAM_DRAW);
 
-    shader.setUniform("uTransform", transform.data);
-    shader.setUniform("uColor", [1.0, 0.1, 0.0]);
-
-    shader.run(gl.TRIANGLES, 0, foodChunk.food.length * boxCoords.length);
+    for(const chunk of foodChunks) {
+        shader.setUniform("uTransform", transform.data);
+        shader.setUniform("uColor", [1.0, 0.1, 0.0]); // TODO
+        const data = createGPUData(chunk.food);
+        gl.bufferData(gl.ARRAY_BUFFER, data, gl.STREAM_DRAW);
+        shader.run(gl.TRIANGLES, 0, chunk.food.length * boxCoords.length);
+    }
 }
 
 let foodGPUData: Float32Array = new Float32Array(32 * boxCoords.length);

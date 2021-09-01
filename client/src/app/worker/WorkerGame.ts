@@ -1,3 +1,4 @@
+import FoodChunk from "../data/FoodChunk";
 import { GameConfig, ServerToClientJSONMessage } from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
@@ -10,7 +11,8 @@ export default class WorkerGame {
 
     targetPlayerId: number;
     config: GameConfig;
-    chunks: Map<ChunkId, WorkerChunk> = new Map();
+    snakeChunks: Map<SnakeChunkId, WorkerChunk> = new Map();
+    foodChunks: Map<FoodChunkId, FoodChunk> = new Map();
     snakes: Map<SnakeId, WorkerSnake> = new Map();
     lastUpdateTime: number;
     ticks: number = 0;
@@ -53,17 +55,22 @@ export default class WorkerGame {
                 }
             });
 
-            // update chunks
+            // update snake chunks
             data.snakeChunkData.forEach((chunkData) => {
-                let chunk = this.chunks.get(chunkData.chunkId);
+                let chunk = this.snakeChunks.get(chunkData.chunkId);
                 if (chunk) {
                     chunk.update(chunkData);
                 } else {
                     const snake = this.snakes.get(chunkData.snakeId);
                     assert(snake !== undefined, "Data for unknown snake.");
                     chunk = new WorkerChunk(snake!, chunkData);
-                    this.chunks.set(chunkData.chunkId, chunk);
+                    this.snakeChunks.set(chunkData.chunkId, chunk);
                 }
+            });
+
+            // update food chunks
+            data.foodChunkData.forEach((chunk) => {
+                this.foodChunks.set(chunk.id, chunk);
             });
 
             this.ticks++;
@@ -111,23 +118,23 @@ export default class WorkerGame {
     }
 
     public getDataUpdate(): GameDataUpdate {
-        const chunks: SnakeChunkData[] = new Array(this.chunks.size);
+        const snakeChunks: SnakeChunkData[] = new Array(this.snakeChunks.size);
         const snakes: SnakeData[] = new Array(this.snakes.size);
 
-        // chunk updates
+        // snake chunk updates
         {
             let i = 0;
             let gc: number[] = [];
-            for (const chunk of this.chunks.values()) {
-                chunks[i] = chunk.createTransferData();
-                if (chunks[i].final) {
-                    gc.push(chunks[i].id);
+            for (const chunk of this.snakeChunks.values()) {
+                snakeChunks[i] = chunk.createTransferData();
+                if (snakeChunks[i].final) {
+                    gc.push(snakeChunks[i].id);
                 }
                 i++;
             }
 
             // garbage-collect chunks
-            gc.forEach((chunkId) => this.chunks.delete(chunkId));
+            gc.forEach((chunkId) => this.snakeChunks.delete(chunkId));
         }
 
         // snake updates
@@ -140,18 +147,24 @@ export default class WorkerGame {
             // TODO: gc snakes
         }
 
+        // food updates
+        const foodChunks: FoodChunk[] = Array.from(this.foodChunks.values());
+        this.foodChunks.clear();
+
         const ticks = this.ticks;
         this.ticks = 0;
 
         return {
             timeSinceLastTick: performance.now() - this.lastUpdateTime,
             ticksSinceLastUpdate: ticks,
-            newSnakeChunks: chunks,
+            newSnakeChunks: snakeChunks,
             snakes,
+            foodChunks,
             cameraTarget: this.targetPlayerId
         };
     }
 }
 
-type ChunkId = number;
+type FoodChunkId = number;
+type SnakeChunkId = number;
 type SnakeId = number;

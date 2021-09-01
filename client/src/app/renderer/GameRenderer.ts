@@ -60,10 +60,10 @@ export function render(data: GameData, camera: Camera, time: number): void {
 
     const pTime = data.timeSinceLastUpdate(time);
 
-    FoodRenderer.render(transform);
+    FoodRenderer.render(data.getFoodChunks(), transform);
 
     // render snake bodies
-    SnakeChunkRenderer.render(data.getChunks(), transform, pTime);
+    SnakeChunkRenderer.render(data.getSnakeChunks(), transform, pTime);
 
     // render snake heads
     SnakeHeadRenderer.render(data.getSnakes(), transform, pTime);

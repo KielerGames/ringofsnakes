@@ -1,7 +1,10 @@
+import FoodChunk from "../data/FoodChunk";
+
 export type GameDataUpdate = {
     timeSinceLastTick: number;
     ticksSinceLastUpdate: number;
     newSnakeChunks: SnakeChunkData[];
+    foodChunks: FoodChunk[];
     snakes: SnakeData[];
     cameraTarget: number;
 };

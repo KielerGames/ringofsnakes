@@ -29,7 +29,7 @@ export default class GameData {
             }
         });
 
-        // add new chunks
+        // add new snake chunks
         data.newSnakeChunks.forEach((chunkData) => {
             const snake = this.snakes.get(chunkData.snakeId);
             if (snake === undefined) {
@@ -40,21 +40,30 @@ export default class GameData {
             this.snakeChunks.set(chunk.id, chunk);
         });
 
-        this.garbageCollectChunks();
+        // update food chunks
+        data.foodChunks.forEach((chunk) =>
+            this.foodChunks.set(chunk.id, chunk)
+        );
+
+        this.garbageCollectSnakeChunks();
     }
 
-    public getChunks(): IterableIterator<SnakeChunk> {
+    public getSnakeChunks(): IterableIterator<SnakeChunk> {
         return this.snakeChunks.values();
+    }
+
+    public getFoodChunks(): IterableIterator<FoodChunk> {
+        return this.foodChunks.values();
     }
 
     public getSnakes(): IterableIterator<Snake> {
         return this.snakes.values();
     }
 
-    private garbageCollectChunks(): void {
+    private garbageCollectSnakeChunks(): void {
         let deleteChunks: SnakeChunk[] = [];
 
-        // collect "garbage" chunks
+        // collect "garbage" snake chunks
         this.snakeChunks.forEach((chunk) => {
             if (chunk.offset() >= chunk.snake.length) {
                 deleteChunks.push(chunk);

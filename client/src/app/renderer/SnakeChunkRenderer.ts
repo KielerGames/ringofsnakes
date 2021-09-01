@@ -44,6 +44,7 @@ export function render(
 ): void {
     const shader = basicMaterialShader;
     shader.use();
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
 

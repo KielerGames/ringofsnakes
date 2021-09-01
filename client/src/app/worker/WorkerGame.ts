@@ -146,7 +146,7 @@ export default class WorkerGame {
         return {
             timeSinceLastTick: performance.now() - this.lastUpdateTime,
             ticksSinceLastUpdate: ticks,
-            newChunks: chunks,
+            newSnakeChunks: chunks,
             snakes,
             cameraTarget: this.targetPlayerId
         };

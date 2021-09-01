@@ -18,13 +18,14 @@ export function decode(
     const column = view.getUint8(0);
     const row = view.getUint8(1);
     const n = view.getUint16(2, false);
+    const chunkId = view.getUint16(0, false);
 
     const xOffset =
         (column - 0.5 * config.chunkInfo.columns) * config.chunkInfo.chunkSize;
     const yOffset =
         (row - 0.5 * config.chunkInfo.rows) * config.chunkInfo.chunkSize;
 
-    const foods: Food[] = new Array(n);
+    const foodItems: Food[] = new Array(n);
 
     for (let i = 0; i < n; i++) {
         const foodOffset = FOOD_CHUNK_HEADER_SIZE + i * FOOD_SIZE;
@@ -38,11 +39,11 @@ export function decode(
         const x = xOffset + (bx / 256) * config.chunkInfo.chunkSize;
         const y = yOffset + (by / 256) * config.chunkInfo.chunkSize;
 
-        foods[i] = new Food(x, y, size, color);
+        foodItems[i] = new Food(x, y, size, color);
     }
 
     return {
-        data: new FoodChunk(foods),
+        data: new FoodChunk(chunkId, foodItems),
         nextByteOffset: offset + FOOD_CHUNK_HEADER_SIZE + n * FOOD_SIZE
     };
 }

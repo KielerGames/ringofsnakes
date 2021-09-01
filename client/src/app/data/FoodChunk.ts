@@ -1,9 +1,11 @@
 import Food from "./Food";
 
 export default class FoodChunk {
+    public id: number;
     food: Food[];
 
-    public constructor(food: Food[]) {
+    public constructor(id: number, food: Food[]) {
+        this.id = id;
         this.food = food;
     }
 
@@ -16,6 +18,8 @@ export default class FoodChunk {
             foods[i] = new Food(x, y, 0.5 + Math.random(), 0);
         }
 
-        return new FoodChunk(foods);
+        const id = Math.floor(Math.random() * 4200);
+
+        return new FoodChunk(id, foods);
     }
 }

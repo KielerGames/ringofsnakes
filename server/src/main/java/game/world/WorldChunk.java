@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class WorldChunk {
+    private final int FOOD_HEADER_SIZE = 4;
     public final BoundingBox box;
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
     private final List<SnakeChunk> snakeChunks = new LinkedList<>();
@@ -64,8 +65,7 @@ public class WorldChunk {
     }
 
     public ByteBuffer encodeFood() {
-        final int HEADER_SIZE = 4; //TODO
-        ByteBuffer buffer = ByteBuffer.allocate(HEADER_SIZE + foodList.size() * Food.BYTE_SIZE);
+        ByteBuffer buffer = ByteBuffer.allocate(FOOD_HEADER_SIZE + foodList.size() * Food.BYTE_SIZE);
 
         buffer.put(this.x);
         buffer.put(this.y);

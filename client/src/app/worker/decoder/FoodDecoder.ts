@@ -30,7 +30,7 @@ export function decode(
         const foodOffset = FOOD_CHUNK_HEADER_SIZE + i * FOOD_SIZE;
         const bx = view.getUint8(foodOffset + 0);
         const by = view.getUint8(foodOffset + 1);
-        const colorAndSize = view.getUint8(foodOffset + 3);
+        const colorAndSize = view.getUint8(foodOffset + 2);
 
         const size = colorAndSize >> SIZE_BIT_OFFSET;
         const color = colorAndSize & COLOR_BIT_MASK;

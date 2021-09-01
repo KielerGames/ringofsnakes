@@ -36,6 +36,7 @@ export function init(glCtx: WebGLRenderingContext): void {
 
 export function render(transform: Matrix) {
     shader.use();
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     const data = createGPUData(foodChunk.food);

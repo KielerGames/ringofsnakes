@@ -46,6 +46,7 @@ export function render(
     timeSinceLastTick: number
 ) {
     shader.use();
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
 

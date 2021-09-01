@@ -54,7 +54,6 @@ public class WorldChunk {
 
         foodList.removeAll(foodToRemove);
         onFoodChange();
-        System.out.println("food removed from chunk (" + x + "|" + y + ")");
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {

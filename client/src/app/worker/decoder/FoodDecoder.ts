@@ -14,16 +14,15 @@ export function decode(
     config: GameConfig
 ): DecodeResult<FoodChunk> {
     const view = new DataView(buffer, offset);
+    const chunkSize = config.chunkInfo.chunkSize;
 
     const column = view.getUint8(0);
     const row = view.getUint8(1);
     const n = view.getUint16(2, false);
     const chunkId = view.getUint16(0, false);
 
-    const xOffset =
-        (column - 0.5 * config.chunkInfo.columns) * config.chunkInfo.chunkSize;
-    const yOffset =
-        (row - 0.5 * config.chunkInfo.rows) * config.chunkInfo.chunkSize;
+    const xOffset = (column - 0.5 * config.chunkInfo.columns) * chunkSize;
+    const yOffset = (row - 0.5 * config.chunkInfo.rows) * chunkSize;
 
     const foodItems: Food[] = new Array(n);
 
@@ -36,8 +35,8 @@ export function decode(
         const size = colorAndSize >> SIZE_BIT_OFFSET;
         const color = colorAndSize & COLOR_BIT_MASK;
 
-        const x = xOffset + (bx / 256) * config.chunkInfo.chunkSize;
-        const y = yOffset + (by / 256) * config.chunkInfo.chunkSize;
+        const x = xOffset + (bx / 256) * chunkSize;
+        const y = yOffset + (by / 256) * chunkSize;
 
         foodItems[i] = new Food(x, y, size, color);
     }

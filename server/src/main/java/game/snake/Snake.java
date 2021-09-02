@@ -12,8 +12,9 @@ import java.util.Random;
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
     public static final float START_LENGTH = 8f;
-    public static final float MAX_WIDTH = 12f;
-    public static final float GETTING_FATTER_UNTIL_LENGTH = 42f;
+    public static final float MAX_WIDTH_GAIN = 4f;
+    public static final float GETTING_FATTER_UNTIL_LENGTH = 142f;
+    public static final float STARTING_WIDTH = 0.5f;
 
     public final GameConfig config = new GameConfig();
     public final short id;
@@ -161,8 +162,10 @@ public class Snake {
     }
 
     public float getWidth() {
-        float width = MAX_WIDTH * (length / GETTING_FATTER_UNTIL_LENGTH);
-        return Math.min(MAX_WIDTH, width);
+
+        var x = Math.min(Math.max(length - START_LENGTH, 0)/GETTING_FATTER_UNTIL_LENGTH, 1.0);
+        return (float) (STARTING_WIDTH + (1.0/(1+Math.exp(-x)) - 0.5)*MAX_WIDTH_GAIN);
+
     }
 
     public void setSnakeInfoBuffer(ByteBuffer snakeInfoBuffer) {

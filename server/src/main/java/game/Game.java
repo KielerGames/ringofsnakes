@@ -6,6 +6,7 @@ import game.snake.Snake;
 import game.snake.SnakeFactory;
 import game.world.Food;
 import game.world.World;
+import game.world.WorldChunk;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
@@ -33,6 +34,12 @@ public class Game {
         config = new GameConfig();
         world = new World(config);
         executor = Executors.newSingleThreadScheduledExecutor();
+
+        // spawn some food
+        for (int i = 0; i < 42; i++) {
+            world.spawnFood();
+        }
+
         DebugView.setGame(this);
     }
 
@@ -63,29 +70,20 @@ public class Game {
     public void start() {
         executor.scheduleAtFixedRate(() -> {
             tick();
-
-            clients.forEach((__, client) -> {
-                //TODO: filter visible chunks
-                snakes.forEach(snake ->
-                        snake.chunks.forEach(client::updateChunk)
-                );
-                client.sendUpdate();
-            });
+            updateClients();
         }, 0, (long) (1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
             synchronized (this) {
                 world.spawnFood();
             }
-        }, 100, (long) (1000 * 25 * config.tickDuration), TimeUnit.MILLISECONDS);
+        }, 100, (long) (25 * 1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
             if (!snakes.isEmpty()) {
                 var snake = snakes.get(0);
                 var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
-                synchronized (this) {
-                    System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
-                }
+                System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
             }
         }, 0, 5, TimeUnit.SECONDS);
 
@@ -102,7 +100,17 @@ public class Game {
         eatFood();
     }
 
-    private synchronized void eatFood() {
+    private void updateClients() {
+        clients.forEach((id, client) -> {
+            var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
+            worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
+            worldChunks.forEach(client::updateClientFoodChunk);
+
+            client.sendUpdate();
+        });
+    }
+
+    private void eatFood() {
         snakes.forEach(snake -> {
             var snakeWidth = snake.getWidth();
             var headPosition = snake.getHeadPosition();
@@ -112,7 +120,10 @@ public class Game {
                     .filter(food -> food.isWithinRange(headPosition, snakeWidth))
                     .collect(Collectors.toList());
             snake.grow(collectedFood.size() * Food.nutritionalValue);
-            worldChunk.removeFood(collectedFood);
+
+            synchronized (this) {
+                worldChunk.removeFood(collectedFood);
+            }
         });
     }
 }

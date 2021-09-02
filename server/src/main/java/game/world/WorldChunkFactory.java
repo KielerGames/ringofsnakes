@@ -58,9 +58,6 @@ public class WorldChunkFactory {
             }
         }
 
-        final double width = columns * chunkSize;
-        final double height = rows * chunkSize;
-
         return new WorldChunkCollection(chunks) {
             @Override
             protected int findChunkIndex(Vector point) {

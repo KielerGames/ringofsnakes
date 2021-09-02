@@ -15,7 +15,7 @@ public class Food {
     public final Vector position;
     public final Size size = Size.SMALL;
     public final byte color;
-    private final byte[] bytePosition = new byte[2];
+    private final byte byteX, byteY;
 
     public Food(Vector position, byte color) {
         this.color = color;
@@ -25,33 +25,36 @@ public class Food {
     }
 
     public Food(WorldChunk chunk) {
-        // generate random position
-        var data = bytePosition;
-        rand.nextBytes(data);
+        // generate position
+        var bytePosition = new byte[2];
+        rand.nextBytes(bytePosition);
+        // set byte position
+        byteX = bytePosition[0];
+        byteY = bytePosition[1];
+        // set global (double) position
+        var x = chunk.box.minX + toNormalizedDouble(bytePosition[0]) * chunk.box.getWidth();
+        var y = chunk.box.minY + toNormalizedDouble(bytePosition[1]) * chunk.box.getHeight();
+        position = new Vector(x, y);
 
         color = (byte) rand.nextInt(64);
-
         // TODO: pick random size (?)
-
-        double x = chunk.box.minX + toNormalizedDouble(data[0]) * chunk.box.getWidth();
-        double y = chunk.box.minY + toNormalizedDouble(data[1]) * chunk.box.getHeight();
-        position = new Vector(x, y);
     }
 
     public boolean isWithinRange(Vector p, double range) {
         return Vector.distance2(position, p) <= range * range;
     }
 
-    public void addToByteBuffer(ByteBuffer buffer) {
-        buffer.put(bytePosition[0]);
-        buffer.put(bytePosition[1]);
+    void addToByteBuffer(ByteBuffer buffer) {
+        buffer.put(byteX);
+        buffer.put(byteY);
 
         int colorAndSizeData = (size.byteValue << 6) | color;
+        assert colorAndSizeData < 256;
         buffer.put((byte) colorAndSizeData);
     }
 
     public enum Size {
-        SMALL(0.2, 0), MEDIUM(0.42, 1), LARGE(1.0, 2);
+        SMALL(0.64, 0), MEDIUM(1.0, 1), LARGE(1.5, 2);
 
         public final double value;
         public final byte byteValue;

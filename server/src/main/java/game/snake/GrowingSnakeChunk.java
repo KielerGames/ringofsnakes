@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SnakeChunkBuilder implements SnakeChunkData {
+public class GrowingSnakeChunk implements SnakeChunk {
     private final Snake snake;
     private final short id;
     private final ChainCodeCoder coder;
@@ -28,7 +28,7 @@ public class SnakeChunkBuilder implements SnakeChunkData {
     private final ByteBuffer chunkByteBuffer;
     private final List<Vector> points = new LinkedList<>();
 
-    public SnakeChunkBuilder(ChainCodeCoder coder, Snake snake, short chunkId) {
+    public GrowingSnakeChunk(ChainCodeCoder coder, Snake snake, short chunkId) {
         this.snake = snake;
         this.id = chunkId;
         this.coder = coder;
@@ -62,7 +62,7 @@ public class SnakeChunkBuilder implements SnakeChunkData {
      * @return Chunk encoded in 128 Bytes of which the first 21 Bytes are the Header
      */
     private ByteBuffer createChunkBuffer() {
-        ByteBuffer buffer = ByteBuffer.allocate(SnakeChunk.BYTE_SIZE);
+        ByteBuffer buffer = ByteBuffer.allocate(FinalSnakeChunk.BYTE_SIZE);
 
         // chunk header
         buffer.putShort(this.snake.id);
@@ -71,15 +71,15 @@ public class SnakeChunkBuilder implements SnakeChunkData {
         buffer.putFloat(this.endDirection);
         buffer.putFloat((float) this.end.x);
         buffer.putFloat((float) this.end.y);
-        assert (buffer.position() == SnakeChunk.BUFFER_OFFSET_POS);
+        assert (buffer.position() == FinalSnakeChunk.BUFFER_OFFSET_POS);
         buffer.putFloat(0.0f);
-        assert (buffer.position() == SnakeChunk.HEADER_BYTE_SIZE);
+        assert (buffer.position() == FinalSnakeChunk.HEADER_BYTE_SIZE);
 
         return buffer;
     }
 
     public void append(int dirDelta, boolean fast) {
-        if (this.chunkByteBuffer.position() >= SnakeChunk.BYTE_SIZE) {
+        if (this.chunkByteBuffer.position() >= FinalSnakeChunk.BYTE_SIZE) {
             throw new IllegalStateException("Buffer is full!");
         }
 
@@ -104,7 +104,7 @@ public class SnakeChunkBuilder implements SnakeChunkData {
             // add new chaincode
             this.chunkByteBuffer.put(coder.encode(dirDelta, fast, 1));
             this.numberOfChainCodes++;
-            this.chunkByteBuffer.put(SnakeChunk.BUFFER_N_POS, (byte) this.numberOfChainCodes);
+            this.chunkByteBuffer.put(FinalSnakeChunk.BUFFER_N_POS, (byte) this.numberOfChainCodes);
 
             // reset path compression vars
             lastFast = fast;
@@ -119,7 +119,7 @@ public class SnakeChunkBuilder implements SnakeChunkData {
         maxY = Math.max(maxY, y);
     }
 
-    public SnakeChunk build() {
+    public FinalSnakeChunk build() {
         if (!isFull()) {
             throw new IllegalStateException();
         }
@@ -128,11 +128,11 @@ public class SnakeChunkBuilder implements SnakeChunkData {
         double chunkWidth = maxX - minX;
         double chunkHeight = maxY - minY;
 
-        return new SnakeChunk(snake, chunkByteBuffer, box, (float) length, points);
+        return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, points);
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {
-        final boolean isNotFirst = this.chunkByteBuffer.position() > SnakeChunk.HEADER_BYTE_SIZE;
+        final boolean isNotFirst = this.chunkByteBuffer.position() > FinalSnakeChunk.HEADER_BYTE_SIZE;
         final boolean noDirectionChange = dirDelta == 0;
         final boolean stepsCanBeIncreased = lastSteps < ChainCodeCoder.MAX_STEPS;
         final boolean fastIsUnchanged = lastFast == fast;
@@ -140,7 +140,7 @@ public class SnakeChunkBuilder implements SnakeChunkData {
     }
 
     public boolean isFull() {
-        return this.chunkByteBuffer.position() == SnakeChunk.BYTE_SIZE;
+        return this.chunkByteBuffer.position() == FinalSnakeChunk.BYTE_SIZE;
     }
 
     public ByteBuffer getBuffer() {
@@ -152,7 +152,7 @@ public class SnakeChunkBuilder implements SnakeChunkData {
     }
 
     public int getByteSize() {
-        return SnakeChunk.HEADER_BYTE_SIZE + numberOfChainCodes;
+        return FinalSnakeChunk.HEADER_BYTE_SIZE + numberOfChainCodes;
     }
 
     public boolean isEmpty() {
@@ -180,5 +180,10 @@ public class SnakeChunkBuilder implements SnakeChunkData {
     @Override
     public void destroy() {
         linkedWorldChunks.forEach(lwc -> lwc.removeSnakeChunk(this));
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getUniqueId();
     }
 }

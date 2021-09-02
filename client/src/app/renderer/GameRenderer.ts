@@ -3,6 +3,7 @@ import GameData from "../data/GameData";
 import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
+import * as FoodRenderer from "./FoodRenderer";
 
 let gl: WebGLRenderingContext;
 
@@ -19,16 +20,20 @@ export function init(parentNode: HTMLElement = document.body): void {
     // init gl context
     gl = canvas.getContext("webgl", {
         alpha: false,
+        depth: false,
         antialias: true,
-        preserveDrawingBuffer: false
+        preserveDrawingBuffer: false,
+        premultipliedAlpha: false
     })!;
     gl.disable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
 
     resize(true);
 
     // init other render modules
     SnakeChunkRenderer.init(gl);
     SnakeHeadRenderer.init(gl);
+    FoodRenderer.init(gl);
 }
 
 export function render(data: GameData, camera: Camera, time: number): void {
@@ -55,8 +60,10 @@ export function render(data: GameData, camera: Camera, time: number): void {
 
     const pTime = data.timeSinceLastUpdate(time);
 
+    FoodRenderer.render(data.getFoodChunks(), transform);
+
     // render snake bodies
-    SnakeChunkRenderer.render(data.getChunks(), transform, pTime);
+    SnakeChunkRenderer.render(data.getSnakeChunks(), transform, pTime);
 
     // render snake heads
     SnakeHeadRenderer.render(data.getSnakes(), transform, pTime);

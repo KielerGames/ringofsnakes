@@ -71,7 +71,7 @@ export class WorkerAPI {
         }
 
         const update = game.getDataUpdate();
-        const transferables = update.newChunks.map(
+        const transferables = update.newSnakeChunks.map(
             (chunk) => chunk.data.buffer
         );
 

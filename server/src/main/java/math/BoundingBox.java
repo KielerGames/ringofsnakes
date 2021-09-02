@@ -2,6 +2,9 @@ package math;
 
 import java.util.Random;
 
+/**
+ * Axis-aligned bounding box.
+ */
 public class BoundingBox {
     public final double minX, maxX, minY, maxY;
 
@@ -21,6 +24,15 @@ public class BoundingBox {
         minY = rand.nextDouble();
         maxX = minX + rand.nextDouble();
         maxY = minY + rand.nextDouble();
+    }
+
+    public BoundingBox(Vector center, double width, double height) {
+        assert (width >= 0 && height >= 0);
+
+        minX = center.x - 0.5 * width;
+        maxX = center.x + 0.5 * width;
+        minY = center.y - 0.5 * height;
+        maxY = center.y + 0.5 * height;
     }
 
     /**
@@ -120,5 +132,10 @@ public class BoundingBox {
                 minX + 0.5 * (maxX - minX),
                 minY + 0.5 * (maxY - minY)
         );
+    }
+
+    @Override
+    public String toString() {
+        return "AABB { x = [" + minX + "," + maxX + "], y = [" + minY + "," + maxY + "]}";
     }
 }

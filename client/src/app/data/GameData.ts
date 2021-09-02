@@ -1,10 +1,12 @@
 import { GameDataUpdate } from "../worker/GameDataUpdate";
+import FoodChunk from "./FoodChunk";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
 
 export default class GameData {
     private snakes: Map<number, Snake> = new Map();
-    private chunks: Map<number, SnakeChunk> = new Map();
+    private snakeChunks: Map<number, SnakeChunk> = new Map();
+    private foodChunks: Map<number, FoodChunk> = new Map();
     private cameraTargetId: number = -1;
     private lastUpdateTime: number = performance.now();
 
@@ -27,33 +29,42 @@ export default class GameData {
             }
         });
 
-        // add new chunks
-        data.newChunks.forEach((chunkData) => {
+        // add new snake chunks
+        data.newSnakeChunks.forEach((chunkData) => {
             const snake = this.snakes.get(chunkData.snakeId);
             if (snake === undefined) {
                 throw new Error(`No data for snake ${chunkData.snakeId}!`);
             }
             const chunk = new SnakeChunk(snake, chunkData);
             snake.setChunk(chunk);
-            this.chunks.set(chunk.id, chunk);
+            this.snakeChunks.set(chunk.id, chunk);
         });
 
-        this.garbageCollectChunks();
+        // update food chunks
+        data.foodChunks.forEach((chunk) =>
+            this.foodChunks.set(chunk.id, chunk)
+        );
+
+        this.garbageCollectSnakeChunks();
     }
 
-    public getChunks(): IterableIterator<SnakeChunk> {
-        return this.chunks.values();
+    public getSnakeChunks(): IterableIterator<SnakeChunk> {
+        return this.snakeChunks.values();
+    }
+
+    public getFoodChunks(): IterableIterator<FoodChunk> {
+        return this.foodChunks.values();
     }
 
     public getSnakes(): IterableIterator<Snake> {
         return this.snakes.values();
     }
 
-    private garbageCollectChunks(): void {
+    private garbageCollectSnakeChunks(): void {
         let deleteChunks: SnakeChunk[] = [];
 
-        // collect "garbage" chunks
-        this.chunks.forEach((chunk) => {
+        // collect "garbage" snake chunks
+        this.snakeChunks.forEach((chunk) => {
             if (chunk.offset() >= chunk.snake.length) {
                 deleteChunks.push(chunk);
             }
@@ -61,7 +72,7 @@ export default class GameData {
 
         // remove collected chunks
         deleteChunks.forEach((chunk) => {
-            this.chunks.delete(chunk.id);
+            this.snakeChunks.delete(chunk.id);
             chunk.snake.removeChunk(chunk.id);
         });
 

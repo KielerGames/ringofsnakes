@@ -4,9 +4,7 @@ import game.snake.SnakeChunk;
 import math.BoundingBox;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class WorldChunk {
@@ -17,7 +15,6 @@ public class WorldChunk {
     private final byte x, y;
     private int foodVersion = 0;
 
-    // TODO: consider different data structures
     private List<Food> foodList = new LinkedList<>();
 
     public WorldChunk(double left, double bottom, double width, double height, int x, int y) {
@@ -28,6 +25,8 @@ public class WorldChunk {
         this.y = (byte) y;
 
         box = new BoundingBox(left, left + width, bottom, bottom + height);
+
+        System.out.println(this + " : " + box);
     }
 
     private void onFoodChange() {
@@ -42,8 +41,11 @@ public class WorldChunk {
     }
 
     public void addFood() {
-        Food food = new Food(this);
-        foodList.add(food);
+        addFood(Collections.singletonList(new Food(this)));
+    }
+
+    public void addFood(Collection<Food> foodItemsToAdd) {
+        foodList.addAll(foodItemsToAdd);
         onFoodChange();
     }
 

@@ -133,4 +133,9 @@ public class BoundingBox {
                 minY + 0.5 * (maxY - minY)
         );
     }
+
+    @Override
+    public String toString() {
+        return "AABB { x = [" + minX + "," + maxX + "], y = [" + minY + "," + maxY + "]}";
+    }
 }

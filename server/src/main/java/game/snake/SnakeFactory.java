@@ -3,6 +3,7 @@ package game.snake;
 import game.world.World;
 import math.Vector;
 import java.nio.ByteBuffer;
+import java.nio.file.attribute.PosixFileAttributes;
 import java.util.Random;
 
 public class SnakeFactory {
@@ -13,11 +14,8 @@ public class SnakeFactory {
     }
 
     public static Snake createSnake(Vector position, World world){
-        Snake snake = new Snake();
-        snake.setWorld(world);
-        snake.setId(nextSnakeId++);
+        Snake snake = new Snake(nextSnakeId++, world);
         snake.setSkin((byte) (random.nextInt(100) % 3));
-
 
         ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
         snakeInfoBuffer.putShort(0, snake.id);
@@ -31,6 +29,10 @@ public class SnakeFactory {
         snake.beginChunk();
 
         return snake;
+    }
+
+    public static Snake createSnake(){
+        return createSnake(new Vector(0,0), new World());
     }
 
 }

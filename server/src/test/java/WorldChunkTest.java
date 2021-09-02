@@ -49,8 +49,6 @@ public class WorldChunkTest {
     @Test
     void testAddASnake() {
         var world = new World();
-
-        // TODO: consider SnakeFactory
         var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
         world.addSnake(snake);
 

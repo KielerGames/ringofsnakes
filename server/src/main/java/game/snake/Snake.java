@@ -15,16 +15,13 @@ public class Snake {
     public static final float MAX_WIDTH = 12f;
     public static final float GETTING_FATTER_UNTIL_LENGTH = 42f;
 
-
-    private static final Random random = new Random();
-    private static short nextSnakeId = 0;
     public final GameConfig config = new GameConfig();
-    public short id;
+    public final short id;
     public byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);
     Vector headPosition;
     private ByteBuffer snakeInfoBuffer;
-    private World world;
+    private final World world;
     public List<SnakeChunk> chunks = new LinkedList<>();
     public SnakeChunkBuilder chunkBuilder;
     float headDirection;
@@ -35,8 +32,9 @@ public class Snake {
     private double lengthBuffer = 0;
 
 
-    public Snake() {
-
+    Snake(short id, World world) {
+        this.id = id;
+        this.world = world;
     }
 
     public void destroy() {
@@ -99,7 +97,6 @@ public class Snake {
             }
         }
     }
-
 
     public void beginChunk() {
         if (chunkBuilder != null) {
@@ -172,10 +169,6 @@ public class Snake {
         this.snakeInfoBuffer = snakeInfoBuffer;
     }
 
-    public void setId(short id) {
-        this.id = id;
-    }
-
     public void setSkin(byte skin) {
         this.skin = skin;
     }
@@ -183,10 +176,5 @@ public class Snake {
     public void setHeadPosition(Vector headPosition) {
         this.headPosition = headPosition;
     }
-
-    public void setWorld(World world) {
-        this.world = world;
-    }
-
 
 }

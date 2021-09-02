@@ -46,8 +46,14 @@ export default class Snake {
         const STARTING_WIDTH = 0.5;
         const MAX_WIDTH_GAIN = 4.0;
         const GETTING_FATTER_UNTIL_LENGTH = 142.0;
-        let x = Math.min(Math.max(this.length - START_LENGTH, 0)/GETTING_FATTER_UNTIL_LENGTH, 1.0);
-        return  (STARTING_WIDTH + (1.0/(1+Math.exp(-x)) - 0.5)*MAX_WIDTH_GAIN);
+        let x = Math.min(
+            Math.max(this.length - START_LENGTH, 0) /
+                GETTING_FATTER_UNTIL_LENGTH,
+            1.0
+        );
+        return (
+            STARTING_WIDTH + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN
+        );
     }
 
     public getPredictedPosition(timeSinceLastTick: number): Vector {

@@ -56,7 +56,7 @@ public class Vector {
         y += stepSize * Math.sin(alpha);
     }
 
-    public void add(Vector v, double s) {
+    public void addScaled(Vector v, double s) {
         this.x = s * v.x;
         this.y = s * v.y;
     }

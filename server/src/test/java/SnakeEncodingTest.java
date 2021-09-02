@@ -22,7 +22,6 @@ public class SnakeEncodingTest {
 
     @Test
     void testEarlyChunkBuilding() {
-        World world = new World();
         Snake snake = SnakeFactory.createSnake();
         final short chunkId = 42;
         SnakeChunkBuilder builder = new SnakeChunkBuilder(coder, snake, chunkId);
@@ -35,7 +34,6 @@ public class SnakeEncodingTest {
 
     @Test
     void testSnakeInfoBuffer() {
-        World world = new World();
         Snake snake = SnakeFactory.createSnake();
         var snakeInfo = snake.getInfo();
         assertEquals(Snake.INFO_BYTE_SIZE, snakeInfo.capacity());

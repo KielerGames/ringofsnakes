@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class WorldChunk {
-    private final int FOOD_HEADER_SIZE = 4;
     public final BoundingBox box;
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
+    private final int FOOD_HEADER_SIZE = 4;
     private final List<SnakeChunk> snakeChunks = new LinkedList<>();
     private final byte x, y;
     private int foodVersion = 0;
@@ -48,7 +48,7 @@ public class WorldChunk {
     }
 
     public void removeFood(List<Food> foodToRemove) {
-        if(foodToRemove.isEmpty()) {
+        if (foodToRemove.isEmpty()) {
             return;
         }
 
@@ -70,6 +70,7 @@ public class WorldChunk {
         buffer.put(this.y);
         buffer.putShort((short) foodList.size());
 
+        assert (foodList.isEmpty() || buffer.hasRemaining());
         foodList.forEach(food -> food.addToByteBuffer(buffer));
         assert (!buffer.hasRemaining());
 

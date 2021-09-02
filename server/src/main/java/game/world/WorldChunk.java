@@ -25,8 +25,6 @@ public class WorldChunk {
         this.y = (byte) y;
 
         box = new BoundingBox(left, left + width, bottom, bottom + height);
-
-        System.out.println(this + " : " + box);
     }
 
     private void onFoodChange() {

@@ -54,7 +54,7 @@ public class Food {
     }
 
     public enum Size {
-        SMALL(0.2, 0), MEDIUM(0.42, 1), LARGE(1.0, 2);
+        SMALL(0.64, 0), MEDIUM(1.0, 1), LARGE(1.5, 2);
 
         public final double value;
         public final byte byteValue;

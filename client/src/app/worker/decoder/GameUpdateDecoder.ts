@@ -34,7 +34,7 @@ export function decode(
         byteOffset = result.nextByteOffset;
     }
 
-    const foodChunks:FoodChunk[] = new Array(numFoodChunks);
+    const foodChunks: FoodChunk[] = new Array(numFoodChunks);
     for (let i = 0; i < numFoodChunks; i++) {
         const result = FCD.decode(buffer, byteOffset, config);
         foodChunks[i] = result.data;

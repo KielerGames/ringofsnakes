@@ -38,7 +38,7 @@ export function render(foodChunks: Iterable<FoodChunk>, transform: Matrix) {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
-    for(const chunk of foodChunks) {
+    for (const chunk of foodChunks) {
         shader.setUniform("uTransform", transform.data);
         shader.setUniform("uColor", [1.0, 0.1, 0.0]); // TODO
         const data = createGPUData(chunk.food);

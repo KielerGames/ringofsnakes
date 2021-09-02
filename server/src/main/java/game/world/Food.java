@@ -47,6 +47,7 @@ public class Food {
         buffer.put(bytePosition[1]);
 
         int colorAndSizeData = (size.byteValue << 6) | color;
+        assert colorAndSizeData < 256;
         buffer.put((byte) colorAndSizeData);
     }
 

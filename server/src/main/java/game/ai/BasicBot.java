@@ -12,6 +12,7 @@ public class BasicBot extends Bot {
     private float alpha = (float) -Math.PI;
     private int counter = 1;
     private boolean turnClockwise = true;
+    private int changeDirectionAtCounter = 120;
 
     public BasicBot(Game game, Vector spawnPosition) {
         super(game, spawnPosition);
@@ -28,14 +29,16 @@ public class BasicBot extends Bot {
             alpha = alpha < -Math.PI ? (float) Math.PI : alpha - turningRate;
         }
 
-        if (counter > 240) {
+        if (counter > changeDirectionAtCounter) {
 
             if (random.nextBoolean()) {
                 turnClockwise = true;
             } else {
                 turnClockwise = false;
             }
+            changeDirectionAtCounter = 60 + random.nextInt(120);
             counter = 0;
+
         }
         snake.setTargetDirection(alpha);
         counter++;

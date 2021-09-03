@@ -2,7 +2,7 @@ package game;
 
 import com.google.gson.Gson;
 import debugview.DebugView;
-import game.ai.BasicBot;
+import game.ai.StupidBot;
 import game.ai.Bot;
 import game.snake.Snake;
 import game.snake.SnakeFactory;
@@ -71,7 +71,7 @@ public class Game {
             var position = snakes.get(0).getHeadPosition();
             position.x += offset.x;
             position.y += offset.y;
-            BasicBot bot = new BasicBot(this, position);
+            StupidBot bot = new StupidBot(this, position);
             snakes.add(bot.getSnake());
             bots.add(bot);
             System.out.println("Bot added!");

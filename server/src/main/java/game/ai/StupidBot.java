@@ -6,7 +6,7 @@ import math.Vector;
 
 import java.util.Random;
 
-public class BasicBot extends Bot {
+public class StupidBot extends Bot {
 
     private Random random = new Random();
     private float alpha = (float) -Math.PI;
@@ -14,7 +14,7 @@ public class BasicBot extends Bot {
     private boolean turnClockwise = true;
     private int changeDirectionAtCounter = 120;
 
-    public BasicBot(Game game, Vector spawnPosition) {
+    public StupidBot(Game game, Vector spawnPosition) {
         super(game, spawnPosition);
     }
 

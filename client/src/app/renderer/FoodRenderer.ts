@@ -21,6 +21,8 @@ const boxCoords = [
     [1.0, -1.0] // bottom-right
 ];
 
+const FOOD_VERTEX_SIZE = 2 + 2 + 3; // x,y, u,v, r,g,b
+
 export function init(glCtx: WebGLRenderingContext): void {
     gl = glCtx;
     buffer = gl.createBuffer()!;
@@ -30,6 +32,8 @@ export function init(glCtx: WebGLRenderingContext): void {
         __VERTEXSHADER_FOOD__,
         __FRAGMENTSHADER_FOOD__
     );
+
+    console.info("buffer layout: ", shader.bufferLayout);
 }
 
 export function render(foodChunks: Iterable<FoodChunk>, transform: Matrix) {
@@ -40,18 +44,19 @@ export function render(foodChunks: Iterable<FoodChunk>, transform: Matrix) {
 
     for (const chunk of foodChunks) {
         shader.setUniform("uTransform", transform.data);
-        shader.setUniform("uColor", [1.0, 0.1, 0.0]); // TODO
         const data = createGPUData(chunk.food);
         gl.bufferData(gl.ARRAY_BUFFER, data, gl.STREAM_DRAW);
-        shader.run(gl.TRIANGLES, 0, chunk.food.length * boxCoords.length);
+        shader.run(chunk.food.length * boxCoords.length, {
+            stride: FOOD_VERTEX_SIZE * Float32Array.BYTES_PER_ELEMENT
+        });
     }
 }
 
 let foodGPUData: Float32Array = new Float32Array(32 * boxCoords.length);
 
 function createGPUData(foods: Food[]): Float32Array {
-    const m = 2 * boxCoords.length;
-    const n = foods.length * 2 * m;
+    const floatsPerFood = FOOD_VERTEX_SIZE * boxCoords.length;
+    const n = foods.length * floatsPerFood;
 
     if (foodGPUData.length < n) {
         foodGPUData = new Float32Array(n);
@@ -59,18 +64,28 @@ function createGPUData(foods: Food[]): Float32Array {
 
     for (let fi = 0; fi < foods.length; fi++) {
         const f = foods[fi];
-        const offset = fi * 2 * m;
+        const offset = fi * floatsPerFood;
+        const { r, g, b } = getColor(f.color);
 
         for (let bi = 0; bi < boxCoords.length; bi++) {
             const [u, v] = boxCoords[bi];
 
-            // [x,y,u,v]
-            foodGPUData[offset + 4 * bi + 0] = f.size * u + f.x;
-            foodGPUData[offset + 4 * bi + 1] = f.size * v + f.y;
-            foodGPUData[offset + 4 * bi + 2] = u;
-            foodGPUData[offset + 4 * bi + 3] = v;
+            // [x,y, u,v, r,g,b]
+            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 0] = f.size * u + f.x;
+            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 1] = f.size * v + f.y;
+
+            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 2] = u;
+            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 3] = v;
+
+            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 4] = r;
+            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 5] = g;
+            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 6] = b;
         }
     }
 
     return foodGPUData;
+}
+
+function getColor(i: number) {
+    return { r: 0, g: 0.25, b: 1.0 };
 }

@@ -16,10 +16,10 @@ export default class WebGLShaderProgram {
         this.gl = gl;
 
         // compile & link shader program
-        let vs = compileShader(gl, gl.VERTEX_SHADER, vertex),
+        const vs = compileShader(gl, gl.VERTEX_SHADER, vertex),
             fs = compileShader(gl, gl.FRAGMENT_SHADER, fragment);
 
-        let program: WebGLProgram = gl.createProgram()!;
+        const program: WebGLProgram = gl.createProgram()!;
         gl.attachShader(program, vs);
         gl.attachShader(program, fs);
         gl.linkProgram(program);
@@ -47,17 +47,19 @@ export default class WebGLShaderProgram {
 
         // get shader attributes & uniforms
         // attributes & uniforms are "active" after linking
-        let numberOfAttributes = gl.getProgramParameter(
+        const numberOfAttributes = gl.getProgramParameter(
             program,
             gl.ACTIVE_ATTRIBUTES
         );
-        let numberOfUniforms = gl.getProgramParameter(
+
+        const numberOfUniforms = gl.getProgramParameter(
             program,
             gl.ACTIVE_UNIFORMS
         );
 
         for (let i = 0; i < numberOfAttributes; i++) {
             const info = gl.getActiveAttrib(program, i)!;
+            console.info(info);
             const location = gl.getAttribLocation(program, info.name);
             this.attribs.set(info.name, new ShaderVar(info, location));
             this.bufferLayout.push(info.name);
@@ -87,12 +89,23 @@ export default class WebGLShaderProgram {
     }
 
     public run(
-        mode: number = this.gl.TRIANGLES,
-        start: number = 0,
-        count: number,
-        stride: number = this.autoStride
+        numVertices: number,
+        options?: {
+            mode?: number;
+            start?: number;
+            stride?: number;
+        }
     ): void {
         const gl = this.gl;
+
+        const { mode, start, stride } = Object.assign(
+            {
+                mode: this.gl.TRIANGLES,
+                start: 0,
+                stride: this.autoStride
+            },
+            options
+        );
 
         let offset = 0;
         for (const name of this.bufferLayout) {
@@ -147,7 +160,7 @@ export default class WebGLShaderProgram {
             }
         });
 
-        gl.drawArrays(mode, start, count);
+        gl.drawArrays(mode, start, numVertices);
     }
 
     public get context() {
@@ -155,10 +168,10 @@ export default class WebGLShaderProgram {
     }
 
     public setAttribute(name: string, value: FloatData): void {
-        let attrib = this.attribs.get(name);
+        const attrib = this.attribs.get(name);
 
         if (attrib) {
-            let stateChanged = (attrib.value === null) !== (value === null);
+            const stateChanged = (attrib.value === null) !== (value === null);
             attrib.value = value;
             if (stateChanged) {
                 this.computeStride();
@@ -169,7 +182,7 @@ export default class WebGLShaderProgram {
     }
 
     public setUniform(name: string, value: FloatData): void {
-        let uniform = this.uniforms.get(name);
+        const uniform = this.uniforms.get(name);
 
         if (uniform) {
             uniform.value = value;
@@ -198,7 +211,7 @@ function compileShader(
     type: number,
     source: string
 ): WebGLShader {
-    let shader: WebGLShader = gl.createShader(type)!;
+    const shader: WebGLShader = gl.createShader(type)!;
 
     // set the source code
     gl.shaderSource(shader, source);

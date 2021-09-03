@@ -48,8 +48,6 @@ export function render(
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
 
-    let nc = 0;
-    let nv = 0;
     for (const chunk of chunks) {
         const snake = chunk.snake;
         setSkin(snake.skin);
@@ -58,14 +56,8 @@ export function render(
         shader.setUniform("uSnakeWidth", snake.width);
 
         gl.bufferData(gl.ARRAY_BUFFER, chunk.buffer, gl.STREAM_DRAW);
-        shader.run(gl.TRIANGLE_STRIP, 0, chunk.vertices);
-        nc++;
-        nv += chunk.vertices;
+        shader.run(chunk.vertices, { mode: gl.TRIANGLE_STRIP });
     }
-
-    // if (__DEBUG__) {
-    //     console.info(`Rendered ${nc} chunks (${nv} vertices).`);
-    // }
 }
 
 function setSkin(skin: number): void {

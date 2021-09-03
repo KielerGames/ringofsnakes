@@ -13,8 +13,9 @@ public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
     public static final float START_LENGTH = 8f;
     public static final float MAX_WIDTH_GAIN = 4f;
-    public static final float GETTING_FATTER_UNTIL_LENGTH = 142f;
-    public static final float STARTING_WIDTH = 0.5f;
+    public static final float LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
+    public static final float MIN_WIDTH = 0.5f;
+    private static final float GROWTH_SPEED = 0.1f;
 
     public final GameConfig config = new GameConfig();
     public final short id;
@@ -162,9 +163,9 @@ public class Snake {
     }
 
     public float getWidth() {
-
-        var x = Math.min(Math.max(length - START_LENGTH, 0)/GETTING_FATTER_UNTIL_LENGTH, 1.0);
-        return (float) (STARTING_WIDTH + (1.0/(1+Math.exp(-x)) - 0.5)*MAX_WIDTH_GAIN);
+        //sigmoid(3) is roughly  0.95
+        var x = 3*(length - config.minLength)/LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
+        return (float) (MIN_WIDTH + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
 
     }
 

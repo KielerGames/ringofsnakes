@@ -2,20 +2,20 @@ package game;
 
 import com.google.gson.Gson;
 import debugview.DebugView;
+import game.ai.BasicBot;
+import game.ai.Bot;
 import game.snake.Snake;
 import game.snake.SnakeFactory;
 import game.world.Food;
 import game.world.World;
 import game.world.WorldChunk;
+import math.Vector;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
 
 import javax.websocket.Session;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +29,7 @@ public class Game {
     private final ScheduledExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
     public List<Snake> snakes = new LinkedList<>();
+    private List<Bot> bots = new LinkedList<>();
 
     public Game() {
         config = new GameConfig();
@@ -53,8 +54,28 @@ public class Game {
         clients.put(session.getId(), player);
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
+        addBotNextToPlayerOne(new Vector(3,4));
+        addBotNextToPlayerOne(new Vector(-4,4));
+        addBotNextToPlayerOne(new Vector(12,4));
+        addBotNextToPlayerOne(new Vector(6,1));
+
+
+
 
         return player;
+    }
+
+    public void addBotNextToPlayerOne(Vector offset){
+        //add a basic bot next to the player at the start of the game
+        if(!snakes.isEmpty()){
+            var position = snakes.get(0).getHeadPosition();
+            position.x += offset.x;
+            position.y += offset.y;
+            BasicBot bot = new BasicBot(this, position);
+            snakes.add(bot.getSnake());
+            bots.add(bot);
+            System.out.println("Bot added!");
+        }
     }
 
     public void removeClient(String sessionId) {
@@ -94,6 +115,7 @@ public class Game {
     private void tick() {
         synchronized (this) {
             snakes.forEach(Snake::tick);
+            bots.forEach(Bot::act);
             //TODO: check collisions
         }
 

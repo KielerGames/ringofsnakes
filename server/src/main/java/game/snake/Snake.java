@@ -32,8 +32,7 @@ public class Snake {
     private boolean fast = false;
     private double lengthBuffer = 0;
 
-
-    Snake(short id, World world) {
+    public Snake(short id, World world) {
         this.id = id;
         this.world = world;
     }

@@ -5,13 +5,14 @@ export default class WebGLShaderProgram {
     private program: WebGLProgram;
     private uniforms: Map<string, ShaderVar<WebGLUniformLocation>> = new Map();
     private attribs: Map<string, ShaderVar<number>> = new Map();
-    public bufferLayout: string[] = [];
+    private attribOrder: string[];
     private autoStride: number = 0;
 
     public constructor(
         gl: WebGLRenderingContext,
         vertex: string,
-        fragment: string
+        fragment: string,
+        vertexBufferLayout?: string[]
     ) {
         this.gl = gl;
 
@@ -57,11 +58,35 @@ export default class WebGLShaderProgram {
             gl.ACTIVE_UNIFORMS
         );
 
+        const attribOrder = [];
+
         for (let i = 0; i < numberOfAttributes; i++) {
             const info = gl.getActiveAttrib(program, i)!;
             const location = gl.getAttribLocation(program, info.name);
             this.attribs.set(info.name, new ShaderVar(info, location));
-            this.bufferLayout.push(info.name);
+            attribOrder.push(info.name);
+        }
+
+        if (vertexBufferLayout !== undefined) {
+            if(__DEBUG__) {
+                // validate custom vertex buffer layout
+
+                if (vertexBufferLayout.length === 0) {
+                    throw new Error("Custom buffer layout may not be empty.");
+                }
+    
+                for (const attribName of vertexBufferLayout) {
+                    if (!this.attribs.has(attribName)) {
+                        throw new Error(
+                            `Attribute "${attribName}" not found. Unused attributes get removed by the compiler.`
+                        );
+                    }
+                }
+            }
+
+            this.attribOrder = [...vertexBufferLayout];
+        } else {
+            this.attribOrder = attribOrder;
         }
 
         this.computeStride();
@@ -74,12 +99,9 @@ export default class WebGLShaderProgram {
     }
 
     private computeStride() {
-        let sum = 0;
-        this.attribs.forEach((attrib) => {
-            if (attrib.value === null) {
-                sum += attrib.size;
-            }
-        });
+        const sum = Array.from(this.attribs.values())
+            .filter((attrib) => attrib.value === null)
+            .reduce((s, attrib) => s + attrib.size, 0);
         this.autoStride = sum * Float32Array.BYTES_PER_ELEMENT;
     }
 
@@ -107,7 +129,7 @@ export default class WebGLShaderProgram {
         );
 
         let offset = 0;
-        for (const name of this.bufferLayout) {
+        for (const name of this.attribOrder) {
             const attrib = this.attribs.get(name)!; // TODO?
             if (attrib.value === null) {
                 gl.enableVertexAttribArray(attrib.location);

@@ -30,10 +30,9 @@ export function init(glCtx: WebGLRenderingContext): void {
     shader = new WebGLShaderProgram(
         gl,
         __VERTEXSHADER_FOOD__,
-        __FRAGMENTSHADER_FOOD__
+        __FRAGMENTSHADER_FOOD__,
+        ["aPosition", "aLocalPos", "aColor"]
     );
-
-    shader.bufferLayout = ["aPosition", "aLocalPos", "aColor"];
 }
 
 export function render(foodChunks: Iterable<FoodChunk>, transform: Matrix) {

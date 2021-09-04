@@ -23,14 +23,14 @@ export function init(glCtx: WebGLRenderingContext): void {
     basicMaterialShader = new WebGLShaderProgram(
         gl,
         __VERTEXSHADER_SNAKE__,
-        __FRAGMENTSHADER_SNAKE__
+        __FRAGMENTSHADER_SNAKE__,
+        [
+            "vPosition",
+            "vNormal",
+            "vNormalOffset",
+            "vRelativePathOffset"
+        ]
     );
-    basicMaterialShader.bufferLayout = [
-        "vPosition",
-        "vNormal",
-        "vNormalOffset",
-        "vRelativePathOffset"
-    ];
 
     buffer = gl.createBuffer()!;
 

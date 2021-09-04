@@ -33,7 +33,7 @@ export function init(glCtx: WebGLRenderingContext): void {
         __FRAGMENTSHADER_FOOD__
     );
 
-    console.info("buffer layout: ", shader.bufferLayout);
+    shader.bufferLayout = ["aPosition", "aLocalPos", "aColor"];
 }
 
 export function render(foodChunks: Iterable<FoodChunk>, transform: Matrix) {

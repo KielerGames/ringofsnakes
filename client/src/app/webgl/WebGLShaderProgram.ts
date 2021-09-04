@@ -59,7 +59,6 @@ export default class WebGLShaderProgram {
 
         for (let i = 0; i < numberOfAttributes; i++) {
             const info = gl.getActiveAttrib(program, i)!;
-            console.info(info);
             const location = gl.getAttribLocation(program, info.name);
             this.attribs.set(info.name, new ShaderVar(info, location));
             this.bufferLayout.push(info.name);

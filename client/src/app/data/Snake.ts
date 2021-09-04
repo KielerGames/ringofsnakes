@@ -42,7 +42,17 @@ export default class Snake {
     }
 
     public get width(): number {
-        return 0.5;
+        const MIN_WIDTH = 0.5;
+        const MAX_WIDTH_GAIN = 4.0;
+        const LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700.0;
+
+        //TODO: get this value from the game config
+        const GAME_CONFIG_MIN_LENGTH = 3.0;
+
+        let x =
+            (3 * (this.length - GAME_CONFIG_MIN_LENGTH)) /
+            LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
+        return MIN_WIDTH + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN;
     }
 
     public getPredictedPosition(timeSinceLastTick: number): Vector {

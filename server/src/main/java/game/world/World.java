@@ -8,7 +8,7 @@ import math.Vector;
 import java.util.Comparator;
 
 public class World {
-    private static final int FOOD_THRESHOLD = 5;
+    private static final int FOOD_THRESHOLD = 50;
     public final WorldChunkCollection chunks;
 
     public World(double chunkSize, int repetitions) {
@@ -37,7 +37,7 @@ public class World {
     }
 
     public void spawnFood() {
-        int numberOfChunksToSpawnSimultaneously = 16;
+        int numberOfChunksToSpawnSimultaneously = 64;
 
         chunks.stream()
                 .filter(c -> c.getFoodCount() < FOOD_THRESHOLD)

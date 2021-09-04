@@ -86,6 +86,12 @@ function createGPUData(foods: Food[]): Float32Array {
     return foodGPUData;
 }
 
+const colors = new Map<number, { r: number; g: number; b: number }>([
+    [0, { r: 1.0, g: 0.1, b: 0.05 }],
+    [1, { r: 0, g: 0.25, b: 1.0 }],
+    [2, { r: 0.1, g: 1.0, b: 0.15 }]
+]);
+
 function getColor(i: number) {
-    return { r: 0, g: 0.25, b: 1.0 };
+    return colors.get(i % 4) ?? { r: 1.0, g: 0.0, b: 1.0 };
 }

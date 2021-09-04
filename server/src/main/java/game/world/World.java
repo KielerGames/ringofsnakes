@@ -37,7 +37,7 @@ public class World {
     }
 
     public void spawnFood() {
-        int numberOfChunksToSpawnSimultaneously = 64;
+        int numberOfChunksToSpawnSimultaneously = 12;
 
         chunks.stream()
                 .filter(c -> c.getFoodCount() < FOOD_THRESHOLD)

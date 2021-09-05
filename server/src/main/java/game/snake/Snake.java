@@ -83,7 +83,6 @@ public class Snake {
         chunkBuilder.append(encDirDelta, fast);
         // after an update a chunk might be full
         if (chunkBuilder.isFull()) {
-            System.out.println("chunk " + chunkBuilder.getUniqueId() + " is full (length: " + chunkBuilder.getLength() + ")");
             beginChunk();
         }
         float offset = chunkBuilder.getLength();

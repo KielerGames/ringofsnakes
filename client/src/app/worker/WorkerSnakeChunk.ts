@@ -10,7 +10,7 @@ import WorkerSnake from "./WorkerSnake";
 
 const PATH_VERTEX_SIZE = 4;
 
-export default class WorkerChunk {
+export default class WorkerSnakeChunk {
     private snake: WorkerSnake;
     private id: number;
     private _full: boolean;

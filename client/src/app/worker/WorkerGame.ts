@@ -3,7 +3,7 @@ import { GameConfig, ServerToClientJSONMessage } from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
 import { SnakeChunkData, SnakeData, GameDataUpdate } from "./GameDataUpdate";
-import WorkerChunk from "./WorkerChunk";
+import WorkerSnakeChunk from "./WorkerSnakeChunk";
 import WorkerSnake from "./WorkerSnake";
 
 export default class WorkerGame {
@@ -11,7 +11,7 @@ export default class WorkerGame {
 
     targetPlayerId: number;
     config: GameConfig;
-    snakeChunks: Map<SnakeChunkId, WorkerChunk> = new Map();
+    snakeChunks: Map<SnakeChunkId, WorkerSnakeChunk> = new Map();
     foodChunks: Map<FoodChunkId, FoodChunk> = new Map();
     snakes: Map<SnakeId, WorkerSnake> = new Map();
     lastUpdateTime: number;
@@ -63,7 +63,7 @@ export default class WorkerGame {
                 } else {
                     const snake = this.snakes.get(chunkData.snakeId);
                     assert(snake !== undefined, "Data for unknown snake.");
-                    chunk = new WorkerChunk(snake!, chunkData);
+                    chunk = new WorkerSnakeChunk(snake!, chunkData);
                     this.snakeChunks.set(chunkData.chunkId, chunk);
                 }
             });

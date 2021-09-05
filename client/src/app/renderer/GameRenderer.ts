@@ -4,6 +4,7 @@ import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
 import * as FoodRenderer from "./FoodRenderer";
+import * as BufferManager from "../webgl/BufferManager";
 
 let gl: WebGLRenderingContext;
 
@@ -31,6 +32,7 @@ export function init(parentNode: HTMLElement = document.body): void {
     resize(true);
 
     // init other render modules
+    BufferManager.init(gl, 16);
     SnakeChunkRenderer.init(gl);
     SnakeHeadRenderer.init(gl);
     FoodRenderer.init(gl);

@@ -1,5 +1,3 @@
-import Food from "../../data/Food";
-import FoodChunk from "../../data/FoodChunk";
 import { GameConfig } from "../../protocol";
 import { DecodeResult } from "./DecodeResult";
 
@@ -13,7 +11,7 @@ export function decode(
     buffer: ArrayBuffer,
     offset: number,
     config: GameConfig
-): DecodeResult<FoodChunk> {
+): DecodeResult<FoodChunkDTO> {
     const view = new DataView(buffer, offset);
     const chunkSize = config.chunkInfo.chunkSize;
 
@@ -25,7 +23,7 @@ export function decode(
     const xOffset = (column - 0.5 * config.chunkInfo.columns) * chunkSize;
     const yOffset = (row - 0.5 * config.chunkInfo.rows) * chunkSize;
 
-    const foodItems: Food[] = new Array(n);
+    const foodItems: FoodItemDTO[] = new Array(n);
 
     for (let i = 0; i < n; i++) {
         const foodOffset = FOOD_CHUNK_HEADER_SIZE + i * FOOD_SIZE;
@@ -39,11 +37,25 @@ export function decode(
         const x = xOffset + (bx / 256) * chunkSize;
         const y = yOffset + (by / 256) * chunkSize;
 
-        foodItems[i] = new Food(x, y, size, color);
+        foodItems[i] = { x, y, size, color };
     }
 
     return {
-        data: new FoodChunk(chunkId, foodItems),
+        data: { id: chunkId, items: foodItems },
         nextByteOffset: offset + FOOD_CHUNK_HEADER_SIZE + n * FOOD_SIZE
     };
 }
+
+export type FoodItemDTO = {
+    x: number;
+    y: number;
+    size: number;
+    color: number;
+};
+
+export type FoodChunkId = number;
+
+export type FoodChunkDTO = {
+    id: FoodChunkId;
+    items: FoodItemDTO[];
+};

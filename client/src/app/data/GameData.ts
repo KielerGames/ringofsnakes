@@ -41,8 +41,8 @@ export default class GameData {
         });
 
         // update food chunks
-        data.foodChunks.forEach((chunk) =>
-            this.foodChunks.set(chunk.id, chunk)
+        data.foodChunks.forEach((chunkDTO) =>
+            this.foodChunks.set(chunkDTO.id, new FoodChunk(chunkDTO))
         );
 
         this.garbageCollectSnakeChunks();

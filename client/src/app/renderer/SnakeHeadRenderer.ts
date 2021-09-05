@@ -11,14 +11,14 @@ let buffer: WebGLBuffer;
 let shader: WebGLShaderProgram;
 
 const VERTEX_SIZE = 2;
-const data = mirror([
+const vertexData = mirror([
     [0.5, -1.0],
     [1.0, 0.0],
     [0.4, 2.0]
 ]);
 const rotOffset = -0.5 * Math.PI;
 
-let snakeColors: Color[] = [
+const snakeColors: Color[] = [
     [0.5, 0.75, 1.0],
     [1.0, 0.75, 0.5],
     [0.75, 1.0, 0.5]
@@ -37,7 +37,7 @@ export function init(glCtx: WebGLRenderingContext): void {
     // send data to GPU (once)
     shader.use();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
 }
 
 export function render(
@@ -59,7 +59,7 @@ export function render(
             snake.direction.predict(timeSinceLastTick) + rotOffset
         );
         setSkin(snake.skin);
-        shader.run(data.length / VERTEX_SIZE, { mode: gl.TRIANGLE_STRIP });
+        shader.run(vertexData.length / VERTEX_SIZE, { mode: gl.TRIANGLE_STRIP });
     }
 }
 
@@ -80,6 +80,6 @@ function mirror(points: [number, number][]): Float32Array {
 }
 
 function setSkin(skin: number): void {
-    let colorIdx = Math.max(0, skin % snakeColors.length);
+    const colorIdx = Math.max(0, skin % snakeColors.length);
     shader.setUniform("uColor", snakeColors[colorIdx]);
 }

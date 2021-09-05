@@ -11,7 +11,7 @@ let gl: WebGLRenderingContext;
 let basicMaterialShader: WebGLShaderProgram;
 let buffer: WebGLBuffer;
 
-let snakeColors: Color[] = [
+const snakeColors: Color[] = [
     [0.5, 0.75, 1.0],
     [1.0, 0.75, 0.5],
     [0.75, 1.0, 0.5]
@@ -61,6 +61,6 @@ export function render(
 }
 
 function setSkin(skin: number): void {
-    let colorIdx = Math.max(0, skin % snakeColors.length);
+    const colorIdx = Math.max(0, skin % snakeColors.length);
     basicMaterialShader.setUniform("uColor", snakeColors[colorIdx]);
 }

@@ -9,6 +9,7 @@ declare const __FRAGMENTSHADER_FOOD__: string;
 let gl: WebGLRenderingContext;
 let buffer: WebGLBuffer;
 let shader: WebGLShaderProgram;
+let texture: WebGLTexture;
 
 const boxCoords = [
     // triangle 1
@@ -21,7 +22,14 @@ const boxCoords = [
     [1.0, -1.0] // bottom-right
 ];
 
-const FOOD_VERTEX_SIZE = 2 + 2 + 3; // x,y, u,v, r,g,b
+const colors = new Uint8Array([
+    255, 25, 12,
+    0, 64, 255,
+    25, 255, 42,
+    255, 0, 255
+]);
+
+const FOOD_VERTEX_SIZE = 2 + 2 + 1; // x,y, u,v, c
 
 export function init(glCtx: WebGLRenderingContext): void {
     gl = glCtx;
@@ -31,15 +39,25 @@ export function init(glCtx: WebGLRenderingContext): void {
         gl,
         __VERTEXSHADER_FOOD__,
         __FRAGMENTSHADER_FOOD__,
-        ["aPosition", "aLocalPos", "aColor"]
+        ["aPosition", "aLocalPos", "aColorIndex"]
     );
+
+    texture = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, colors.length/3, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, colors);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 }
 
 export function render(foodChunks: Iterable<FoodChunk>, transform: Matrix) {
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    shader.setUniform("uColorSampler", 0);
 
     for (const chunk of foodChunks) {
         shader.setUniform("uTransform", transform.data);
@@ -64,33 +82,21 @@ function createGPUData(foods: Food[]): Float32Array {
     for (let fi = 0; fi < foods.length; fi++) {
         const f = foods[fi];
         const offset = fi * floatsPerFood;
-        const { r, g, b } = getColor(f.color);
+        const color = (f.color % 4) / 3;
 
         for (let bi = 0; bi < boxCoords.length; bi++) {
             const [u, v] = boxCoords[bi];
 
-            // [x,y, u,v, r,g,b]
+            // [x,y, u,v, c]
             foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 0] = f.size * u + f.x;
             foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 1] = f.size * v + f.y;
 
             foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 2] = u;
             foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 3] = v;
 
-            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 4] = r;
-            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 5] = g;
-            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 6] = b;
+            foodGPUData[offset + FOOD_VERTEX_SIZE * bi + 4] = color;
         }
     }
 
     return foodGPUData;
-}
-
-const colors = new Map<number, { r: number; g: number; b: number }>([
-    [0, { r: 1.0, g: 0.1, b: 0.05 }],
-    [1, { r: 0, g: 0.25, b: 1.0 }],
-    [2, { r: 0.1, g: 1.0, b: 0.15 }]
-]);
-
-function getColor(i: number) {
-    return colors.get(i % 4) ?? { r: 1.0, g: 0.0, b: 1.0 };
 }

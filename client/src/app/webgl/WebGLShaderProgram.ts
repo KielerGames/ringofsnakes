@@ -53,11 +53,6 @@ export default class WebGLShaderProgram {
             gl.ACTIVE_ATTRIBUTES
         );
 
-        const numberOfUniforms = gl.getProgramParameter(
-            program,
-            gl.ACTIVE_UNIFORMS
-        );
-
         const attribOrder = [];
 
         for (let i = 0; i < numberOfAttributes; i++) {
@@ -68,13 +63,13 @@ export default class WebGLShaderProgram {
         }
 
         if (vertexBufferLayout !== undefined) {
-            if(__DEBUG__) {
+            if (__DEBUG__) {
                 // validate custom vertex buffer layout
 
                 if (vertexBufferLayout.length === 0) {
                     throw new Error("Custom buffer layout may not be empty.");
                 }
-    
+
                 for (const attribName of vertexBufferLayout) {
                     if (!this.attribs.has(attribName)) {
                         throw new Error(
@@ -90,6 +85,13 @@ export default class WebGLShaderProgram {
         }
 
         this.computeStride();
+
+        // uniforms
+
+        const numberOfUniforms = gl.getProgramParameter(
+            program,
+            gl.ACTIVE_UNIFORMS
+        );
 
         for (let i = 0; i < numberOfUniforms; i++) {
             const info = gl.getActiveUniform(program, i)!;
@@ -155,6 +157,8 @@ export default class WebGLShaderProgram {
             if (uniform.value !== null) {
                 if (uniform.type === gl.FLOAT) {
                     gl.uniform1f(uniform.location, uniform.value as number);
+                } else if (uniform.type === gl.SAMPLER_2D) {
+                    gl.uniform1i(uniform.location, uniform.value as number);
                 } else if (uniform.type === gl.FLOAT_VEC2) {
                     gl.uniform2fv(uniform.location, uniform.value as number[]);
                 } else if (uniform.type === gl.FLOAT_VEC3) {

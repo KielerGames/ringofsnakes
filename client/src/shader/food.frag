@@ -1,7 +1,7 @@
 precision mediump float;
 
 varying vec2 varPos;
-varying vec3 vColor;
+varying lowp vec3 vColor;
 
 const vec3 centerColor = vec3(1.0, 1.0, 1.0);
 

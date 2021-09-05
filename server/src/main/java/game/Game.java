@@ -79,14 +79,6 @@ public class Game {
             }
         }, 100, (long) (25 * 1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 
-        executor.scheduleAtFixedRate(() -> {
-            if (!snakes.isEmpty()) {
-                var snake = snakes.get(0);
-                var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
-                System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
-            }
-        }, 0, 5, TimeUnit.SECONDS);
-
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
 

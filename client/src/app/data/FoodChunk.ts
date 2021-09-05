@@ -25,13 +25,11 @@ export default class FoodChunk {
         this.id = dto.id;
         this.numFoodItems = dto.items.length;
         this.gpuBuffer = BufferManager.create();
+        this.gpuData = createGPUData(dto.items, this.gpuData);
+    }
 
-        if (this.gpuData === undefined) {
-            this.gpuData = new Float32Array(
-                FoodChunk.FOOD_VERTEX_SIZE * boxCoords.length * dto.items.length
-            );
-        }
-
+    public update(dto: FoodChunkDTO): void {
+        this.numFoodItems = dto.items.length;
         this.gpuData = createGPUData(dto.items, this.gpuData);
     }
 
@@ -55,13 +53,13 @@ export default class FoodChunk {
 
 function createGPUData(
     items: FoodItemDTO[],
-    gpuData: Float32Array
+    gpuData: Float32Array | undefined
 ): Float32Array {
     const floatsPerFood = FoodChunk.FOOD_VERTEX_SIZE * boxCoords.length;
     const n = items.length * floatsPerFood;
     const fvs = FoodChunk.FOOD_VERTEX_SIZE;
 
-    if (gpuData.length < n) {
+    if (gpuData === undefined || gpuData.length < n) {
         gpuData = new Float32Array(n);
     }
 

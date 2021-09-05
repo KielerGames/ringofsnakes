@@ -24,7 +24,7 @@ const boxCoords = [
 
 const colors = new Uint8Array([
     255, 25, 12,
-    0, 64, 255,
+    0, 128, 255,
     25, 255, 42,
     255, 0, 255
 ]);

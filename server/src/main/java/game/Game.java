@@ -54,20 +54,18 @@ public class Game {
         clients.put(session.getId(), player);
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
-        addBotNextToPlayerOne(new Vector(3,4));
-        addBotNextToPlayerOne(new Vector(-4,4));
-        addBotNextToPlayerOne(new Vector(12,4));
-        addBotNextToPlayerOne(new Vector(6,1));
-
-
+        addBotNextToPlayerOne(new Vector(3, 4));
+        //addBotNextToPlayerOne(new Vector(-4,4));
+        //addBotNextToPlayerOne(new Vector(12,4));
+        //addBotNextToPlayerOne(new Vector(6,1));
 
 
         return player;
     }
 
-    public void addBotNextToPlayerOne(Vector offset){
+    public void addBotNextToPlayerOne(Vector offset) {
         //add a basic bot next to the player at the start of the game
-        if(!snakes.isEmpty()){
+        if (!snakes.isEmpty()) {
             var position = snakes.get(0).getHeadPosition();
             position.x += offset.x;
             position.y += offset.y;
@@ -105,6 +103,7 @@ public class Game {
                 var snake = snakes.get(0);
                 var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
                 System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
+                System.out.println("pointDataLength" + snake.pointData.size());
             }
         }, 0, 5, TimeUnit.SECONDS);
 
@@ -116,10 +115,17 @@ public class Game {
         synchronized (this) {
             snakes.forEach(Snake::tick);
             bots.forEach(Bot::act);
-            //TODO: check collisions
+            checkForCollisions();
         }
 
         eatFood();
+    }
+
+    private void checkForCollisions() {
+        snakes.forEach(s1 -> snakes.stream().filter(s2 -> s1.id != s2.id
+                        && Vector.distance2(s1.getHeadPosition(), s2.getHeadPosition())
+                        < s2.getLength() * s2.getLength())
+                .anyMatch(s2 -> s1.collidesWith(s2)));
     }
 
     private void updateClients() {
@@ -139,7 +145,9 @@ public class Game {
             var worldChunk = world.chunks.findChunk(headPosition);
             var foodList = worldChunk.getFoodList();
             var collectedFood = foodList.stream()
-                    .filter(food -> food.isWithinRange(headPosition, snakeWidth))
+                    .filter(food -> Vector.distance2(headPosition, food.position)
+                            < (snakeWidth/2.0 + food.size.value)
+                            * (snakeWidth/2.0 + food.size.value))
                     .collect(Collectors.toList());
             snake.grow(collectedFood.size() * Food.nutritionalValue);
 

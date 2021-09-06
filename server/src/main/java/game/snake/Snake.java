@@ -3,11 +3,12 @@ package game.snake;
 import game.GameConfig;
 import game.world.World;
 import math.Vector;
+import util.SnakePointData;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
@@ -31,6 +32,10 @@ public class Snake {
     private float targetDirection;
     private boolean fast = false;
     private double lengthBuffer = 0;
+
+    public final LinkedList<SnakePointData> pointData = new LinkedList<>();
+    private float pointDataSnakeLength = 0f;
+
 
     public Snake(short id, World world) {
         this.id = id;
@@ -72,10 +77,14 @@ public class Snake {
             shrink(config.burnRate);
             handleLengthChange(config.fastSnakeSpeed);
             headPosition.addDirection(headDirection, config.fastSnakeSpeed);
+
         } else {
             handleLengthChange(config.snakeSpeed);
             headPosition.addDirection(headDirection, config.snakeSpeed);
+
         }
+        updatePointData();
+
 
         // update chunks
         chunkBuilder.append(encDirDelta, fast);
@@ -96,6 +105,15 @@ public class Snake {
                 removedChunk.destroy();
             }
         }
+    }
+
+    private void updatePointData() {
+        this.pointData.addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
+        while(this.pointDataSnakeLength > length){
+            var p = pointData.removeLast();
+            pointDataSnakeLength -= p.fast ? config.fastSnakeSpeed : config.snakeSpeed;
+        }
+        pointDataSnakeLength += fast ? config.fastSnakeSpeed : config.snakeSpeed;
     }
 
     public void beginChunk() {
@@ -175,8 +193,22 @@ public class Snake {
         this.skin = skin;
     }
 
-    public void setHeadPosition(Vector headPosition) {
-        this.headPosition = headPosition;
+    public boolean collidesWith(Snake s){
+        if (s.pointData.stream().anyMatch(pd ->
+                (Vector.distance2(headPosition, pd.point)) < (this.getWidth()/2.0 + s.getWidth()/2.0)
+                        * (this.getWidth()/2.0 + s.getWidth()/2.0))){
+           onCollision();
+           return  true;
+        }
+       else{
+           return false;
+       }
     }
+
+    private void onCollision(){
+        System.out.println("Collision!!");
+        length = config.minLength;
+    }
+
 
 }

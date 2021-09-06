@@ -14,8 +14,12 @@ import server.SnakeServer;
 
 public class DebugView extends Application {
 
-    private static final double zoom = 4.0;
+    private static final double ZOOM = 8.0;
+    private static final boolean FOLLOW_PLAYER = true;
+    private double camera_x = 0.0;
+    private double camera_y = 0.0;
     private static Game game;
+
 
     public static void main(String[] args) {
         // start game server
@@ -63,20 +67,33 @@ public class DebugView extends Application {
         g.setFill(Color.RED);
         g.setStroke(Color.RED);
         game.world.chunks.forEach(chunk -> chunk.getFoodList().forEach(food -> {
-                g.fillOval(food.position.x * zoom + 400,
-                        300 - food.position.y * zoom, 2 * zoom, 2 * zoom);
-
+            g.fillOval((food.position.x - camera_x) * ZOOM + 400,
+                    300 - (food.position.y - camera_y) * ZOOM,
+                    food.size.value * ZOOM, food.size.value * ZOOM);
         }));
     }
 
     private void drawSnakes(GraphicsContext g) {
-        double x = game.snakes.get(0).getHeadPosition().x;
-        double y = game.snakes.get(0).getHeadPosition().y;
-        float snakeSize = game.snakes.get(0).getWidth();
-
-        g.setFill(Color.BLACK);
-        g.setStroke(Color.BLACK);
-        g.fillOval(x * zoom + 400 - snakeSize, 300 - y * zoom - snakeSize, snakeSize * zoom, snakeSize * zoom);
+        game.snakes.forEach(snake -> {
+            g.setFill(Color.BLACK);
+            g.setStroke(Color.BLACK);
+            if (snake.id == 0) {
+                g.setFill(Color.BLUE);
+                g.setStroke(Color.BLUE);
+                if (FOLLOW_PLAYER) {
+                    camera_x = snake.getHeadPosition().x;
+                    camera_y = snake.getHeadPosition().y;
+                }
+            }
+            var snakeSize = game.snakes.get(0).getWidth();
+            snake.pointData.forEach(pd -> {
+                var x = pd.point.x;
+                var y = pd.point.y;
+                g.fillOval((x - camera_x) * ZOOM + 400 - snakeSize,
+                        300 - (y - camera_y) * ZOOM - snakeSize,
+                        snakeSize * ZOOM, snakeSize * ZOOM);
+            });
+        });
     }
 }
 

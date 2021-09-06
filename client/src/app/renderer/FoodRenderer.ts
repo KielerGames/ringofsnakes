@@ -1,5 +1,7 @@
 import FoodChunk from "../data/FoodChunk";
+import Snake from "../data/Snake";
 import Matrix from "../math/Matrix";
+import Vector from "../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 
 declare const __VERTEXSHADER_FOOD__: string;
@@ -10,10 +12,14 @@ let shader: WebGLShaderProgram;
 let texture: WebGLTexture;
 
 const colors = new Uint8Array([
-    255, 25, 12, 0, 128, 255, 25, 255, 42, 255, 0, 255
+    255, 25, 12, // red
+    0, 128, 255, // blue
+    25, 255, 42, // green
+    255, 0, 255  // pink
 ]);
 
 const FOOD_VERTEX_SIZE = FoodChunk.FOOD_VERTEX_SIZE;
+const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
 
 export function init(glCtx: WebGLRenderingContext): void {
     gl = glCtx;
@@ -43,7 +49,7 @@ export function init(glCtx: WebGLRenderingContext): void {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 }
 
-export function render(foodChunks: Iterable<FoodChunk>, transform: Matrix) {
+export function render(foodChunks: Iterable<FoodChunk>, targetSnake: Snake | undefined, transform: Matrix) {
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
@@ -51,6 +57,9 @@ export function render(foodChunks: Iterable<FoodChunk>, transform: Matrix) {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     shader.setUniform("uColorSampler", 0);
     shader.setUniform("uTransform", transform.data);
+
+    const attractor = targetSnake ? targetSnake.getPredictedPosition(0) : FAR_AWAY;
+    shader.setUniform("uPlayerPosition", [attractor.x, attractor.y]);
 
     for (const chunk of foodChunks) {
         chunk.useBuffer(gl);

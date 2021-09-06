@@ -17,8 +17,8 @@ export default class WebGLShaderProgram {
         this.gl = gl;
 
         // compile & link shader program
-        const vs = compileShader(gl, gl.VERTEX_SHADER, vertex),
-            fs = compileShader(gl, gl.FRAGMENT_SHADER, fragment);
+        const vs = compileShader(gl, gl.VERTEX_SHADER, vertex);
+        const fs = compileShader(gl, gl.FRAGMENT_SHADER, fragment);
 
         const program: WebGLProgram = gl.createProgram()!;
         gl.attachShader(program, vs);

@@ -1,10 +1,15 @@
 package game.world;
 
+import game.snake.Snake;
 import game.snake.SnakeChunk;
 import math.BoundingBox;
 
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class WorldChunk {
@@ -104,5 +109,21 @@ public class WorldChunk {
     public int getFoodVersion() {
         assert foodVersion >= 0;
         return foodVersion;
+    }
+
+    //returns
+    public void checkForPotentialCollisions(Snake s){
+        var potentialColliders =  this.snakeChunks.stream()
+                .filter(snakeChunk -> snakeChunk.getBoundingBox()
+                .isWithinRange(s.getHeadPosition(), s.getWidth()/2.0)
+                        && snakeChunk.getSnake() != s)
+                .filter(distinctByKey(SnakeChunk::getSnake));
+        potentialColliders.forEach(snakeChunk ->
+        s.collidesWith(snakeChunk.getSnake()));
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 }

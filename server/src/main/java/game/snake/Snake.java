@@ -194,7 +194,7 @@ public class Snake {
     }
 
     public boolean collidesWith(Snake s){
-        if (s.pointData.stream().anyMatch(pd ->
+         if (s.pointData.stream().anyMatch(pd ->
                 (Vector.distance2(headPosition, pd.point)) < (this.getWidth()/2.0 + s.getWidth()/2.0)
                         * (this.getWidth()/2.0 + s.getWidth()/2.0))){
            onCollision();

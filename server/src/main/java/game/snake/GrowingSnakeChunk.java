@@ -113,10 +113,10 @@ public class GrowingSnakeChunk implements SnakeChunk {
         }
 
         // update bounding box
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
+        minX = Math.min(minX, snake.headPosition.x);
+        minY = Math.min(minY, snake.headPosition.y);
+        maxX = Math.max(maxX, snake.headPosition.x);
+        maxY = Math.max(maxY, snake.headPosition.y);
     }
 
     public FinalSnakeChunk build() {

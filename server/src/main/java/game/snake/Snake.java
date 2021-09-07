@@ -37,7 +37,7 @@ public class Snake {
     private float pointDataSnakeLength = 0f;
 
 
-    public Snake(short id, World world) {
+     Snake(short id, World world) {
         this.id = id;
         this.world = world;
     }

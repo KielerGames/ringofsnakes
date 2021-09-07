@@ -3,6 +3,7 @@ package game.world;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import math.BoundingBox;
+import math.Vector;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -120,6 +121,22 @@ public class WorldChunk {
                 .filter(distinctByKey(SnakeChunk::getSnake));
         potentialColliders.forEach(snakeChunk ->
         s.collidesWith(snakeChunk.getSnake()));
+    }
+
+    //TODO: Make this function work without bugs...
+    public void destroyInactiveSnakeChunks(){
+        List<SnakeChunk> collectedChunks = new ArrayList<SnakeChunk>();
+        snakeChunks.stream().forEach(snakeChunk -> {
+            if(!snakeChunk.getSnake().pointData.stream()
+                    .anyMatch(p -> this.box.isWithinRange(p.point, snakeChunk.getSnake().getWidth()/2)
+                    ))
+            {
+                if(snakeChunk.isFull()){
+                    collectedChunks.add(snakeChunk);
+                }
+            }
+        });
+        collectedChunks.forEach(SnakeChunk::destroy);
     }
 
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {

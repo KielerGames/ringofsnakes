@@ -9,6 +9,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import math.Vector;
 import server.SnakeServer;
 
 
@@ -16,8 +17,7 @@ public class DebugView extends Application {
 
     private static final double ZOOM = 8.0;
     private static final boolean FOLLOW_PLAYER = true;
-    private double camera_x = 0.0;
-    private double camera_y = 0.0;
+    private Vector camera = new Vector(0, 0);
     private static Game game;
 
 
@@ -67,8 +67,8 @@ public class DebugView extends Application {
         g.setFill(Color.RED);
         g.setStroke(Color.RED);
         game.world.chunks.forEach(chunk -> chunk.getFoodList().forEach(food -> {
-            g.fillOval((food.position.x - camera_x) * ZOOM + 400,
-                    300 - (food.position.y - camera_y) * ZOOM,
+            g.fillOval((food.position.x - camera.x) * ZOOM + 400,
+                    300 - (food.position.y - camera.y) * ZOOM,
                     food.size.value * ZOOM, food.size.value * ZOOM);
         }));
     }
@@ -81,16 +81,15 @@ public class DebugView extends Application {
                 g.setFill(Color.BLUE);
                 g.setStroke(Color.BLUE);
                 if (FOLLOW_PLAYER) {
-                    camera_x = snake.getHeadPosition().x;
-                    camera_y = snake.getHeadPosition().y;
+                    camera = snake.getHeadPosition();
                 }
             }
             var snakeSize = game.snakes.get(0).getWidth();
             snake.pointData.forEach(pd -> {
                 var x = pd.point.x;
                 var y = pd.point.y;
-                g.fillOval((x - camera_x) * ZOOM + 400 - snakeSize,
-                        300 - (y - camera_y) * ZOOM - snakeSize,
+                g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize,
+                        300 - (y - camera.y) * ZOOM - snakeSize,
                         snakeSize * ZOOM, snakeSize * ZOOM);
             });
         });

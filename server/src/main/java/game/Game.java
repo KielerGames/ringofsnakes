@@ -54,20 +54,22 @@ public class Game {
         clients.put(session.getId(), player);
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
-        addBotNextToPlayerOne(new Vector(3, 4));
+        addBotsNextToPlayerOne(new Vector(3, 4), 10);
         return player;
     }
 
-    public void addBotNextToPlayerOne(Vector offset) {
-        //add a basic bot next to the player at the start of the game
+    public void addBotsNextToPlayerOne(Vector offset, int n) {
+        //adds n stupid bots next to the player at the start of the game
         if (!snakes.isEmpty()) {
-            var position = snakes.get(0).getHeadPosition();
-            position.x += offset.x;
-            position.y += offset.y;
-            StupidBot bot = new StupidBot(this, position);
-            snakes.add(bot.getSnake());
-            bots.add(bot);
-            System.out.println("Bot added!");
+            for(int i = 0; i < n; i++){
+                var position = snakes.get(0).getHeadPosition();
+                position.x += offset.x + i;
+                position.y += offset.y;
+                StupidBot bot = new StupidBot(this, position);
+                snakes.add(bot.getSnake());
+                bots.add(bot);
+                System.out.println("Bot added!");
+            }
         }
     }
 
@@ -116,7 +118,15 @@ public class Game {
         eatFood();
     }
 
-    private void checkForCollisions() {
+
+    private void checkForCollisions(){
+        snakes.forEach(snake -> world.chunks.findChunk(snake.getHeadPosition()).checkForPotentialCollisions(snake));
+    }
+
+
+
+    //Let's keep it for not for testing purposes
+    private void badCheckForCollisions() {
         snakes.forEach(s1 -> snakes.stream().filter(s2 -> s1.id != s2.id
                         && Vector.distance2(s1.getHeadPosition(), s2.getHeadPosition())
                         < s2.getLength() * s2.getLength())

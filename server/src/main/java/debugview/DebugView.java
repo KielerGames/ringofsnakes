@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import math.Vector;
 import server.SnakeServer;
@@ -55,6 +56,8 @@ public class DebugView extends Application {
                     synchronized (game) {
                         drawSnakes(ctx);
                         drawFood(ctx);
+                        drawCurrentWorldChunk(ctx);
+                        drawSnakeChunksBoundingBoxes(ctx);
                     }
                 }
             }
@@ -67,9 +70,10 @@ public class DebugView extends Application {
         g.setFill(Color.RED);
         g.setStroke(Color.RED);
         game.world.chunks.forEach(chunk -> chunk.getFoodList().forEach(food -> {
-            g.fillOval((food.position.x - camera.x) * ZOOM + 400,
-                    300 - (food.position.y - camera.y) * ZOOM,
-                    food.size.value * ZOOM, food.size.value * ZOOM);
+            var size = food.size.value;
+            g.fillOval((food.position.x - camera.x) * ZOOM + 400 - size * ZOOM,
+                    300 - (food.position.y - camera.y) * ZOOM - size * ZOOM,
+                    size * ZOOM, size * ZOOM);
         }));
     }
 
@@ -88,11 +92,46 @@ public class DebugView extends Application {
             snake.pointData.forEach(pd -> {
                 var x = pd.point.x;
                 var y = pd.point.y;
-                g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize,
-                        300 - (y - camera.y) * ZOOM - snakeSize,
+                g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,
+                        300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
                         snakeSize * ZOOM, snakeSize * ZOOM);
             });
         });
+    }
+
+    private void drawCurrentWorldChunk(GraphicsContext g){
+        if (game != null && game.snakes.size() != 0) {
+            var snake = game.snakes.get(0);
+            var x = game.world.chunks.findChunk(snake.getHeadPosition()).box.getCenter().x;
+            var y = game.world.chunks.findChunk(snake.getHeadPosition()).box.getCenter().y;
+            var height = game.world.chunks.findChunk(snake.getHeadPosition()).box.getHeight();
+            var width = game.world.chunks.findChunk(snake.getHeadPosition()).box.getWidth();
+            g.setFill(Color.TRANSPARENT);
+            g.setStroke(Color.GREEN);
+            g.strokeRect((x - camera.x) * ZOOM + 400 - width/2 * ZOOM,
+                    300 - (y - camera.y) * ZOOM - height/2 * ZOOM,
+                    width * ZOOM, height * ZOOM);
+        }
+    }
+
+    private void drawSnakeChunksBoundingBoxes(GraphicsContext g){
+        game.world.chunks.forEach(chunk -> chunk.streamSnakeChunks()
+                .forEach(snakeChunk -> {
+                    var boundingBox = snakeChunk.getBoundingBox();
+                    var x = boundingBox.getCenter().x;
+                    var y = boundingBox.getCenter().y;
+                    var height = boundingBox.getHeight();
+                    var width = boundingBox.getWidth();
+                    g.setFill(Color.TRANSPARENT);
+                    if(snakeChunk.getSnake().id == 0){
+                        g.setStroke(Color.BLUE);
+                    }else{
+                        g.setStroke(Color.BLACK);
+                    }
+                    g.strokeRect((x - camera.x) * ZOOM + 400 - width/2 * ZOOM,
+                            300 - (y - camera.y) * ZOOM - height/2 * ZOOM,
+                            width * ZOOM, height * ZOOM);
+                }));
     }
 }
 

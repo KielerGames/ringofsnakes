@@ -18,7 +18,5 @@ public abstract class Bot {
         return this.snake;
     }
     
-    public void act(){
-        
-    }
+    public abstract void act();
 }

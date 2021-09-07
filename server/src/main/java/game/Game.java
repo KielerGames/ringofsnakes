@@ -140,9 +140,7 @@ public class Game {
             var worldChunk = world.chunks.findChunk(headPosition);
             var foodList = worldChunk.getFoodList();
             var collectedFood = foodList.stream()
-                    .filter(food -> Vector.distance2(headPosition, food.position)
-                            < (snakeWidth/2.0 + food.size.value)
-                            * (snakeWidth/2.0 + food.size.value))
+                    .filter(food -> food.isWithinRange(headPosition, (snakeWidth + food.size.value) / 2 ))
                     .collect(Collectors.toList());
             snake.grow(collectedFood.size() * Food.nutritionalValue);
 

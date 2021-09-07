@@ -30,15 +30,9 @@ public class StupidBot extends Bot {
         }
 
         if (counter > changeDirectionAtCounter) {
-
-            if (random.nextBoolean()) {
-                turnClockwise = true;
-            } else {
-                turnClockwise = false;
-            }
+            turnClockwise = random.nextBoolean();
             changeDirectionAtCounter = 60 + random.nextInt(120);
             counter = 0;
-
         }
         snake.setTargetDirection(alpha);
         counter++;

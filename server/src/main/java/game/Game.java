@@ -55,11 +55,6 @@ public class Game {
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
         addBotNextToPlayerOne(new Vector(3, 4));
-        //addBotNextToPlayerOne(new Vector(-4,4));
-        //addBotNextToPlayerOne(new Vector(12,4));
-        //addBotNextToPlayerOne(new Vector(6,1));
-
-
         return player;
     }
 

@@ -63,7 +63,6 @@ public class Game {
             var snake = ((Player) client).snake;
             // TODO: generate food (?), consider changing list to another data structure
             snakes.remove(snake);
-            snake.destroy();
         }
     }
 
@@ -86,6 +85,7 @@ public class Game {
     private void tick() {
         synchronized (this) {
             snakes.forEach(Snake::tick);
+            world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
             //TODO: check collisions
         }
 

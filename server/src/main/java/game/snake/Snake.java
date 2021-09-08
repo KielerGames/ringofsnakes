@@ -7,7 +7,6 @@ import math.Vector;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
@@ -37,10 +36,6 @@ public class Snake {
     Snake(short id, World world) {
         this.id = id;
         this.world = world;
-    }
-
-    public void destroy() {
-        chunks.forEach(FinalSnakeChunk::destroy);
     }
 
     public void setTargetDirection(float alpha) {
@@ -93,8 +88,7 @@ public class Snake {
         if (chunks.size() > 0) {
             FinalSnakeChunk lastChunk = chunks.get(chunks.size() - 1);
             if (lastChunk.isJunk()) {
-                var removedChunk = chunks.remove(chunks.size() - 1);
-                removedChunk.destroy();
+                chunks.remove(chunks.size() - 1);
             }
         }
     }

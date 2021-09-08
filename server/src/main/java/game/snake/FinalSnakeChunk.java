@@ -37,7 +37,7 @@ public class FinalSnakeChunk implements SnakeChunk {
         this.uniqueId = buffer.getInt(0); // bytes 0-3
         this.pointData = new HashMap<>();
         linkedWorldChunks = new LinkedList<>();
-        gsc.destroy();
+        gsc.markAsJunk();
     }
 
     public ByteBuffer getBuffer() {

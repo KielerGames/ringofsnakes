@@ -96,6 +96,7 @@ public class Snake {
                 chunks.remove(chunks.size() - 1);
             }
         }
+        updatePointData();
     }
 
     private void updatePointData() {

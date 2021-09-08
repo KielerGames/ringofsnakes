@@ -9,6 +9,7 @@ import game.snake.SnakeFactory;
 import game.world.Food;
 import game.world.World;
 import game.world.WorldChunk;
+import math.Vector;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
@@ -81,7 +82,6 @@ public class Game {
             var snake = ((Player) client).snake;
             // TODO: generate food (?), consider changing list to another data structure
             snakes.remove(snake);
-            snake.destroy();
         }
     }
 

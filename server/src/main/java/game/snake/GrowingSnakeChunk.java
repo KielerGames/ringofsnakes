@@ -23,6 +23,7 @@ public class GrowingSnakeChunk implements SnakeChunk {
     private int lastSteps = 0;
     private boolean lastFast = false;
     private int lastDirDelta = 0;
+    private boolean junk = false;
     private final List<WorldChunk> linkedWorldChunks = new LinkedList<>();
 
     private final ByteBuffer chunkByteBuffer;
@@ -166,6 +167,10 @@ public class GrowingSnakeChunk implements SnakeChunk {
     public float getLength() {
         return (float) this.length;
     }
+
+    public boolean isJunk() {return  junk; }
+
+    public void  markAsJunk() { junk = true; }
 
     @Override
     public BoundingBox getBoundingBox() {

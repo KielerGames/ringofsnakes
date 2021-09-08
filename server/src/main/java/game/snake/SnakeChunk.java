@@ -25,6 +25,8 @@ public interface SnakeChunk {
 
     float getLength();
 
+    boolean isJunk();
+
     BoundingBox getBoundingBox();
 
     void linkWorldChunk(WorldChunk worldChunk);

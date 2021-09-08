@@ -57,7 +57,7 @@ public class Game {
         clients.put(session.getId(), player);
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
-        addBotsNextToPlayerOne(new Vector(3, 4), 1);
+        addBotsNextToPlayerOne(new Vector(3, 4), 20);
         return player;
     }
 

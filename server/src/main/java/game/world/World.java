@@ -10,9 +10,13 @@ import java.util.Comparator;
 public class World {
     private static final int FOOD_THRESHOLD = 50;
     public final WorldChunkCollection chunks;
+    public double height = 0;
+    public double width = 0;
 
     public World(double chunkSize, int repetitions) {
         chunks = WorldChunkFactory.createChunks(chunkSize, repetitions, repetitions);
+        height = chunkSize * repetitions;
+        width = chunkSize * repetitions;
     }
 
     public World() {
@@ -21,6 +25,8 @@ public class World {
 
     public World(GameConfig config) {
         chunks = WorldChunkFactory.createChunks(config.chunkInfo);
+        height = config.chunkInfo.chunkSize * config.chunkInfo.rows;
+        width = config.chunkInfo.chunkSize * config.chunkInfo.columns;
     }
 
     public Vector findSpawnPosition() {

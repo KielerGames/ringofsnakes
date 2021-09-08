@@ -78,6 +78,8 @@ public class Snake {
             headPosition.addDirection(headDirection, config.snakeSpeed);
         }
 
+
+
         // update chunks
         chunkBuilder.append(encDirDelta, fast);
         // after an update a chunk might be full
@@ -97,6 +99,13 @@ public class Snake {
             }
         }
         updatePointData();
+        keepSnakeInWorld();
+    }
+
+    private void keepSnakeInWorld() {
+        if(Math.abs(headPosition.x) > world.width/2.0  || Math.abs(headPosition.y) > world.height/2.0 -5  ){
+            headPosition = new Vector(0,0);
+        }
     }
 
     private void updatePointData() {

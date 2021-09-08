@@ -85,8 +85,8 @@ public class GrowingSnakeChunk implements SnakeChunk {
 
         direction += coder.decodeDirectionChange(dirDelta);
         final double stepSize = fast ? snake.config.fastSnakeSpeed : snake.config.snakeSpeed;
-        x += Math.cos(direction);
-        y += Math.sin(direction);
+        x += Math.cos(direction) * stepSize;
+        y += Math.sin(direction) * stepSize;
         points.add(new Vector(x, y));
 
         // update chaincode
@@ -113,10 +113,10 @@ public class GrowingSnakeChunk implements SnakeChunk {
         }
 
         // update bounding box
-        minX = Math.min(minX, snake.headPosition.x);
-        minY = Math.min(minY, snake.headPosition.y);
-        maxX = Math.max(maxX, snake.headPosition.x);
-        maxY = Math.max(maxY, snake.headPosition.y);
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
     }
 
     public FinalSnakeChunk build() {

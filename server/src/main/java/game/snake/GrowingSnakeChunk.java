@@ -128,7 +128,7 @@ public class GrowingSnakeChunk implements SnakeChunk {
         double chunkWidth = maxX - minX;
         double chunkHeight = maxY - minY;
 
-        return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, points);
+        return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, points, this);
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {

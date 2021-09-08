@@ -9,13 +9,15 @@ import game.snake.SnakeFactory;
 import game.world.Food;
 import game.world.World;
 import game.world.WorldChunk;
-import math.Vector;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
 
 import javax.websocket.Session;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -100,7 +102,6 @@ public class Game {
                 var snake = snakes.get(0);
                 var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
                 System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
-                System.out.println("pointDataLength" + snake.pointData.size());
             }
         }, 0, 5, TimeUnit.SECONDS);
 
@@ -111,6 +112,8 @@ public class Game {
     private void tick() {
         synchronized (this) {
             snakes.forEach(Snake::tick);
+            world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
+            //TODO: check collisions
             bots.forEach(Bot::act);
             checkForCollisions();
         }
@@ -150,7 +153,7 @@ public class Game {
             var worldChunk = world.chunks.findChunk(headPosition);
             var foodList = worldChunk.getFoodList();
             var collectedFood = foodList.stream()
-                    .filter(food -> food.isWithinRange(headPosition, (snakeWidth + food.size.value) / 2 ))
+                    .filter(food -> food.isWithinRange(headPosition, snakeWidth + 1.0))
                     .collect(Collectors.toList());
             snake.grow(collectedFood.size() * Food.nutritionalValue);
 

@@ -28,6 +28,4 @@ public interface SnakeChunk {
     BoundingBox getBoundingBox();
 
     void linkWorldChunk(WorldChunk worldChunk);
-
-    void destroy();
 }

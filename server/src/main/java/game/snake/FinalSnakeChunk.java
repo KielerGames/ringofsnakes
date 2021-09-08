@@ -85,11 +85,6 @@ public class FinalSnakeChunk implements SnakeChunk {
     }
 
     @Override
-    public void destroy() {
-        linkedWorldChunks.forEach(lwc -> lwc.removeSnakeChunk(this));
-    }
-
-    @Override
     public int hashCode() {
         return this.getUniqueId();
     }

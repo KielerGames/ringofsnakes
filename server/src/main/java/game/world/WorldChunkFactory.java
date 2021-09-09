@@ -71,6 +71,7 @@ public class WorldChunkFactory {
                     mechanic the exception is shown.
                     TODO: Fix this somehow.
                      */
+                    System.out.println("Point out of bound Exception in WorldChunkFactory.");
                     throw new IllegalArgumentException("Point is out of bounds.");
                 }
 

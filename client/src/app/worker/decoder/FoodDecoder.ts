@@ -41,7 +41,16 @@ export function decode(
     }
 
     return {
-        data: { id: chunkId, items: foodItems },
+        data: {
+            id: chunkId,
+            items: foodItems,
+            bounds: {
+                minX: xOffset,
+                maxX: xOffset + chunkSize,
+                minY: yOffset,
+                maxY: yOffset + chunkSize
+            }
+        },
         nextByteOffset: offset + FOOD_CHUNK_HEADER_SIZE + n * FOOD_SIZE
     };
 }
@@ -58,4 +67,10 @@ export type FoodChunkId = number;
 export type FoodChunkDTO = {
     id: FoodChunkId;
     items: FoodItemDTO[];
+    bounds: {
+        minX: number;
+        maxX: number;
+        minY: number;
+        maxY: number;
+    };
 };

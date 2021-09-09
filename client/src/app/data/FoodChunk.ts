@@ -1,5 +1,6 @@
 import { FoodChunkDTO, FoodItemDTO } from "../worker/decoder/FoodDecoder";
 import * as BufferManager from "../webgl/BufferManager";
+import Rectangle from "../math/Rectangle";
 
 const boxCoords = [
     // triangle 1
@@ -20,10 +21,12 @@ export default class FoodChunk {
         32 * boxCoords.length
     );
     private numFoodItems: number;
+    private readonly box: Rectangle;
 
     public constructor(dto: FoodChunkDTO) {
         this.id = dto.id;
         this.numFoodItems = dto.items.length;
+        this.box = Rectangle.fromTransferable(dto.bounds);
         this.gpuBuffer = BufferManager.create();
         this.gpuData = createGPUData(dto.items, this.gpuData);
     }
@@ -44,6 +47,10 @@ export default class FoodChunk {
             gl.bufferData(gl.ARRAY_BUFFER, this.gpuData, gl.STATIC_DRAW);
             this.gpuData = undefined;
         }
+    }
+
+    public intersects(box: Rectangle): boolean {
+        return Rectangle.distance2(this.box, box) == 0.0;
     }
 
     public get numberOfVertices(): number {

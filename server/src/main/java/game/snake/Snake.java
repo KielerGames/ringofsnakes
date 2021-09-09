@@ -79,7 +79,6 @@ public class Snake {
         }
 
 
-
         // update chunks
         chunkBuilder.append(encDirDelta, fast);
         // after an update a chunk might be full
@@ -103,14 +102,14 @@ public class Snake {
     }
 
     private void keepSnakeInWorld() {
-        if(Math.abs(headPosition.x) > world.width/2.0  || Math.abs(headPosition.y) > world.height/2.0 -5  ){
-            headPosition = new Vector(0,0);
+        if (Math.abs(headPosition.x) > world.width / 2.0 || Math.abs(headPosition.y) > world.height / 2.0 - 5) {
+            headPosition = new Vector(0, 0);
         }
     }
 
     private void updatePointData() {
         this.pointData.addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
-        while(this.pointDataSnakeLength > length){
+        while (this.pointDataSnakeLength > length) {
             var p = pointData.removeLast();
             pointDataSnakeLength -= p.fast ? config.fastSnakeSpeed : config.snakeSpeed;
         }
@@ -181,7 +180,7 @@ public class Snake {
 
     public float getWidth() {
         //sigmoid(3) is roughly  0.95
-        var x = 3*(length - config.minLength)/LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
+        var x = 3 * (length - config.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
         return (float) (MIN_WIDTH + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
 
     }
@@ -194,19 +193,18 @@ public class Snake {
         this.skin = skin;
     }
 
-    public boolean collidesWith(Snake s){
-         if (s.pointData.stream().anyMatch(pd ->
-                (Vector.distance2(headPosition, pd.point)) < (this.getWidth()/2.0 + s.getWidth()/2.0)
-                        * (this.getWidth()/2.0 + s.getWidth()/2.0))){
-           onCollision();
-           return  true;
+    public boolean collidesWith(Snake s) {
+        if (s.pointData.stream().anyMatch(pd ->
+                (Vector.distance2(headPosition, pd.point)) < (this.getWidth() / 2.0 + s.getWidth() / 2.0)
+                        * (this.getWidth() / 2.0 + s.getWidth() / 2.0))) {
+            onCollision();
+            return true;
+        } else {
+            return false;
         }
-       else{
-           return false;
-       }
     }
 
-    private void onCollision(){
+    private void onCollision() {
         System.out.println("Collision!!");
         length = config.minLength;
     }

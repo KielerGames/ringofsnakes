@@ -126,16 +126,6 @@ public class Game {
         snakes.forEach(snake -> world.chunks.findChunk(snake.getHeadPosition()).checkForPotentialCollisions(snake));
     }
 
-
-
-    //Let's keep it for not for testing purposes
-    private void badCheckForCollisions() {
-        snakes.forEach(s1 -> snakes.stream().filter(s2 -> s1.id != s2.id
-                        && Vector.distance2(s1.getHeadPosition(), s2.getHeadPosition())
-                        < s2.getLength() * s2.getLength())
-                .anyMatch(s2 -> s1.collidesWith(s2)));
-    }
-
     private void updateClients() {
         clients.forEach((id, client) -> {
             var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());

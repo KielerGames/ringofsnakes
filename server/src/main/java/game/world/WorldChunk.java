@@ -117,14 +117,14 @@ public class WorldChunk {
     }
 
     //returns
-    public void checkForPotentialCollisions(Snake s){
-        var potentialColliders =  this.snakeChunks.stream()
+    public void checkForPotentialCollisions(Snake s) {
+        snakeChunks.stream()
                 .filter(snakeChunk -> snakeChunk.getBoundingBox()
-                .isWithinRange(s.getHeadPosition(), s.getWidth()/2.0)
+                        .isWithinRange(s.getHeadPosition(), s.getWidth() / 2.0)
                         && snakeChunk.getSnake() != s)
-                .filter(distinctByKey(SnakeChunk::getSnake));
-        potentialColliders.forEach(snakeChunk ->
-        s.collidesWith(snakeChunk.getSnake()));
+                .filter(distinctByKey(SnakeChunk::getSnake))
+                .forEach(snakeChunk ->
+                        s.collidesWith(snakeChunk.getSnake()));
     }
 
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {

@@ -64,8 +64,8 @@ public class Game {
     public void addBotsNextToPlayerOne(Vector offset, int n) {
         //adds n stupid bots next to the player at the start of the game
         if (!snakes.isEmpty()) {
+            var position = snakes.get(0).getHeadPosition().clone();
             for (int i = 0; i < n; i++) {
-                var position = snakes.get(0).getHeadPosition();
                 position.x += offset.x + i;
                 position.y += offset.y;
                 StupidBot bot = new StupidBot(this, position);

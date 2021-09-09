@@ -1,3 +1,4 @@
+import Rectangle from "../math/Rectangle";
 import { GameDataUpdate } from "../worker/GameDataUpdate";
 import FoodChunk from "./FoodChunk";
 import Snake from "./Snake";
@@ -58,6 +59,15 @@ export default class GameData {
 
     public getSnakes(): IterableIterator<Snake> {
         return this.snakes.values();
+    }
+
+    public garbageCollectFoodChunks(viewBox: Rectangle): void {
+        Array.from(this.foodChunks.values())
+            .filter((fc) => !fc.intersects(viewBox))
+            .forEach((fc) => {
+                this.foodChunks.delete(fc.id);
+                fc.destroy();
+            });
     }
 
     private garbageCollectSnakeChunks(): void {

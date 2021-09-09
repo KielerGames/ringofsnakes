@@ -37,4 +37,12 @@ document.body.appendChild(root);
 
     // render user interface
     Preact.render(<GameUI game={game} />, root);
+
+    // cleanup
+    window.setInterval(() => {
+        if(!game.ended) {
+            const viewBox = game.camera.getViewBox();
+            game.data.garbageCollectFoodChunks(viewBox);
+        }
+    }, 1000);
 })();

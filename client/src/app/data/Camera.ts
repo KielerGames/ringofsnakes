@@ -1,4 +1,5 @@
 import Matrix from "../math/Matrix";
+import Rectangle from "../math/Rectangle";
 import Vector from "../math/Vector";
 import Snake from "./Snake";
 
@@ -32,6 +33,19 @@ export abstract class Camera {
         return Matrix.compose(
             Matrix.compose(this.unstretch, this.scale),
             this.translation
+        );
+    }
+
+    public getViewBox(): Rectangle {
+        const center = this.lastPosition;
+        const ratio = this.unstretch.getEntry(0, 0);
+        const width = 1.0 / (ratio * WORLD_SCALE);
+        const height = 1.0 / WORLD_SCALE;
+        return new Rectangle(
+            center.x - 0.5 * width,
+            center.x + 0.5 * width,
+            center.y - 0.5 * height,
+            center.y + 0.5 * height
         );
     }
 }

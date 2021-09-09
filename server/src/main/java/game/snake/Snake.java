@@ -8,6 +8,7 @@ import util.SnakePointData;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
@@ -205,8 +206,17 @@ public class Snake {
     }
 
     private void onCollision() {
-        System.out.println("Collision!!");
+        System.out.println("Collision" + generateExlamationMarks());
         length = config.minLength;
+    }
+
+    private String generateExlamationMarks() {
+        Random random = new Random();
+        String s = "!";
+        for (int i = 0; i < random.nextInt(3); i++) {
+            s += "!";
+        }
+        return s;
     }
 
 

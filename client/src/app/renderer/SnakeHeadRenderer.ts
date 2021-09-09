@@ -59,7 +59,9 @@ export function render(
             snake.direction.predict(timeSinceLastTick) + rotOffset
         );
         setSkin(snake.skin);
-        shader.run(vertexData.length / VERTEX_SIZE, { mode: gl.TRIANGLE_STRIP });
+        shader.run(vertexData.length / VERTEX_SIZE, {
+            mode: gl.TRIANGLE_STRIP
+        });
     }
 }
 

@@ -24,12 +24,7 @@ export function init(glCtx: WebGLRenderingContext): void {
         gl,
         __VERTEXSHADER_SNAKE__,
         __FRAGMENTSHADER_SNAKE__,
-        [
-            "vPosition",
-            "vNormal",
-            "vNormalOffset",
-            "vRelativePathOffset"
-        ]
+        ["vPosition", "vNormal", "vNormalOffset", "vRelativePathOffset"]
     );
 
     buffer = gl.createBuffer()!;

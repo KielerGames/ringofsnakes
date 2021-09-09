@@ -72,7 +72,10 @@ describe("WorkerChunk", () => {
             undefined,
             new Rand(seed)
         );
-        const wc = new WorkerSnakeChunk(snake, SCD.decode(chunkData1, 0, cfg).data);
+        const wc = new WorkerSnakeChunk(
+            snake,
+            SCD.decode(chunkData1, 0, cfg).data
+        );
         const pathLength1 = wc.createTransferData().length;
         assert.isAbove(pathLength1, 0.0);
 

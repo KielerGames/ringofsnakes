@@ -124,12 +124,11 @@ public class GrowingSnakeChunk implements SnakeChunk {
         if (!isFull()) {
             throw new IllegalStateException();
         }
-
-        BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
-        double chunkWidth = maxX - minX;
-        double chunkHeight = maxY - minY;
-
-        return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, points, this);
+            BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
+            double chunkWidth = maxX - minX;
+            double chunkHeight = maxY - minY;
+            junk = true;
+            return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, points);
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {

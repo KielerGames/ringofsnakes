@@ -26,7 +26,7 @@ public class FinalSnakeChunk implements SnakeChunk {
 
 
     protected FinalSnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, float length,
-                              List<Vector> points, GrowingSnakeChunk gsc) {
+                              List<Vector> points) {
         assert buffer.position() == BYTE_SIZE;
         assert length > 0;
 
@@ -37,7 +37,6 @@ public class FinalSnakeChunk implements SnakeChunk {
         this.uniqueId = buffer.getInt(0); // bytes 0-3
         this.pointData = new HashMap<>();
         linkedWorldChunks = new LinkedList<>();
-        gsc.markAsJunk();
     }
 
     public ByteBuffer getBuffer() {

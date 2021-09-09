@@ -125,8 +125,6 @@ public class GrowingSnakeChunk implements SnakeChunk {
             throw new IllegalStateException();
         }
             BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
-            double chunkWidth = maxX - minX;
-            double chunkHeight = maxY - minY;
             junk = true;
             return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, points);
     }

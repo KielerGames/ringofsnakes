@@ -64,7 +64,7 @@ public class Game {
     public void addBotsNextToPlayerOne(Vector offset, int n) {
         //adds n stupid bots next to the player at the start of the game
         if (!snakes.isEmpty()) {
-            for(int i = 0; i < n; i++){
+            for (int i = 0; i < n; i++) {
                 var position = snakes.get(0).getHeadPosition();
                 position.x += offset.x + i;
                 position.y += offset.y;
@@ -106,12 +106,19 @@ public class Game {
         }, 0, 5, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
+
+
     }
 
 
     private void tick() {
         synchronized (this) {
-            snakes.forEach(Snake::tick);
+            snakes.forEach(snake -> {
+                if (snake.isAlive) {
+                    snake.tick();
+                    killDesertingSnakes(snake);
+                }
+            });
             world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
             //TODO: check collisions
             bots.forEach(Bot::act);
@@ -122,7 +129,7 @@ public class Game {
     }
 
 
-    private void checkForCollisions(){
+    private void checkForCollisions() {
         snakes.forEach(snake -> world.chunks.findChunk(snake.getHeadPosition()).checkForPotentialCollisions(snake));
     }
 
@@ -151,5 +158,12 @@ public class Game {
                 worldChunk.removeFood(collectedFood);
             }
         });
+    }
+
+    private void killDesertingSnakes(Snake s) {
+        if (Math.abs(s.getHeadPosition().x) > world.width / 2.0 - 3 || Math.abs(s.getHeadPosition().y) > world.height / 2.0 - 3) {
+            System.out.println("Removing Snake " + s.id + " from Game, because it is leaving the map.");
+            s.isAlive = false;
+        }
     }
 }

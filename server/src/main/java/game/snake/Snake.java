@@ -33,6 +33,7 @@ public class Snake {
     private float targetDirection;
     private boolean fast = false;
     private double lengthBuffer = 0;
+    public boolean isAlive = true;
 
     public final LinkedList<SnakePointData> pointData = new LinkedList<>();
     private float pointDataSnakeLength = 0f;
@@ -99,13 +100,6 @@ public class Snake {
             }
         }
         updatePointData();
-        keepSnakeInWorld();
-    }
-
-    private void keepSnakeInWorld() {
-        if (Math.abs(headPosition.x) > world.width / 2.0 || Math.abs(headPosition.y) > world.height / 2.0 - 5) {
-            headPosition = new Vector(0, 0);
-        }
     }
 
     private void updatePointData() {

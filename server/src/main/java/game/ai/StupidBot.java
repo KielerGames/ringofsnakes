@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class StupidBot extends Bot {
 
-    private Random random = new Random();
+    private static Random random = new Random();
     private float alpha = (float) -Math.PI;
     private int counter = 1;
     private boolean turnClockwise = true;

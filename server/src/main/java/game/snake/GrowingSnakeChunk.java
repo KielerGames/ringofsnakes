@@ -167,8 +167,6 @@ public class GrowingSnakeChunk implements SnakeChunk {
 
     public boolean isJunk() {return  junk; }
 
-    public void  markAsJunk() { junk = true; }
-
     @Override
     public BoundingBox getBoundingBox() {
         return new BoundingBox(minX, maxX, minY, maxY);

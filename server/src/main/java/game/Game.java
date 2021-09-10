@@ -120,7 +120,6 @@ public class Game {
                 }
             });
             world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
-            //TODO: check collisions
             bots.forEach(Bot::act);
             checkForCollisions();
         }
@@ -138,7 +137,6 @@ public class Game {
             var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
             worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
             worldChunks.forEach(client::updateClientFoodChunk);
-
             client.sendUpdate();
         });
     }

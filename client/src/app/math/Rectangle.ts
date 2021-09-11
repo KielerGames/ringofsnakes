@@ -2,10 +2,10 @@
  * Represents an axis-aligned rectangle.
  */
 export default class Rectangle {
-    public minX: number;
-    public maxX: number;
-    public minY: number;
-    public maxY: number;
+    public readonly minX: number;
+    public readonly maxX: number;
+    public readonly minY: number;
+    public readonly maxY: number;
 
     public constructor(minX: number, maxX: number, minY: number, maxY: number) {
         this.minX = minX;

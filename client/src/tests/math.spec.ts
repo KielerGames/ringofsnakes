@@ -31,22 +31,52 @@ describe("Rectangle", () => {
     it("disjoint rectangles", () => {
         const rand = new Rand("disjoint rect seed");
 
-        const rect1 = new Rectangle(
-            100 * rand.next(),
-            100 * rand.next(),
-            100 * rand.next(),
-            100 * rand.next()
-        );
+        const rect1 = createRandomRectangle(100, rand);
 
         const rect2Width = 100 * rand.next();
 
         const rect2 = new Rectangle(
             rect1.maxX + 20,
             rect1.maxX + 20 + rect2Width,
-            100 * rand.next(),
-            100 * rand.next()
+            0,
+            100 * rand.next() + 1
         );
 
         assert.isAbove(Rectangle.distance2(rect1, rect2), 0.0);
     });
+
+    it("partially intersecting rectangles", () => {
+        const rect1 = new Rectangle(0, 10, 0, 10);
+        const rect2 = new Rectangle(5, 15, 0, 10);
+
+        assert.equal(Rectangle.distance2(rect1, rect2), 0.0);
+    });
+
+    it("distance properties", () => {
+        const rand = new Rand("distance test seed");
+
+        for(let i=0; i<100; i++) {
+            const rect1 = createRandomRectangle(100, rand);
+            const rect2 = createRandomRectangle(100, rand);
+
+            const dist1 = Rectangle.distance2(rect1, rect2);
+            const dist2 = Rectangle.distance2(rect1, rect2);
+
+            assert.isAtLeast(dist1, 0.0);
+            assert.isAtLeast(dist2, 0.0);
+
+            assert.approximately(dist1, dist2, 1e-8);
+        }
+    });
+
+    function createRandomRectangle(scale: number, rand: Rand): Rectangle {
+        const x = scale * rand.next();
+        const y = scale * rand.next();
+        return new Rectangle(
+            x,
+            x + scale * rand.next(),
+            y,
+            y + scale * rand.next()
+        );
+    }
 });

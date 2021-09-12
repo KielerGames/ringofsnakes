@@ -205,9 +205,6 @@ public class Snake {
     }
 
     public boolean collidesWithSnakeChunk(SnakeChunk sc) {
-        sc.getPointData().stream().forEach(pd -> {
-        });
-
         if (sc.getPointData().stream().anyMatch(pd ->
                 (Vector.distance2(headPosition, pd.point)) < (this.getWidth() / 2.0 +
                         sc.getSnake().getWidth() / 2.0)

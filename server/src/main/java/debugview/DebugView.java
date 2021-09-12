@@ -16,7 +16,7 @@ import server.SnakeServer;
 
 public class DebugView extends Application {
 
-    private static final double ZOOM = 2.0;
+    private static final double ZOOM = 8.0;
     private static final boolean FOLLOW_PLAYER = true;
     private Vector camera = new Vector(0, 0);
     private static Game game;

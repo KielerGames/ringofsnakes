@@ -1,5 +1,7 @@
 import game.world.WorldChunk;
+import math.BoundingBox;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -9,15 +11,11 @@ import server.protocol.GameUpdate;
 
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import java.nio.ByteBuffer;
 
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GameUpdateTest {
@@ -57,7 +55,7 @@ public class GameUpdateTest {
 
     @Test
     void testBinaryEmptyUpdate() {
-        var client = new Client(session);
+        var client = new TestClient(session);
         var updateData = captureUpdateData(client);
         assertNotNull(updateData);
         assertEquals(GameUpdate.HEADER_SIZE, updateData.capacity());
@@ -68,7 +66,7 @@ public class GameUpdateTest {
 
     @Test
     void testBinarySameChunkOnce() {
-        var client = new Client(session);
+        var client = new TestClient(session);
         var chunk = new WorldChunk(0, 0, 42, 42, 0, 0);
 
         client.updateClientFoodChunk(chunk);
@@ -85,7 +83,7 @@ public class GameUpdateTest {
 
     @Test
     void testBinarySameChunkUpdated() {
-        var client = new Client(session);
+        var client = new TestClient(session);
         var chunk = new WorldChunk(0, 0, 42, 42, 0, 0);
         chunk.addFood();
 
@@ -99,5 +97,18 @@ public class GameUpdateTest {
         var update2 = captureUpdateData(client);
         assertNotNull(update2);
         assertEquals(1, update2.get(2));
+    }
+
+    private static class TestClient extends Client {
+        TestClient(Session session) {
+            super(session);
+        }
+
+        public BoundingBox knowledgeBox = new BoundingBox(0, 0, 100, 100);
+
+        @Override
+        public BoundingBox getKnowledgeBox() {
+            return knowledgeBox;
+        }
     }
 }

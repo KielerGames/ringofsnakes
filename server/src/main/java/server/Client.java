@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-public class Client {
+public abstract class Client {
     public final Session session;
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private final Map<WorldChunk, Integer> knownWorldChunks = new HashMap<>();
@@ -75,8 +75,5 @@ public class Client {
         return true;
     }
 
-    public BoundingBox getKnowledgeBox() {
-        //TODO
-        return new BoundingBox(0.0, 0.0, 0.0, 0.0);
-    }
+    public abstract BoundingBox getKnowledgeBox();
 }

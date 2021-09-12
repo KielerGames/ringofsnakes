@@ -101,8 +101,9 @@ public class Snake {
                 chunks.remove(chunks.size() - 1);
             }
         }
-            updatePointData();
+        updatePointData();
     }
+
     //TODO: make this nicer
     private void updatePointData() {
         if (this.activeSnakeChunks.isEmpty()) {

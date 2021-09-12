@@ -54,7 +54,7 @@ public class Game {
         clients.put(session.getId(), player);
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
-        addBotsNextToPlayerOne(50.0, 100);
+        addBotsNextToPlayerOne(25.0, 10);
         return player;
     }
 
@@ -65,7 +65,7 @@ public class Game {
             var position = snakes.get(0).getHeadPosition().clone();
             for (int i = 0; i < n; i++) {
                 var spawnPosition = new Vector(position.x + (random.nextDouble() * 2 - 1.0) * radius,
-                        position.y + (random.nextDouble() * 2 - 1.0 ) * radius);
+                        position.y + (random.nextDouble() * 2 - 1.0) * radius);
                 StupidBot bot = new StupidBot(this, spawnPosition);
                 snakes.add(bot.getSnake());
                 bots.add(bot);

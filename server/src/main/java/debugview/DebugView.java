@@ -102,7 +102,7 @@ public class DebugView extends Application {
     }
 
 
-    private void drawCurrentWorldChunk(GraphicsContext g){
+    private void drawCurrentWorldChunk(GraphicsContext g) {
         if (game != null && game.snakes.size() != 0) {
             var snake = game.snakes.get(0);
             var x = game.world.chunks.findChunk(snake.getHeadPosition()).box.getCenter().x;
@@ -111,13 +111,13 @@ public class DebugView extends Application {
             var width = game.world.chunks.findChunk(snake.getHeadPosition()).box.getWidth();
             g.setFill(Color.TRANSPARENT);
             g.setStroke(Color.GREEN);
-            g.strokeRect((x - camera.x) * ZOOM + 400 - width/2 * ZOOM,
-                    300 - (y - camera.y) * ZOOM - height/2 * ZOOM,
+            g.strokeRect((x - camera.x) * ZOOM + 400 - width / 2 * ZOOM,
+                    300 - (y - camera.y) * ZOOM - height / 2 * ZOOM,
                     width * ZOOM, height * ZOOM);
         }
     }
 
-    private void drawSnakeChunksBoundingBoxes(GraphicsContext g){
+    private void drawSnakeChunksBoundingBoxes(GraphicsContext g) {
         game.world.chunks.forEach(chunk -> chunk.streamSnakeChunks()
                 .forEach(snakeChunk -> {
                     var boundingBox = snakeChunk.getBoundingBox();
@@ -126,13 +126,13 @@ public class DebugView extends Application {
                     var height = boundingBox.getHeight();
                     var width = boundingBox.getWidth();
                     g.setFill(Color.TRANSPARENT);
-                    if(snakeChunk.getSnake().id == 0){
+                    if (snakeChunk.getSnake().id == 0) {
                         g.setStroke(Color.BLUE);
-                    }else{
+                    } else {
                         g.setStroke(Color.BLACK);
                     }
-                    g.strokeRect((x - camera.x) * ZOOM + 400 - width/2 * ZOOM,
-                            300 - (y - camera.y) * ZOOM - height/2 * ZOOM,
+                    g.strokeRect((x - camera.x) * ZOOM + 400 - width / 2 * ZOOM,
+                            300 - (y - camera.y) * ZOOM - height / 2 * ZOOM,
                             width * ZOOM, height * ZOOM);
                 }));
     }

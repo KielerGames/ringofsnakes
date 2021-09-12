@@ -132,12 +132,13 @@ export default class WorkerSnakeChunk {
 function createBoundingBox(pathData: Float32Array): Rectangle {
     assert(pathData.length > 0);
     const N = PATH_VERTEX_SIZE;
+    const n = pathData.length / N;
 
     let minX, maxX, minY, maxY;
     minX = maxX = pathData[0];
     minY = maxY = pathData[1];
 
-    for (let i = 1; i < pathData.length; i++) {
+    for (let i = 1; i < n; i++) {
         const x = pathData[N * i];
         const y = pathData[N * i + 1];
         minX = Math.min(minX, x);

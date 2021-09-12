@@ -1,3 +1,5 @@
+import assert from "../utilities/assert";
+
 /**
  * Represents an axis-aligned rectangle.
  */
@@ -12,6 +14,12 @@ export default class Rectangle {
         this.maxX = maxX;
         this.minY = minY;
         this.maxY = maxY;
+
+        if(__DEBUG__) {
+            if([minX, maxX, minY, maxY].find(isNaN) !== undefined) {
+                throw new Error(`Rectangle constructor argument was NaN.`);
+            }
+        }
     }
 
     public get width(): number {

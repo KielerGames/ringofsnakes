@@ -1,18 +1,18 @@
-import FoodChunk from "../data/FoodChunk";
 import { GameConfig, ServerToClientJSONMessage } from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
 import { SnakeChunkData, SnakeData, GameDataUpdate } from "./GameDataUpdate";
-import WorkerChunk from "./WorkerChunk";
+import WorkerSnakeChunk from "./WorkerSnakeChunk";
 import WorkerSnake from "./WorkerSnake";
+import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
 
 export default class WorkerGame {
     socket: WebSocket;
 
     targetPlayerId: number;
     config: GameConfig;
-    snakeChunks: Map<SnakeChunkId, WorkerChunk> = new Map();
-    foodChunks: Map<FoodChunkId, FoodChunk> = new Map();
+    snakeChunks: Map<SnakeChunkId, WorkerSnakeChunk> = new Map();
+    foodChunks: Map<FoodChunkId, FoodChunkDTO> = new Map();
     snakes: Map<SnakeId, WorkerSnake> = new Map();
     lastUpdateTime: number;
     ticks: number = 0;
@@ -63,7 +63,7 @@ export default class WorkerGame {
                 } else {
                     const snake = this.snakes.get(chunkData.snakeId);
                     assert(snake !== undefined, "Data for unknown snake.");
-                    chunk = new WorkerChunk(snake!, chunkData);
+                    chunk = new WorkerSnakeChunk(snake!, chunkData);
                     this.snakeChunks.set(chunkData.chunkId, chunk);
                 }
             });
@@ -148,7 +148,7 @@ export default class WorkerGame {
         }
 
         // food updates
-        const foodChunks: FoodChunk[] = Array.from(this.foodChunks.values());
+        const foodChunks = Array.from(this.foodChunks.values());
         this.foodChunks.clear();
 
         const ticks = this.ticks;
@@ -165,6 +165,5 @@ export default class WorkerGame {
     }
 }
 
-type FoodChunkId = number;
 type SnakeChunkId = number;
 type SnakeId = number;

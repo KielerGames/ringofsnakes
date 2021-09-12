@@ -1,76 +1,81 @@
-import Food from "../data/Food";
 import FoodChunk from "../data/FoodChunk";
+import Snake from "../data/Snake";
 import Matrix from "../math/Matrix";
+import Vector from "../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 
 declare const __VERTEXSHADER_FOOD__: string;
 declare const __FRAGMENTSHADER_FOOD__: string;
 
 let gl: WebGLRenderingContext;
-let buffer: WebGLBuffer;
 let shader: WebGLShaderProgram;
+let texture: WebGLTexture;
 
-const boxCoords = [
-    // triangle 1
-    [-1.0, 1.0], // top-left
-    [1.0, 1.0], // top-right
-    [-1.0, -1.0], // bottom-left
-    // triangle 2
-    [-1.0, -1.0], // bottom-left
-    [1.0, 1.0], // top-right
-    [1.0, -1.0] // bottom-right
-];
+const colors = new Uint8Array([
+    // red
+    255, 25, 12,
+    // blue
+    0, 128, 255,
+    // green
+    25, 255, 42,
+    // pink
+    255, 0, 255
+]);
+
+const FOOD_VERTEX_SIZE = FoodChunk.FOOD_VERTEX_SIZE;
+const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
 
 export function init(glCtx: WebGLRenderingContext): void {
     gl = glCtx;
-    buffer = gl.createBuffer()!;
 
     shader = new WebGLShaderProgram(
         gl,
         __VERTEXSHADER_FOOD__,
-        __FRAGMENTSHADER_FOOD__
+        __FRAGMENTSHADER_FOOD__,
+        ["aPosition", "aLocalPos", "aColorIndex"]
     );
+
+    texture = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGB,
+        colors.length / 3,
+        1,
+        0,
+        gl.RGB,
+        gl.UNSIGNED_BYTE,
+        colors
+    );
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 }
 
-export function render(foodChunks: Iterable<FoodChunk>, transform: Matrix) {
+export function render(
+    foodChunks: Iterable<FoodChunk>,
+    targetSnake: Snake | undefined,
+    transform: Matrix
+) {
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    shader.setUniform("uColorSampler", 0);
+    shader.setUniform("uTransform", transform.data);
+
+    const attractor = targetSnake
+        ? targetSnake.getPredictedPosition(0)
+        : FAR_AWAY;
+    shader.setUniform("uPlayerPosition", [attractor.x, attractor.y]);
 
     for (const chunk of foodChunks) {
-        shader.setUniform("uTransform", transform.data);
-        shader.setUniform("uColor", [1.0, 0.1, 0.0]); // TODO
-        const data = createGPUData(chunk.food);
-        gl.bufferData(gl.ARRAY_BUFFER, data, gl.STREAM_DRAW);
-        shader.run(gl.TRIANGLES, 0, chunk.food.length * boxCoords.length);
+        chunk.useBuffer(gl);
+
+        shader.run(chunk.numberOfVertices, {
+            stride: FOOD_VERTEX_SIZE * Float32Array.BYTES_PER_ELEMENT
+        });
     }
-}
-
-let foodGPUData: Float32Array = new Float32Array(32 * boxCoords.length);
-
-function createGPUData(foods: Food[]): Float32Array {
-    const m = 2 * boxCoords.length;
-    const n = foods.length * 2 * m;
-
-    if (foodGPUData.length < n) {
-        foodGPUData = new Float32Array(n);
-    }
-
-    for (let fi = 0; fi < foods.length; fi++) {
-        const f = foods[fi];
-        const offset = fi * 2 * m;
-
-        for (let bi = 0; bi < boxCoords.length; bi++) {
-            const [u, v] = boxCoords[bi];
-
-            // [x,y,u,v]
-            foodGPUData[offset + 4 * bi + 0] = f.size * u + f.x;
-            foodGPUData[offset + 4 * bi + 1] = f.size * v + f.y;
-            foodGPUData[offset + 4 * bi + 2] = u;
-            foodGPUData[offset + 4 * bi + 3] = v;
-        }
-    }
-
-    return foodGPUData;
 }

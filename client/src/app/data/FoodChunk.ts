@@ -1,25 +1,93 @@
-import Food from "./Food";
+import { FoodChunkDTO, FoodItemDTO } from "../worker/decoder/FoodDecoder";
+import * as BufferManager from "../webgl/BufferManager";
+import Rectangle from "../math/Rectangle";
 
+const boxCoords = [
+    // triangle 1
+    [-1.0, 1.0], // top-left
+    [1.0, 1.0], // top-right
+    [-1.0, -1.0], // bottom-left
+    // triangle 2
+    [-1.0, -1.0], // bottom-left
+    [1.0, 1.0], // top-right
+    [1.0, -1.0] // bottom-right
+];
 export default class FoodChunk {
+    public static readonly FOOD_VERTEX_SIZE = 2 + 2 + 1; // x,y, u,v, c
+
     public id: number;
-    food: Food[];
+    private gpuBuffer: WebGLBuffer;
+    private gpuData: Float32Array | undefined = new Float32Array(
+        32 * boxCoords.length
+    );
+    private numFoodItems: number;
+    private readonly box: Rectangle;
 
-    public constructor(id: number, food: Food[]) {
-        this.id = id;
-        this.food = food;
+    public constructor(dto: FoodChunkDTO) {
+        this.id = dto.id;
+        this.numFoodItems = dto.items.length;
+        this.box = Rectangle.fromTransferable(dto.bounds);
+        this.gpuBuffer = BufferManager.create();
+        this.gpuData = createGPUData(dto.items, this.gpuData);
     }
 
-    public static createRandom(): FoodChunk {
-        const foods = new Array(20);
+    public update(dto: FoodChunkDTO): void {
+        this.numFoodItems = dto.items.length;
+        this.gpuData = createGPUData(dto.items, this.gpuData);
+    }
 
-        for (let i = 0; i < foods.length; i++) {
-            const x = (2 * Math.random() - 1) * 25;
-            const y = (2 * Math.random() - 1) * 25;
-            foods[i] = new Food(x, y, 0.5 + Math.random(), 0);
+    public destroy(): void {
+        BufferManager.free(this.gpuBuffer);
+    }
+
+    public useBuffer(gl: WebGLRenderingContext): void {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.gpuBuffer);
+
+        if (this.gpuData) {
+            gl.bufferData(gl.ARRAY_BUFFER, this.gpuData, gl.STATIC_DRAW);
+            this.gpuData = undefined;
         }
-
-        const id = Math.floor(Math.random() * 4200);
-
-        return new FoodChunk(id, foods);
     }
+
+    public intersects(box: Rectangle): boolean {
+        return Rectangle.distance2(this.box, box) == 0.0;
+    }
+
+    public get numberOfVertices(): number {
+        return this.numFoodItems * boxCoords.length;
+    }
+}
+
+function createGPUData(
+    items: FoodItemDTO[],
+    gpuData: Float32Array | undefined
+): Float32Array {
+    const floatsPerFood = FoodChunk.FOOD_VERTEX_SIZE * boxCoords.length;
+    const n = items.length * floatsPerFood;
+    const fvs = FoodChunk.FOOD_VERTEX_SIZE;
+
+    if (gpuData === undefined || gpuData.length < n) {
+        gpuData = new Float32Array(n);
+    }
+
+    for (let fi = 0; fi < items.length; fi++) {
+        const f = items[fi];
+        const offset = fi * floatsPerFood;
+        const color = (f.color % 4) / 3;
+
+        for (let bi = 0; bi < boxCoords.length; bi++) {
+            const [u, v] = boxCoords[bi];
+
+            // [x,y, u,v, c]
+            gpuData[offset + fvs * bi + 0] = f.size * u + f.x;
+            gpuData[offset + fvs * bi + 1] = f.size * v + f.y;
+
+            gpuData[offset + fvs * bi + 2] = u;
+            gpuData[offset + fvs * bi + 3] = v;
+
+            gpuData[offset + fvs * bi + 4] = color;
+        }
+    }
+
+    return gpuData;
 }

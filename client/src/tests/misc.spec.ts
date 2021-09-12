@@ -5,7 +5,7 @@ import Snake from "../app/data/Snake";
 import SnakeChunk from "../app/data/SnakeChunk";
 import Rectangle from "../app/math/Rectangle";
 import { SnakeChunkData } from "../app/worker/GameDataUpdate";
-import WorkerChunk from "../app/worker/WorkerChunk";
+import WorkerSnakeChunk from "../app/worker/WorkerSnakeChunk";
 import {
     createGameConfig,
     createSnakeChunkBuffer,
@@ -72,7 +72,10 @@ describe("WorkerChunk", () => {
             undefined,
             new Rand(seed)
         );
-        const wc = new WorkerChunk(snake, SCD.decode(chunkData1, 0, cfg).data);
+        const wc = new WorkerSnakeChunk(
+            snake,
+            SCD.decode(chunkData1, 0, cfg).data
+        );
         const pathLength1 = wc.createTransferData().length;
         assert.isAbove(pathLength1, 0.0);
 

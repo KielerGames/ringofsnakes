@@ -22,6 +22,6 @@ public class Player extends Client {
 
     @Override
     public BoundingBox getKnowledgeBox() {
-        return new BoundingBox(snake.getHeadPosition(), 42.0, 42.0);
+        return new BoundingBox(snake.getHeadPosition(), 24.0, 24.0);
     }
 }

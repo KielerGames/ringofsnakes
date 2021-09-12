@@ -94,11 +94,12 @@ public class Game {
 
     private void updateClients() {
         clients.forEach((id, client) -> {
-            var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
+            final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
             worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
             worldChunks.forEach(client::updateClientFoodChunk);
 
             client.sendUpdate();
+            client.cleanupKnowledge();
         });
     }
 
@@ -109,7 +110,7 @@ public class Game {
             var worldChunk = world.chunks.findChunk(headPosition);
             var foodList = worldChunk.getFoodList();
             var collectedFood = foodList.stream()
-                    .filter(food -> food.isWithinRange(headPosition, snakeWidth + 1.0))
+                    .filter(food -> food.isWithinRange(headPosition, snakeWidth * 1.1 + 1.0))
                     .collect(Collectors.toList());
             snake.grow(collectedFood.size() * Food.nutritionalValue);
 

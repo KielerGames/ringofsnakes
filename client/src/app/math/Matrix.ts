@@ -22,6 +22,10 @@ export default class Matrix {
         this.data[row + n * column] = value;
     }
 
+    public getEntry(row: number, column: number): number {
+        return this.data[row + n * column];
+    }
+
     // public multiply3(v:Vector, res = new Vector()):Vector {
     //     for(let i=0; i<3; i++) {
     //         let sum = 0.0;

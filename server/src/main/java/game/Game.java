@@ -10,13 +10,13 @@ import game.world.WorldChunk;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
+import util.ExceptionalExecutorService;
 
 import javax.websocket.Session;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -33,7 +33,7 @@ public class Game {
     public Game() {
         config = new GameConfig();
         world = new World(config);
-        executor = Executors.newSingleThreadScheduledExecutor();
+        executor = new ExceptionalExecutorService();
 
         // spawn some food
         for (int i = 0; i < 42; i++) {

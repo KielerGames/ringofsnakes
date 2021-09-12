@@ -122,7 +122,7 @@ public class WorldChunk {
                 .filter(snakeChunk -> snakeChunk.getBoundingBox()
                         .isWithinRange(s.getHeadPosition(), s.getWidth()
                                 / 2.0 + snakeChunk.getSnake().getWidth() / 2.0)
-                        && snakeChunk.getSnake() != s).forEach(snakeChunk -> {
+                        && !snakeChunk.getSnake().equals(s)).forEach(snakeChunk -> {
                             s.collidesWithSnakeChunk(snakeChunk);
                 });
     }

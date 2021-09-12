@@ -63,7 +63,8 @@ export default class WorkerSnakeChunk {
         this._full = data.full;
         this._final = data.full; // TODO
 
-        // TODO: update bounding box
+        // TODO: update bounding box efficiently
+        createBoundingBox(this.pathData);
     }
 
     public createTransferData(): SnakeChunkData {
@@ -142,7 +143,7 @@ function createBoundingBox(pathData: Float32Array): Rectangle {
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x);
         minY = Math.min(minY, y);
-        maxY = Math.max(maxX, y);
+        maxY = Math.max(maxY, y);
     }
 
     return new Rectangle(minX, maxX, minY, maxY);

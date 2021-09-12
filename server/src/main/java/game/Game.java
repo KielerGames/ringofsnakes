@@ -94,11 +94,12 @@ public class Game {
 
     private void updateClients() {
         clients.forEach((id, client) -> {
-            var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
+            final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
             worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
             worldChunks.forEach(client::updateClientFoodChunk);
 
             client.sendUpdate();
+            client.cleanupKnowledge();
         });
     }
 

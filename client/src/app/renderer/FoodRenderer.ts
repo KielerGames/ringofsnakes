@@ -12,18 +12,14 @@ let shader: WebGLShaderProgram;
 let texture: WebGLTexture;
 
 const colors = new Uint8Array([
-    255,
-    25,
-    12, // red
-    0,
-    128,
-    255, // blue
-    25,
-    255,
-    42, // green
-    255,
-    0,
-    255 // pink
+    // red
+    255, 25, 12,
+    // blue
+    0, 128, 255,
+    // green
+    25, 255, 42,
+    // pink
+    255, 0, 255
 ]);
 
 const FOOD_VERTEX_SIZE = FoodChunk.FOOD_VERTEX_SIZE;

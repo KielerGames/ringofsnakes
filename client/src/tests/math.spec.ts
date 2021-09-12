@@ -55,7 +55,7 @@ describe("Rectangle", () => {
     it("distance properties", () => {
         const rand = new Rand("distance test seed");
 
-        for(let i=0; i<100; i++) {
+        for (let i = 0; i < 100; i++) {
             const rect1 = createRandomRectangle(100, rand);
             const rect2 = createRandomRectangle(100, rand);
 

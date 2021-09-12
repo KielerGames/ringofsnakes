@@ -2,8 +2,10 @@ package game.snake;
 
 import game.world.WorldChunk;
 import math.BoundingBox;
+import util.SnakePointData;
 
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
 
 public interface SnakeChunk {
     ByteBuffer getBuffer();
@@ -24,6 +26,8 @@ public interface SnakeChunk {
     int getUniqueId();
 
     float getLength();
+
+    LinkedList<SnakePointData> getPointData();
 
     boolean isJunk();
 

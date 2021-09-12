@@ -35,7 +35,7 @@ public class Snake {
     private double lengthBuffer = 0;
     public boolean isAlive = true;
 
-    public final LinkedList<SnakePointData> pointData = new LinkedList<>();
+    public final LinkedList<SnakeChunk> activeSnakeChunks = new LinkedList<>();
     private float pointDataSnakeLength = 0f;
 
 
@@ -80,13 +80,15 @@ public class Snake {
             headPosition.addDirection(headDirection, config.snakeSpeed);
         }
 
-
         // update chunks
         chunkBuilder.append(encDirDelta, fast);
         // after an update a chunk might be full
         if (chunkBuilder.isFull()) {
             System.out.println("chunk " + chunkBuilder.getUniqueId() + " is full (length: " + chunkBuilder.getLength() + ")");
             beginChunk();
+            if (chunkBuilder.getUniqueId() == 1) {
+                System.out.println("ID = 1");
+            }
         }
         float offset = chunkBuilder.getLength();
         for (FinalSnakeChunk chunk : chunks) {
@@ -99,14 +101,25 @@ public class Snake {
                 chunks.remove(chunks.size() - 1);
             }
         }
-        updatePointData();
+            updatePointData();
     }
-
+    //TODO: make this nicer
     private void updatePointData() {
-        this.pointData.addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
-        while (this.pointDataSnakeLength > length) {
-            var p = pointData.removeLast();
-            pointDataSnakeLength -= p.fast ? config.fastSnakeSpeed : config.snakeSpeed;
+        if (this.activeSnakeChunks.isEmpty()) {
+            return;
+        }
+        this.activeSnakeChunks.getFirst().getPointData().
+                addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
+        while (this.pointDataSnakeLength > length && !activeSnakeChunks.isEmpty()) {
+            var lastAsc = activeSnakeChunks.getLast();
+            var pd = lastAsc.getPointData();
+            if (!pd.isEmpty()) {
+                var p = pd.removeLast();
+                pointDataSnakeLength -= p.fast ? config.fastSnakeSpeed : config.snakeSpeed;
+            } else {
+                activeSnakeChunks.removeLast();
+                updatePointData();
+            }
         }
         pointDataSnakeLength += fast ? config.fastSnakeSpeed : config.snakeSpeed;
     }
@@ -119,10 +132,13 @@ public class Snake {
             chunks.add(0, snakeChunk);
             //world.removeSnakeChunk(chunkBuilder);
             world.addSnakeChunk(snakeChunk);
+            activeSnakeChunks.removeFirst();
+            activeSnakeChunks.addFirst(snakeChunk);
         }
 
         chunkBuilder = new GrowingSnakeChunk(coder, this, nextChunkId++);
         world.addSnakeChunk(chunkBuilder);
+        activeSnakeChunks.addFirst(chunkBuilder);
     }
 
     public ByteBuffer getLatestMeaningfulBuffer() {
@@ -188,27 +204,32 @@ public class Snake {
         this.skin = skin;
     }
 
-    public boolean collidesWith(Snake s) {
-        if (s.pointData.stream().anyMatch(pd ->
-                (Vector.distance2(headPosition, pd.point)) < (this.getWidth() / 2.0 + s.getWidth() / 2.0)
-                        * (this.getWidth() / 2.0 + s.getWidth() / 2.0))) {
-            onCollision();
+    public boolean collidesWithSnakeChunk(SnakeChunk sc) {
+        sc.getPointData().stream().forEach(pd -> {
+        });
+
+        if (sc.getPointData().stream().anyMatch(pd ->
+                (Vector.distance2(headPosition, pd.point)) < (this.getWidth() / 2.0 +
+                        sc.getSnake().getWidth() / 2.0)
+                        * (this.getWidth() / 2.0 +
+                        sc.getSnake().getWidth() / 2.0))) {
+            this.onCollision();
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
+
     private void onCollision() {
-        System.out.println("Collision" + generateExlamationMarks());
+        System.out.println("Collision" + eitherOneOrThreeExclamationMarks());
         length = config.minLength;
     }
 
-    private String generateExlamationMarks() {
+    private String eitherOneOrThreeExclamationMarks() {
         Random random = new Random();
         String s = "!";
-        for (int i = 0; i < random.nextInt(3); i++) {
-            s += "!";
+        if (random.nextBoolean() == true) {
+            s = "!!!";
         }
         return s;
     }

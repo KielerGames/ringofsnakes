@@ -16,7 +16,7 @@ import server.SnakeServer;
 
 public class DebugView extends Application {
 
-    private static final double ZOOM = 8.0;
+    private static final double ZOOM = 2.0;
     private static final boolean FOLLOW_PLAYER = true;
     private Vector camera = new Vector(0, 0);
     private static Game game;
@@ -89,15 +89,18 @@ public class DebugView extends Application {
                 }
             }
             var snakeSize = game.snakes.get(0).getWidth();
-            snake.pointData.forEach(pd -> {
-                var x = pd.point.x;
-                var y = pd.point.y;
-                g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,
-                        300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
-                        snakeSize * ZOOM, snakeSize * ZOOM);
-            });
+            snake.activeSnakeChunks.forEach(snakeChunk ->
+                    snakeChunk.getPointData()
+                            .forEach(pd -> {
+                                var x = pd.point.x;
+                                var y = pd.point.y;
+                                g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,
+                                        300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
+                                        snakeSize * ZOOM, snakeSize * ZOOM);
+                            }));
         });
     }
+
 
     private void drawCurrentWorldChunk(GraphicsContext g){
         if (game != null && game.snakes.size() != 0) {

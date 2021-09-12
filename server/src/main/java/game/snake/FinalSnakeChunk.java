@@ -3,6 +3,7 @@ package game.snake;
 import game.world.WorldChunk;
 import math.BoundingBox;
 import math.Vector;
+import util.SnakePointData;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -20,22 +21,23 @@ public class FinalSnakeChunk implements SnakeChunk {
     private final ByteBuffer chunkByteBuffer;
     private final float length;
     private final int uniqueId;
-    private final Map<Byte, List<Vector>> pointData;
-    private final List<WorldChunk> linkedWorldChunks;
+    public  LinkedList<SnakePointData> pointData;
+    private LinkedList<WorldChunk> linkedWorldChunks;
     private final BoundingBox boundingBox;
 
 
+
     protected FinalSnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, float length,
-                              List<Vector> points) {
+                              LinkedList<SnakePointData> pointData) {
         assert buffer.position() == BYTE_SIZE;
         assert length > 0;
 
+        this.pointData = (LinkedList<SnakePointData>) pointData.clone();
         this.snake = snake;
         chunkByteBuffer = buffer;
         boundingBox = box;
         this.length = length;
         this.uniqueId = buffer.getInt(0); // bytes 0-3
-        this.pointData = new HashMap<>();
         linkedWorldChunks = new LinkedList<>();
     }
 
@@ -65,6 +67,11 @@ public class FinalSnakeChunk implements SnakeChunk {
 
     public float getLength() {
         return this.length;
+    }
+
+    @Override
+    public LinkedList<SnakePointData> getPointData() {
+        return pointData;
     }
 
     public void setOffset(float offset) {

@@ -3,6 +3,7 @@ package game.snake;
 import game.world.WorldChunk;
 import math.BoundingBox;
 import math.Vector;
+import util.SnakePointData;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -25,6 +26,7 @@ public class GrowingSnakeChunk implements SnakeChunk {
     private int lastDirDelta = 0;
     private boolean junk = false;
     private final List<WorldChunk> linkedWorldChunks = new LinkedList<>();
+    public final LinkedList<SnakePointData> pointData = new LinkedList<>();
 
     private final ByteBuffer chunkByteBuffer;
     private final List<Vector> points = new LinkedList<>();
@@ -126,7 +128,7 @@ public class GrowingSnakeChunk implements SnakeChunk {
         }
             BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
             junk = true;
-            return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, points);
+            return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, pointData);
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {
@@ -163,6 +165,11 @@ public class GrowingSnakeChunk implements SnakeChunk {
 
     public float getLength() {
         return (float) this.length;
+    }
+
+    @Override
+    public LinkedList<SnakePointData> getPointData() {
+        return pointData;
     }
 
     public boolean isJunk() {return  junk; }

@@ -15,10 +15,7 @@ import server.Player;
 import server.protocol.SpawnInfo;
 
 import javax.websocket.Session;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -57,18 +54,19 @@ public class Game {
         clients.put(session.getId(), player);
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
-        addBotsNextToPlayerOne(new Vector(3, 4), 20);
+        addBotsNextToPlayerOne(50.0, 100);
         return player;
     }
 
-    public void addBotsNextToPlayerOne(Vector offset, int n) {
+    public void addBotsNextToPlayerOne(Double radius, int n) {
         //adds n stupid bots next to the player at the start of the game
+        Random random = new Random();
         if (!snakes.isEmpty()) {
             var position = snakes.get(0).getHeadPosition().clone();
             for (int i = 0; i < n; i++) {
-                position.x += offset.x + i;
-                position.y += offset.y;
-                StupidBot bot = new StupidBot(this, position);
+                var spawnPosition = new Vector(position.x + (random.nextDouble() * 2 - 1.0) * radius,
+                        position.y + (random.nextDouble() * 2 - 1.0 ) * radius);
+                StupidBot bot = new StupidBot(this, spawnPosition);
                 snakes.add(bot.getSnake());
                 bots.add(bot);
                 System.out.println("Bot added!");
@@ -123,7 +121,6 @@ public class Game {
             bots.forEach(Bot::act);
             checkForCollisions();
         }
-
         eatFood();
     }
 

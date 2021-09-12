@@ -21,7 +21,7 @@ export default class FoodChunk {
         32 * boxCoords.length
     );
     private numFoodItems: number;
-    private readonly box: Rectangle;
+    public readonly box: Rectangle;
 
     public constructor(dto: FoodChunkDTO) {
         this.id = dto.id;

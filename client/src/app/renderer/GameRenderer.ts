@@ -4,6 +4,7 @@ import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
 import * as FoodRenderer from "./FoodRenderer";
+import * as BoxRenderer from "./BoxRenderer";
 import * as BufferManager from "../webgl/BufferManager";
 
 let gl: WebGLRenderingContext;
@@ -32,6 +33,10 @@ export function init(parentNode: HTMLElement = document.body): void {
     SnakeChunkRenderer.init(gl);
     SnakeHeadRenderer.init(gl);
     FoodRenderer.init(gl);
+
+    if (__DEBUG__) {
+        BoxRenderer.init(gl);
+    }
 }
 
 export function render(data: GameData, camera: Camera, time: number): void {
@@ -54,6 +59,10 @@ export function render(data: GameData, camera: Camera, time: number): void {
 
     // render snake heads
     SnakeHeadRenderer.render(data.getSnakes(), transform, pTime);
+
+    if (__DEBUG__) {
+        BoxRenderer.renderAll(transform);
+    }
 }
 
 function resize(force: boolean = false) {

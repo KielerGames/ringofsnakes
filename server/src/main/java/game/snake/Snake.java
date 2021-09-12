@@ -86,9 +86,6 @@ public class Snake {
         if (chunkBuilder.isFull()) {
             System.out.println("chunk " + chunkBuilder.getUniqueId() + " is full (length: " + chunkBuilder.getLength() + ")");
             beginChunk();
-            if (chunkBuilder.getUniqueId() == 1) {
-                System.out.println("ID = 1");
-            }
         }
         float offset = chunkBuilder.getLength();
         for (FinalSnakeChunk chunk : chunks) {

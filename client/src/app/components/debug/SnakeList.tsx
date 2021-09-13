@@ -51,7 +51,7 @@ function SnakeOverview(props: Readonly<SOProps>) {
         <div class={`snake skin${snake.skin}`}>
             <div class="snake-info">{`Snake ${snake.id}`}</div>
             <div class="chunks">
-                {snake.getChunks().map((chunk) => (
+                {snake.getSnakeChunks().map((chunk) => (
                     <div class="chunk-info" key={chunk.id}>
                         {`id:${chunk.id & CHUNK_ID_MASK} len:${Math.round(
                             chunk.length

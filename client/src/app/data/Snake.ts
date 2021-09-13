@@ -73,10 +73,15 @@ export default class Snake {
         }
     }
 
-    public removeChunk(id: number): void {
+    public removeSnakeChunk(id: number): void {
         this.chunks.delete(id);
 
         if (this.currentChunk && this.currentChunk.id === id) {
+            if (__DEBUG__) {
+                console.warn(
+                    `Warning: Current chunk ${id} of snake ${this.currentChunk.snake.id} removed.`
+                );
+            }
             this.currentChunk = null;
         }
     }
@@ -85,7 +90,7 @@ export default class Snake {
         return this.currentChunk;
     }
 
-    public getChunks(): SnakeChunk[] {
+    public getSnakeChunks(): SnakeChunk[] {
         return Array.from(this.chunks.values());
     }
 }

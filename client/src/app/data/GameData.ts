@@ -83,7 +83,7 @@ export default class GameData {
         // remove collected chunks
         deleteChunks.forEach((chunk) => {
             this.snakeChunks.delete(chunk.id);
-            chunk.snake.removeChunk(chunk.id);
+            chunk.snake.removeSnakeChunk(chunk.id);
         });
 
         if (deleteChunks.length > 0) {

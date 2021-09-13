@@ -16,8 +16,8 @@ export default class Rectangle {
         this.minY = minY;
         this.maxY = maxY;
 
-        if(__DEBUG__) {
-            if([minX, maxX, minY, maxY].find(isNaN) !== undefined) {
+        if (__DEBUG__) {
+            if ([minX, maxX, minY, maxY].find(isNaN) !== undefined) {
                 throw new Error(`Rectangle constructor argument was NaN.`);
             }
         }
@@ -69,12 +69,15 @@ export default class Rectangle {
         return dx * dx + dy * dy;
     }
 
-    public extendTo(point: Vector): Rectangle {
+    public extendTo(
+        point: Vector,
+        padding: number = Number.EPSILON
+    ): Rectangle {
         return new Rectangle(
-            Math.min(this.minX, point.x),
-            Math.max(this.maxX, point.x + Number.EPSILON),
-            Math.min(this.minY, point.y),
-            Math.max(this.maxY, point.y + Number.EPSILON)
+            Math.min(this.minX, point.x - padding),
+            Math.max(this.maxX, point.x + padding),
+            Math.min(this.minY, point.y - padding),
+            Math.max(this.maxY, point.y + padding)
         );
     }
 

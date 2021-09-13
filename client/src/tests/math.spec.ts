@@ -71,7 +71,7 @@ describe("Rectangle", () => {
     });
 
     it("extension should contain point", () => {
-        const rect = new Rectangle(1,2,0,1);
+        const rect = new Rectangle(1, 2, 0, 1);
         const point = new Vector(0.5, 0.5);
 
         assert.isFalse(rect.contains(point));
@@ -79,6 +79,24 @@ describe("Rectangle", () => {
         const extendedRect = rect.extendTo(point);
         assert.isTrue(extendedRect.contains(point));
         assert.equal(Rectangle.distance2(rect, extendedRect), 0.0);
+    });
+
+    it("should not shrink", () => {
+        const rand = new Rand("rectangle grow seed");
+
+        let rect = new Rectangle(0, 0, 0, 0);
+
+        for (let i = 0; i < 100; i++) {
+            const point = new Vector(
+                200 * rand.next() - 100,
+                200 * rand.next() - 100
+            );
+            const extendedRect = rect.extendTo(point);
+            assert.isAtLeast(extendedRect.width, rect.width);
+            assert.isAtLeast(extendedRect.height, rect.height);
+
+            rect = extendedRect;
+        }
     });
 
     function createRandomRectangle(scale: number, rand: Rand): Rectangle {

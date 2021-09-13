@@ -40,8 +40,8 @@ export default class SnakeChunk {
 
     /**
      * Offset is the path-distance from the snake head to this chunk.
-     * @param timeSinceLastTick 
-     * @returns 
+     * @param timeSinceLastTick
+     * @returns
      */
     public offset(timeSinceLastTick: number = 0.0): number {
         const t = timeSinceLastTick;
@@ -57,7 +57,10 @@ export default class SnakeChunk {
             this.buffer[n - 11] = end.y;
         }
 
-        this.boundingBox = this.boundingBox.extendTo(end, 0.5 * this.snake.width);
+        this.boundingBox = this.boundingBox.extendTo(
+            end,
+            0.5 * this.snake.width
+        );
     }
 
     public getBoundingBox(): Rectangle {

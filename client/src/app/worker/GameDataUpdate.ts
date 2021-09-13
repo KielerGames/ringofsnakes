@@ -6,7 +6,7 @@ export type GameDataUpdate = {
     newSnakeChunks: SnakeChunkData[];
     foodChunks: FoodChunkDTO[];
     snakes: SnakeData[];
-    cameraTarget: number;
+    targetSnakeId: number;
 };
 
 /* Vertex buffer triangle strip:

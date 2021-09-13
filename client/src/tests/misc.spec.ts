@@ -46,7 +46,7 @@ describe("MT Snake Chunk", () => {
 
         const chunk = new SnakeChunk(snake, data);
 
-        snake.setChunk(chunk);
+        snake.addSnakeChunk(chunk);
 
         assert.equal(chunk.offset(0.0), 0.0);
         assert.isAbove(chunk.offset(1.0), 0.0);

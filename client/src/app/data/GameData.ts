@@ -8,7 +8,7 @@ export default class GameData {
     private snakes: Map<number, Snake> = new Map();
     private snakeChunks: Map<number, SnakeChunk> = new Map();
     private foodChunks: Map<number, FoodChunk> = new Map();
-    private cameraTargetId: number = -1;
+    private targetSnakeId: number = -1;
     private lastUpdateTime: number = performance.now();
 
     public update(data: GameDataUpdate): void {
@@ -18,7 +18,7 @@ export default class GameData {
         this.lastUpdateTime = now;
 
         // camera
-        this.cameraTargetId = data.cameraTarget;
+        this.targetSnakeId = data.targetSnakeId;
 
         // update & add new snakes
         data.snakes.forEach((snakeData) => {
@@ -37,7 +37,7 @@ export default class GameData {
                 throw new Error(`No data for snake ${chunkData.snakeId}!`);
             }
             const chunk = new SnakeChunk(snake, chunkData);
-            snake.setChunk(chunk);
+            snake.addSnakeChunk(chunk);
             this.snakeChunks.set(chunk.id, chunk);
         });
 
@@ -112,8 +112,8 @@ export default class GameData {
     }
 
     public get cameraTarget(): Snake | undefined {
-        if (this.cameraTargetId >= 0) {
-            return this.snakes.get(this.cameraTargetId);
+        if (this.targetSnakeId >= 0) {
+            return this.snakes.get(this.targetSnakeId);
         }
     }
 }

@@ -61,17 +61,16 @@ export default class Snake {
         return pos;
     }
 
-    public setChunk(chunk: SnakeChunk): void {
+    public addSnakeChunk(chunk: SnakeChunk): void {
         this.chunks.set(chunk.id, chunk);
 
         if (!chunk.final) {
             this.currentChunk = chunk;
+        } else if (this.currentChunk) {
+            if (this.currentChunk.id === chunk.id) {
+                this.currentChunk = null;
+            }
         }
-        // else if (this.currentChunk) {
-        //     if (this.currentChunk.id === chunk.id) {
-        //         this.currentChunk = null;
-        //     }
-        // }
     }
 
     public removeChunk(id: number): void {

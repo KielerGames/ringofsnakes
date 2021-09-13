@@ -160,7 +160,7 @@ export default class WorkerGame {
             newSnakeChunks: snakeChunks,
             snakes,
             foodChunks,
-            cameraTarget: this.targetPlayerId
+            targetSnakeId: this.targetPlayerId
         };
     }
 }

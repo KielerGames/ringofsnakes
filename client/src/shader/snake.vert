@@ -15,6 +15,7 @@ varying float normalOffset;
 void main(void) {
     normalOffset = vNormalOffset;
     pathOffset = uChunkPathOffset + vRelativePathOffset;
-    vec2 position = vPosition + (vNormalOffset * uSnakeWidth) * vNormal;
+    float size = 0.5 * uSnakeWidth;
+    vec2 position = vPosition + (vNormalOffset * size) * vNormal;
     gl_Position = vec4(uTransform * vec3(position, 1.0), 1.0);
 }

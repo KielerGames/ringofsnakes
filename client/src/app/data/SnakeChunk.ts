@@ -52,7 +52,7 @@ export default class SnakeChunk {
             this.buffer[n - 11] = end.y;
         }
 
-        this.boundingBox = this.boundingBox.extendTo(end, this.snake.width);
+        this.boundingBox = this.boundingBox.extendTo(end, 0.5 * this.snake.width);
     }
 
     public getBoundingBox(): Rectangle {

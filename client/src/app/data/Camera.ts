@@ -39,8 +39,8 @@ export abstract class Camera {
     public getViewBox(): Rectangle {
         const center = this.lastPosition;
         const ratio = this.unstretch.getEntry(0, 0);
-        const width = 1.0 / (ratio * WORLD_SCALE);
-        const height = 1.0 / WORLD_SCALE;
+        const width = 2.0 / (ratio * WORLD_SCALE);
+        const height = 2.0 / WORLD_SCALE;
         return new Rectangle(
             center.x - 0.5 * width,
             center.x + 0.5 * width,

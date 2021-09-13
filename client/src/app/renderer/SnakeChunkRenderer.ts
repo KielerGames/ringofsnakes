@@ -43,6 +43,7 @@ export function render(
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
+    shader.setUniform("uJunkAlpha", __DEBUG__ ? 0.1 : 0.0);
 
     for (const chunk of chunks) {
         const snake = chunk.snake;

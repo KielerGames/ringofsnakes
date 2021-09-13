@@ -44,7 +44,6 @@ export default class SnakeChunk {
     }
 
     public updateEndPoint(end: Vector): void {
-        // TODO: update bounding box
         const n = this.buffer.length;
         if (n > 12) {
             this.buffer[n - 6] = end.x;
@@ -52,6 +51,8 @@ export default class SnakeChunk {
             this.buffer[n - 12] = end.x;
             this.buffer[n - 11] = end.y;
         }
+
+        this.boundingBox = this.boundingBox.extendTo(end);
     }
 
     public getBoundingBox(): Rectangle {

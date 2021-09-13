@@ -1,4 +1,5 @@
 import assert from "../utilities/assert";
+import Vector from "./Vector";
 
 /**
  * Represents an axis-aligned rectangle.
@@ -66,6 +67,21 @@ export default class Rectangle {
         }
 
         return dx * dx + dy * dy;
+    }
+
+    public extendTo(point: Vector): Rectangle {
+        return new Rectangle(
+            Math.min(this.minX, point.x),
+            Math.max(this.maxX, point.x + Number.EPSILON),
+            Math.min(this.minY, point.y),
+            Math.max(this.maxY, point.y + Number.EPSILON)
+        );
+    }
+
+    public contains(point: Vector): boolean {
+        const x = this.minX <= point.x && point.x < this.maxX;
+        const y = this.minY <= point.y && point.y < this.maxY;
+        return x && y;
     }
 }
 

@@ -47,7 +47,7 @@ export default class Snake {
         const LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700.0;
         const denominator = 1.0 / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
 
-        //TODO: get this value from the game config
+        // TODO: get this value from the game config
         const minLength = 3.0;
 
         const x = 3.0 * (this.length - minLength) * denominator;

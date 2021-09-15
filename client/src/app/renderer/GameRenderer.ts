@@ -1,6 +1,5 @@
 import { Camera } from "../data/Camera";
 import GameData from "../data/GameData";
-import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
 import * as FoodRenderer from "./FoodRenderer";

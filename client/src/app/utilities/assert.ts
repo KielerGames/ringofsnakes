@@ -1,10 +1,12 @@
-function checkAndThrow(condition: boolean, msg: string = ""): void {
+const checkAndThrow = (condition: boolean, msg: string = "") => {
     if (!condition) {
         throw new Error(`AssertionError: ${msg}`);
     }
-}
+};
 
-function noop(): void {}
+const noop = () => {
+    /* eslint no-empty: "off" */
+};
 
 type AssertFunc = (condition: boolean, msg?: string) => void;
 

@@ -4,5 +4,8 @@
         "prefer-for-of": true,
         "no-console": false,
         "no-bitwise": false
+    },
+    "env": {
+        "browser": true
     }
 }

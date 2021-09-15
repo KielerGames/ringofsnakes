@@ -49,8 +49,8 @@ export default class FoodChunk {
         }
     }
 
-    public intersects(box: Rectangle): boolean {
-        return Rectangle.distance2(this.box, box) == 0.0;
+    public isVisible(viewBox: Rectangle): boolean {
+        return Rectangle.distance2(this.box, viewBox) === 0.0;
     }
 
     public get numberOfVertices(): number {

@@ -63,7 +63,7 @@ export default class GameData {
 
     public garbageCollectFoodChunks(viewBox: Rectangle): void {
         Array.from(this.foodChunks.values())
-            .filter((fc) => !fc.intersects(viewBox))
+            .filter((fc) => !fc.isVisible(viewBox))
             .forEach((fc) => {
                 this.foodChunks.delete(fc.id);
                 fc.destroy();
@@ -71,23 +71,23 @@ export default class GameData {
     }
 
     private garbageCollectSnakeChunks(): void {
-        let deleteChunks: SnakeChunk[] = [];
+        const chunksToDelete: SnakeChunk[] = [];
 
         // collect "garbage" snake chunks
         this.snakeChunks.forEach((chunk) => {
             if (chunk.offset() >= chunk.snake.length) {
-                deleteChunks.push(chunk);
+                chunksToDelete.push(chunk);
             }
         });
 
         // remove collected chunks
-        deleteChunks.forEach((chunk) => {
+        chunksToDelete.forEach((chunk) => {
             this.snakeChunks.delete(chunk.id);
             chunk.snake.removeSnakeChunk(chunk.id);
         });
 
-        if (deleteChunks.length > 0) {
-            console.log(`Garbage-collected ${deleteChunks.length} chunk(s).`);
+        if (chunksToDelete.length > 0) {
+            console.log(`Garbage-collected ${chunksToDelete.length} chunk(s).`);
         }
     }
 

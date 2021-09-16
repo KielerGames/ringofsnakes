@@ -4,7 +4,7 @@ import Snake from "../../data/Snake";
 import SnakeChunk from "../../data/SnakeChunk";
 
 type SLProps = {
-    data: GameData;
+    data: Readonly<GameData>;
 };
 
 export default class SnakeList extends Component<SLProps> {

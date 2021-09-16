@@ -17,7 +17,7 @@ export type GameConfig = Readonly<{
     fastSnakeSpeed: number;
     maxTurnDelta: number;
     tickDuration: number;
-    selfCollision: boolean;
+    minLength: number;
     chunkInfo: {
         chunkSize: number;
         columns: number;

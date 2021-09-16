@@ -38,7 +38,11 @@ export function init(parentNode: HTMLElement = document.body): void {
     }
 }
 
-export function render(data: GameData, camera: Camera, time: number): void {
+export function render(
+    data: Readonly<GameData>,
+    camera: Camera,
+    time: number
+): void {
     // resize canvas (only if needed)
     resize();
 

@@ -1,15 +1,21 @@
 import Rectangle from "../math/Rectangle";
+import { GameConfig } from "../protocol";
 import { GameDataUpdate } from "../worker/GameDataUpdate";
 import FoodChunk from "./FoodChunk";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
 
 export default class GameData {
-    private snakes: Map<number, Snake> = new Map();
-    private snakeChunks: Map<number, SnakeChunk> = new Map();
-    private foodChunks: Map<number, FoodChunk> = new Map();
+    private readonly snakes: Map<number, Snake> = new Map();
+    private readonly snakeChunks: Map<number, SnakeChunk> = new Map();
+    private readonly foodChunks: Map<number, FoodChunk> = new Map();
     private targetSnakeId: number = -1;
     private lastUpdateTime: number = performance.now();
+    public readonly config: Readonly<GameConfig>;
+
+    public constructor(config: Readonly<GameConfig>) {
+        this.config = config;
+    }
 
     public update(data: GameDataUpdate): void {
         // time stuff
@@ -30,7 +36,10 @@ export default class GameData {
                     now
                 );
             } else {
-                this.snakes.set(snakeData.id, new Snake(snakeData));
+                this.snakes.set(
+                    snakeData.id,
+                    new Snake(snakeData, this.config)
+                );
             }
         });
 

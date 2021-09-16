@@ -1,6 +1,7 @@
 import { Component } from "preact";
 import GameData from "../../data/GameData";
 import Snake from "../../data/Snake";
+import SnakeChunk from "../../data/SnakeChunk";
 
 type SLProps = {
     data: GameData;
@@ -42,8 +43,6 @@ type SOProps = {
     data: Snake;
 };
 
-const CHUNK_ID_MASK = (1 << 16) - 1;
-
 function SnakeOverview(props: Readonly<SOProps>) {
     const snake = props.data;
 
@@ -53,7 +52,7 @@ function SnakeOverview(props: Readonly<SOProps>) {
             <div class="chunks">
                 {snake.getSnakeChunks().map((chunk) => (
                     <div class="chunk-info" key={chunk.id}>
-                        {`id:${chunk.id & CHUNK_ID_MASK} len:${Math.round(
+                        {`id:${getIdStringOfSnakeChunk(chunk)} len:${Math.round(
                             chunk.length
                         )}`}
                     </div>
@@ -61,4 +60,9 @@ function SnakeOverview(props: Readonly<SOProps>) {
             </div>
         </div>
     );
+}
+
+function getIdStringOfSnakeChunk(chunk: Readonly<SnakeChunk>): string {
+    const CHUNK_ID_MASK = (1 << 16) - 1;
+    return `${chunk.id & CHUNK_ID_MASK}${chunk.final ? "" : "*"}`;
 }

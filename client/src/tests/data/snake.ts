@@ -37,7 +37,7 @@ export function createGameConfig(speed: number = 0.24): GameConfig {
         fastSnakeSpeed: 2 * speed,
         maxTurnDelta: Math.PI / 30,
         tickDuration: 1.0 / 25,
-        selfCollision: false,
+        minLength: 3.0,
         chunkInfo: {
             chunkSize: 32,
             columns: 16,

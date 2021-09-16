@@ -1,5 +1,6 @@
 package server;
 
+import game.snake.FinalSnakeChunk;
 import game.snake.SnakeChunk;
 import game.world.WorldChunk;
 import math.BoundingBox;
@@ -23,6 +24,12 @@ public abstract class Client {
     }
 
     public void updateClientSnakeChunk(SnakeChunk chunk) {
+        // TODO Kilian: remove instanceof check
+        if(chunk instanceof FinalSnakeChunk) {
+            if(((FinalSnakeChunk) chunk).isJunk()) {
+                return;
+            }
+        }
         if (knownSnakeChunks.contains(chunk)) {
             nextUpdate.addSnake(chunk.getSnake());
         } else {

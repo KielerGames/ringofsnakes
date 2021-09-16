@@ -1,6 +1,7 @@
 import * as Comlink from "comlink";
 import { SnakeCamera } from "./data/Camera";
 import GameData from "./data/GameData";
+import { GameConfig } from "./protocol";
 import { WorkerAPI } from "./worker/worker";
 
 export default class Game {
@@ -9,6 +10,7 @@ export default class Game {
     private updateInterval: number = -1;
     private _ended: boolean = false;
     public camera: SnakeCamera = new SnakeCamera();
+    public config: GameConfig;
 
     private constructor() {
         this.worker = Comlink.wrap<WorkerAPI>(
@@ -22,17 +24,17 @@ export default class Game {
         const game = new Game();
         await game.worker.init(name);
 
-        const config = await game.worker.getConfig();
+        game.config = await game.worker.getConfig();
         game.updateInterval = window.setInterval(
-            game.updateData.bind(game),
-            1000 * config.tickDuration
+            game.getUpdatesFromWorker.bind(game),
+            1000 * game.config.tickDuration
         );
         game.worker.onEnd(Comlink.proxy(() => game.stop()));
 
         return game;
     }
 
-    private async updateData(): Promise<void> {
+    private async getUpdatesFromWorker(): Promise<void> {
         try {
             const diff = await this.worker.getGameDataUpdate();
             this.data.update(diff);

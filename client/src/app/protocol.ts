@@ -6,13 +6,13 @@ export type UpdatePlayerName = {
     name: string;
 };
 
-export type SpawnInfo = {
+export type SpawnInfo = Readonly<{
     tag: "SpawnInfo";
     snakeId: number;
     gameConfig: GameConfig;
-};
+}>;
 
-export type GameConfig = {
+export type GameConfig = Readonly<{
     snakeSpeed: number;
     fastSnakeSpeed: number;
     maxTurnDelta: number;
@@ -23,4 +23,4 @@ export type GameConfig = {
         columns: number;
         rows: number;
     };
-};
+}>;

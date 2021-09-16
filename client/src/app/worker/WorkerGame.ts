@@ -9,13 +9,15 @@ import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
 export default class WorkerGame {
     socket: WebSocket;
 
+    readonly config: GameConfig;
     targetPlayerId: number;
-    config: GameConfig;
-    snakeChunks: Map<SnakeChunkId, WorkerSnakeChunk> = new Map();
-    foodChunks: Map<FoodChunkId, FoodChunkDTO> = new Map();
-    snakes: Map<SnakeId, WorkerSnake> = new Map();
-    lastUpdateTime: number;
-    ticks: number = 0;
+
+    readonly snakes: Map<SnakeId, WorkerSnake> = new Map();
+    readonly snakeChunks: Map<SnakeChunkId, WorkerSnakeChunk> = new Map();
+    readonly foodChunks: Map<FoodChunkId, FoodChunkDTO> = new Map();
+
+    lastServerUpdateTime: number;
+    ticksSinceLastMainThreadUpdate: number = 0;
 
     targetAlpha: number = 0.0;
     wantsToBeFast: boolean = false;
@@ -42,7 +44,7 @@ export default class WorkerGame {
             }
         };
 
-        this.lastUpdateTime = performance.now();
+        this.lastServerUpdateTime = performance.now();
 
         console.log(`target snake id: ${snakeId}`);
     }
@@ -81,8 +83,8 @@ export default class WorkerGame {
             this.foodChunks.set(chunk.id, chunk);
         });
 
-        this.ticks++;
-        this.lastUpdateTime = performance.now();
+        this.ticksSinceLastMainThreadUpdate++;
+        this.lastServerUpdateTime = performance.now();
     }
 
     private onJsonMessageFromServer(json: ServerToClientJSONMessage): void {
@@ -96,9 +98,9 @@ export default class WorkerGame {
         }
     }
 
-    public updateUserInput(alpha: number, fast: boolean): void {
+    public updateUserInput(alpha: number, wantsFast: boolean): void {
         this.targetAlpha = alpha;
-        this.wantsToBeFast = fast;
+        this.wantsToBeFast = wantsFast;
 
         // send to server
         // TODO: limit update rate
@@ -131,7 +133,7 @@ export default class WorkerGame {
         // snake chunk updates
         {
             let i = 0;
-            let gc: number[] = [];
+            const gc: number[] = [];
             for (const chunk of this.snakeChunks.values()) {
                 snakeChunks[i] = chunk.createTransferData();
                 if (snakeChunks[i].final) {
@@ -158,12 +160,12 @@ export default class WorkerGame {
         const foodChunks = Array.from(this.foodChunks.values());
         this.foodChunks.clear();
 
-        const ticks = this.ticks;
-        this.ticks = 0;
+        const ticks = this.ticksSinceLastMainThreadUpdate;
+        this.ticksSinceLastMainThreadUpdate = 0;
 
         return {
-            timeSinceLastTick: performance.now() - this.lastUpdateTime,
-            ticksSinceLastUpdate: ticks,
+            timeSinceLastTick: performance.now() - this.lastServerUpdateTime,
+            ticksSinceLastMainThreadUpdate: ticks,
             newSnakeChunks: snakeChunks,
             snakes,
             foodChunks,

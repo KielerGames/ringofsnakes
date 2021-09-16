@@ -1,4 +1,3 @@
-import assert from "../utilities/assert";
 import Vector from "./Vector";
 
 /**
@@ -40,7 +39,7 @@ export default class Rectangle {
         };
     }
 
-    public static fromTransferable(obj: TransferableBox): Rectangle {
+    public static fromTransferable(obj: Readonly<TransferableBox>): Rectangle {
         return new Rectangle(obj.minX, obj.maxX, obj.minY, obj.maxY);
     }
 

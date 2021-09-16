@@ -9,7 +9,7 @@ import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
 export default class WorkerGame {
     socket: WebSocket;
 
-    readonly config: GameConfig;
+    readonly config: Readonly<GameConfig>;
     targetPlayerId: number;
 
     readonly snakes: Map<SnakeId, WorkerSnake> = new Map();
@@ -49,7 +49,7 @@ export default class WorkerGame {
         console.log(`target snake id: ${snakeId}`);
     }
 
-    private onBinaryMessageFromServer(binaryData: ArrayBuffer): void {
+    private onBinaryMessageFromServer(binaryData: Readonly<ArrayBuffer>): void {
         const data = GUD.decode(this.config, binaryData);
 
         // update snakes
@@ -87,7 +87,9 @@ export default class WorkerGame {
         this.lastServerUpdateTime = performance.now();
     }
 
-    private onJsonMessageFromServer(json: ServerToClientJSONMessage): void {
+    private onJsonMessageFromServer(
+        json: Readonly<ServerToClientJSONMessage>
+    ): void {
         switch (json.tag) {
             // TODO
             default: {

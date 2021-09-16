@@ -21,7 +21,7 @@ export default class WorkerSnakeChunk {
     private _final: boolean;
     private box: Rectangle;
 
-    public constructor(snake: WorkerSnake, data: DecodedSnakeChunk) {
+    public constructor(snake: WorkerSnake, data: Readonly<DecodedSnakeChunk>) {
         assert(snake.id === data.snakeId);
         this.id = data.chunkId;
         this.snake = snake;
@@ -51,7 +51,7 @@ export default class WorkerSnakeChunk {
         this.box = createBoundingBox(this.pathData);
     }
 
-    public update(data: DecodedSnakeChunk): void {
+    public update(data: Readonly<DecodedSnakeChunk>): void {
         assert(data.points >= this.numPoints);
         assert(data.pathLength >= data.pathLength);
 
@@ -129,7 +129,7 @@ export default class WorkerSnakeChunk {
     }
 }
 
-function createBoundingBox(pathData: Float32Array): Rectangle {
+function createBoundingBox(pathData: Readonly<Float32Array>): Rectangle {
     assert(pathData.length > 0);
     const N = PATH_VERTEX_SIZE;
     const n = pathData.length / N;

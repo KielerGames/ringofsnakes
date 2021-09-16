@@ -43,7 +43,7 @@ export abstract class Camera {
         // the WebGL viewbox has width & height 2: [-1,1] x [-1,1]
         const width = 2.0 / (ratio * WORLD_SCALE);
         const height = 2.0 / WORLD_SCALE;
-        
+
         return new Rectangle(
             center.x - 0.5 * width,
             center.x + 0.5 * width,

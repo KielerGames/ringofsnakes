@@ -28,63 +28,70 @@ export default class WorkerGame {
         assert(socket.readyState === WebSocket.OPEN);
         assert(socket.binaryType === "arraybuffer");
 
-        socket.onmessage = this.onMessageFromServer.bind(this);
         socket.onclose = () => console.log("Connection closed.");
+        socket.onerror = (e) => console.error(e);
+        socket.onmessage = (event: MessageEvent) => {
+            const rawData = event.data as ArrayBuffer | string;
+
+            if (rawData instanceof ArrayBuffer) {
+                this.onBinaryMessageFromServer(rawData);
+            } else {
+                this.onJsonMessageFromServer(
+                    JSON.parse(rawData) as ServerToClientJSONMessage
+                );
+            }
+        };
 
         this.lastUpdateTime = performance.now();
 
-        console.log(`Snake id: ${snakeId}`);
+        console.log(`target snake id: ${snakeId}`);
     }
 
-    private onMessageFromServer(event: MessageEvent) {
-        const rawData = event.data as ArrayBuffer | string;
+    private onBinaryMessageFromServer(binaryData: ArrayBuffer): void {
+        const data = GUD.decode(this.config, binaryData);
 
-        if (rawData instanceof ArrayBuffer) {
-            const data = GUD.decode(this.config, rawData);
+        // update snakes
+        data.snakeInfos.forEach((info) => {
+            const snake = this.snakes.get(info.snakeId);
+            if (snake) {
+                snake.updateFromServer(info, this.config);
+            } else {
+                this.snakes.set(
+                    info.snakeId,
+                    new WorkerSnake(info, this.config)
+                );
+            }
+        });
 
-            // update snakes
-            data.snakeInfos.forEach((info) => {
-                const snake = this.snakes.get(info.snakeId);
-                if (snake) {
-                    snake.updateFromServer(info, this.config);
-                } else {
-                    this.snakes.set(
-                        info.snakeId,
-                        new WorkerSnake(info, this.config)
-                    );
-                }
-            });
+        // update snake chunks
+        data.snakeChunkData.forEach((chunkData) => {
+            let chunk = this.snakeChunks.get(chunkData.chunkId);
+            if (chunk) {
+                chunk.update(chunkData);
+            } else {
+                const snake = this.snakes.get(chunkData.snakeId);
+                assert(snake !== undefined, "Data for unknown snake.");
+                chunk = new WorkerSnakeChunk(snake!, chunkData);
+                this.snakeChunks.set(chunkData.chunkId, chunk);
+            }
+        });
 
-            // update snake chunks
-            data.snakeChunkData.forEach((chunkData) => {
-                let chunk = this.snakeChunks.get(chunkData.chunkId);
-                if (chunk) {
-                    chunk.update(chunkData);
-                } else {
-                    const snake = this.snakes.get(chunkData.snakeId);
-                    assert(snake !== undefined, "Data for unknown snake.");
-                    chunk = new WorkerSnakeChunk(snake!, chunkData);
-                    this.snakeChunks.set(chunkData.chunkId, chunk);
-                }
-            });
+        // update food chunks
+        data.foodChunkData.forEach((chunk) => {
+            this.foodChunks.set(chunk.id, chunk);
+        });
 
-            // update food chunks
-            data.foodChunkData.forEach((chunk) => {
-                this.foodChunks.set(chunk.id, chunk);
-            });
+        this.ticks++;
+        this.lastUpdateTime = performance.now();
+    }
 
-            this.ticks++;
-            this.lastUpdateTime = performance.now();
-        } else {
-            const json = JSON.parse(rawData) as ServerToClientJSONMessage;
-
-            switch (json.tag) {
-                // TODO
-                default: {
-                    throw new Error(
-                        `Unexpected message from server. (tag = ${json.tag})`
-                    );
-                }
+    private onJsonMessageFromServer(json: ServerToClientJSONMessage): void {
+        switch (json.tag) {
+            // TODO
+            default: {
+                throw new Error(
+                    `Unexpected message from server. (tag = ${json.tag})`
+                );
             }
         }
     }

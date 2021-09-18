@@ -48,7 +48,7 @@ export default class WorkerSnakeChunk {
         assert(this.pathData instanceof Float32Array);
         assert(this.pathData.length % PATH_VERTEX_SIZE === 0);
 
-        this.box = createBoundingBox(this.pathData);
+        this.box = createBoundingBox(this.pathData, this.numPoints);
     }
 
     public update(data: Readonly<DecodedSnakeChunk>): void {
@@ -64,7 +64,7 @@ export default class WorkerSnakeChunk {
         this._final = data.full; // TODO
 
         // TODO: update bounding box efficiently
-        createBoundingBox(this.pathData);
+        createBoundingBox(this.pathData, this.numPoints);
     }
 
     public createTransferData(): SnakeChunkData {
@@ -129,16 +129,18 @@ export default class WorkerSnakeChunk {
     }
 }
 
-function createBoundingBox(pathData: Readonly<Float32Array>): Rectangle {
+function createBoundingBox(
+    pathData: Readonly<Float32Array>,
+    points: number
+): Rectangle {
     assert(pathData.length > 0);
     const N = PATH_VERTEX_SIZE;
-    const n = pathData.length / N;
 
     let minX, maxX, minY, maxY;
     minX = maxX = pathData[0];
     minY = maxY = pathData[1];
 
-    for (let i = 1; i < n; i++) {
+    for (let i = 1; i < points; i++) {
         const x = pathData[N * i];
         const y = pathData[N * i + 1];
         minX = Math.min(minX, x);

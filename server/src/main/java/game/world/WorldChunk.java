@@ -1,10 +1,8 @@
 package game.world;
 
-import game.snake.FinalSnakeChunk;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import math.BoundingBox;
-import math.Vector;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -118,17 +116,16 @@ public class WorldChunk {
 
     //returns
     public void checkForPotentialCollisions(Snake s) {
-        snakeChunks.stream()
+        //add snakeChunks of this worldChunk
+        Set<SnakeChunk> snakeChunksToConsider = new HashSet<>(snakeChunks);
+        //add snakeChunks of neighboring worldChunks
+        neighbors.forEach(worldChunk -> snakeChunksToConsider.addAll(worldChunk.snakeChunks));
+        //check for intersecting boundingBoxes
+        snakeChunksToConsider.stream()
                 .filter(snakeChunk -> snakeChunk.getBoundingBox()
                         .isWithinRange(s.getHeadPosition(), s.getWidth()
                                 / 2.0 + snakeChunk.getSnake().getWidth() / 2.0)
-                        && !snakeChunk.getSnake().equals(s)).forEach(snakeChunk -> {
-                            s.collidesWithSnakeChunk(snakeChunk);
-                });
-    }
-
-    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
+                        && !snakeChunk.getSnake().equals(s)).forEach(snakeChunk ->
+                        s.collidesWithSnakeChunk(snakeChunk));
     }
 }

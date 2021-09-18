@@ -34,6 +34,7 @@ public class Snake {
     private boolean fast = false;
     private double lengthBuffer = 0;
     public boolean isAlive = true;
+    public boolean collided = false;
 
     public final LinkedList<SnakeChunk> activeSnakeChunks = new LinkedList<>();
     private float pointDataSnakeLength = 0f;
@@ -122,6 +123,27 @@ public class Snake {
         pointDataSnakeLength += fast ? config.fastSnakeSpeed : config.snakeSpeed;
     }
 
+    public boolean collidesWithSnakeChunk(SnakeChunk sc) {
+        if (sc.getPointData().stream().anyMatch(pd ->
+                (Vector.distance2(headPosition, pd.point)) < (this.getWidth() / 2.0 +
+                        sc.getSnake().getWidth() / 2.0)
+                        * (this.getWidth() / 2.0 +
+                        sc.getSnake().getWidth() / 2.0))) {
+            this.onCollision();
+            return true;
+        }
+        this.collided = false;
+        return false;
+    }
+
+    private void onCollision() {
+        System.out.println("Collision!");
+        //Comment this out if the snake length should not be reset at collision
+        length = config.minLength;
+        //Comment this out if snakes should not stop at collision
+        this.collided = true;
+    }
+
     public void beginChunk() {
         if (chunkBuilder != null) {
             assert chunkBuilder.isFull();
@@ -173,7 +195,6 @@ public class Snake {
 
     public void shrink(float amount) {
         assert (amount > 0);
-
         var bufferAmount = Math.min(lengthBuffer, amount);
         lengthBuffer -= bufferAmount;
         var snakeAmount = amount - bufferAmount;
@@ -201,33 +222,4 @@ public class Snake {
     public void setSkin(byte skin) {
         this.skin = skin;
     }
-
-    public boolean collidesWithSnakeChunk(SnakeChunk sc) {
-        if (sc.getPointData().stream().anyMatch(pd ->
-                (Vector.distance2(headPosition, pd.point)) < (this.getWidth() / 2.0 +
-                        sc.getSnake().getWidth() / 2.0)
-                        * (this.getWidth() / 2.0 +
-                        sc.getSnake().getWidth() / 2.0))) {
-            this.onCollision();
-            return true;
-        }
-        return false;
-    }
-
-
-    private void onCollision() {
-        System.out.println("Collision" + eitherOneOrThreeExclamationMarks());
-        length = config.minLength;
-    }
-
-    private String eitherOneOrThreeExclamationMarks() {
-        Random random = new Random();
-        String s = "!";
-        if (random.nextBoolean() == true) {
-            s = "!!!";
-        }
-        return s;
-    }
-
-
 }

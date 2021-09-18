@@ -54,7 +54,7 @@ public class Game {
         clients.put(session.getId(), player);
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
-        addBotsNextToPlayerOne(25.0, 10);
+        addBotsNextToPlayerOne(25.0, 30);
         return player;
     }
 
@@ -112,7 +112,7 @@ public class Game {
     private void tick() {
         synchronized (this) {
             snakes.forEach(snake -> {
-                if (snake.isAlive) {
+                if (snake.isAlive && !snake.collided) {
                     snake.tick();
                     killDesertingSnakes(snake);
                 }

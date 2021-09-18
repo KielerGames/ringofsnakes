@@ -64,7 +64,7 @@ export default class WorkerSnakeChunk {
         this._final = data.full; // TODO
 
         // TODO: update bounding box efficiently
-        createBoundingBox(this.pathData, this.numPoints);
+        this.box = createBoundingBox(this.pathData, this.numPoints);
     }
 
     public createTransferData(): SnakeChunkData {

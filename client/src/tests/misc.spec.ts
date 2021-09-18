@@ -38,13 +38,13 @@ describe("MT Snake Chunk", () => {
                 id: 0,
                 skin: 0,
                 length: 0.0,
+                width: 0.42,
                 speed: 1.0,
                 position: { x: 0, y: 0 },
                 direction: 0.0,
                 targetDirection: 0.0,
                 offsetCorrection: 0
-            },
-            createGameConfig()
+            }
         );
 
         const chunk = new SnakeChunk(snake, data);

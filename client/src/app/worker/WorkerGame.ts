@@ -56,7 +56,7 @@ export default class WorkerGame {
         data.snakeInfos.forEach((info) => {
             const snake = this.snakes.get(info.snakeId);
             if (snake) {
-                snake.updateFromServer(info, this.config);
+                snake.updateFromServer(info);
             } else {
                 this.snakes.set(
                     info.snakeId,
@@ -152,7 +152,7 @@ export default class WorkerGame {
         {
             let i = 0;
             for (const snake of this.snakes.values()) {
-                snakes[i] = snake.createTransferData(this.config);
+                snakes[i] = snake.createTransferData();
                 i++;
             }
             // TODO: gc snakes

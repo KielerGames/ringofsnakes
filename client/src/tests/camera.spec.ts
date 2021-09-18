@@ -70,11 +70,11 @@ describe("Camera", () => {
                     speed: 6.66,
                     offsetCorrection: 0,
                     length: 42.0,
+                    width: 1.0,
                     position: { x: 10 * rand.next(), y: 10 * rand.next() },
                     direction: 2 * Math.PI * rand.next(),
                     targetDirection: 2 * Math.PI * rand.next()
-                },
-                createGameConfig()
+                }
             );
 
             const cam = new SnakeCamera(snake);

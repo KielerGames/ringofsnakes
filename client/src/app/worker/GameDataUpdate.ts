@@ -36,6 +36,7 @@ export type SnakeChunkData = {
 export type SnakeData = {
     id: number;
     length: number;
+    width: number;
     skin: number;
     position: { x: number; y: number };
     direction: number;

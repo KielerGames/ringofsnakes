@@ -9,20 +9,20 @@ export default class Snake {
     public readonly skin: number;
     private chunks: Map<number, SnakeChunk> = new Map();
     public length: number;
+    public width: number;
     private lastPosition: Vector;
     public speed: number;
     public direction: PredictedAngle;
     private currentChunk: SnakeChunk | null = null;
-    private config: Readonly<GameConfig>;
 
-    public constructor(data: SnakeData, gameConfig: Readonly<GameConfig>) {
+    public constructor(data: SnakeData) {
         this.id = data.id;
         this.skin = data.skin;
         this.length = data.length;
+        this.width = data.width;
         this.lastPosition = Vector.fromObject(data.position);
         this.speed = data.speed;
         this.direction = new PredictedAngle(data.direction);
-        this.config = gameConfig;
     }
 
     public update(
@@ -31,6 +31,7 @@ export default class Snake {
         time: number
     ): void {
         this.length = data.length;
+        this.width = data.width;
         this.lastPosition.set(data.position);
         this.direction.update(data.direction, data.targetDirection, time);
 
@@ -42,10 +43,6 @@ export default class Snake {
         }
 
         this.speed = data.speed;
-    }
-
-    public get width(): number {
-        return computeWidthFromLength(this.length, this.config);
     }
 
     public getPredictedPosition(timeSinceLastTick: number): Vector {
@@ -86,18 +83,4 @@ export default class Snake {
     public getSnakeChunks(): SnakeChunk[] {
         return Array.from(this.chunks.values());
     }
-}
-
-function computeWidthFromLength(
-    length: number,
-    config: Readonly<GameConfig>
-): number {
-    const minWidth = 0.5;
-    const maxWidthGain = 4.0;
-    const LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700.0;
-    const denominator = 1.0 / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
-
-    const x = 3.0 * (length - config.minLength) * denominator;
-    const sigmoid = 1.0 / (1.0 + Math.exp(-x)) - 0.5;
-    return 2.0 * (minWidth + sigmoid * maxWidthGain);
 }

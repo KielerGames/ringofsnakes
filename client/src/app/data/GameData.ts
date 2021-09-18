@@ -36,10 +36,7 @@ export default class GameData {
                     now
                 );
             } else {
-                this.snakes.set(
-                    snakeData.id,
-                    new Snake(snakeData, this.config)
-                );
+                this.snakes.set(snakeData.id, new Snake(snakeData));
             }
         });
 

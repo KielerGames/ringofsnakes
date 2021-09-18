@@ -1,9 +1,9 @@
 import { Camera } from "../data/Camera";
 import GameData from "../data/GameData";
-import Matrix from "../math/Matrix";
 import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
 import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
 import * as FoodRenderer from "./FoodRenderer";
+import * as BoxRenderer from "./BoxRenderer";
 import * as BufferManager from "../webgl/BufferManager";
 
 let gl: WebGLRenderingContext;
@@ -32,9 +32,17 @@ export function init(parentNode: HTMLElement = document.body): void {
     SnakeChunkRenderer.init(gl);
     SnakeHeadRenderer.init(gl);
     FoodRenderer.init(gl);
+
+    if (__DEBUG__) {
+        BoxRenderer.init(gl);
+    }
 }
 
-export function render(data: GameData, camera: Camera, time: number): void {
+export function render(
+    data: Readonly<GameData>,
+    camera: Camera,
+    time: number
+): void {
     // resize canvas (only if needed)
     resize();
 
@@ -47,13 +55,17 @@ export function render(data: GameData, camera: Camera, time: number): void {
 
     const pTime = data.timeSinceLastUpdate(time);
 
-    FoodRenderer.render(data.getFoodChunks(), data.cameraTarget, transform);
+    FoodRenderer.render(data.getFoodChunks(), data.getTargetSnake, transform);
 
     // render snake bodies
     SnakeChunkRenderer.render(data.getSnakeChunks(), transform, pTime);
 
     // render snake heads
     SnakeHeadRenderer.render(data.getSnakes(), transform, pTime);
+
+    if (__DEBUG__) {
+        BoxRenderer.renderAll(transform);
+    }
 }
 
 function resize(force: boolean = false) {

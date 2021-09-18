@@ -21,7 +21,7 @@ export default class WorkerSnakeChunk {
     private _final: boolean;
     private box: Rectangle;
 
-    public constructor(snake: WorkerSnake, data: DecodedSnakeChunk) {
+    public constructor(snake: WorkerSnake, data: Readonly<DecodedSnakeChunk>) {
         assert(snake.id === data.snakeId);
         this.id = data.chunkId;
         this.snake = snake;
@@ -51,7 +51,7 @@ export default class WorkerSnakeChunk {
         this.box = createBoundingBox(this.pathData);
     }
 
-    public update(data: DecodedSnakeChunk): void {
+    public update(data: Readonly<DecodedSnakeChunk>): void {
         assert(data.points >= this.numPoints);
         assert(data.pathLength >= data.pathLength);
 
@@ -63,7 +63,8 @@ export default class WorkerSnakeChunk {
         this._full = data.full;
         this._final = data.full; // TODO
 
-        // TODO: update bounding box
+        // TODO: update bounding box efficiently
+        createBoundingBox(this.pathData);
     }
 
     public createTransferData(): SnakeChunkData {
@@ -128,21 +129,22 @@ export default class WorkerSnakeChunk {
     }
 }
 
-function createBoundingBox(pathData: Float32Array): Rectangle {
+function createBoundingBox(pathData: Readonly<Float32Array>): Rectangle {
     assert(pathData.length > 0);
     const N = PATH_VERTEX_SIZE;
+    const n = pathData.length / N;
 
     let minX, maxX, minY, maxY;
     minX = maxX = pathData[0];
     minY = maxY = pathData[1];
 
-    for (let i = 1; i < pathData.length; i++) {
+    for (let i = 1; i < n; i++) {
         const x = pathData[N * i];
         const y = pathData[N * i + 1];
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x);
         minY = Math.min(minY, y);
-        maxY = Math.max(maxX, y);
+        maxY = Math.max(maxY, y);
     }
 
     return new Rectangle(minX, maxX, minY, maxY);

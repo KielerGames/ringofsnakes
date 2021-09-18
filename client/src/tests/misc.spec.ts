@@ -33,20 +33,23 @@ describe("MT Snake Chunk", () => {
             offset: 0.0
         };
 
-        const snake = new Snake({
-            id: 0,
-            skin: 0,
-            length: 0.0,
-            speed: 1.0,
-            position: { x: 0, y: 0 },
-            direction: 0.0,
-            targetDirection: 0.0,
-            offsetCorrection: 0
-        });
+        const snake = new Snake(
+            {
+                id: 0,
+                skin: 0,
+                length: 0.0,
+                speed: 1.0,
+                position: { x: 0, y: 0 },
+                direction: 0.0,
+                targetDirection: 0.0,
+                offsetCorrection: 0
+            },
+            createGameConfig()
+        );
 
         const chunk = new SnakeChunk(snake, data);
 
-        snake.setChunk(chunk);
+        snake.addSnakeChunk(chunk);
 
         assert.equal(chunk.offset(0.0), 0.0);
         assert.isAbove(chunk.offset(1.0), 0.0);

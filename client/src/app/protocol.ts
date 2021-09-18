@@ -6,21 +6,21 @@ export type UpdatePlayerName = {
     name: string;
 };
 
-export type SpawnInfo = {
+export type SpawnInfo = Readonly<{
     tag: "SpawnInfo";
     snakeId: number;
     gameConfig: GameConfig;
-};
+}>;
 
-export type GameConfig = {
+export type GameConfig = Readonly<{
     snakeSpeed: number;
     fastSnakeSpeed: number;
     maxTurnDelta: number;
     tickDuration: number;
-    selfCollision: boolean;
+    minLength: number;
     chunkInfo: {
         chunkSize: number;
         columns: number;
         rows: number;
     };
-};
+}>;

@@ -22,6 +22,7 @@ public class Player extends Client {
 
     @Override
     public BoundingBox getKnowledgeBox() {
-        return new BoundingBox(snake.getHeadPosition(), 24.0, 24.0);
+        // TODO: get aspect ratio from client
+        return new BoundingBox(snake.getHeadPosition(), 60.0, 47.0);
     }
 }

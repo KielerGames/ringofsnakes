@@ -2,6 +2,7 @@ import SnakeChunk from "../data/SnakeChunk";
 import assert from "../utilities/assert";
 import Matrix from "../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
+import * as BoxRenderer from "./BoxRenderer";
 
 declare const __VERTEXSHADER_SNAKE__: string;
 declare const __FRAGMENTSHADER_SNAKE__: string;
@@ -42,6 +43,7 @@ export function render(
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
+    shader.setUniform("uJunkAlpha", __DEBUG__ ? 0.1 : 0.0);
 
     for (const chunk of chunks) {
         const snake = chunk.snake;
@@ -52,6 +54,13 @@ export function render(
 
         gl.bufferData(gl.ARRAY_BUFFER, chunk.buffer, gl.STREAM_DRAW);
         shader.run(chunk.vertices, { mode: gl.TRIANGLE_STRIP });
+
+        if (__DEBUG__) {
+            BoxRenderer.addBox(
+                chunk.getBoundingBox(),
+                chunk.final ? [1, 1.0, 0.1, 0.42] : [1, 0.5, 0, 0.25]
+            );
+        }
     }
 }
 

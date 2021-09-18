@@ -3,6 +3,7 @@ import Snake from "../data/Snake";
 import Matrix from "../math/Matrix";
 import Vector from "../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
+import * as BoxRenderer from "./BoxRenderer";
 
 declare const __VERTEXSHADER_FOOD__: string;
 declare const __FRAGMENTSHADER_FOOD__: string;
@@ -77,5 +78,9 @@ export function render(
         shader.run(chunk.numberOfVertices, {
             stride: FOOD_VERTEX_SIZE * Float32Array.BYTES_PER_ELEMENT
         });
+
+        if (__DEBUG__) {
+            BoxRenderer.addBox(chunk.box, [0.1, 0.5, 1, 0.333]);
+        }
     }
 }

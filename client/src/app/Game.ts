@@ -5,7 +5,7 @@ import { WorkerAPI } from "./worker/worker";
 
 export default class Game {
     private worker: Comlink.Remote<WorkerAPI>;
-    public data: GameData;
+    private _data: GameData;
     private updateInterval: number = -1;
     private _ended: boolean = false;
     public camera: SnakeCamera = new SnakeCamera();
@@ -14,17 +14,16 @@ export default class Game {
         this.worker = Comlink.wrap<WorkerAPI>(
             new Worker("worker.bundle.js", { name: "SnakeWorker" })
         );
-
-        this.data = new GameData();
     }
 
     public static async joinAs(name: string): Promise<Game> {
         const game = new Game();
         await game.worker.init(name);
-
         const config = await game.worker.getConfig();
+        game._data = new GameData(config);
+
         game.updateInterval = window.setInterval(
-            game.updateData.bind(game),
+            game.getUpdatesFromWorker.bind(game),
             1000 * config.tickDuration
         );
         game.worker.onEnd(Comlink.proxy(() => game.stop()));
@@ -32,11 +31,15 @@ export default class Game {
         return game;
     }
 
-    private async updateData(): Promise<void> {
+    public get data(): Readonly<GameData> {
+        return this._data;
+    }
+
+    private async getUpdatesFromWorker(): Promise<void> {
         try {
             const diff = await this.worker.getGameDataUpdate();
-            this.data.update(diff);
-            this.camera.setTargetSnake(this.data.cameraTarget);
+            this._data.update(diff);
+            this.camera.setTargetSnake(this._data.getTargetSnake);
         } catch (e) {
             console.error(e);
             this.stop();
@@ -44,9 +47,9 @@ export default class Game {
     }
 
     public async frameTick(time: number): Promise<void> {
-        const t = this.data.timeSinceLastUpdate(time);
+        const t = this._data.timeSinceLastUpdate(time);
         this.camera.update(t);
-        this.data.predict(t);
+        this._data.predict(t);
     }
 
     public async updateUserInput(alpha: number, fast: boolean): Promise<void> {

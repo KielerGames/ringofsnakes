@@ -9,13 +9,15 @@ import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
 export default class WorkerGame {
     socket: WebSocket;
 
+    readonly config: Readonly<GameConfig>;
     targetPlayerId: number;
-    config: GameConfig;
-    snakeChunks: Map<SnakeChunkId, WorkerSnakeChunk> = new Map();
-    foodChunks: Map<FoodChunkId, FoodChunkDTO> = new Map();
-    snakes: Map<SnakeId, WorkerSnake> = new Map();
-    lastUpdateTime: number;
-    ticks: number = 0;
+
+    readonly snakes: Map<SnakeId, WorkerSnake> = new Map();
+    readonly snakeChunks: Map<SnakeChunkId, WorkerSnakeChunk> = new Map();
+    readonly foodChunks: Map<FoodChunkId, FoodChunkDTO> = new Map();
+
+    lastServerUpdateTime: number;
+    ticksSinceLastMainThreadUpdate: number = 0;
 
     targetAlpha: number = 0.0;
     wantsToBeFast: boolean = false;
@@ -28,70 +30,79 @@ export default class WorkerGame {
         assert(socket.readyState === WebSocket.OPEN);
         assert(socket.binaryType === "arraybuffer");
 
-        socket.onmessage = this.onMessageFromServer.bind(this);
         socket.onclose = () => console.log("Connection closed.");
+        socket.onerror = (e) => console.error(e);
+        socket.onmessage = (event: MessageEvent) => {
+            const rawData = event.data as ArrayBuffer | string;
 
-        this.lastUpdateTime = performance.now();
+            if (rawData instanceof ArrayBuffer) {
+                this.onBinaryMessageFromServer(rawData);
+            } else {
+                this.onJsonMessageFromServer(
+                    JSON.parse(rawData) as ServerToClientJSONMessage
+                );
+            }
+        };
 
-        console.log(`Snake id: ${snakeId}`);
+        this.lastServerUpdateTime = performance.now();
+
+        console.log(`target snake id: ${snakeId}`);
     }
 
-    private onMessageFromServer(event: MessageEvent) {
-        const rawData = event.data as ArrayBuffer | string;
+    private onBinaryMessageFromServer(binaryData: Readonly<ArrayBuffer>): void {
+        const data = GUD.decode(this.config, binaryData);
 
-        if (rawData instanceof ArrayBuffer) {
-            const data = GUD.decode(this.config, rawData);
+        // update snakes
+        data.snakeInfos.forEach((info) => {
+            const snake = this.snakes.get(info.snakeId);
+            if (snake) {
+                snake.updateFromServer(info, this.config);
+            } else {
+                this.snakes.set(
+                    info.snakeId,
+                    new WorkerSnake(info, this.config)
+                );
+            }
+        });
 
-            // update snakes
-            data.snakeInfos.forEach((info) => {
-                const snake = this.snakes.get(info.snakeId);
-                if (snake) {
-                    snake.updateFromServer(info, this.config);
-                } else {
-                    this.snakes.set(
-                        info.snakeId,
-                        new WorkerSnake(info, this.config)
-                    );
-                }
-            });
+        // update snake chunks
+        data.snakeChunkData.forEach((chunkData) => {
+            let chunk = this.snakeChunks.get(chunkData.chunkId);
+            if (chunk) {
+                chunk.update(chunkData);
+            } else {
+                const snake = this.snakes.get(chunkData.snakeId);
+                assert(snake !== undefined, "Data for unknown snake.");
+                chunk = new WorkerSnakeChunk(snake!, chunkData);
+                this.snakeChunks.set(chunkData.chunkId, chunk);
+            }
+        });
 
-            // update snake chunks
-            data.snakeChunkData.forEach((chunkData) => {
-                let chunk = this.snakeChunks.get(chunkData.chunkId);
-                if (chunk) {
-                    chunk.update(chunkData);
-                } else {
-                    const snake = this.snakes.get(chunkData.snakeId);
-                    assert(snake !== undefined, "Data for unknown snake.");
-                    chunk = new WorkerSnakeChunk(snake!, chunkData);
-                    this.snakeChunks.set(chunkData.chunkId, chunk);
-                }
-            });
+        // update food chunks
+        data.foodChunkData.forEach((chunk) => {
+            this.foodChunks.set(chunk.id, chunk);
+        });
 
-            // update food chunks
-            data.foodChunkData.forEach((chunk) => {
-                this.foodChunks.set(chunk.id, chunk);
-            });
+        this.ticksSinceLastMainThreadUpdate++;
+        this.lastServerUpdateTime = performance.now();
+    }
 
-            this.ticks++;
-            this.lastUpdateTime = performance.now();
-        } else {
-            const json = JSON.parse(rawData) as ServerToClientJSONMessage;
-
-            switch (json.tag) {
-                // TODO
-                default: {
-                    throw new Error(
-                        `Unexpected message from server. (tag = ${json.tag})`
-                    );
-                }
+    private onJsonMessageFromServer(
+        json: Readonly<ServerToClientJSONMessage>
+    ): void {
+        switch (json.tag) {
+            // TODO
+            default: {
+                throw new Error(
+                    `Unexpected message from server. (tag = ${json.tag})`
+                );
             }
         }
     }
 
-    public updateUserInput(alpha: number, fast: boolean): void {
+    public updateUserInput(alpha: number, wantsFast: boolean): void {
         this.targetAlpha = alpha;
-        this.wantsToBeFast = fast;
+        this.wantsToBeFast = wantsFast;
 
         // send to server
         // TODO: limit update rate
@@ -124,7 +135,7 @@ export default class WorkerGame {
         // snake chunk updates
         {
             let i = 0;
-            let gc: number[] = [];
+            const gc: number[] = [];
             for (const chunk of this.snakeChunks.values()) {
                 snakeChunks[i] = chunk.createTransferData();
                 if (snakeChunks[i].final) {
@@ -151,16 +162,16 @@ export default class WorkerGame {
         const foodChunks = Array.from(this.foodChunks.values());
         this.foodChunks.clear();
 
-        const ticks = this.ticks;
-        this.ticks = 0;
+        const ticks = this.ticksSinceLastMainThreadUpdate;
+        this.ticksSinceLastMainThreadUpdate = 0;
 
         return {
-            timeSinceLastTick: performance.now() - this.lastUpdateTime,
-            ticksSinceLastUpdate: ticks,
+            timeSinceLastTick: performance.now() - this.lastServerUpdateTime,
+            ticksSinceLastMainThreadUpdate: ticks,
             newSnakeChunks: snakeChunks,
             snakes,
             foodChunks,
-            cameraTarget: this.targetPlayerId
+            targetSnakeId: this.targetPlayerId
         };
     }
 }

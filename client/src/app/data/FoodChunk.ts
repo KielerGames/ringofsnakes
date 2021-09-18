@@ -21,7 +21,7 @@ export default class FoodChunk {
         32 * boxCoords.length
     );
     private numFoodItems: number;
-    private readonly box: Rectangle;
+    public readonly box: Rectangle;
 
     public constructor(dto: FoodChunkDTO) {
         this.id = dto.id;
@@ -49,8 +49,8 @@ export default class FoodChunk {
         }
     }
 
-    public intersects(box: Rectangle): boolean {
-        return Rectangle.distance2(this.box, box) == 0.0;
+    public isVisible(viewBox: Rectangle): boolean {
+        return Rectangle.distance2(this.box, viewBox) === 0.0;
     }
 
     public get numberOfVertices(): number {

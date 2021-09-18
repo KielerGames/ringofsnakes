@@ -2,11 +2,11 @@ import { FoodChunkDTO } from "./decoder/FoodDecoder";
 
 export type GameDataUpdate = {
     timeSinceLastTick: number;
-    ticksSinceLastUpdate: number;
+    ticksSinceLastMainThreadUpdate: number;
     newSnakeChunks: SnakeChunkData[];
     foodChunks: FoodChunkDTO[];
     snakes: SnakeData[];
-    cameraTarget: number;
+    targetSnakeId: number;
 };
 
 /* Vertex buffer triangle strip:

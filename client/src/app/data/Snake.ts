@@ -1,5 +1,6 @@
 import PredictedAngle from "../math/PredictedAngle";
 import Vector from "../math/Vector";
+import { GameConfig } from "../protocol";
 import { SnakeData } from "../worker/GameDataUpdate";
 import SnakeChunk from "./SnakeChunk";
 
@@ -12,14 +13,16 @@ export default class Snake {
     public speed: number;
     public direction: PredictedAngle;
     private currentChunk: SnakeChunk | null = null;
+    private config: Readonly<GameConfig>;
 
-    public constructor(data: SnakeData) {
+    public constructor(data: SnakeData, gameConfig: Readonly<GameConfig>) {
         this.id = data.id;
         this.skin = data.skin;
         this.length = data.length;
         this.lastPosition = Vector.fromObject(data.position);
         this.speed = data.speed;
         this.direction = new PredictedAngle(data.direction);
+        this.config = gameConfig;
     }
 
     public update(
@@ -42,17 +45,7 @@ export default class Snake {
     }
 
     public get width(): number {
-        const MIN_WIDTH = 0.5;
-        const MAX_WIDTH_GAIN = 4.0;
-        const LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700.0;
-
-        //TODO: get this value from the game config
-        const GAME_CONFIG_MIN_LENGTH = 3.0;
-
-        let x =
-            (3 * (this.length - GAME_CONFIG_MIN_LENGTH)) /
-            LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
-        return MIN_WIDTH + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN;
+        return computeWidthFromLength(this.length, this.config);
     }
 
     public getPredictedPosition(timeSinceLastTick: number): Vector {
@@ -61,23 +54,27 @@ export default class Snake {
         return pos;
     }
 
-    public setChunk(chunk: SnakeChunk): void {
+    public addSnakeChunk(chunk: SnakeChunk): void {
         this.chunks.set(chunk.id, chunk);
 
         if (!chunk.final) {
             this.currentChunk = chunk;
+        } else if (this.currentChunk) {
+            if (this.currentChunk.id === chunk.id) {
+                this.currentChunk = null;
+            }
         }
-        // else if (this.currentChunk) {
-        //     if (this.currentChunk.id === chunk.id) {
-        //         this.currentChunk = null;
-        //     }
-        // }
     }
 
-    public removeChunk(id: number): void {
+    public removeSnakeChunk(id: number): void {
         this.chunks.delete(id);
 
         if (this.currentChunk && this.currentChunk.id === id) {
+            if (__DEBUG__) {
+                console.warn(
+                    `Warning: Current chunk ${id} of snake ${this.currentChunk.snake.id} removed.`
+                );
+            }
             this.currentChunk = null;
         }
     }
@@ -86,7 +83,21 @@ export default class Snake {
         return this.currentChunk;
     }
 
-    public getChunks(): SnakeChunk[] {
+    public getSnakeChunks(): SnakeChunk[] {
         return Array.from(this.chunks.values());
     }
+}
+
+function computeWidthFromLength(
+    length: number,
+    config: Readonly<GameConfig>
+): number {
+    const minWidth = 0.5;
+    const maxWidthGain = 4.0;
+    const LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700.0;
+    const denominator = 1.0 / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
+
+    const x = 3.0 * (length - config.minLength) * denominator;
+    const sigmoid = 1.0 / (1.0 + Math.exp(-x)) - 0.5;
+    return 2.0 * (minWidth + sigmoid * maxWidthGain);
 }

@@ -2,8 +2,8 @@ package game;
 
 import com.google.gson.Gson;
 import debugview.DebugView;
-import game.ai.StupidBot;
 import game.ai.Bot;
+import game.ai.StupidBot;
 import game.snake.Snake;
 import game.snake.SnakeFactory;
 import game.world.Food;
@@ -14,15 +14,18 @@ import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
 import util.ExceptionalExecutorService;
+
 import javax.websocket.Session;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Game {
     private static final Gson gson = new Gson();
     public final int id = 1; //TODO
     public final GameConfig config;
     public final World world;
-    private final ScheduledExecutorService executor;
+    private final ExceptionalExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
     public List<Snake> snakes = new LinkedList<>();
     private List<Bot> bots = new LinkedList<>();

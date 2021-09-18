@@ -11,6 +11,7 @@ void main(void) {
     float c = cos(uHeadRotation);
     float s = sin(uHeadRotation);
     mat2 rotate = mat2(c,s,-s,c);
-    vec2 position = uHeadPosition + uSnakeWidth * rotate * vRelPosition;
+    float size = 0.5 * uSnakeWidth;
+    vec2 position = uHeadPosition + size * rotate * vRelPosition;
     gl_Position = vec4(uTransform * vec3(position, 1.0), 1.0);
 }

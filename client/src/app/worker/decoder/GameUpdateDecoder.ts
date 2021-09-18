@@ -2,7 +2,6 @@ import { GameConfig } from "../../protocol";
 import * as SID from "./SnakeInfoDecoder";
 import * as SCD from "./SnakeChunkDecoder";
 import * as FCD from "./FoodDecoder";
-import FoodChunk from "../../data/FoodChunk";
 
 const UPDATE_HEADER_SIZE = 3;
 
@@ -34,7 +33,7 @@ export function decode(
         byteOffset = result.nextByteOffset;
     }
 
-    const foodChunks: FoodChunk[] = new Array(numFoodChunks);
+    const foodChunks: FCD.FoodChunkDTO[] = new Array(numFoodChunks);
     for (let i = 0; i < numFoodChunks; i++) {
         const result = FCD.decode(buffer, byteOffset, config);
         foodChunks[i] = result.data;
@@ -57,5 +56,5 @@ export function decode(
 export type GameUpdateData = {
     snakeInfos: SID.SnakeInfo[];
     snakeChunkData: SCD.DecodedSnakeChunk[];
-    foodChunkData: FoodChunk[];
+    foodChunkData: FCD.FoodChunkDTO[];
 };

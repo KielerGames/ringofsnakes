@@ -1,5 +1,6 @@
 package server;
 
+import game.snake.FinalSnakeChunk;
 import game.snake.SnakeChunk;
 import game.world.WorldChunk;
 import math.BoundingBox;
@@ -9,11 +10,12 @@ import javax.websocket.Session;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class Client {
+public abstract class Client {
     public final Session session;
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
-    private final Map<WorldChunk, Integer> knownWorldChunks = new HashMap<>();
+    private final Map<WorldChunk, Integer> knownFoodChunks = new HashMap<>();
     private GameUpdate nextUpdate;
 
     public Client(Session session) {
@@ -22,6 +24,12 @@ public class Client {
     }
 
     public void updateClientSnakeChunk(SnakeChunk chunk) {
+        // TODO Kilian: remove instanceof check
+        if(chunk instanceof FinalSnakeChunk) {
+            if(((FinalSnakeChunk) chunk).isJunk()) {
+                return;
+            }
+        }
         if (knownSnakeChunks.contains(chunk)) {
             nextUpdate.addSnake(chunk.getSnake());
         } else {
@@ -33,11 +41,11 @@ public class Client {
     }
 
     public void updateClientFoodChunk(WorldChunk chunk) {
-        int knownVersion = knownWorldChunks.getOrDefault(chunk, -1);
+        final int knownVersion = knownFoodChunks.getOrDefault(chunk, -1);
         if (knownVersion != chunk.getFoodVersion()) {
             nextUpdate.addFoodChunk(chunk);
         }
-        knownWorldChunks.put(chunk, chunk.getFoodVersion());
+        knownFoodChunks.put(chunk, chunk.getFoodVersion());
     }
 
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
@@ -75,8 +83,14 @@ public class Client {
         return true;
     }
 
-    public BoundingBox getKnowledgeBox() {
-        //TODO
-        return new BoundingBox(0.0, 0.0, 0.0, 0.0);
+    public abstract BoundingBox getKnowledgeBox();
+
+    public void cleanupKnowledge() {
+        final var knowledgeBox = getKnowledgeBox();
+        final var chunksToForget = knownFoodChunks.keySet().stream()
+                .filter(chunk -> !BoundingBox.intersect(knowledgeBox, chunk.box))
+                .collect(Collectors.toList());
+
+        chunksToForget.forEach(chunk -> knownFoodChunks.remove(chunk));
     }
 }

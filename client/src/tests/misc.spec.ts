@@ -5,7 +5,7 @@ import Snake from "../app/data/Snake";
 import SnakeChunk from "../app/data/SnakeChunk";
 import Rectangle from "../app/math/Rectangle";
 import { SnakeChunkData } from "../app/worker/GameDataUpdate";
-import WorkerChunk from "../app/worker/WorkerChunk";
+import WorkerSnakeChunk from "../app/worker/WorkerSnakeChunk";
 import {
     createGameConfig,
     createSnakeChunkBuffer,
@@ -33,20 +33,23 @@ describe("MT Snake Chunk", () => {
             offset: 0.0
         };
 
-        const snake = new Snake({
-            id: 0,
-            skin: 0,
-            length: 0.0,
-            speed: 1.0,
-            position: { x: 0, y: 0 },
-            direction: 0.0,
-            targetDirection: 0.0,
-            offsetCorrection: 0
-        });
+        const snake = new Snake(
+            {
+                id: 0,
+                skin: 0,
+                length: 0.0,
+                speed: 1.0,
+                position: { x: 0, y: 0 },
+                direction: 0.0,
+                targetDirection: 0.0,
+                offsetCorrection: 0
+            },
+            createGameConfig()
+        );
 
         const chunk = new SnakeChunk(snake, data);
 
-        snake.setChunk(chunk);
+        snake.addSnakeChunk(chunk);
 
         assert.equal(chunk.offset(0.0), 0.0);
         assert.isAbove(chunk.offset(1.0), 0.0);
@@ -72,7 +75,10 @@ describe("WorkerChunk", () => {
             undefined,
             new Rand(seed)
         );
-        const wc = new WorkerChunk(snake, SCD.decode(chunkData1, 0, cfg).data);
+        const wc = new WorkerSnakeChunk(
+            snake,
+            SCD.decode(chunkData1, 0, cfg).data
+        );
         const pathLength1 = wc.createTransferData().length;
         assert.isAbove(pathLength1, 0.0);
 

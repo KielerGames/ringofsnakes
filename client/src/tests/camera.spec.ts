@@ -3,6 +3,7 @@ import Rand from "rand-seed";
 import { SnakeCamera, TargetCamera } from "../app/data/Camera";
 import Snake from "../app/data/Snake";
 import Vector from "../app/math/Vector";
+import { createGameConfig } from "./data/snake";
 
 function createRandomPoint(rand: Rand, maxValue: number): Vector {
     const x = (2 * rand.next() - 1) * maxValue;
@@ -62,16 +63,19 @@ describe("Camera", () => {
         it("should follow the snake", () => {
             const rand = new Rand("follow seed");
 
-            const snake = new Snake({
-                id: 0,
-                skin: 0,
-                speed: 6.66,
-                offsetCorrection: 0,
-                length: 42.0,
-                position: { x: 10 * rand.next(), y: 10 * rand.next() },
-                direction: 2 * Math.PI * rand.next(),
-                targetDirection: 2 * Math.PI * rand.next()
-            });
+            const snake = new Snake(
+                {
+                    id: 0,
+                    skin: 0,
+                    speed: 6.66,
+                    offsetCorrection: 0,
+                    length: 42.0,
+                    position: { x: 10 * rand.next(), y: 10 * rand.next() },
+                    direction: 2 * Math.PI * rand.next(),
+                    targetDirection: 2 * Math.PI * rand.next()
+                },
+                createGameConfig()
+            );
 
             const cam = new SnakeCamera(snake);
 

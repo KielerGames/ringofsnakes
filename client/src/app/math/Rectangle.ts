@@ -1,17 +1,25 @@
+import Vector from "./Vector";
+
 /**
  * Represents an axis-aligned rectangle.
  */
 export default class Rectangle {
-    public minX: number;
-    public maxX: number;
-    public minY: number;
-    public maxY: number;
+    public readonly minX: number;
+    public readonly maxX: number;
+    public readonly minY: number;
+    public readonly maxY: number;
 
     public constructor(minX: number, maxX: number, minY: number, maxY: number) {
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
         this.maxY = maxY;
+
+        if (__DEBUG__) {
+            if ([minX, maxX, minY, maxY].find(isNaN) !== undefined) {
+                throw new Error(`Rectangle constructor argument was NaN.`);
+            }
+        }
     }
 
     public get width(): number {
@@ -31,7 +39,7 @@ export default class Rectangle {
         };
     }
 
-    public static fromTransferable(obj: TransferableBox): Rectangle {
+    public static fromTransferable(obj: Readonly<TransferableBox>): Rectangle {
         return new Rectangle(obj.minX, obj.maxX, obj.minY, obj.maxY);
     }
 
@@ -58,6 +66,24 @@ export default class Rectangle {
         }
 
         return dx * dx + dy * dy;
+    }
+
+    public extendTo(
+        point: Vector,
+        padding: number = Number.EPSILON
+    ): Rectangle {
+        return new Rectangle(
+            Math.min(this.minX, point.x - padding),
+            Math.max(this.maxX, point.x + padding),
+            Math.min(this.minY, point.y - padding),
+            Math.max(this.maxY, point.y + padding)
+        );
+    }
+
+    public contains(point: Vector): boolean {
+        const x = this.minX <= point.x && point.x < this.maxX;
+        const y = this.minY <= point.y && point.y < this.maxY;
+        return x && y;
     }
 }
 

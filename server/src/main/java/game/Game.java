@@ -13,13 +13,9 @@ import math.Vector;
 import server.Client;
 import server.Player;
 import server.protocol.SpawnInfo;
-
+import util.ExceptionalExecutorService;
 import javax.websocket.Session;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class Game {
     private static final Gson gson = new Gson();
@@ -34,7 +30,7 @@ public class Game {
     public Game() {
         config = new GameConfig();
         world = new World(config);
-        executor = Executors.newSingleThreadScheduledExecutor();
+        executor = new ExceptionalExecutorService();
 
         // spawn some food
         for (int i = 0; i < 42; i++) {
@@ -131,10 +127,11 @@ public class Game {
 
     private void updateClients() {
         clients.forEach((id, client) -> {
-            var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
+            final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
             worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
             worldChunks.forEach(client::updateClientFoodChunk);
             client.sendUpdate();
+            client.cleanupKnowledge();
         });
     }
 
@@ -145,7 +142,7 @@ public class Game {
             var worldChunk = world.chunks.findChunk(headPosition);
             var foodList = worldChunk.getFoodList();
             var collectedFood = foodList.stream()
-                    .filter(food -> food.isWithinRange(headPosition, snakeWidth + 1.0))
+                    .filter(food -> food.isWithinRange(headPosition, snakeWidth * 1.1 + 1.0))
                     .collect(Collectors.toList());
             snake.grow(collectedFood.size() * Food.nutritionalValue);
 

@@ -3,6 +3,10 @@
     "rules": {
         "prefer-for-of": true,
         "no-console": false,
-        "no-bitwise": false
+        "no-bitwise": false,
+        "one-variable-per-declaration": false
+    },
+    "env": {
+        "browser": true
     }
 }

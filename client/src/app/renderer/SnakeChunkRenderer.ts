@@ -2,6 +2,7 @@ import SnakeChunk from "../data/SnakeChunk";
 import assert from "../utilities/assert";
 import Matrix from "../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
+import * as BoxRenderer from "./BoxRenderer";
 
 declare const __VERTEXSHADER_SNAKE__: string;
 declare const __FRAGMENTSHADER_SNAKE__: string;
@@ -11,7 +12,7 @@ let gl: WebGLRenderingContext;
 let basicMaterialShader: WebGLShaderProgram;
 let buffer: WebGLBuffer;
 
-let snakeColors: Color[] = [
+const snakeColors: Color[] = [
     [0.5, 0.75, 1.0],
     [1.0, 0.75, 0.5],
     [0.75, 1.0, 0.5]
@@ -23,14 +24,9 @@ export function init(glCtx: WebGLRenderingContext): void {
     basicMaterialShader = new WebGLShaderProgram(
         gl,
         __VERTEXSHADER_SNAKE__,
-        __FRAGMENTSHADER_SNAKE__
+        __FRAGMENTSHADER_SNAKE__,
+        ["vPosition", "vNormal", "vNormalOffset", "vRelativePathOffset"]
     );
-    basicMaterialShader.bufferLayout = [
-        "vPosition",
-        "vNormal",
-        "vNormalOffset",
-        "vRelativePathOffset"
-    ];
 
     buffer = gl.createBuffer()!;
 
@@ -47,9 +43,8 @@ export function render(
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
+    shader.setUniform("uJunkAlpha", __DEBUG__ ? 0.1 : 0.0);
 
-    let nc = 0;
-    let nv = 0;
     for (const chunk of chunks) {
         const snake = chunk.snake;
         setSkin(snake.skin);
@@ -58,17 +53,18 @@ export function render(
         shader.setUniform("uSnakeWidth", snake.width);
 
         gl.bufferData(gl.ARRAY_BUFFER, chunk.buffer, gl.STREAM_DRAW);
-        shader.run(gl.TRIANGLE_STRIP, 0, chunk.vertices);
-        nc++;
-        nv += chunk.vertices;
-    }
+        shader.run(chunk.vertices, { mode: gl.TRIANGLE_STRIP });
 
-    // if (__DEBUG__) {
-    //     console.info(`Rendered ${nc} chunks (${nv} vertices).`);
-    // }
+        if (__DEBUG__) {
+            BoxRenderer.addBox(
+                chunk.getBoundingBox(),
+                chunk.final ? [1, 1.0, 0.1, 0.42] : [1, 0.5, 0, 0.25]
+            );
+        }
+    }
 }
 
 function setSkin(skin: number): void {
-    let colorIdx = Math.max(0, skin % snakeColors.length);
+    const colorIdx = Math.max(0, skin % snakeColors.length);
     basicMaterialShader.setUniform("uColor", snakeColors[colorIdx]);
 }

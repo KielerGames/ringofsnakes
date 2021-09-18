@@ -1,14 +1,21 @@
+import Rectangle from "../math/Rectangle";
+import { GameConfig } from "../protocol";
 import { GameDataUpdate } from "../worker/GameDataUpdate";
 import FoodChunk from "./FoodChunk";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
 
 export default class GameData {
-    private snakes: Map<number, Snake> = new Map();
-    private snakeChunks: Map<number, SnakeChunk> = new Map();
-    private foodChunks: Map<number, FoodChunk> = new Map();
-    private cameraTargetId: number = -1;
+    private readonly snakes: Map<number, Snake> = new Map();
+    private readonly snakeChunks: Map<number, SnakeChunk> = new Map();
+    private readonly foodChunks: Map<number, FoodChunk> = new Map();
+    private targetSnakeId: number = -1;
     private lastUpdateTime: number = performance.now();
+    public readonly config: Readonly<GameConfig>;
+
+    public constructor(config: Readonly<GameConfig>) {
+        this.config = config;
+    }
 
     public update(data: GameDataUpdate): void {
         // time stuff
@@ -17,15 +24,22 @@ export default class GameData {
         this.lastUpdateTime = now;
 
         // camera
-        this.cameraTargetId = data.cameraTarget;
+        this.targetSnakeId = data.targetSnakeId;
 
         // update & add new snakes
         data.snakes.forEach((snakeData) => {
             const snake = this.snakes.get(snakeData.id);
             if (snake) {
-                snake.update(snakeData, data.ticksSinceLastUpdate, now);
+                snake.update(
+                    snakeData,
+                    data.ticksSinceLastMainThreadUpdate,
+                    now
+                );
             } else {
-                this.snakes.set(snakeData.id, new Snake(snakeData));
+                this.snakes.set(
+                    snakeData.id,
+                    new Snake(snakeData, this.config)
+                );
             }
         });
 
@@ -36,13 +50,13 @@ export default class GameData {
                 throw new Error(`No data for snake ${chunkData.snakeId}!`);
             }
             const chunk = new SnakeChunk(snake, chunkData);
-            snake.setChunk(chunk);
+            snake.addSnakeChunk(chunk);
             this.snakeChunks.set(chunk.id, chunk);
         });
 
         // update food chunks
-        data.foodChunks.forEach((chunk) =>
-            this.foodChunks.set(chunk.id, chunk)
+        data.foodChunks.forEach((chunkDTO) =>
+            this.foodChunks.set(chunkDTO.id, new FoodChunk(chunkDTO))
         );
 
         this.garbageCollectSnakeChunks();
@@ -60,24 +74,33 @@ export default class GameData {
         return this.snakes.values();
     }
 
+    public garbageCollectFoodChunks(viewBox: Rectangle): void {
+        Array.from(this.foodChunks.values())
+            .filter((fc) => !fc.isVisible(viewBox))
+            .forEach((fc) => {
+                this.foodChunks.delete(fc.id);
+                fc.destroy();
+            });
+    }
+
     private garbageCollectSnakeChunks(): void {
-        let deleteChunks: SnakeChunk[] = [];
+        const chunksToDelete: SnakeChunk[] = [];
 
         // collect "garbage" snake chunks
         this.snakeChunks.forEach((chunk) => {
             if (chunk.offset() >= chunk.snake.length) {
-                deleteChunks.push(chunk);
+                chunksToDelete.push(chunk);
             }
         });
 
         // remove collected chunks
-        deleteChunks.forEach((chunk) => {
+        chunksToDelete.forEach((chunk) => {
             this.snakeChunks.delete(chunk.id);
-            chunk.snake.removeChunk(chunk.id);
+            chunk.snake.removeSnakeChunk(chunk.id);
         });
 
-        if (deleteChunks.length > 0) {
-            console.log(`Garbage-collected ${deleteChunks.length} chunk(s).`);
+        if (chunksToDelete.length > 0) {
+            console.log(`Garbage-collected ${chunksToDelete.length} chunk(s).`);
         }
     }
 
@@ -101,9 +124,9 @@ export default class GameData {
         });
     }
 
-    public get cameraTarget(): Snake | undefined {
-        if (this.cameraTargetId >= 0) {
-            return this.snakes.get(this.cameraTargetId);
+    public get getTargetSnake(): Snake | undefined {
+        if (this.targetSnakeId >= 0) {
+            return this.snakes.get(this.targetSnakeId);
         }
     }
 }

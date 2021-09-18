@@ -1,17 +1,55 @@
+import Matrix from "../math/Matrix";
+import Rectangle from "../math/Rectangle";
 import Vector from "../math/Vector";
 import Snake from "./Snake";
 
+const WORLD_SCALE = 0.042;
+
 export abstract class Camera {
     protected lastPosition: Vector;
+    private translation = new Matrix();
+    private unstretch = new Matrix();
+    private scale = new Matrix();
 
     public constructor(pos: Vector) {
         this.lastPosition = pos;
+
+        this.scale.setEntry(0, 0, WORLD_SCALE);
+        this.scale.setEntry(1, 1, WORLD_SCALE);
     }
 
     public abstract update(timeSinceLastUpdate: number): void;
 
     public get position(): Vector {
         return this.lastPosition;
+    }
+
+    public getTransformMatrix(width: number, height: number): Matrix {
+        this.unstretch.setEntry(0, 0, height / width);
+
+        this.translation.setEntry(0, 2, -this.lastPosition.x);
+        this.translation.setEntry(1, 2, -this.lastPosition.y);
+
+        return Matrix.compose(
+            Matrix.compose(this.unstretch, this.scale),
+            this.translation
+        );
+    }
+
+    public getViewBox(): Rectangle {
+        const center = this.lastPosition;
+        const ratio = this.unstretch.getEntry(0, 0);
+
+        // the WebGL viewbox has width & height 2: [-1,1] x [-1,1]
+        const width = 2.0 / (ratio * WORLD_SCALE);
+        const height = 2.0 / WORLD_SCALE;
+
+        return new Rectangle(
+            center.x - 0.5 * width,
+            center.x + 0.5 * width,
+            center.y - 0.5 * height,
+            center.y + 0.5 * height
+        );
     }
 }
 
@@ -46,7 +84,7 @@ export class TargetCamera extends Camera {
         const t2 = timeSinceLastUpdate * timeSinceLastUpdate;
         const len2 = mx * mx + my * my;
         if (len2 > this.maxSpeed2 * t2) {
-            let s = Math.sqrt(this.maxSpeed2 / len2);
+            const s = Math.sqrt(this.maxSpeed2 / len2);
             mx = mx * s;
             my = my * s;
         }

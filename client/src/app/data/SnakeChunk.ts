@@ -32,19 +32,23 @@ export default class SnakeChunk {
                 console.warn(`Negative offset correction by ${diff}.`);
             }
             if (!this.final) {
-                console.warn(`Offset change on non-final chunk`);
+                console.warn(`Offset change on non-final chunk.`);
             }
         }
         this.lastTickOffset += diff;
     }
 
+    /**
+     * Offset is the path-distance from the snake head to this chunk.
+     * @param timeSinceLastTick
+     * @returns
+     */
     public offset(timeSinceLastTick: number = 0.0): number {
         const t = timeSinceLastTick;
         return this.lastTickOffset + t * this.snake.speed;
     }
 
     public updateEndPoint(end: Vector): void {
-        // TODO: update bounding box
         const n = this.buffer.length;
         if (n > 12) {
             this.buffer[n - 6] = end.x;
@@ -52,5 +56,14 @@ export default class SnakeChunk {
             this.buffer[n - 12] = end.x;
             this.buffer[n - 11] = end.y;
         }
+
+        this.boundingBox = this.boundingBox.extendTo(
+            end,
+            0.5 * this.snake.width
+        );
+    }
+
+    public getBoundingBox(): Rectangle {
+        return this.boundingBox;
     }
 }

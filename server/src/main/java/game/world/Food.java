@@ -13,7 +13,7 @@ public class Food {
     private static final Random rand = new Random();
 
     public final Vector position;
-    public final Size size = Size.SMALL;
+    public final Size size;
     public final byte color;
     private final byte byteX, byteY;
 
@@ -26,18 +26,26 @@ public class Food {
 
     public Food(WorldChunk chunk) {
         // generate position
-        var bytePosition = new byte[2];
+        final var bytePosition = new byte[2];
         rand.nextBytes(bytePosition);
         // set byte position
         byteX = bytePosition[0];
         byteY = bytePosition[1];
         // set global (double) position
-        var x = chunk.box.minX + toNormalizedDouble(bytePosition[0]) * chunk.box.getWidth();
-        var y = chunk.box.minY + toNormalizedDouble(bytePosition[1]) * chunk.box.getHeight();
+        final var x = chunk.box.minX + toNormalizedDouble(bytePosition[0]) * chunk.box.getWidth();
+        final var y = chunk.box.minY + toNormalizedDouble(bytePosition[1]) * chunk.box.getHeight();
         position = new Vector(x, y);
 
         color = (byte) rand.nextInt(64);
-        // TODO: pick random size (?)
+
+        final var sizeProb = rand.nextDouble();
+        if (0.6 <= sizeProb && sizeProb < 0.9) {
+            size = Size.MEDIUM;
+        } else if (0.9 <= sizeProb) {
+            size = Size.LARGE;
+        } else {
+            size = Size.SMALL;
+        }
     }
 
     public boolean isWithinRange(Vector p, double range) {

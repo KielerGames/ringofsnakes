@@ -115,11 +115,11 @@ export default class WorkerGame {
         // TODO: limit update rate
         const ws = this.socket;
         if (ws.readyState === WebSocket.OPEN) {
-            let buffer = new ArrayBuffer(10);
+            let buffer = new ArrayBuffer(9);
             let view = new DataView(buffer);
-            view.setFloat64(0, this.targetAlpha, false);
+            view.setFloat32(0, this.viewBox.width / this.viewBox.height, false);
+            view.setFloat32(4, this.targetAlpha, false);
             view.setUint8(8, this.wantsToBeFast ? 1 : 0);
-            view.setUint8(9, 42);
             ws.send(buffer);
         }
     }

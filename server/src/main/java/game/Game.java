@@ -105,14 +105,19 @@ public class Game {
 
     private void eatFood() {
         snakes.forEach(snake -> {
-            var snakeWidth = snake.getWidth();
-            var headPosition = snake.getHeadPosition();
-            var worldChunk = world.chunks.findChunk(headPosition);
-            var foodList = worldChunk.getFoodList();
-            var collectedFood = foodList.stream()
-                    .filter(food -> food.isWithinRange(headPosition, snakeWidth * 1.1 + 1.0))
+            final var foodCollectRadius = snake.getWidth() * 1.1 + 1.0;
+            final var headPosition = snake.getHeadPosition();
+            final var worldChunk = world.chunks.findChunk(headPosition);
+            
+            final var collectedFood = worldChunk.getFoodList().stream()
+                    .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
                     .collect(Collectors.toList());
-            snake.grow(collectedFood.size() * Food.nutritionalValue);
+
+            final var foodAmount = collectedFood.stream()
+                    .mapToDouble(food -> food.size.value)
+                    .map(v -> v * v)
+                    .sum();
+            snake.grow((float) foodAmount * Food.nutritionalValue);
 
             synchronized (this) {
                 worldChunk.removeFood(collectedFood);

@@ -18,7 +18,7 @@ export default class GameUI extends Component<Props> {
                 {__DEBUG__ ? <SnakeList data={game.data} /> : null}
                 <UserInput
                     initial={0.0}
-                    onChange={game.updateUserInput.bind(game)}
+                    onChange={game.updateUserData.bind(game)}
                 />
             </>
         );

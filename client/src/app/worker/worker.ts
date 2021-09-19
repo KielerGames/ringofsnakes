@@ -1,4 +1,5 @@
 import * as Comlink from "comlink";
+import Rectangle, { TransferableBox } from "../math/Rectangle";
 import {
     ClientToServerMessage,
     GameConfig,
@@ -59,9 +60,17 @@ export class WorkerAPI {
         console.info(`WorkerGame init complete.`);
     }
 
-    public updateUserInput(alpha: number, fast: boolean): void {
+    public updateUserData(
+        alpha: number,
+        wantsFast: boolean,
+        viewBox: TransferableBox
+    ): void {
         if (game) {
-            game.updateUserInput(alpha, fast);
+            game.updateUserData(
+                alpha,
+                wantsFast,
+                Rectangle.fromTransferable(viewBox)
+            );
         }
     }
 

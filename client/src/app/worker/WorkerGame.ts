@@ -5,6 +5,7 @@ import { SnakeChunkData, SnakeData, GameDataUpdate } from "./GameDataUpdate";
 import WorkerSnakeChunk from "./WorkerSnakeChunk";
 import WorkerSnake from "./WorkerSnake";
 import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
+import Rectangle from "../math/Rectangle";
 
 export default class WorkerGame {
     socket: WebSocket;
@@ -21,6 +22,7 @@ export default class WorkerGame {
 
     targetAlpha: number = 0.0;
     wantsToBeFast: boolean = false;
+    private viewBox: Rectangle;
 
     constructor(socket: WebSocket, snakeId: number, gameConfig: GameConfig) {
         this.socket = socket;
@@ -100,9 +102,14 @@ export default class WorkerGame {
         }
     }
 
-    public updateUserInput(alpha: number, wantsFast: boolean): void {
+    public updateUserData(
+        alpha: number,
+        wantsFast: boolean,
+        viewBox: Rectangle
+    ): void {
         this.targetAlpha = alpha;
         this.wantsToBeFast = wantsFast;
+        this.viewBox = viewBox;
 
         // send to server
         // TODO: limit update rate

@@ -52,8 +52,11 @@ export default class Game {
         this._data.predict(t);
     }
 
-    public async updateUserInput(alpha: number, fast: boolean): Promise<void> {
-        this.worker.updateUserInput(alpha, fast);
+    public async updateUserData(
+        alpha: number,
+        wantsFast: boolean
+    ): Promise<void> {
+        this.worker.updateUserData(alpha, wantsFast, this.camera.getViewBox());
     }
 
     public get ended(): boolean {

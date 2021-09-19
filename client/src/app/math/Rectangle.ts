@@ -87,7 +87,7 @@ export default class Rectangle {
     }
 }
 
-type TransferableBox = {
+export type TransferableBox = {
     minX: number;
     maxX: number;
     minY: number;

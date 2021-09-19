@@ -1,16 +1,21 @@
-import { GameConfig, ServerToClientJSONMessage } from "../protocol";
+import { ServerToClientJSONMessage } from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
-import { SnakeChunkData, SnakeData, GameDataUpdate } from "./GameDataUpdate";
+import {
+    SnakeChunkData,
+    SnakeData,
+    MainThreadGameDataUpdate
+} from "./GameDataUpdate";
 import WorkerSnakeChunk from "./WorkerSnakeChunk";
 import WorkerSnake from "./WorkerSnake";
 import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
 import Rectangle from "../math/Rectangle";
+import { GameConfig } from "../types/GameConfig";
 
 export default class WorkerGame {
     socket: WebSocket;
 
-    readonly config: Readonly<GameConfig>;
+    readonly config: GameConfig;
     targetPlayerId: number;
 
     readonly snakes: Map<SnakeId, WorkerSnake> = new Map();
@@ -135,7 +140,7 @@ export default class WorkerGame {
         }
     }
 
-    public getDataUpdate(): GameDataUpdate {
+    public getDataUpdate(): MainThreadGameDataUpdate {
         const snakeChunks: SnakeChunkData[] = new Array(this.snakeChunks.size);
         const snakes: SnakeData[] = new Array(this.snakes.size);
 

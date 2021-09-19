@@ -1,9 +1,8 @@
 import Rand from "rand-seed";
-import { GameConfig } from "../../app/protocol";
-
 import * as SCD from "../../app/worker/decoder/SnakeChunkDecoder";
 import WorkerSnakeChunk from "../../app/worker/WorkerSnakeChunk";
 import WorkerSnake from "../../app/worker/WorkerSnake";
+import { GameConfig } from "../../app/types/GameConfig";
 
 export function createSnakeChunkBuffer(
     numberOfChainCodes: number,

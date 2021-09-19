@@ -1,7 +1,7 @@
-import { GameConfig } from "../../protocol";
 import * as SID from "./SnakeInfoDecoder";
 import * as SCD from "./SnakeChunkDecoder";
 import * as FCD from "./FoodDecoder";
+import { GameConfig } from "../../types/GameConfig";
 
 const UPDATE_HEADER_SIZE = 3;
 

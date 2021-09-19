@@ -1,11 +1,8 @@
 import * as Comlink from "comlink";
 import Rectangle, { TransferableBox } from "../math/Rectangle";
-import {
-    ClientToServerMessage,
-    GameConfig,
-    ServerToClientJSONMessage
-} from "../protocol";
-import { GameDataUpdate } from "./GameDataUpdate";
+import { ClientToServerMessage, ServerToClientJSONMessage } from "../protocol";
+import { GameConfig } from "../types/GameConfig";
+import { MainThreadGameDataUpdate } from "./GameDataUpdate";
 import WorkerGame from "./WorkerGame";
 
 let game: WorkerGame | null = null;
@@ -74,7 +71,7 @@ export class WorkerAPI {
         }
     }
 
-    public getGameDataUpdate(): GameDataUpdate {
+    public getGameDataUpdate(): MainThreadGameDataUpdate {
         if (game === null) {
             throw new Error("Not initialized.");
         }

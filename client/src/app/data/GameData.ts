@@ -1,6 +1,6 @@
 import Rectangle from "../math/Rectangle";
-import { GameConfig } from "../protocol";
-import { GameDataUpdate } from "../worker/GameDataUpdate";
+import { GameConfig } from "../types/GameConfig";
+import { MainThreadGameDataUpdate } from "../worker/GameDataUpdate";
 import FoodChunk from "./FoodChunk";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
@@ -11,13 +11,13 @@ export default class GameData {
     private readonly foodChunks: Map<number, FoodChunk> = new Map();
     private targetSnakeId: number = -1;
     private lastUpdateTime: number = performance.now();
-    public readonly config: Readonly<GameConfig>;
+    public readonly config: GameConfig;
 
-    public constructor(config: Readonly<GameConfig>) {
+    public constructor(config: GameConfig) {
         this.config = config;
     }
 
-    public update(data: GameDataUpdate): void {
+    public update(data: MainThreadGameDataUpdate): void {
         // time stuff
         const now = performance.now();
         const timeSinceLastUpdate = now - this.lastUpdateTime;

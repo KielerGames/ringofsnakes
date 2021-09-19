@@ -1,4 +1,4 @@
-import { GameConfig } from "../../protocol";
+import { GameConfig } from "../../types/GameConfig";
 import { DecodeResult } from "./DecodeResult";
 
 const FOOD_SIZE = 3;

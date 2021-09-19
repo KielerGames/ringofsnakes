@@ -1,9 +1,8 @@
 import { assert } from "chai";
 import Rand from "rand-seed";
-
+import { GameConfig } from "../app/types/GameConfig";
 import * as SCD from "../app/worker/decoder/SnakeChunkDecoder";
 import * as SID from "../app/worker/decoder/SnakeInfoDecoder";
-import { GameConfig } from "../app/protocol";
 import { createSnakeChunkBuffer } from "./data/snake";
 
 const cfg: GameConfig = {

@@ -121,7 +121,7 @@ export default class GameData {
         });
     }
 
-    public get getTargetSnake(): Snake | undefined {
+    public get targetSnake(): Snake | undefined {
         if (this.targetSnakeId >= 0) {
             return this.snakes.get(this.targetSnakeId);
         }

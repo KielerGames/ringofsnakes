@@ -39,7 +39,7 @@ export default class Game {
         try {
             const diff = await this.worker.getGameDataUpdate();
             this._data.update(diff);
-            this.camera.setTargetSnake(this._data.getTargetSnake);
+            this.camera.setTargetSnake(this._data.targetSnake);
         } catch (e) {
             console.error(e);
             this.stop();

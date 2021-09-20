@@ -5,6 +5,7 @@ import game.world.World;
 import math.Vector;
 import util.SnakePointData;
 
+import java.awt.desktop.SystemSleepEvent;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +17,6 @@ public class Snake {
     public static final float MAX_WIDTH_GAIN = 4f;
     public static final float LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
     public static final float MIN_WIDTH = 0.5f;
-    private static final float GROWTH_SPEED = 0.1f;
 
     public final GameConfig config = new GameConfig();
     public final short id;
@@ -25,7 +25,7 @@ public class Snake {
     Vector headPosition;
     private ByteBuffer snakeInfoBuffer;
     private final World world;
-    public List<FinalSnakeChunk> chunks = new LinkedList<>();
+    public LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     public GrowingSnakeChunk chunkBuilder;
     float headDirection;
     private float length = START_LENGTH;
@@ -34,9 +34,6 @@ public class Snake {
     private boolean fast = false;
     private double lengthBuffer = 0;
     public boolean isAlive = true;
-    public boolean collided = false;
-
-    public final LinkedList<SnakeChunk> activeSnakeChunks = new LinkedList<>();
     private float pointDataSnakeLength = 0f;
 
 
@@ -102,46 +99,17 @@ public class Snake {
         updatePointData();
     }
 
-    //TODO: make this nicer
     private void updatePointData() {
-        if (this.activeSnakeChunks.isEmpty()) {
-            return;
+        if (chunkBuilder != null) {
+            chunkBuilder.pointData.addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
+            pointDataSnakeLength += fast ? config.fastSnakeSpeed : config.snakeSpeed;
         }
-        this.activeSnakeChunks.getFirst().getPointData().
-                addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
-        while (this.pointDataSnakeLength > length && !activeSnakeChunks.isEmpty()) {
-            var lastAsc = activeSnakeChunks.getLast();
-            var pd = lastAsc.getPointData();
-            if (!pd.isEmpty()) {
-                var p = pd.removeLast();
-                pointDataSnakeLength -= p.fast ? config.fastSnakeSpeed : config.snakeSpeed;
-            } else {
-                activeSnakeChunks.removeLast();
-                updatePointData();
-            }
+        var currentPointDataList =
+                chunks.isEmpty() ? chunkBuilder.pointData : chunks.getLast().pointData;
+        while (!currentPointDataList.isEmpty() && pointDataSnakeLength > length) {
+            var p = currentPointDataList.removeLast();
+            pointDataSnakeLength -= p.fast ? config.fastSnakeSpeed : config.snakeSpeed;
         }
-        pointDataSnakeLength += fast ? config.fastSnakeSpeed : config.snakeSpeed;
-    }
-
-    public boolean collidesWithSnakeChunk(SnakeChunk sc) {
-        if (sc.getPointData().stream().anyMatch(pd ->
-                (Vector.distance2(headPosition, pd.point)) < (this.getWidth() / 2.0 +
-                        sc.getSnake().getWidth() / 2.0)
-                        * (this.getWidth() / 2.0 +
-                        sc.getSnake().getWidth() / 2.0))) {
-            this.onCollision();
-            return true;
-        }
-        this.collided = false;
-        return false;
-    }
-
-    private void onCollision() {
-        System.out.println("Collision!");
-        //Comment this out if the snake length should not be reset at collision
-        length = config.minLength;
-        //Comment this out if snakes should not stop at collision
-        this.collided = true;
     }
 
     public void beginChunk() {
@@ -152,13 +120,10 @@ public class Snake {
             chunks.add(0, snakeChunk);
             //world.removeSnakeChunk(chunkBuilder);
             world.addSnakeChunk(snakeChunk);
-            activeSnakeChunks.removeFirst();
-            activeSnakeChunks.addFirst(snakeChunk);
         }
 
         chunkBuilder = new GrowingSnakeChunk(coder, this, nextChunkId++);
         world.addSnakeChunk(chunkBuilder);
-        activeSnakeChunks.addFirst(chunkBuilder);
     }
 
     public ByteBuffer getLatestMeaningfulBuffer() {

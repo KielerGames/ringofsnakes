@@ -12,6 +12,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import math.Vector;
 import server.SnakeServer;
+import util.SnakePointData;
+
+import java.util.LinkedList;
 
 
 public class DebugView extends Application {
@@ -89,15 +92,16 @@ public class DebugView extends Application {
                 }
             }
             var snakeSize = game.snakes.get(0).getWidth();
-            snake.activeSnakeChunks.forEach(snakeChunk ->
-                    snakeChunk.getPointData()
-                            .forEach(pd -> {
-                                var x = pd.point.x;
-                                var y = pd.point.y;
-                                g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,
-                                        300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
-                                        snakeSize * ZOOM, snakeSize * ZOOM);
-                            }));
+            LinkedList<SnakePointData> pointsToDraw = new LinkedList(snake.chunkBuilder.pointData);
+            //System.out.println("pointDataLength:" + pointsToDraw.size());
+            snake.chunks.forEach(chunk -> pointsToDraw.addAll(chunk.pointData));
+            pointsToDraw.forEach(pd -> {
+                var x = pd.point.x;
+                var y = pd.point.y;
+                g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,
+                        300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
+                        snakeSize * ZOOM, snakeSize * ZOOM);
+            });
         });
     }
 

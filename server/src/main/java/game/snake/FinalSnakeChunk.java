@@ -21,10 +21,9 @@ public class FinalSnakeChunk implements SnakeChunk {
     private final ByteBuffer chunkByteBuffer;
     private final float length;
     private final int uniqueId;
-    public  LinkedList<SnakePointData> pointData;
+    public LinkedList<SnakePointData> pointData;
     private LinkedList<WorldChunk> linkedWorldChunks;
     private final BoundingBox boundingBox;
-
 
 
     protected FinalSnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, float length,
@@ -32,7 +31,7 @@ public class FinalSnakeChunk implements SnakeChunk {
         assert buffer.position() == BYTE_SIZE;
         assert length > 0;
 
-        this.pointData = (LinkedList<SnakePointData>) pointData.clone();
+        this.pointData = pointData;
         this.snake = snake;
         chunkByteBuffer = buffer;
         boundingBox = box;

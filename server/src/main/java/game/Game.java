@@ -29,6 +29,7 @@ public class Game {
     private final Map<String, Client> clients = new HashMap<>(64);
     public List<Snake> snakes = new LinkedList<>();
     private List<Bot> bots = new LinkedList<>();
+    private final CollisionManager collisionManager;
 
     public Game() {
         config = new GameConfig();
@@ -41,6 +42,7 @@ public class Game {
         }
 
         DebugView.setGame(this);
+        collisionManager = new CollisionManager(this);
     }
 
     public Player createPlayer(Session session) {
@@ -53,7 +55,7 @@ public class Game {
         clients.put(session.getId(), player);
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
-        addBotsNextToPlayerOne(25.0, 30);
+        addBotsNextToPlayerOne(25.0, 2);
         return player;
     }
 
@@ -111,21 +113,16 @@ public class Game {
     private void tick() {
         synchronized (this) {
             snakes.forEach(snake -> {
-                if (snake.isAlive && !snake.collided) {
+                if (snake.isAlive) {
                     snake.tick();
                     killDesertingSnakes(snake);
                 }
             });
             world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
             bots.forEach(Bot::act);
-            checkForCollisions();
         }
         eatFood();
-    }
-
-
-    private void checkForCollisions() {
-        snakes.forEach(snake -> world.chunks.findChunk(snake.getHeadPosition()).checkForPotentialCollisions(snake));
+        collisionManager.manageCollisions();
     }
 
     private void updateClients() {

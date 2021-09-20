@@ -114,18 +114,7 @@ public class WorldChunk {
         return foodVersion;
     }
 
-    //returns
-    public void checkForPotentialCollisions(Snake s) {
-        //add snakeChunks of this worldChunk
-        Set<SnakeChunk> snakeChunksToConsider = new HashSet<>(snakeChunks);
-        //add snakeChunks of neighboring worldChunks
-        neighbors.forEach(worldChunk -> snakeChunksToConsider.addAll(worldChunk.snakeChunks));
-        //check for intersecting boundingBoxes
-        snakeChunksToConsider.stream()
-                .filter(snakeChunk -> snakeChunk.getBoundingBox()
-                        .isWithinRange(s.getHeadPosition(), s.getWidth()
-                                / 2.0 + snakeChunk.getSnake().getWidth() / 2.0)
-                        && !snakeChunk.getSnake().equals(s)).forEach(snakeChunk ->
-                        s.collidesWithSnakeChunk(snakeChunk));
+    public List<SnakeChunk> getSnakeChunks() {
+        return snakeChunks;
     }
 }

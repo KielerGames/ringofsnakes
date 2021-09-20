@@ -9,13 +9,15 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-public class GrowingSnakeChunk implements SnakeChunk {
-    private final Snake snake;
+public class GrowingSnakeChunk extends SnakeChunk {
+    public final LinkedList<SnakePointData> pointData = new LinkedList<>();
     private final short id;
     private final ChainCodeCoder coder;
-
     private final Vector end;
     private final float endDirection;
+    private final List<WorldChunk> linkedWorldChunks = new LinkedList<>();
+    private final ByteBuffer chunkByteBuffer;
+    private final List<Vector> points = new LinkedList<>();
     private int numberOfChainCodes = 0;
     private double x, y;
     private float direction;
@@ -25,14 +27,9 @@ public class GrowingSnakeChunk implements SnakeChunk {
     private boolean lastFast = false;
     private int lastDirDelta = 0;
     private boolean junk = false;
-    private final List<WorldChunk> linkedWorldChunks = new LinkedList<>();
-    public final LinkedList<SnakePointData> pointData = new LinkedList<>();
-
-    private final ByteBuffer chunkByteBuffer;
-    private final List<Vector> points = new LinkedList<>();
 
     public GrowingSnakeChunk(ChainCodeCoder coder, Snake snake, short chunkId) {
-        this.snake = snake;
+        super(snake);
         this.id = chunkId;
         this.coder = coder;
 
@@ -74,9 +71,9 @@ public class GrowingSnakeChunk implements SnakeChunk {
         buffer.putFloat(this.endDirection);
         buffer.putFloat((float) this.end.x);
         buffer.putFloat((float) this.end.y);
-        assert (buffer.position() == FinalSnakeChunk.BUFFER_OFFSET_POS);
+        assert (buffer.position() == BUFFER_OFFSET_POS);
         buffer.putFloat(0.0f);
-        assert (buffer.position() == FinalSnakeChunk.HEADER_BYTE_SIZE);
+        assert (buffer.position() == HEADER_BYTE_SIZE);
 
         return buffer;
     }
@@ -126,9 +123,9 @@ public class GrowingSnakeChunk implements SnakeChunk {
         if (!isFull()) {
             throw new IllegalStateException();
         }
-            BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
-            junk = true;
-            return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, pointData);
+        BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
+        junk = true;
+        return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, pointData);
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {
@@ -145,10 +142,6 @@ public class GrowingSnakeChunk implements SnakeChunk {
 
     public ByteBuffer getBuffer() {
         return chunkByteBuffer.asReadOnlyBuffer().flip();
-    }
-
-    public Snake getSnake() {
-        return this.snake;
     }
 
     public int getByteSize() {
@@ -172,7 +165,10 @@ public class GrowingSnakeChunk implements SnakeChunk {
         return pointData;
     }
 
-    public boolean isJunk() {return  junk; }
+    @Override
+    public boolean isJunk() {
+        return junk || super.isJunk();
+    }
 
     @Override
     public BoundingBox getBoundingBox() {

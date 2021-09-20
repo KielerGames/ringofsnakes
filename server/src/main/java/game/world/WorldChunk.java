@@ -1,15 +1,10 @@
 package game.world;
 
-import game.snake.Snake;
 import game.snake.SnakeChunk;
 import math.BoundingBox;
 
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class WorldChunk {
@@ -95,10 +90,7 @@ public class WorldChunk {
     }
 
     public void removeOldSnakeChunks() {
-        var junk = snakeChunks.stream()
-                .filter(SnakeChunk::isJunk)
-                .collect(Collectors.toList());
-        snakeChunks.removeAll(junk);
+        snakeChunks.removeIf(SnakeChunk::isJunk);
     }
 
     public String toString() {

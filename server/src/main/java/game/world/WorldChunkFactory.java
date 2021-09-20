@@ -64,7 +64,14 @@ public class WorldChunkFactory {
                 int x = (int) ((point.x - offsetX) / chunkSize);
                 int y = (int) ((point.y - offsetY) / chunkSize);
 
+
                 if (x < 0 || y < 0 || x >= columns || y >= rows) {
+                    /*At the moment this Exception causes the application to crash without any notification about the reasons.
+                    this seems to be a side effect of how  executor.scheduleAtFixedRate in Game works. When using a simple sleep
+                    mechanic the exception is shown.
+                    TODO: Fix this somehow.
+                     */
+                    System.out.println("Point out of bound Exception in WorldChunkFactory.");
                     throw new IllegalArgumentException("Point is out of bounds.");
                 }
 

@@ -3,10 +3,10 @@ package game.snake;
 import game.GameConfig;
 import game.world.World;
 import math.Vector;
+import util.SnakePointData;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
-import java.util.List;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
@@ -14,7 +14,6 @@ public class Snake {
     public static final float MAX_WIDTH_GAIN = 4f;
     public static final float LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
     public static final float MIN_WIDTH = 0.5f;
-    private static final float GROWTH_SPEED = 0.1f;
 
     public final GameConfig config = new GameConfig();
     public final short id;
@@ -23,7 +22,7 @@ public class Snake {
     Vector headPosition;
     private ByteBuffer snakeInfoBuffer;
     private final World world;
-    public List<FinalSnakeChunk> chunks = new LinkedList<>();
+    public LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     public GrowingSnakeChunk chunkBuilder;
     float headDirection;
     private float length = START_LENGTH;
@@ -31,6 +30,8 @@ public class Snake {
     private float targetDirection;
     private boolean fast = false;
     private double lengthBuffer = 0;
+    public boolean alive = true;
+    private float pointDataSnakeLength = 0f;
 
 
     Snake(short id, World world) {
@@ -78,6 +79,7 @@ public class Snake {
         chunkBuilder.append(encDirDelta, fast);
         // after an update a chunk might be full
         if (chunkBuilder.isFull()) {
+            System.out.println("chunk " + chunkBuilder.getUniqueId() + " is full (length: " + chunkBuilder.getLength() + ")");
             beginChunk();
         }
         float offset = chunkBuilder.getLength();
@@ -90,6 +92,22 @@ public class Snake {
             if (lastChunk.isJunk()) {
                 chunks.remove(chunks.size() - 1);
             }
+        }
+        updatePointData();
+    }
+
+    private void updatePointData() {
+        if (chunkBuilder == null) {
+            throw new IllegalStateException();
+        }
+        chunkBuilder.pointData.addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
+        pointDataSnakeLength += fast ? config.fastSnakeSpeed : config.snakeSpeed;
+
+        var currentPointDataList =
+                chunks.isEmpty() ? chunkBuilder.pointData : chunks.getLast().pointData;
+        while (!currentPointDataList.isEmpty() && pointDataSnakeLength > length) {
+            var p = currentPointDataList.removeLast();
+            pointDataSnakeLength -= p.fast ? config.fastSnakeSpeed : config.snakeSpeed;
         }
     }
 
@@ -141,7 +159,6 @@ public class Snake {
 
     public void shrink(float amount) {
         assert (amount > 0);
-
         var bufferAmount = Math.min(lengthBuffer, amount);
         lengthBuffer -= bufferAmount;
         var snakeAmount = amount - bufferAmount;
@@ -157,7 +174,7 @@ public class Snake {
 
     public float getWidth() {
         //sigmoid(3) is roughly  0.95
-        var x = 3*(length - config.minLength)/LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
+        var x = 3 * (length - config.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
         return (float) (MIN_WIDTH + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
 
     }
@@ -169,9 +186,4 @@ public class Snake {
     public void setSkin(byte skin) {
         this.skin = skin;
     }
-
-    public void setHeadPosition(Vector headPosition) {
-        this.headPosition = headPosition;
-    }
-
 }

@@ -37,10 +37,10 @@ public class CollisionManager {
     }
 
     private boolean checkForCollision(Snake s, SnakeChunk sc) {
-        var halfSW = s.getWidth() / 2.0;
-        var halfScW = sc.getSnake().getWidth() / 2.0;
+        final var collisionBound = (s.getWidth() / 2.0 + sc.getSnake().getWidth() / 2.0)
+                * (s.getWidth() / 2.0 + sc.getSnake().getWidth() / 2.0);
         if (sc.getPointData().stream().anyMatch(pd ->
-                (Vector.distance2(s.getHeadPosition(), pd.point)) < (halfSW + halfScW) * (halfSW + halfScW))) {
+                (Vector.distance2(s.getHeadPosition(), pd.point)) < collisionBound)) {
             onCollision(s);
             return true;
         }

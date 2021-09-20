@@ -97,10 +97,12 @@ public class Snake {
     }
 
     private void updatePointData() {
-        if (chunkBuilder != null) {
-            chunkBuilder.pointData.addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
-            pointDataSnakeLength += fast ? config.fastSnakeSpeed : config.snakeSpeed;
+        if (chunkBuilder == null) {
+            throw new IllegalStateException();
         }
+        chunkBuilder.pointData.addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
+        pointDataSnakeLength += fast ? config.fastSnakeSpeed : config.snakeSpeed;
+
         var currentPointDataList =
                 chunks.isEmpty() ? chunkBuilder.pointData : chunks.getLast().pointData;
         while (!currentPointDataList.isEmpty() && pointDataSnakeLength > length) {

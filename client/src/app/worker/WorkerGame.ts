@@ -140,7 +140,7 @@ export default class WorkerGame {
         }
     }
 
-    public getDataUpdate(): MainThreadGameDataUpdate {
+    public getDataChanges(): MainThreadGameDataUpdate {
         const snakeChunks: SnakeChunkData[] = new Array(this.snakeChunks.size);
         const snakes: SnakeData[] = new Array(this.snakes.size);
 
@@ -167,7 +167,9 @@ export default class WorkerGame {
                 snakes[i] = snake.createTransferData();
                 i++;
             }
-            // TODO: gc snakes
+
+            // garbage-collect snakes
+            // TODO
         }
 
         // food updates

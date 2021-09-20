@@ -76,7 +76,7 @@ export class WorkerAPI {
             throw new Error("Not initialized.");
         }
 
-        const update = game.getDataUpdate();
+        const update = game.getDataChanges();
         const transferables = update.newSnakeChunks.map(
             (chunk) => chunk.data.buffer
         );

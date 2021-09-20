@@ -1,12 +1,10 @@
 package game.world;
 
-import game.snake.FinalSnakeChunk;
 import game.snake.SnakeChunk;
 import math.BoundingBox;
 
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class WorldChunk {
@@ -92,10 +90,7 @@ public class WorldChunk {
     }
 
     public void removeOldSnakeChunks() {
-        var junk = snakeChunks.stream()
-                .filter(FinalSnakeChunk.class::isInstance)
-                .collect(Collectors.toList());
-        snakeChunks.removeAll(junk);
+        snakeChunks.removeIf(SnakeChunk::isJunk);
     }
 
     public String toString() {
@@ -109,5 +104,9 @@ public class WorldChunk {
     public int getFoodVersion() {
         assert foodVersion >= 0;
         return foodVersion;
+    }
+
+    public List<SnakeChunk> getSnakeChunks() {
+        return snakeChunks;
     }
 }

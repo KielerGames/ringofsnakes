@@ -2,40 +2,33 @@ package game.snake;
 
 import game.world.WorldChunk;
 import math.BoundingBox;
-import math.Vector;
+import util.SnakePointData;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
-public class FinalSnakeChunk implements SnakeChunk {
+public class FinalSnakeChunk extends SnakeChunk {
     public final static int BYTE_SIZE = 128;
-    public final static int HEADER_BYTE_SIZE = 21;
-    public final static int BUFFER_N_POS = 4;
-    public final static int BUFFER_OFFSET_POS = 17;
 
-    private final Snake snake;
     private final ByteBuffer chunkByteBuffer;
     private final float length;
     private final int uniqueId;
-    private final Map<Byte, List<Vector>> pointData;
-    private final List<WorldChunk> linkedWorldChunks;
     private final BoundingBox boundingBox;
-
+    public LinkedList<SnakePointData> pointData;
+    private LinkedList<WorldChunk> linkedWorldChunks;
 
     protected FinalSnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, float length,
-                              List<Vector> points) {
+                              LinkedList<SnakePointData> pointData) {
+        super(snake);
+
         assert buffer.position() == BYTE_SIZE;
         assert length > 0;
 
-        this.snake = snake;
+        this.pointData = pointData;
         chunkByteBuffer = buffer;
         boundingBox = box;
         this.length = length;
         this.uniqueId = buffer.getInt(0); // bytes 0-3
-        this.pointData = new HashMap<>();
         linkedWorldChunks = new LinkedList<>();
     }
 
@@ -67,12 +60,18 @@ public class FinalSnakeChunk implements SnakeChunk {
         return this.length;
     }
 
+    @Override
+    public LinkedList<SnakePointData> getPointData() {
+        return pointData;
+    }
+
     public void setOffset(float offset) {
         chunkByteBuffer.putFloat(BUFFER_OFFSET_POS, offset);
     }
 
+    @Override
     public boolean isJunk() {
-        return chunkByteBuffer.getFloat(BUFFER_OFFSET_POS) >= snake.getLength();
+        return super.isJunk() || chunkByteBuffer.getFloat(BUFFER_OFFSET_POS) >= snake.getLength();
     }
 
     public BoundingBox getBoundingBox() {

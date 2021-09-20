@@ -113,7 +113,7 @@ public class Game {
     private void tick() {
         synchronized (this) {
             snakes.forEach(snake -> {
-                if (snake.isAlive) {
+                if (snake.alive) {
                     snake.tick();
                     killDesertingSnakes(snake);
                 }
@@ -155,7 +155,7 @@ public class Game {
     private void killDesertingSnakes(Snake s) {
         if (Math.abs(s.getHeadPosition().x) > world.width / 2.0 - 3 || Math.abs(s.getHeadPosition().y) > world.height / 2.0 - 3) {
             System.out.println("Removing Snake " + s.id + " from Game, because it is leaving the map.");
-            s.isAlive = false;
+            s.alive = false;
         }
     }
 }

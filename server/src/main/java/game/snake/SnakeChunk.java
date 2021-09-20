@@ -7,31 +7,46 @@ import util.SnakePointData;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
-public interface SnakeChunk {
-    ByteBuffer getBuffer();
+public abstract class SnakeChunk {
 
-    Snake getSnake();
+    public final static int HEADER_BYTE_SIZE = 21;
+    public final static int BUFFER_N_POS = 4;
+    public final static int BUFFER_OFFSET_POS = 17;
 
-    int getByteSize();
+    protected final Snake snake;
 
-    boolean isEmpty();
+    protected SnakeChunk(Snake snake) {
+        this.snake = snake;
+    }
 
-    boolean isFull();
+    public abstract ByteBuffer getBuffer();
+
+    public Snake getSnake() {
+        return snake;
+    }
+
+    public abstract int getByteSize();
+
+    public abstract boolean isEmpty();
+
+    public abstract boolean isFull();
 
     /**
      * The id is a combination of snake id and chunk id
      *
      * @return An id that is unique within the game
      */
-    int getUniqueId();
+    public abstract int getUniqueId();
 
-    float getLength();
+    public abstract float getLength();
 
-    LinkedList<SnakePointData> getPointData();
+    public abstract LinkedList<SnakePointData> getPointData();
 
-    boolean isJunk();
+    public boolean isJunk() {
+        return !snake.alive;
+    }
 
-    BoundingBox getBoundingBox();
+    public abstract BoundingBox getBoundingBox();
 
-    void linkWorldChunk(WorldChunk worldChunk);
+    public abstract void linkWorldChunk(WorldChunk worldChunk);
 }

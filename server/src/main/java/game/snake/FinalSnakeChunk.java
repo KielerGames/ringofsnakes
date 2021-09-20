@@ -2,37 +2,29 @@ package game.snake;
 
 import game.world.WorldChunk;
 import math.BoundingBox;
-import math.Vector;
 import util.SnakePointData;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
-public class FinalSnakeChunk implements SnakeChunk {
+public class FinalSnakeChunk extends SnakeChunk {
     public final static int BYTE_SIZE = 128;
-    public final static int HEADER_BYTE_SIZE = 21;
-    public final static int BUFFER_N_POS = 4;
-    public final static int BUFFER_OFFSET_POS = 17;
 
-    private final Snake snake;
     private final ByteBuffer chunkByteBuffer;
     private final float length;
     private final int uniqueId;
+    private final BoundingBox boundingBox;
     public LinkedList<SnakePointData> pointData;
     private LinkedList<WorldChunk> linkedWorldChunks;
-    private final BoundingBox boundingBox;
-
 
     protected FinalSnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, float length,
                               LinkedList<SnakePointData> pointData) {
+        super(snake);
+
         assert buffer.position() == BYTE_SIZE;
         assert length > 0;
 
         this.pointData = pointData;
-        this.snake = snake;
         chunkByteBuffer = buffer;
         boundingBox = box;
         this.length = length;
@@ -77,8 +69,9 @@ public class FinalSnakeChunk implements SnakeChunk {
         chunkByteBuffer.putFloat(BUFFER_OFFSET_POS, offset);
     }
 
+    @Override
     public boolean isJunk() {
-        return chunkByteBuffer.getFloat(BUFFER_OFFSET_POS) >= snake.getLength();
+        return super.isJunk() || chunkByteBuffer.getFloat(BUFFER_OFFSET_POS) >= snake.getLength();
     }
 
     public BoundingBox getBoundingBox() {

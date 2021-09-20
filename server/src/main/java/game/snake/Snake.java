@@ -5,11 +5,8 @@ import game.world.World;
 import math.Vector;
 import util.SnakePointData;
 
-import java.awt.desktop.SystemSleepEvent;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
@@ -33,7 +30,7 @@ public class Snake {
     private float targetDirection;
     private boolean fast = false;
     private double lengthBuffer = 0;
-    public boolean isAlive = true;
+    public boolean alive = true;
     private float pointDataSnakeLength = 0f;
 
 

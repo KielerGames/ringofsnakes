@@ -80,7 +80,10 @@ public class Game {
         if (client instanceof Player) {
             var snake = ((Player) client).snake;
             // TODO: generate food (?), consider changing list to another data structure
-            snakes.remove(snake);
+            synchronized (this) {
+                snakes.remove(snake);
+            }
+            snake.alive = false;
         }
     }
 

@@ -48,7 +48,7 @@ export default class SnakeChunk {
         return this.lastTickOffset + t * this.snake.speed;
     }
 
-    public updateEndPoint(end: Vector): void {
+    public updateEndPoint(end: Readonly<Vector>): void {
         const n = this.buffer.length;
         if (n > 12) {
             this.buffer[n - 6] = end.x;
@@ -63,7 +63,7 @@ export default class SnakeChunk {
         );
     }
 
-    public getBoundingBox(): Rectangle {
+    public getBoundingBox(): Readonly<Rectangle> {
         return this.boundingBox;
     }
 }

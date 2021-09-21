@@ -76,7 +76,7 @@ export default class WorkerGame {
         data.snakeChunkData.forEach((chunkData) => {
             let chunk = this.snakeChunks.get(chunkData.chunkId);
             if (chunk) {
-                chunk.update(chunkData);
+                chunk.applyUpdateFromServer(chunkData);
             } else {
                 const snake = this.snakes.get(chunkData.snakeId);
                 assert(snake !== undefined, "Data for unknown snake.");

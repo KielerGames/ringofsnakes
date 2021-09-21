@@ -89,16 +89,16 @@ export default class WorkerSnakeChunk {
             );
         }
 
-        if (!this.final) {
-            // continue line in direction of the snake
-            const position = this.snake.position;
-            builder.addPoint(
-                position.x,
-                position.y,
-                this.snake.direction,
-                this.pathLength
-            );
-        }
+        // if (!this.final) {
+        //     // continue line in direction of the snake
+        //     const position = this.snake.position;
+        //     builder.addPoint(
+        //         position.x,
+        //         position.y,
+        //         this.snake.direction,
+        //         this.pathLength
+        //     );
+        // }
 
         return {
             id: this.id,

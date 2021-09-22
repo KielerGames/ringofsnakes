@@ -5,8 +5,7 @@ import game.snake.SnakeChunk;
 import game.world.WorldChunk;
 import math.Vector;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CollisionManager {
     private final Game game;
@@ -22,23 +21,31 @@ public class CollisionManager {
     }
 
     private void checkForPotentialCollisions(Snake s, WorldChunk wc) {
-        //add snakeChunks of this worldChunk
-        Set<SnakeChunk> snakeChunksToConsider = new HashSet<>(wc.getSnakeChunks());
-        //add snakeChunks of neighboring worldChunks
-        wc.neighbors.forEach(worldChunk -> snakeChunksToConsider.addAll(worldChunk.getSnakeChunks()));
-        //check for intersecting boundingBoxes
+        // add snakeChunks of this worldChunk
+        final var snakeChunksToConsider = wc.streamSnakeChunks().collect(Collectors.toSet());
+        // add snakeChunks of neighboring worldChunks
+        wc.neighbors.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(snakeChunksToConsider::add);
+
+        final var snakeRadius = s.getWidth() / 2.0;
+
+        // check for intersecting boundingBoxes
         snakeChunksToConsider.stream()
-                .filter(snakeChunk -> snakeChunk.getBoundingBox()
-                        .isWithinRange(s.getHeadPosition(), s.getWidth()
-                                / 2.0 + snakeChunk.getSnake().getWidth() / 2.0))
+                .filter(snakeChunk ->
+                        snakeChunk.getBoundingBox().isWithinRange(
+                                s.getHeadPosition(),
+                                snakeRadius + 0.5 * snakeChunk.getSnake().getWidth()
+                        )
+                )
                 .filter(snakeChunk -> !snakeChunk.getSnake().equals(s))
-                //check for actual collision between snakeHead and snakeChunk
+                // check for actual collision between snakeHead and snakeChunk
                 .forEach(snakeChunk -> checkForCollision(s, snakeChunk));
     }
 
     private boolean checkForCollision(Snake s, SnakeChunk sc) {
-        final var collisionBound = (s.getWidth() / 2.0 + sc.getSnake().getWidth() / 2.0)
-                * (s.getWidth() / 2.0 + sc.getSnake().getWidth() / 2.0);
+        final var radius1 = s.getWidth() / 2.0;
+        final var radius2 = sc.getSnake().getWidth() / 2.0;
+        final var collisionBound = (radius1 + radius2) * (radius1 + radius2);
+
         if (sc.getPointData().stream().anyMatch(pd ->
                 (Vector.distance2(s.getHeadPosition(), pd.point)) < collisionBound)) {
             onCollision(s);

@@ -11,7 +11,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import math.Vector;
 import server.SnakeServer;
-import util.SnakePointData;
 
 import java.util.LinkedList;
 
@@ -71,7 +70,7 @@ public class DebugView extends Application {
     private void drawFood(GraphicsContext g) {
         g.setFill(Color.RED);
         g.setStroke(Color.RED);
-        game.world.chunks.forEach(chunk -> chunk.getFoodList().forEach(food -> {
+        game.world.chunks.forEach(chunk -> chunk.streamFood().forEach(food -> {
             var size = food.size.value;
             g.fillOval((food.position.x - camera.x) * ZOOM + 400 - size * ZOOM,
                     300 - (food.position.y - camera.y) * ZOOM - size * ZOOM,
@@ -90,9 +89,9 @@ public class DebugView extends Application {
                     camera = snake.getHeadPosition();
                 }
             }
-            var snakeSize = game.snakes.get(0).getWidth();
-            LinkedList<SnakePointData> pointsToDraw = new LinkedList(snake.chunkBuilder.pointData);
-            //System.out.println("pointDataLength:" + pointsToDraw.size());
+            final var snakeSize = game.snakes.get(0).getWidth();
+            final var pointsToDraw = new LinkedList<>(snake.chunkBuilder.pointData);
+
             snake.chunks.forEach(chunk -> pointsToDraw.addAll(chunk.pointData));
             pointsToDraw.forEach(pd -> {
                 var x = pd.point.x;

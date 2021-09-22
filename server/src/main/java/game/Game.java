@@ -37,7 +37,7 @@ public class Game {
         executor = new ExceptionalExecutorService();
 
         // spawn some food
-        for (int i = 0; i < 42; i++) {
+        for (int i = 0; i < 256; i++) {
             world.spawnFood();
         }
 

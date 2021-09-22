@@ -37,10 +37,6 @@ public class Snake {
     Snake(short id, World world) {
         this.id = id;
         this.world = world;
-
-        // these values don't change
-        snakeInfoBuffer.putShort(0, id);
-        snakeInfoBuffer.put(4, skin);
     }
 
     public void setTargetDirection(float alpha) {
@@ -135,7 +131,9 @@ public class Snake {
 
     public ByteBuffer encodeInfo() {
         final var buffer = this.snakeInfoBuffer;
+        buffer.putShort(0, id);
         buffer.putShort(2, currentChunk.id);
+        buffer.put(4, skin);
         buffer.put(5, (byte) (fast ? 1 : 0));
         buffer.putFloat(6, length);
         buffer.putFloat(10, headDirection);

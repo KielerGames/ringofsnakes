@@ -2,8 +2,8 @@ package game.snake;
 
 import game.world.World;
 import math.Vector;
+
 import java.nio.ByteBuffer;
-import java.nio.file.attribute.PosixFileAttributes;
 import java.util.Random;
 
 public class SnakeFactory {
@@ -27,6 +27,8 @@ public class SnakeFactory {
         snake.headDirection = (float) ((random.nextDouble() * 2.0 - 1.0) * Math.PI);
         snake.setTargetDirection(snake.headDirection);
         snake.beginChunk();
+
+        world.addSnake(snake);
 
         return snake;
     }

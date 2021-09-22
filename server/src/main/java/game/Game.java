@@ -27,9 +27,9 @@ public class Game {
     public final World world;
     private final ExceptionalExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
+    private final CollisionManager collisionManager;
     public List<Snake> snakes = new LinkedList<>();
     private List<Bot> bots = new LinkedList<>();
-    private final CollisionManager collisionManager;
 
     public Game() {
         config = new GameConfig();
@@ -46,16 +46,29 @@ public class Game {
     }
 
     public Player createPlayer(Session session) {
-        var spawnPos = world.findSpawnPosition();
-        var snake = SnakeFactory.createSnake(spawnPos, world);
-        snakes.add(snake);
-        world.addSnake(snake);
+        final var spawnPos = world.findSpawnPosition();
+        final Snake snake;
 
-        var player = new Player(snake, session);
-        clients.put(session.getId(), player);
+        synchronized (this) {
+            snake = SnakeFactory.createSnake(spawnPos, world);
+            snakes.add(snake);
+        }
+
+        final var player = new Player(snake, session);
+
+        synchronized (this) {
+            clients.put(session.getId(), player);
+        }
+
         var data = gson.toJson(new SpawnInfo(config, snake));
         player.sendSync(data);
-        addBotsNextToPlayerOne(25.0, 2);
+
+        executor.schedule(() -> {
+            synchronized (this) {
+                addBotsNextToPlayerOne(25.0, 2);
+            }
+        }, 1, TimeUnit.SECONDS);
+
         return player;
     }
 
@@ -100,18 +113,15 @@ public class Game {
         }, 100, (long) (25 * 1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
-            if (!snakes.isEmpty()) {
-                var snake = snakes.get(0);
-                var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
-                System.out.println(worldChunk + ": amount of food: " + worldChunk.getFoodCount());
+            synchronized (this) {
+                world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
             }
-        }, 0, 5, TimeUnit.SECONDS);
+        }, 250, 1000, TimeUnit.MILLISECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
 
 
     }
-
 
     private void tick() {
         synchronized (this) {
@@ -121,11 +131,12 @@ public class Game {
                     killDesertingSnakes(snake);
                 }
             });
-            world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
-            bots.forEach(Bot::act);
         }
-        eatFood();
-        collisionManager.manageCollisions();
+        bots.forEach(Bot::act);
+        synchronized (this) {
+            eatFood();
+            collisionManager.manageCollisions();
+        }
     }
 
     private void updateClients() {
@@ -143,8 +154,8 @@ public class Game {
             final var foodCollectRadius = snake.getWidth() * 1.1 + 1.0;
             final var headPosition = snake.getHeadPosition();
             final var worldChunk = world.chunks.findChunk(headPosition);
-            
-            final var collectedFood = worldChunk.getFoodList().stream()
+
+            final var collectedFood = worldChunk.streamFood()
                     .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
                     .collect(Collectors.toList());
 

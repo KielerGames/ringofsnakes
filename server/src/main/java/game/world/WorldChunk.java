@@ -5,6 +5,7 @@ import math.BoundingBox;
 
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class WorldChunk {
@@ -85,12 +86,17 @@ public class WorldChunk {
         return snakeChunks.size();
     }
 
-    public List<Food> getFoodList() {
-        return foodList;
+    public Stream<Food> streamFood() {
+        return foodList.stream();
     }
 
-    public void removeOldSnakeChunks() {
-        snakeChunks.removeIf(SnakeChunk::isJunk);
+    /**
+     * Removes snake chunks that are junk.
+     *
+     * @return true if any snake chunks have been removed
+     */
+    public boolean removeOldSnakeChunks() {
+        return snakeChunks.removeIf(SnakeChunk::isJunk);
     }
 
     public String toString() {
@@ -98,15 +104,11 @@ public class WorldChunk {
     }
 
     public Stream<SnakeChunk> streamSnakeChunks() {
-        return snakeChunks.stream();
+        return snakeChunks.stream().filter(Predicate.not(SnakeChunk::isJunk));
     }
 
     public int getFoodVersion() {
         assert foodVersion >= 0;
         return foodVersion;
-    }
-
-    public List<SnakeChunk> getSnakeChunks() {
-        return snakeChunks;
     }
 }

@@ -65,12 +65,13 @@ public class SnakeServer {
         System.out.println("Player has been removed. (" + sessionId + ")");
     }
 
-    public static void onUserInputUpdate(Session session, float alpha, boolean fast) {
+    public static void onUserInputUpdate(Session session, float alpha, boolean fast, float ratio) {
         var player = players.get(session.getId());
 
         if (player != null) {
             player.snake.setTargetDirection(alpha);
             player.snake.setFast(fast);
+            player.setViewBoxRatio(ratio);
         } else {
             System.err.println("Illegal request from client.");
         }

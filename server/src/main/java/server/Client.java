@@ -16,6 +16,7 @@ public abstract class Client {
     public final Session session;
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private final Map<WorldChunk, Integer> knownFoodChunks = new HashMap<>();
+    protected float viewBoxRatio = 1f;
     private GameUpdate nextUpdate;
 
     public Client(Session session) {
@@ -25,8 +26,8 @@ public abstract class Client {
 
     public void updateClientSnakeChunk(SnakeChunk chunk) {
         // TODO Kilian: remove instanceof check
-        if(chunk instanceof FinalSnakeChunk) {
-            if(((FinalSnakeChunk) chunk).isJunk()) {
+        if (chunk instanceof FinalSnakeChunk) {
+            if (((FinalSnakeChunk) chunk).isJunk()) {
                 return;
             }
         }
@@ -92,5 +93,10 @@ public abstract class Client {
                 .collect(Collectors.toList());
 
         chunksToForget.forEach(chunk -> knownFoodChunks.remove(chunk));
+    }
+
+    public void setViewBoxRatio(float ratio) {
+        assert(ratio > 0f && ratio < 3f);
+        viewBoxRatio = ratio;
     }
 }

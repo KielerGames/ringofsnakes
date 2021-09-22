@@ -1,3 +1,5 @@
+import { GameConfig } from "./types/GameConfig";
+
 export type ClientToServerMessage = UpdatePlayerName;
 export type ServerToClientJSONMessage = SpawnInfo;
 
@@ -10,17 +12,4 @@ export type SpawnInfo = Readonly<{
     tag: "SpawnInfo";
     snakeId: number;
     gameConfig: GameConfig;
-}>;
-
-export type GameConfig = Readonly<{
-    snakeSpeed: number;
-    fastSnakeSpeed: number;
-    maxTurnDelta: number;
-    tickDuration: number;
-    minLength: number;
-    chunkInfo: {
-        chunkSize: number;
-        columns: number;
-        rows: number;
-    };
 }>;

@@ -1,15 +1,21 @@
-import { GameConfig, ServerToClientJSONMessage } from "../protocol";
+import { ServerToClientJSONMessage } from "../protocol";
 import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
-import { SnakeChunkData, SnakeData, GameDataUpdate } from "./GameDataUpdate";
+import {
+    SnakeChunkData,
+    SnakeData,
+    MainThreadGameDataUpdate
+} from "./GameDataUpdate";
 import WorkerSnakeChunk from "./WorkerSnakeChunk";
 import WorkerSnake from "./WorkerSnake";
 import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
+import Rectangle from "../math/Rectangle";
+import { GameConfig } from "../types/GameConfig";
 
 export default class WorkerGame {
     socket: WebSocket;
 
-    readonly config: Readonly<GameConfig>;
+    readonly config: GameConfig;
     targetPlayerId: number;
 
     readonly snakes: Map<SnakeId, WorkerSnake> = new Map();
@@ -21,6 +27,7 @@ export default class WorkerGame {
 
     targetAlpha: number = 0.0;
     wantsToBeFast: boolean = false;
+    private viewBox: Rectangle;
 
     constructor(socket: WebSocket, snakeId: number, gameConfig: GameConfig) {
         this.socket = socket;
@@ -69,7 +76,7 @@ export default class WorkerGame {
         data.snakeChunkData.forEach((chunkData) => {
             let chunk = this.snakeChunks.get(chunkData.chunkId);
             if (chunk) {
-                chunk.update(chunkData);
+                chunk.applyUpdateFromServer(chunkData);
             } else {
                 const snake = this.snakes.get(chunkData.snakeId);
                 assert(snake !== undefined, "Data for unknown snake.");
@@ -100,19 +107,24 @@ export default class WorkerGame {
         }
     }
 
-    public updateUserInput(alpha: number, wantsFast: boolean): void {
+    public updateUserData(
+        alpha: number,
+        wantsFast: boolean,
+        viewBox: Rectangle
+    ): void {
         this.targetAlpha = alpha;
         this.wantsToBeFast = wantsFast;
+        this.viewBox = viewBox;
 
         // send to server
         // TODO: limit update rate
         const ws = this.socket;
         if (ws.readyState === WebSocket.OPEN) {
-            let buffer = new ArrayBuffer(10);
+            let buffer = new ArrayBuffer(9);
             let view = new DataView(buffer);
-            view.setFloat64(0, this.targetAlpha, false);
+            view.setFloat32(0, this.viewBox.width / this.viewBox.height, false);
+            view.setFloat32(4, this.targetAlpha, false);
             view.setUint8(8, this.wantsToBeFast ? 1 : 0);
-            view.setUint8(9, 42);
             ws.send(buffer);
         }
     }
@@ -128,7 +140,7 @@ export default class WorkerGame {
         }
     }
 
-    public getDataUpdate(): GameDataUpdate {
+    public getDataChanges(): MainThreadGameDataUpdate {
         const snakeChunks: SnakeChunkData[] = new Array(this.snakeChunks.size);
         const snakes: SnakeData[] = new Array(this.snakes.size);
 
@@ -155,7 +167,9 @@ export default class WorkerGame {
                 snakes[i] = snake.createTransferData();
                 i++;
             }
-            // TODO: gc snakes
+
+            // garbage-collect snakes
+            // TODO
         }
 
         // food updates

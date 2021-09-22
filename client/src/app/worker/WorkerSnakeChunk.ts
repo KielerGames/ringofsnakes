@@ -51,7 +51,7 @@ export default class WorkerSnakeChunk {
         this.box = createBoundingBox(this.pathData, this.numPoints);
     }
 
-    public update(data: Readonly<DecodedSnakeChunk>): void {
+    public applyUpdateFromServer(data: Readonly<DecodedSnakeChunk>): void {
         assert(data.points >= this.numPoints);
         assert(data.pathLength >= data.pathLength);
 

@@ -2,6 +2,7 @@ import { Component } from "preact";
 import Game from "../Game";
 import FPSStats from "./debug/FPSStats";
 import SnakeList from "./debug/SnakeList";
+import SnakeInfoUI from "./SnakeInfoUI";
 import UserInput from "./UserInput";
 
 type Props = {
@@ -15,10 +16,11 @@ export default class GameUI extends Component<Props> {
         return (
             <>
                 <FPSStats />
+                <SnakeInfoUI game={game} />
                 {__DEBUG__ ? <SnakeList data={game.data} /> : null}
                 <UserInput
                     initial={0.0}
-                    onChange={game.updateUserInput.bind(game)}
+                    onChange={game.updateUserData.bind(game)}
                 />
             </>
         );

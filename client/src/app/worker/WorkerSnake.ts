@@ -1,5 +1,5 @@
 import Vector from "../math/Vector";
-import { GameConfig } from "../protocol";
+import { GameConfig } from "../types/GameConfig";
 import { SnakeInfo } from "./decoder/SnakeInfoDecoder";
 import { SnakeData } from "./GameDataUpdate";
 

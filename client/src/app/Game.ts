@@ -39,7 +39,7 @@ export default class Game {
         try {
             const diff = await this.worker.getGameDataUpdate();
             this._data.update(diff);
-            this.camera.setTargetSnake(this._data.getTargetSnake);
+            this.camera.setTargetSnake(this._data.targetSnake);
         } catch (e) {
             console.error(e);
             this.stop();
@@ -52,8 +52,11 @@ export default class Game {
         this._data.predict(t);
     }
 
-    public async updateUserInput(alpha: number, fast: boolean): Promise<void> {
-        this.worker.updateUserInput(alpha, fast);
+    public async updateUserData(
+        alpha: number,
+        wantsFast: boolean
+    ): Promise<void> {
+        this.worker.updateUserData(alpha, wantsFast, this.camera.getViewBox());
     }
 
     public get ended(): boolean {

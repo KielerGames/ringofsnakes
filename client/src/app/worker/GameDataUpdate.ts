@@ -1,6 +1,7 @@
+import { TransferableBox } from "../math/Rectangle";
 import { FoodChunkDTO } from "./decoder/FoodDecoder";
 
-export type GameDataUpdate = {
+export type MainThreadGameDataUpdate = {
     timeSinceLastTick: number;
     ticksSinceLastMainThreadUpdate: number;
     newSnakeChunks: SnakeChunkData[];
@@ -21,12 +22,7 @@ export type SnakeChunkData = {
 
     data: Float32Array;
     vertices: number;
-    boundingBox: {
-        minX: number;
-        maxX: number;
-        minY: number;
-        maxY: number;
-    };
+    boundingBox: TransferableBox;
 
     length: number;
     offset: number;

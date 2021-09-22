@@ -3,7 +3,6 @@ import Rand from "rand-seed";
 import { SnakeCamera, TargetCamera } from "../app/data/Camera";
 import Snake from "../app/data/Snake";
 import Vector from "../app/math/Vector";
-import { createGameConfig } from "./data/snake";
 
 function createRandomPoint(rand: Rand, maxValue: number): Vector {
     const x = (2 * rand.next() - 1) * maxValue;

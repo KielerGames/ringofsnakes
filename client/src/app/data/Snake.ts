@@ -1,6 +1,5 @@
 import PredictedAngle from "../math/PredictedAngle";
 import Vector from "../math/Vector";
-import { GameConfig } from "../protocol";
 import { SnakeData } from "../worker/GameDataUpdate";
 import SnakeChunk from "./SnakeChunk";
 

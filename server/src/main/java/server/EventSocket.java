@@ -22,10 +22,19 @@ public class EventSocket {
 
     @OnMessage
     public void onWebSocketMessage(Session session, ByteBuffer buffer) {
-        float alpha = (float) buffer.getDouble(0); // TODO
+        if(buffer.capacity() != 9) {
+            System.err.println("Illegal binary message from client.");
+            return;
+        }
+
+        float viewBoxRatio = buffer.getFloat(0);
+        float alpha = buffer.getFloat(4);
         boolean fast = buffer.get(8) != 0;
-        assert(buffer.get(9) == 42);
-        SnakeServer.onUserInputUpdate(session, alpha, fast);
+
+        if (Float.isFinite(alpha) && Float.isFinite(viewBoxRatio)) {
+            // TODO(?) make sure float values are in a valid range
+            SnakeServer.onUserInputUpdate(session, alpha, fast, viewBoxRatio);
+        }
     }
 
     @OnClose

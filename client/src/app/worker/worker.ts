@@ -1,10 +1,8 @@
 import * as Comlink from "comlink";
-import {
-    ClientToServerMessage,
-    GameConfig,
-    ServerToClientJSONMessage
-} from "../protocol";
-import { GameDataUpdate } from "./GameDataUpdate";
+import Rectangle, { TransferableBox } from "../math/Rectangle";
+import { ClientToServerMessage, ServerToClientJSONMessage } from "../protocol";
+import { GameConfig } from "../types/GameConfig";
+import { MainThreadGameDataUpdate } from "./GameDataUpdate";
 import WorkerGame from "./WorkerGame";
 
 let game: WorkerGame | null = null;
@@ -59,18 +57,26 @@ export class WorkerAPI {
         console.info(`WorkerGame init complete.`);
     }
 
-    public updateUserInput(alpha: number, fast: boolean): void {
+    public updateUserData(
+        alpha: number,
+        wantsFast: boolean,
+        viewBox: TransferableBox
+    ): void {
         if (game) {
-            game.updateUserInput(alpha, fast);
+            game.updateUserData(
+                alpha,
+                wantsFast,
+                Rectangle.fromTransferable(viewBox)
+            );
         }
     }
 
-    public getGameDataUpdate(): GameDataUpdate {
+    public getGameDataUpdate(): MainThreadGameDataUpdate {
         if (game === null) {
             throw new Error("Not initialized.");
         }
 
-        const update = game.getDataUpdate();
+        const update = game.getDataChanges();
         const transferables = update.newSnakeChunks.map(
             (chunk) => chunk.data.buffer
         );

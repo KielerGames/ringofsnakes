@@ -80,7 +80,7 @@ describe("WorkerChunk", () => {
         const pathLength1 = wc.createTransferData().length;
         assert.isAbove(pathLength1, 0.0);
 
-        wc.update(SCD.decode(chunkData2, 0, cfg).data);
+        wc.applyUpdateFromServer(SCD.decode(chunkData2, 0, cfg).data);
         const pathLength2 = wc.createTransferData().length;
         assert.isAbove(pathLength2, pathLength1);
     });

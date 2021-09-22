@@ -90,7 +90,7 @@ public class DebugView extends Application {
                 }
             }
             final var snakeSize = game.snakes.get(0).getWidth();
-            final var pointsToDraw = new LinkedList<>(snake.chunkBuilder.pointData);
+            final var pointsToDraw = new LinkedList<>(snake.currentChunk.pointData);
 
             snake.chunks.forEach(chunk -> pointsToDraw.addAll(chunk.pointData));
             pointsToDraw.forEach(pd -> {

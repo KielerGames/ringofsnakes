@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
 public class Snake {
-    public static final int INFO_BYTE_SIZE = 24;
+    public static final int INFO_BYTE_SIZE = 26;
     public static final float START_LENGTH = 8f;
     public static final float MAX_WIDTH_GAIN = 4f;
     public static final float LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
@@ -20,10 +20,10 @@ public class Snake {
     public byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);
     Vector headPosition;
-    private ByteBuffer snakeInfoBuffer;
+    private ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final World world;
     public LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
-    public GrowingSnakeChunk chunkBuilder;
+    public GrowingSnakeChunk currentChunk;
     float headDirection;
     private float length = START_LENGTH;
     private short nextChunkId = 0;
@@ -37,6 +37,10 @@ public class Snake {
     Snake(short id, World world) {
         this.id = id;
         this.world = world;
+
+        // these values don't change
+        snakeInfoBuffer.putShort(0, id);
+        snakeInfoBuffer.put(4, skin);
     }
 
     public void setTargetDirection(float alpha) {
@@ -76,13 +80,13 @@ public class Snake {
         }
 
         // update chunks
-        chunkBuilder.append(encDirDelta, fast);
+        currentChunk.append(encDirDelta, fast);
         // after an update a chunk might be full
-        if (chunkBuilder.isFull()) {
-            System.out.println("chunk " + chunkBuilder.getUniqueId() + " is full (length: " + chunkBuilder.getLength() + ")");
+        if (currentChunk.isFull()) {
+            System.out.println("chunk " + currentChunk.getUniqueId() + " is full (length: " + currentChunk.getLength() + ")");
             beginChunk();
         }
-        float offset = chunkBuilder.getLength();
+        float offset = currentChunk.getLength();
         for (FinalSnakeChunk chunk : chunks) {
             chunk.setOffset(offset);
             offset += chunk.getLength();
@@ -97,14 +101,14 @@ public class Snake {
     }
 
     private void updatePointData() {
-        if (chunkBuilder == null) {
+        if (currentChunk == null) {
             throw new IllegalStateException();
         }
-        chunkBuilder.pointData.addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
+        currentChunk.pointData.addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
         pointDataSnakeLength += fast ? config.fastSnakeSpeed : config.snakeSpeed;
 
         var currentPointDataList =
-                chunks.isEmpty() ? chunkBuilder.pointData : chunks.getLast().pointData;
+                chunks.isEmpty() ? currentChunk.pointData : chunks.getLast().pointData;
         while (!currentPointDataList.isEmpty() && pointDataSnakeLength > length) {
             var p = currentPointDataList.removeLast();
             pointDataSnakeLength -= p.fast ? config.fastSnakeSpeed : config.snakeSpeed;
@@ -112,38 +116,32 @@ public class Snake {
     }
 
     public void beginChunk() {
-        if (chunkBuilder != null) {
-            assert chunkBuilder.isFull();
+        if (currentChunk != null) {
+            assert currentChunk.isFull();
 
-            var snakeChunk = chunkBuilder.build();
+            var snakeChunk = currentChunk.build();
             chunks.add(0, snakeChunk);
             //world.removeSnakeChunk(chunkBuilder);
             world.addSnakeChunk(snakeChunk);
         }
 
-        chunkBuilder = new GrowingSnakeChunk(coder, this, nextChunkId++);
-        world.addSnakeChunk(chunkBuilder);
-    }
-
-    public ByteBuffer getLatestMeaningfulBuffer() {
-        if (chunkBuilder.isEmpty() && chunks.size() > 0) {
-            return chunks.get(chunks.size() - 1).getBuffer();
-        }
-        return chunkBuilder.getBuffer();
+        currentChunk = new GrowingSnakeChunk(coder, this, nextChunkId++);
+        world.addSnakeChunk(currentChunk);
     }
 
     public float getLength() {
         return this.length;
     }
 
-    public ByteBuffer getInfo() {
-        var buffer = this.snakeInfoBuffer;
-        buffer.put(3, (byte) (fast ? 1 : 0));
-        buffer.putFloat(4, length);
-        buffer.putFloat(8, headDirection);
-        buffer.putFloat(12, targetDirection);
-        buffer.putFloat(16, (float) headPosition.x);
-        buffer.putFloat(20, (float) headPosition.y);
+    public ByteBuffer encodeInfo() {
+        final var buffer = this.snakeInfoBuffer;
+        buffer.putShort(2, currentChunk.id);
+        buffer.put(5, (byte) (fast ? 1 : 0));
+        buffer.putFloat(6, length);
+        buffer.putFloat(10, headDirection);
+        buffer.putFloat(14, targetDirection);
+        buffer.putFloat(18, (float) headPosition.x);
+        buffer.putFloat(22, (float) headPosition.y);
         buffer.position(INFO_BYTE_SIZE);
         return buffer.asReadOnlyBuffer().flip();
     }

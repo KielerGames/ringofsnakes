@@ -2,6 +2,7 @@ import Vector from "../math/Vector";
 import { GameConfig } from "../types/GameConfig";
 import { SnakeInfo } from "./decoder/SnakeInfoDecoder";
 import { SnakeData } from "./GameDataUpdate";
+import WorkerSnakeChunk from "./WorkerSnakeChunk";
 
 export default class WorkerSnake {
     public readonly id: number;
@@ -12,6 +13,7 @@ export default class WorkerSnake {
     private offsetPrediction: number = 0.0;
     private correctOffset: number = 0.0;
     private gameConfig: Readonly<GameConfig>;
+    public headSnakeChunk: Readonly<WorkerSnakeChunk>;
 
     public constructor(info: SnakeInfo, cfg: Readonly<GameConfig>) {
         this.id = info.snakeId;

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class GrowingSnakeChunk extends SnakeChunk {
     public final LinkedList<SnakePointData> pointData = new LinkedList<>();
-    private final short id;
+    public final short id;
     private final ChainCodeCoder coder;
     private final Vector end;
     private final float endDirection;

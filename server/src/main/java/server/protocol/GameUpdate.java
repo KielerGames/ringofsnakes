@@ -28,7 +28,7 @@ public class GameUpdate {
     }
 
     public void addFoodChunk(WorldChunk chunk) {
-        var encodedFood = chunk.encodeFood();
+        final var encodedFood = chunk.encodeFood();
         foodChunkBuffers.add(encodedFood);
         foodChunkBufferSize += encodedFood.capacity();
     }
@@ -52,7 +52,7 @@ public class GameUpdate {
         buffer.put((byte) foodChunkBuffers.size());
 
         // add data
-        snakes.forEach(snake -> buffer.put(snake.getInfo()));
+        snakes.forEach(snake -> buffer.put(snake.encodeInfo()));
         snakeChunkBuffers.forEach(buffer::put);
         foodChunkBuffers.forEach(buffer::put);
 
@@ -66,10 +66,10 @@ public class GameUpdate {
 
     @Override
     public String toString() {
-        var snakes = this.snakes.stream()
+        final var snakes = this.snakes.stream()
                 .map(s -> String.valueOf(s.id))
                 .collect(Collectors.joining(","));
-        var foodChunks = foodChunkBuffers.stream()
+        final var foodChunks = foodChunkBuffers.stream()
                 .map(fcb -> "(" + fcb.get(0) + "|" + fcb.get(1) + ":" + fcb.getShort(2) + ")")
                 .collect(Collectors.joining(", "));
         return "GameUpdate { snakes: " + snakes + ", foodChunks: [" + foodChunks + "] }";

@@ -69,7 +69,8 @@ export default class WorkerSnakeChunk {
 
     public createTransferData(): SnakeChunkData {
         const points = this.numPoints;
-        const bufferPoints = this.final ? points : points + 1;
+        //const bufferPoints = this.final ? points : points + 1;
+        const bufferPoints = points;
         const builder = new SnakeChunkVertexBufferBuilder(
             bufferPoints,
             this.pathLength
@@ -89,8 +90,8 @@ export default class WorkerSnakeChunk {
             );
         }
 
-        if (!this.final) {
-            // continue line in direction of the snake
+        if (false) {
+            // connect chunk with snake head
             const position = this.snake.position;
             builder.addPoint(
                 position.x,

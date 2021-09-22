@@ -65,26 +65,26 @@ public class Game {
 
         executor.schedule(() -> {
             synchronized (this) {
-                addBotsNextToPlayerOne(25.0, 2);
+                addBotsNextToPlayer(player, 25.0, 2);
             }
         }, 1, TimeUnit.SECONDS);
 
         return player;
     }
 
-    public void addBotsNextToPlayerOne(Double radius, int n) {
+    public void addBotsNextToPlayer(Player player, double radius, int n) {
         //adds n stupid bots next to the player at the start of the game
         Random random = new Random();
-        if (!snakes.isEmpty()) {
-            var position = snakes.get(0).getHeadPosition().clone();
-            for (int i = 0; i < n; i++) {
-                var spawnPosition = new Vector(position.x + (random.nextDouble() * 2 - 1.0) * radius,
-                        position.y + (random.nextDouble() * 2 - 1.0) * radius);
-                StupidBot bot = new StupidBot(this, spawnPosition);
-                snakes.add(bot.getSnake());
-                bots.add(bot);
-                System.out.println("Bot added!");
-            }
+
+        final var position = player.snake.getHeadPosition();
+
+        for (int i = 0; i < n; i++) {
+            final var spawnPosition = new Vector(position.x + (random.nextDouble() * 2 - 1.0) * radius,
+                    position.y + (random.nextDouble() * 2 - 1.0) * radius);
+            StupidBot bot = new StupidBot(this, spawnPosition);
+            snakes.add(bot.getSnake());
+            bots.add(bot);
+            System.out.println("Bot added!");
         }
     }
 

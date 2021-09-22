@@ -13,7 +13,6 @@ export default class WorkerSnake {
     private offsetPrediction: number = 0.0;
     private correctOffset: number = 0.0;
     private gameConfig: Readonly<GameConfig>;
-    public headSnakeChunk: Readonly<WorkerSnakeChunk>;
 
     public constructor(info: SnakeInfo, cfg: Readonly<GameConfig>) {
         this.id = info.snakeId;
@@ -52,6 +51,10 @@ export default class WorkerSnake {
 
     public get direction(): number {
         return this.data.direction;
+    }
+
+    public get currentSnakeChunkId(): number {
+        return this.data.currentChunkId;
     }
 
     private speed(): number {

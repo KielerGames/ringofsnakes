@@ -69,8 +69,8 @@ export default class WorkerSnakeChunk {
 
     public createTransferData(): SnakeChunkData {
         const points = this.numPoints;
-        //const bufferPoints = this.final ? points : points + 1;
-        const bufferPoints = points;
+        const bufferPoints =
+            this.id === this.snake.currentSnakeChunkId ? points + 1 : points;
         const builder = new SnakeChunkVertexBufferBuilder(
             bufferPoints,
             this.pathLength
@@ -90,7 +90,7 @@ export default class WorkerSnakeChunk {
             );
         }
 
-        if (false) {
+        if (this.id === this.snake.currentSnakeChunkId) {
             // connect chunk with snake head
             const position = this.snake.position;
             builder.addPoint(
@@ -115,11 +115,8 @@ export default class WorkerSnakeChunk {
         };
     }
 
-    /**
-     * A chunk is final if it is full and all predictions have been corrected.
-     */
     public get final(): boolean {
-        return this._final;
+        return this.id !== this.snake.currentSnakeChunkId;
     }
 
     /**

@@ -42,7 +42,8 @@ describe("MT Snake Chunk", () => {
             position: { x: 0, y: 0 },
             direction: 0.0,
             targetDirection: 0.0,
-            offsetCorrection: 0
+            offsetCorrection: 0,
+            headChunkId: 0
         });
 
         const chunk = new SnakeChunk(snake, data);

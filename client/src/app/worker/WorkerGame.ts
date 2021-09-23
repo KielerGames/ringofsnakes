@@ -3,9 +3,9 @@ import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
 import {
     SnakeChunkData,
-    SnakeData,
+    SnakeDataDTO,
     MainThreadGameDataUpdate
-} from "./GameDataUpdate";
+} from "./MainThreadGameDataUpdate";
 import WorkerSnakeChunk from "./WorkerSnakeChunk";
 import WorkerSnake from "./WorkerSnake";
 import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
@@ -142,7 +142,7 @@ export default class WorkerGame {
 
     public getDataChanges(): MainThreadGameDataUpdate {
         const snakeChunks: SnakeChunkData[] = new Array(this.snakeChunks.size);
-        const snakes: SnakeData[] = new Array(this.snakes.size);
+        const snakes: SnakeDataDTO[] = new Array(this.snakes.size);
 
         // snake chunk updates
         {

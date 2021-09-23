@@ -4,7 +4,7 @@ import Rand from "rand-seed";
 import Snake from "../app/data/Snake";
 import SnakeChunk from "../app/data/SnakeChunk";
 import Rectangle from "../app/math/Rectangle";
-import { SnakeChunkData } from "../app/worker/GameDataUpdate";
+import { SnakeChunkData } from "../app/worker/MainThreadGameDataUpdate";
 import WorkerSnakeChunk from "../app/worker/WorkerSnakeChunk";
 import {
     createGameConfig,

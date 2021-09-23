@@ -4,7 +4,7 @@ import {
     DecodedSnakeChunk,
     FULL_CHUNK_NUM_POINTS
 } from "./decoder/SnakeChunkDecoder";
-import { SnakeChunkData } from "./GameDataUpdate";
+import { SnakeChunkData } from "./MainThreadGameDataUpdate";
 import SnakeChunkVertexBufferBuilder from "./SnakeChunkVertexBufferBuilder";
 import WorkerSnake from "./WorkerSnake";
 

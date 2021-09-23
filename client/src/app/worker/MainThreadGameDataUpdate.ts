@@ -6,7 +6,7 @@ export type MainThreadGameDataUpdate = {
     ticksSinceLastMainThreadUpdate: number;
     newSnakeChunks: SnakeChunkData[];
     foodChunks: FoodChunkDTO[];
-    snakes: SnakeData[];
+    snakes: SnakeDataDTO[];
     targetSnakeId: number;
 };
 
@@ -29,7 +29,7 @@ export type SnakeChunkData = {
     final: boolean;
 };
 
-export type SnakeData = {
+export type SnakeDataDTO = {
     id: number;
     length: number;
     width: number;

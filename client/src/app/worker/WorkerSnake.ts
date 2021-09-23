@@ -1,7 +1,7 @@
 import Vector from "../math/Vector";
 import { GameConfig } from "../types/GameConfig";
 import { SnakeInfo } from "./decoder/SnakeInfoDecoder";
-import { SnakeData } from "./GameDataUpdate";
+import { SnakeDataDTO } from "./MainThreadGameDataUpdate";
 import WorkerSnakeChunk from "./WorkerSnakeChunk";
 
 export default class WorkerSnake {
@@ -62,7 +62,7 @@ export default class WorkerSnake {
         return this.fast ? cfg.fastSnakeSpeed : cfg.snakeSpeed;
     }
 
-    public createTransferData(): SnakeData {
+    public createTransferData(): SnakeDataDTO {
         const currentSpeed = this.speed();
         // correction for the main thread prediction
         const offsetCorrection = this.correctOffset - this.offsetPrediction;

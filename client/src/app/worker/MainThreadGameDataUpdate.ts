@@ -39,4 +39,5 @@ export type SnakeDataDTO = {
     targetDirection: number;
     speed: number;
     offsetCorrection: number;
+    headChunkId: number;
 };

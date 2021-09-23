@@ -70,7 +70,7 @@ export default class WorkerSnakeChunk {
     public createTransferData(): SnakeChunkData {
         const points = this.numPoints;
         const bufferPoints =
-            this.id === this.snake.currentSnakeChunkId ? points + 1 : points;
+            this.id === this.snake.headSnakeChunkId ? points + 1 : points;
         const builder = new SnakeChunkVertexBufferBuilder(
             bufferPoints,
             this.pathLength
@@ -90,7 +90,7 @@ export default class WorkerSnakeChunk {
             );
         }
 
-        if (this.id === this.snake.currentSnakeChunkId) {
+        if (this.id === this.snake.headSnakeChunkId) {
             // connect chunk with snake head
             const position = this.snake.position;
             builder.addPoint(
@@ -116,7 +116,7 @@ export default class WorkerSnakeChunk {
     }
 
     public get final(): boolean {
-        return this.id !== this.snake.currentSnakeChunkId;
+        return this.id !== this.snake.headSnakeChunkId;
     }
 
     /**

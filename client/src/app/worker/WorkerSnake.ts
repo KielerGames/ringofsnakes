@@ -53,7 +53,7 @@ export default class WorkerSnake {
         return this.data.direction;
     }
 
-    public get currentSnakeChunkId(): number {
+    public get headSnakeChunkId(): number {
         return this.data.currentChunkId;
     }
 
@@ -80,7 +80,8 @@ export default class WorkerSnake {
             direction: this.direction,
             targetDirection: this.data.targetDirection,
             speed: currentSpeed,
-            offsetCorrection
+            offsetCorrection,
+            headChunkId: this.headSnakeChunkId
         };
     }
 }

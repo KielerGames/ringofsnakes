@@ -119,22 +119,23 @@ public class WorldChunk {
         Vector position = new Vector(rnd, box);
         if (snakeChunks.isEmpty()) {
             return position;
-        } else {
-            for (int i = 0; i < NUMBER_OF_ATTEMPTS; i++) {
-                BoundingBox potentialSpawnArea =
-                        new BoundingBox(position, Snake.START_LENGTH, Snake.START_LENGTH);
-
-                var areaClear = snakeChunks.stream().allMatch(snakeChunk ->
-                        BoundingBox.intersect(potentialSpawnArea, snakeChunk.getBoundingBox()));
-                if (areaClear) {
-                    return position;
-                } else {
-                    position = new Vector(rnd, box);
-                }
-            }
-
         }
-        System.out.println("No clear spawn Area Found...spawning nonetheless!");
+
+        for (int i = 0; i < NUMBER_OF_ATTEMPTS; i++) {
+            BoundingBox potentialSpawnArea =
+                    new BoundingBox(position, Snake.START_LENGTH + Snake.MIN_WIDTH,
+                            Snake.START_LENGTH + Snake.MIN_WIDTH);
+
+            var areaClear = snakeChunks.stream().noneMatch(snakeChunk ->
+                    BoundingBox.intersect(potentialSpawnArea, snakeChunk.getBoundingBox()));
+            if (areaClear) {
+                return position;
+            } else {
+                position = new Vector(rnd, box);
+            }
+        }
+
+        System.err.println("No clear spawn area found, spawning nonetheless!");
         return position;
     }
 }

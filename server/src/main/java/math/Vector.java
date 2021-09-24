@@ -21,7 +21,12 @@ public class Vector {
         this.y = (2.0 * rand.nextDouble() - 1.0) * maxValue;
     }
 
-    //returns a random position withing provided bounding box
+    /**
+     * Returns a randomly chosen Vector within the bounds of the provided bounding box b.
+     *
+     * @param rand instance of Random which is used
+     * @param b    bounding box defining the bounds of the vector
+     */
     public Vector(Random rand, BoundingBox b) {
         this.x = b.minX + rand.nextDouble() * b.getWidth();
         this.y = b.minY + rand.nextDouble() * b.getHeight();

@@ -14,6 +14,7 @@ public class World {
     public final WorldChunkCollection chunks;
     public double height;
     public double width;
+    private static Random rnd = new Random();
 
     public World(double chunkSize, int repetitions) {
         chunks = WorldChunkFactory.createChunks(chunkSize, repetitions, repetitions);
@@ -31,12 +32,12 @@ public class World {
         width = config.chunkInfo.chunkSize * config.chunkInfo.columns;
     }
 
-    public Vector findSpawnPosition(Random rnd) {
-        var worldChunkToSpawnIn = findRandomWorldChunkWithMinSnakeChunkCount(rnd);
+    public Vector findSpawnPosition() {
+        var worldChunkToSpawnIn = findRandomWorldChunkWithMinSnakeChunkCount();
         return worldChunkToSpawnIn.findSnakeSpawnPosition(rnd);
     }
 
-    private WorldChunk findRandomWorldChunkWithMinSnakeChunkCount(Random rnd) {
+    private WorldChunk findRandomWorldChunkWithMinSnakeChunkCount() {
         assert (chunks.numberOfChunks() > 0);
         var worldChunksSortedBySnakeChunkCount =
                 chunks.stream().sorted(Comparator.comparing(WorldChunk::getSnakeChunkCount)).collect(Collectors.toList());
@@ -64,5 +65,14 @@ public class World {
                 .sorted(Comparator.comparingInt(WorldChunk::getFoodCount))
                 .limit(numberOfChunksToSpawnSimultaneously)
                 .forEach(WorldChunk::addFood);
+    }
+
+    /**
+     * Sets the random object, useful for debugging
+     *
+     * @param random
+     */
+    public void setRnd(Random random) {
+        this.rnd = random;
     }
 }

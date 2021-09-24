@@ -30,6 +30,7 @@ public class Game {
     private final CollisionManager collisionManager;
     public List<Snake> snakes = new LinkedList<>();
     private List<Bot> bots = new LinkedList<>();
+    private Random rnd = new Random();
 
     public Game() {
         config = new GameConfig();
@@ -46,7 +47,7 @@ public class Game {
     }
 
     public Player createPlayer(Session session) {
-        final var spawnPos = world.findSpawnPosition();
+        final var spawnPos = world.findSpawnPosition(rnd);
         final Snake snake;
 
         synchronized (this) {
@@ -65,7 +66,7 @@ public class Game {
 
         executor.schedule(() -> {
             synchronized (this) {
-                addBotsNextToPlayer(player, 25.0, 2);
+                addBotsRandomly(25);
             }
         }, 1, TimeUnit.SECONDS);
 
@@ -84,7 +85,16 @@ public class Game {
             StupidBot bot = new StupidBot(this, spawnPosition);
             snakes.add(bot.getSnake());
             bots.add(bot);
-            System.out.println("Bot added!");
+            System.out.println("Bot added next to player!");
+        }
+    }
+
+    public void addBotsRandomly(int n) {
+        for (int i = 0; i < n; i++) {
+            StupidBot bot = new StupidBot(this, this.world.findSpawnPosition(rnd));
+            snakes.add(bot.getSnake());
+            bots.add(bot);
+            System.out.println("Bot added randomly!");
         }
     }
 

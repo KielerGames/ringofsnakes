@@ -6,6 +6,8 @@ import game.snake.SnakeChunk;
 import math.Vector;
 
 import java.util.Comparator;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class World {
     private static final int FOOD_THRESHOLD = 16;
@@ -29,8 +31,20 @@ public class World {
         width = config.chunkInfo.chunkSize * config.chunkInfo.columns;
     }
 
-    public Vector findSpawnPosition() {
-        return new Vector(0.0, 0.0); //TODO
+    public Vector findSpawnPosition(Random rnd) {
+        var worldChunkToSpawnIn = findRandomWorldChunkWithMinSnakeChunkCount(rnd);
+        return worldChunkToSpawnIn.findSnakeSpawnPosition(rnd);
+    }
+
+    private WorldChunk findRandomWorldChunkWithMinSnakeChunkCount(Random rnd) {
+        assert (chunks.numberOfChunks() > 0);
+        var worldChunksSortedBySnakeChunkCount =
+                chunks.stream().sorted(Comparator.comparing(WorldChunk::getSnakeChunkCount)).collect(Collectors.toList());
+        var minimalSnakeChunkCount = worldChunksSortedBySnakeChunkCount.get(0).getSnakeChunkCount();
+        var worldChunksWithMinimalSnakeChunkCount = worldChunksSortedBySnakeChunkCount.stream()
+                .filter(worldChunk -> worldChunk.getSnakeChunkCount() == minimalSnakeChunkCount).collect(Collectors.toList());
+        int randomIndex = rnd.nextInt(worldChunksWithMinimalSnakeChunkCount.size());
+        return worldChunksSortedBySnakeChunkCount.get(randomIndex);
     }
 
     public void addSnake(Snake snake) {

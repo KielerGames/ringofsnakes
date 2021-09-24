@@ -21,6 +21,12 @@ public class Vector {
         this.y = (2.0 * rand.nextDouble() - 1.0) * maxValue;
     }
 
+    //returns a random position withing provided bounding box
+    public Vector(Random rand, BoundingBox b) {
+        this.x = b.minX + rand.nextDouble() * b.getWidth();
+        this.y = b.minY + rand.nextDouble() * b.getHeight();
+    }
+
     public static double distance(Vector a, Vector b) {
         final double dx = a.x - b.x,
                 dy = a.y - b.y;

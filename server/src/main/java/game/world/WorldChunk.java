@@ -1,7 +1,9 @@
 package game.world;
 
+import game.snake.Snake;
 import game.snake.SnakeChunk;
 import math.BoundingBox;
+import math.Vector;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -110,5 +112,29 @@ public class WorldChunk {
     public int getFoodVersion() {
         assert foodVersion >= 0;
         return foodVersion;
+    }
+
+    public Vector findSnakeSpawnPosition(Random rnd) {
+        final int NUMBER_OF_ATTEMPTS = 42;
+        Vector position = new Vector(rnd, box);
+        if (snakeChunks.isEmpty()) {
+            return position;
+        } else {
+            for (int i = 0; i < NUMBER_OF_ATTEMPTS; i++) {
+                BoundingBox potentialSpawnArea =
+                        new BoundingBox(position, Snake.START_LENGTH, Snake.START_LENGTH);
+
+                var areaClear = snakeChunks.stream().allMatch(snakeChunk ->
+                        BoundingBox.intersect(potentialSpawnArea, snakeChunk.getBoundingBox()));
+                if (areaClear) {
+                    return position;
+                } else {
+                    position = new Vector(rnd, box);
+                }
+            }
+
+        }
+        System.out.println("No clear spawn Area Found...spawning nonetheless!");
+        return position;
     }
 }

@@ -2,7 +2,7 @@ import { DecodeResult } from "./DecodeResult";
 import { normalizeAngle } from "../../math/utils";
 import { GameConfig } from "../../types/GameConfig";
 
-const SNAKE_CHUNK_MAX_BYTES = 128;
+const SNAKE_CHUNK_MAX_BYTES = 96;
 export const SNAKE_CHUNK_HEADER_SIZE = 21;
 export const FULL_CHUNK_NUM_POINTS =
     SNAKE_CHUNK_MAX_BYTES - SNAKE_CHUNK_HEADER_SIZE + 1;

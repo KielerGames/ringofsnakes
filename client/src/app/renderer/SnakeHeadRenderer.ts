@@ -51,7 +51,7 @@ export function render(
     shader.setUniform("uTransform", transform.data);
 
     for (const snake of snakes) {
-        if(!snake.hasChunks()) {
+        if (!snake.hasChunks()) {
             continue;
         }
 

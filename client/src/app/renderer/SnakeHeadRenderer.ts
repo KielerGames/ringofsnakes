@@ -51,6 +51,10 @@ export function render(
     shader.setUniform("uTransform", transform.data);
 
     for (const snake of snakes) {
+        if(!snake.hasChunks()) {
+            continue;
+        }
+
         const { x, y } = snake.getPredictedPosition(timeSinceLastTick);
         shader.setUniform("uSnakeWidth", 1.25 * snake.width);
         shader.setUniform("uHeadPosition", [x, y]);

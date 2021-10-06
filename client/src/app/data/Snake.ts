@@ -82,4 +82,8 @@ export default class Snake {
     public getSnakeChunks(): SnakeChunk[] {
         return Array.from(this.chunks.values());
     }
+
+    public hasChunks(): boolean {
+        return this.chunks.size > 0;
+    }
 }

@@ -50,7 +50,7 @@ export function render(
         setSkin(snake.skin);
         shader.setUniform("uChunkPathOffset", chunk.offset(timeSinceLastTick));
         shader.setUniform("uSnakeLength", snake.length);
-        shader.setUniform("uSnakeWidth", snake.width);
+        shader.setUniform("uSnakeMaxWidth", snake.maxWidth);
 
         gl.bufferData(gl.ARRAY_BUFFER, chunk.buffer, gl.STREAM_DRAW);
         shader.run(chunk.vertices, { mode: gl.TRIANGLE_STRIP });

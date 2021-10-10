@@ -56,7 +56,7 @@ export function render(
         }
 
         const { x, y } = snake.getPredictedPosition(timeSinceLastTick);
-        shader.setUniform("uSnakeWidth", 1.25 * snake.width);
+        shader.setUniform("uSnakeWidth", 1.25 * snake.maxWidth);
         shader.setUniform("uHeadPosition", [x, y]);
         shader.setUniform(
             "uHeadRotation",

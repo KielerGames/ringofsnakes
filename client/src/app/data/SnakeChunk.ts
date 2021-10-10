@@ -59,7 +59,7 @@ export default class SnakeChunk {
 
         this.boundingBox = this.boundingBox.extendTo(
             end,
-            0.5 * this.snake.width
+            0.5 * this.snake.maxWidth
         );
     }
 

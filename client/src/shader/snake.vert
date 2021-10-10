@@ -6,7 +6,7 @@ attribute float vNormalOffset;
 attribute float vRelativePathOffset;
 
 uniform mat3 uTransform;
-uniform float uSnakeWidth;
+uniform float uSnakeMaxWidth;
 uniform float uChunkPathOffset;
 
 varying float pathOffset;
@@ -15,7 +15,7 @@ varying float normalOffset;
 void main(void) {
     normalOffset = vNormalOffset;
     pathOffset = uChunkPathOffset + vRelativePathOffset;
-    float size = 0.5 * uSnakeWidth;
+    float size = 0.5 * uSnakeMaxWidth;
     vec2 position = vPosition + (vNormalOffset * size) * vNormal;
     gl_Position = vec4(uTransform * vec3(position, 1.0), 1.0);
 }

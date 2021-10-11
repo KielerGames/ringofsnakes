@@ -25,9 +25,9 @@ public class Game {
     public final int id = 1; //TODO
     public final GameConfig config;
     public final World world;
+    public final CollisionManager collisionManager;
     private final ExceptionalExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
-    private final CollisionManager collisionManager;
     public List<Snake> snakes = new LinkedList<>();
     private List<Bot> bots = new LinkedList<>();
 
@@ -119,11 +119,9 @@ public class Game {
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
-
-
     }
 
-    private void tick() {
+    protected void tick() {
         synchronized (this) {
             snakes.forEach(snake -> {
                 if (snake.alive) {
@@ -159,6 +157,10 @@ public class Game {
                     .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
                     .collect(Collectors.toList());
 
+            if (collectedFood.isEmpty()) {
+                return;
+            }
+
             final var foodAmount = collectedFood.stream()
                     .mapToDouble(food -> food.size.value)
                     .map(v -> v * v)
@@ -176,5 +178,9 @@ public class Game {
             System.out.println("Removing Snake " + s.id + " from Game, because it is leaving the map.");
             s.alive = false;
         }
+    }
+
+    public void stop() {
+        this.executor.shutdown();
     }
 }

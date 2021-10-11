@@ -2,7 +2,9 @@ package math;
 
 import java.util.Random;
 
-public class Vector {
+public class Vector implements Cloneable {
+    public final static Vector ORIGIN = new Vector(0.0, 0.0);
+
     public double x;
     public double y;
 
@@ -63,6 +65,10 @@ public class Vector {
 
     @Override
     public Vector clone() {
-        return new Vector(this.x, this.y);
+        try {
+            return (Vector) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException();
+        }
     }
 }

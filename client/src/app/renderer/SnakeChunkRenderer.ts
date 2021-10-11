@@ -50,7 +50,10 @@ export function render(
         shader.setUniform("uChunkPathOffset", chunk.offset(timeSinceLastTick));
         shader.setUniform("uSnakeLength", snake.length);
         shader.setUniform("uSnakeMaxWidth", snake.maxWidth);
-        shader.setUniform("uSnakeThinningStart", Math.min(0.75, snake.length * 0.025) * snake.length);
+        shader.setUniform(
+            "uSnakeThinningStart",
+            Math.min(0.75, snake.length * 0.025) * snake.length
+        );
 
         gl.bufferData(gl.ARRAY_BUFFER, chunk.buffer, gl.STREAM_DRAW);
         shader.run(chunk.vertices, { mode: gl.TRIANGLE_STRIP });

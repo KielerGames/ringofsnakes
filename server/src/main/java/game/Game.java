@@ -135,7 +135,7 @@ public class Game {
         bots.forEach(Bot::act);
         synchronized (this) {
             eatFood();
-            collisionManager.manageCollisions();
+            collisionManager.detectCollisions();
         }
     }
 
@@ -151,7 +151,7 @@ public class Game {
 
     private void eatFood() {
         snakes.forEach(snake -> {
-            final var foodCollectRadius = snake.getWidth() * 1.1 + 1.0;
+            final var foodCollectRadius = snake.getMaxWidth() * 1.1 + 1.0;
             final var headPosition = snake.getHeadPosition();
             final var worldChunk = world.chunks.findChunk(headPosition);
 

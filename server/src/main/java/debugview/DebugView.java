@@ -89,7 +89,7 @@ public class DebugView extends Application {
                     camera = snake.getHeadPosition();
                 }
             }
-            final var snakeSize = game.snakes.get(0).getWidth();
+            final var snakeSize = game.snakes.get(0).getMaxWidth();
             final var pointsToDraw = new LinkedList<>(snake.currentChunk.pointData);
 
             snake.chunks.forEach(chunk -> pointsToDraw.addAll(chunk.pointData));

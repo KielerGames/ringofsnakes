@@ -49,15 +49,19 @@ public class CollisionManager {
     }
 
     private void checkForCollision(Snake snake, SnakeChunk snakeChunk) {
+        final var otherSnake = snakeChunk.getSnake();
         final var radius1 = snake.getMaxWidth() / 2.0;
-        final var radius2 = snakeChunk.getSnake().getMaxWidth() / 2.0;
+        final var radius2 = otherSnake.getMaxWidth() / 2.0;
         final var collisionBound = (radius1 + radius2) * (radius1 + radius2);
         final var headPosition = snake.getHeadPosition();
 
-        final var collidesWithChunk = snakeChunk.getPointData().stream()
-                .map(pointData -> pointData.point)
-                .filter(point -> Vector.distance2(headPosition, point) < collisionBound)
-                .anyMatch(point -> true /* TODO: check with actual snake width */);
+        final var collidesWithChunk = snakeChunk.getPathData().stream()
+                .filter(pd -> Vector.distance2(headPosition, pd.point) < collisionBound)
+                .anyMatch(pd -> {
+                    final var r2 = otherSnake.getWidthAt(pd.getOffsetInSnake());
+                    final var bound = (radius1 + r2) * (radius1 + r2);
+                    return Vector.distance2(headPosition, pd.point) < bound;
+                });
 
         if (collidesWithChunk) {
             collisionHandlers.forEach(handler -> handler.accept(snake, snakeChunk));

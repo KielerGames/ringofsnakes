@@ -2,10 +2,10 @@ package game.snake;
 
 import game.world.WorldChunk;
 import math.BoundingBox;
-import util.SnakePointData;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
+import java.util.List;
 
 public class FinalSnakeChunk extends SnakeChunk {
     public final static int BYTE_SIZE = 96;
@@ -14,11 +14,11 @@ public class FinalSnakeChunk extends SnakeChunk {
     private final float length;
     private final int uniqueId;
     private final BoundingBox boundingBox;
-    public LinkedList<SnakePointData> pointData;
+    public List<SnakePathPoint> pointData;
     private LinkedList<WorldChunk> linkedWorldChunks;
 
     protected FinalSnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, float length,
-                              LinkedList<SnakePointData> pointData) {
+                              List<SnakePathPoint> pointData) {
         super(snake);
 
         assert buffer.position() == BYTE_SIZE;
@@ -61,8 +61,13 @@ public class FinalSnakeChunk extends SnakeChunk {
     }
 
     @Override
-    public LinkedList<SnakePointData> getPointData() {
+    public List<SnakePathPoint> getPathData() {
         return pointData;
+    }
+
+    @Override
+    public float getOffset() {
+        return chunkByteBuffer.getFloat(BUFFER_OFFSET_POS);
     }
 
     public void setOffset(float offset) {

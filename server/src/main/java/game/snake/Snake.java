@@ -3,7 +3,6 @@ package game.snake;
 import game.GameConfig;
 import game.world.World;
 import math.Vector;
-import util.SnakePointData;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -101,22 +100,6 @@ public class Snake {
             if (lastChunk.isJunk()) {
                 chunks.remove(chunks.size() - 1);
             }
-        }
-        updatePointData();
-    }
-
-    private void updatePointData() {
-        if (currentChunk == null) {
-            throw new IllegalStateException();
-        }
-        currentChunk.pointData.addFirst(new SnakePointData(new Vector(this.headPosition.x, this.headPosition.y), fast));
-        pointDataSnakeLength += fast ? config.fastSnakeSpeed : config.snakeSpeed;
-
-        var currentPointDataList =
-                chunks.isEmpty() ? currentChunk.pointData : chunks.getLast().pointData;
-        while (!currentPointDataList.isEmpty() && pointDataSnakeLength > length) {
-            var p = currentPointDataList.removeLast();
-            pointDataSnakeLength -= p.fast ? config.fastSnakeSpeed : config.snakeSpeed;
         }
     }
 

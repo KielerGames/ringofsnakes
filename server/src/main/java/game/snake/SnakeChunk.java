@@ -2,10 +2,9 @@ package game.snake;
 
 import game.world.WorldChunk;
 import math.BoundingBox;
-import util.SnakePointData;
 
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
+import java.util.List;
 
 public abstract class SnakeChunk {
 
@@ -40,7 +39,7 @@ public abstract class SnakeChunk {
 
     public abstract float getLength();
 
-    public abstract LinkedList<SnakePointData> getPointData();
+    public abstract List<SnakePathPoint> getPathData();
 
     public boolean isJunk() {
         return !snake.alive;
@@ -49,4 +48,6 @@ public abstract class SnakeChunk {
     public abstract BoundingBox getBoundingBox();
 
     public abstract void linkWorldChunk(WorldChunk worldChunk);
+
+    public abstract float getOffset();
 }

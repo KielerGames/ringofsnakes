@@ -3,21 +3,19 @@ package game.snake;
 import game.world.WorldChunk;
 import math.BoundingBox;
 import math.Vector;
-import util.SnakePointData;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
 public class GrowingSnakeChunk extends SnakeChunk {
-    public final LinkedList<SnakePointData> pointData = new LinkedList<>();
     public final short id;
+    private final List<SnakePathPoint> pathData = new LinkedList<>();
     private final ChainCodeCoder coder;
     private final Vector end;
     private final float endDirection;
     private final List<WorldChunk> linkedWorldChunks = new LinkedList<>();
     private final ByteBuffer chunkByteBuffer;
-    private final List<Vector> points = new LinkedList<>();
     private int numberOfChainCodes = 0;
     private double x, y;
     private float direction;
@@ -34,7 +32,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
         this.coder = coder;
 
         end = snake.headPosition.clone();
-        points.add(end.clone());
+        pathData.add(new SnakePathPoint(this, end.clone(), 0.0));
         endDirection = snake.headDirection;
         direction = endDirection;
 
@@ -87,12 +85,10 @@ public class GrowingSnakeChunk extends SnakeChunk {
         final double stepSize = fast ? snake.config.fastSnakeSpeed : snake.config.snakeSpeed;
         x += Math.cos(direction) * stepSize;
         y += Math.sin(direction) * stepSize;
-        points.add(new Vector(x, y));
+        length += stepSize;
+        pathData.add(new SnakePathPoint(this, new Vector(x, y), length));
 
         // update chaincode
-        length += stepSize;
-
-        // path compression?
         if (canUpdatePreviousChainCode(dirDelta, fast)) {
             // increase steps of last chaincode
             chunkByteBuffer.put(
@@ -125,7 +121,8 @@ public class GrowingSnakeChunk extends SnakeChunk {
         }
         BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
         junk = true;
-        return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, pointData);
+        final var finalPathData = this.pathData.toArray(new SnakePathPoint[0]);
+        return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, List.of(finalPathData));
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {
@@ -161,8 +158,8 @@ public class GrowingSnakeChunk extends SnakeChunk {
     }
 
     @Override
-    public LinkedList<SnakePointData> getPointData() {
-        return pointData;
+    public List<SnakePathPoint> getPathData() {
+        return pathData;
     }
 
     @Override
@@ -178,6 +175,11 @@ public class GrowingSnakeChunk extends SnakeChunk {
     @Override
     public void linkWorldChunk(WorldChunk worldChunk) {
         linkedWorldChunks.add((worldChunk));
+    }
+
+    @Override
+    public float getOffset() {
+        return 0.0f;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package debugview;
 
 import game.Game;
+import game.snake.SnakePathPoint;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -19,9 +20,8 @@ public class DebugView extends Application {
 
     private static final double ZOOM = 8.0;
     private static final boolean FOLLOW_PLAYER = true;
-    private Vector camera = new Vector(0, 0);
     private static Game game;
-
+    private Vector camera = new Vector(0, 0);
 
     public static void main(String[] args) {
         // start game server
@@ -90,12 +90,12 @@ public class DebugView extends Application {
                 }
             }
             final var snakeSize = game.snakes.get(0).getMaxWidth();
-            final var pointsToDraw = new LinkedList<>(snake.currentChunk.pointData);
+            final var pointsToDraw = new LinkedList<SnakePathPoint>();
 
             snake.chunks.forEach(chunk -> pointsToDraw.addAll(chunk.pointData));
             pointsToDraw.forEach(pd -> {
-                var x = pd.point.x;
-                var y = pd.point.y;
+                final var x = pd.point.x;
+                final var y = pd.point.y;
                 g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,
                         300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
                         snakeSize * ZOOM, snakeSize * ZOOM);

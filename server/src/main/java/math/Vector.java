@@ -71,4 +71,9 @@ public class Vector implements Cloneable {
             throw new IllegalStateException();
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("Vector(%.2f, %.2f)", x, y);
+    }
 }

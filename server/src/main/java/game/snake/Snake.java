@@ -6,6 +6,9 @@ import math.Vector;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
@@ -20,11 +23,11 @@ public class Snake {
     private final World world;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     public byte skin;
-    public LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     public GrowingSnakeChunk currentChunk;
     public boolean alive = true;
     Vector headPosition;
     float headDirection;
+    private LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private double length = START_LENGTH;
     private short nextChunkId = 0;
     private float targetDirection;
@@ -189,5 +192,13 @@ public class Snake {
 
     public double getMaxWidth() {
         return maxWidth;
+    }
+
+    public Stream<SnakeChunk> streamSnakeChunks() {
+        return Stream.concat(Stream.of(currentChunk), chunks.stream());
+    }
+
+    public List<SnakeChunk> getSnakeChunks() {
+        return streamSnakeChunks().collect(Collectors.toList());
     }
 }

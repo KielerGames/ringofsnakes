@@ -48,12 +48,12 @@ public class SnakeEncodingTest {
     void testSnakeChunkBuffer() {
         World world = new World(64.0, 20);
         Snake snake = SnakeFactory.createSnake(new Vector(0, 0), world);
-        var n = snake.chunks.size();
+        var n = snake.getSnakeChunks().size();
         var i = 0;
 
 
         // fill a chunk
-        while (snake.chunks.size() == n) {
+        while (snake.getSnakeChunks().size() == n) {
             snake.tick();
 
             if (i++ > 4096) {
@@ -61,7 +61,7 @@ public class SnakeEncodingTest {
             }
         }
 
-        var chunk = snake.chunks.get(n);
+        var chunk = snake.getSnakeChunks().get(n);
         assertFalse(chunk.isEmpty());
         var chunkBuffer = chunk.getBuffer();
         assertEquals(FinalSnakeChunk.BYTE_SIZE, chunkBuffer.capacity());

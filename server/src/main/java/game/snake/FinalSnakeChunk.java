@@ -14,17 +14,22 @@ public class FinalSnakeChunk extends SnakeChunk {
     private final float length;
     private final int uniqueId;
     private final BoundingBox boundingBox;
-    public List<SnakePathPoint> pointData;
+    private List<SnakePathPoint> pathData;
     private LinkedList<WorldChunk> linkedWorldChunks;
 
-    protected FinalSnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, float length,
-                              List<SnakePathPoint> pointData) {
+    protected FinalSnakeChunk(
+            Snake snake,
+            ByteBuffer buffer,
+            BoundingBox box,
+            float length,
+            List<SnakePathPoint> pathData
+    ) {
         super(snake);
 
         assert buffer.position() == BYTE_SIZE;
         assert length > 0;
 
-        this.pointData = pointData;
+        this.pathData = pathData;
         chunkByteBuffer = buffer;
         boundingBox = box;
         this.length = length;
@@ -62,7 +67,7 @@ public class FinalSnakeChunk extends SnakeChunk {
 
     @Override
     public List<SnakePathPoint> getPathData() {
-        return pointData;
+        return pathData;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package debugview;
 
 import game.Game;
-import game.snake.SnakePathPoint;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -12,8 +11,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import math.Vector;
 import server.SnakeServer;
-
-import java.util.LinkedList;
 
 
 public class DebugView extends Application {
@@ -89,17 +86,20 @@ public class DebugView extends Application {
                     camera = snake.getHeadPosition();
                 }
             }
-            final var snakeSize = game.snakes.get(0).getMaxWidth();
-            final var pointsToDraw = new LinkedList<SnakePathPoint>();
 
-            snake.chunks.forEach(chunk -> pointsToDraw.addAll(chunk.pointData));
-            pointsToDraw.forEach(pd -> {
-                final var x = pd.point.x;
-                final var y = pd.point.y;
-                g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,
-                        300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
-                        snakeSize * ZOOM, snakeSize * ZOOM);
-            });
+            final var snakeSize = snake.getMaxWidth();
+            final var snakeLength = snake.getLength();
+
+            snake.streamSnakeChunks()
+                    .flatMap(chunk -> chunk.getPathData().stream())
+                    .filter(pd -> pd.getOffsetInSnake() < snakeLength)
+                    .forEach(pd -> {
+                        final var x = pd.point.x;
+                        final var y = pd.point.y;
+                        g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,
+                                300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
+                                snakeSize * ZOOM, snakeSize * ZOOM);
+                    });
         });
     }
 

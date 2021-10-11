@@ -50,15 +50,24 @@ public class CollisionManager {
 
     private void checkForCollision(Snake snake, SnakeChunk snakeChunk) {
         final var otherSnake = snakeChunk.getSnake();
-        final var radius1 = snake.getMaxWidth() / 2.0;
-        final var radius2 = otherSnake.getMaxWidth() / 2.0;
+        final var otherSnakeLength = otherSnake.getLength();
+        final var radius1 = 0.5 * snake.getMaxWidth();
+        final var radius2 = 0.5 * otherSnake.getMaxWidth();
         final var collisionBound = (radius1 + radius2) * (radius1 + radius2);
         final var headPosition = snake.getHeadPosition();
 
         final var collidesWithChunk = snakeChunk.getPathData().stream()
+                .filter(pd -> pd.getOffsetInSnake() < otherSnakeLength)
                 .filter(pd -> Vector.distance2(headPosition, pd.point) < collisionBound)
                 .anyMatch(pd -> {
-                    final var r2 = otherSnake.getWidthAt(pd.getOffsetInSnake());
+                    final var width = otherSnake.getWidthAt(pd.getOffsetInSnake());
+
+                    if (width < 1e-4) {
+                        // no collision if the snake is very thin
+                        return false;
+                    }
+
+                    final var r2 = 0.5 * width;
                     final var bound = (radius1 + r2) * (radius1 + r2);
                     return Vector.distance2(headPosition, pd.point) < bound;
                 });

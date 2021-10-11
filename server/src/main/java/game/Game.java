@@ -32,9 +32,7 @@ public class Game {
     private List<Bot> bots = new LinkedList<>();
 
     public Game() {
-        config = new GameConfig();
-        world = new World(config);
-        executor = new ExceptionalExecutorService();
+        this(new GameConfig());
 
         // spawn some food
         for (int i = 0; i < 256; i++) {
@@ -42,6 +40,22 @@ public class Game {
         }
 
         DebugView.setGame(this);
+    }
+
+    /**
+     * For tests only.
+     */
+    protected Game(GameConfig config) {
+        this(config, new World(config));
+    }
+
+    /**
+     * For tests only.
+     */
+    protected Game(GameConfig config, World world) {
+        this.config = config;
+        this.world = world;
+        executor = new ExceptionalExecutorService();
         collisionManager = new CollisionManager(this);
     }
 

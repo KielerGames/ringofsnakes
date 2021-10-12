@@ -60,7 +60,7 @@ public class CollisionManager {
                 .filter(pd -> pd.getOffsetInSnake() < otherSnakeLength)
                 .filter(pd -> Vector.distance2(headPosition, pd.point) < collisionBound)
                 .anyMatch(pd -> {
-                    final var width = otherSnake.getWidthAt(pd.getOffsetInSnake());
+                    final var width = pd.getSnakeWidth();
 
                     if (width < 1e-4) {
                         // no collision if the snake is very thin

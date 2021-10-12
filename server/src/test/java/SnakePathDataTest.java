@@ -5,6 +5,7 @@ import math.Vector;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -98,5 +99,33 @@ public class SnakePathDataTest {
             assertTrue(sameValueTicks < 2, "Value did not change for " + sameValueTicks + " ticks.");
             lastSnakeChunkLength = chunkLength;
         }
+    }
+
+    @Test
+    void testOffsetValues() {
+        final var snake = SnakeFactory.createTestSnake();
+        snake.grow(64.0);
+        tickUntilFullLength(snake);
+        tickUntilNewSnakeChunk(snake);
+        assertTrue(snake.getSnakeChunks().size() > 1);
+        final var snakeChunks = snake.getSnakeChunks();
+        final var lastSnakeChunk = snakeChunks.get(snakeChunks.size() - 1);
+        assertFalse(lastSnakeChunk.isJunk());
+        assertTrue(lastSnakeChunk.isFull());
+
+        final var pathData = lastSnakeChunk.getPathData();
+
+        // test range
+        for (SnakePathPoint pd : pathData) {
+            final var localOffset = pd.getOffsetInChunk();
+            assertTrue(0 <= localOffset);
+            assertTrue(localOffset <= lastSnakeChunk.getLength());
+        }
+
+        int n = pathData.stream().map(SnakePathPoint::getOffsetInChunk).collect(Collectors.toSet()).size();
+        int m = pathData.stream().map(SnakePathPoint::getOffsetInSnake).collect(Collectors.toSet()).size();
+
+        assertEquals(pathData.size(), n);
+        assertEquals(n, m);
     }
 }

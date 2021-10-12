@@ -1,6 +1,6 @@
 import Rectangle from "../math/Rectangle";
 import { GameConfig } from "../types/GameConfig";
-import { MainThreadGameDataUpdate } from "../worker/GameDataUpdate";
+import { MainThreadGameDataUpdate } from "../worker/MainThreadGameDataUpdate";
 import FoodChunk from "./FoodChunk";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";

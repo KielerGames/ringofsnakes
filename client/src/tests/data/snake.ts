@@ -49,6 +49,7 @@ export function createWorkerSnake(): WorkerSnake {
     return new WorkerSnake(
         {
             snakeId: 0,
+            currentChunkId: 0,
             skin: 0,
             fast: false,
             length: 42.0,

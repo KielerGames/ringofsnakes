@@ -1,7 +1,8 @@
 import Vector from "../math/Vector";
 import { GameConfig } from "../types/GameConfig";
 import { SnakeInfo } from "./decoder/SnakeInfoDecoder";
-import { SnakeData } from "./GameDataUpdate";
+import { SnakeDataDTO } from "./MainThreadGameDataUpdate";
+import WorkerSnakeChunk from "./WorkerSnakeChunk";
 
 export default class WorkerSnake {
     public readonly id: number;
@@ -52,12 +53,16 @@ export default class WorkerSnake {
         return this.data.direction;
     }
 
+    public get headSnakeChunkId(): number {
+        return this.data.currentChunkId;
+    }
+
     private speed(): number {
         const cfg = this.gameConfig;
         return this.fast ? cfg.fastSnakeSpeed : cfg.snakeSpeed;
     }
 
-    public createTransferData(): SnakeData {
+    public createTransferData(): SnakeDataDTO {
         const currentSpeed = this.speed();
         // correction for the main thread prediction
         const offsetCorrection = this.correctOffset - this.offsetPrediction;
@@ -75,7 +80,8 @@ export default class WorkerSnake {
             direction: this.direction,
             targetDirection: this.data.targetDirection,
             speed: currentSpeed,
-            offsetCorrection
+            offsetCorrection,
+            headChunkId: this.headSnakeChunkId
         };
     }
 }

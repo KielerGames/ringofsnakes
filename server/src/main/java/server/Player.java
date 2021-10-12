@@ -17,7 +17,7 @@ public class Player extends Client {
     @Override
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
         super.onBeforeUpdateBufferIsCreated(update);
-        update.addSnakeChunk(snake.chunkBuilder);
+        update.addSnakeChunk(snake.currentChunk);
     }
 
     @Override

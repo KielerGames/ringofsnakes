@@ -30,9 +30,12 @@ export default class SnakeList extends Component<SLProps> {
         return (
             <div id="snake-list" class="debug-ui">
                 {snakes.length > 0
-                    ? snakes.map((snake) => (
-                          <SnakeOverview key={snake.id} data={snake} />
-                      ))
+                    ? snakes
+                          .filter((snake) => snake.hasChunks())
+                          .slice(0, 7)
+                          .map((snake) => (
+                              <SnakeOverview key={snake.id} data={snake} />
+                          ))
                     : "No snake data."}
             </div>
         );
@@ -52,9 +55,7 @@ function SnakeOverview(props: Readonly<SOProps>) {
             <div class="chunks">
                 {snake.getSnakeChunks().map((chunk) => (
                     <div class="chunk-info" key={chunk.id}>
-                        {`id:${getIdStringOfSnakeChunk(chunk)} len:${Math.round(
-                            chunk.length
-                        )}`}
+                        {`id:${getIdStringOfSnakeChunk(chunk)}`}
                     </div>
                 ))}
             </div>

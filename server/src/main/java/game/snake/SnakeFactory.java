@@ -17,11 +17,6 @@ public class SnakeFactory {
         Snake snake = new Snake(nextSnakeId++, world);
         snake.setSkin((byte) (random.nextInt(100) % 3));
 
-        ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
-        snakeInfoBuffer.putShort(0, snake.id);
-        snakeInfoBuffer.put(2, snake.skin);
-        snake.setSnakeInfoBuffer(snakeInfoBuffer);
-
         // start position & rotation
         snake.headPosition = position.clone();
         snake.headDirection = (float) ((random.nextDouble() * 2.0 - 1.0) * Math.PI);

@@ -1,6 +1,6 @@
 import Rectangle from "../math/Rectangle";
 import Vector from "../math/Vector";
-import { SnakeChunkData } from "../worker/GameDataUpdate";
+import { SnakeChunkData } from "../worker/MainThreadGameDataUpdate";
 import Snake from "./Snake";
 
 export default class SnakeChunk {

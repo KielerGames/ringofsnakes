@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
 public class FinalSnakeChunk extends SnakeChunk {
-    public final static int BYTE_SIZE = 128;
+    public final static int BYTE_SIZE = 96;
 
     private final ByteBuffer chunkByteBuffer;
     private final float length;

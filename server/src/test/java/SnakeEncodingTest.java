@@ -22,7 +22,7 @@ public class SnakeEncodingTest {
 
     @Test
     void testEarlyChunkBuilding() {
-        Snake snake = SnakeFactory.createSnake();
+        Snake snake = SnakeFactory.createTestSnake();
         final short chunkId = 42;
         GrowingSnakeChunk builder = new GrowingSnakeChunk(coder, snake, chunkId);
         assertFalse(builder.isFull());
@@ -34,7 +34,7 @@ public class SnakeEncodingTest {
 
     @Test
     void testSnakeInfoBuffer() {
-        Snake snake = SnakeFactory.createSnake();
+        Snake snake = SnakeFactory.createTestSnake();
         var snakeInfo = snake.encodeInfo();
         assertEquals(Snake.INFO_BYTE_SIZE, snakeInfo.capacity());
         var buffer = ByteBuffer.allocate(1 + Snake.INFO_BYTE_SIZE);

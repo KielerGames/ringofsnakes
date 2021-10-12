@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SnakeWidthTest {
     @Test
     void testLowerBound() {
-        final var snake = SnakeFactory.createSnake();
+        final var snake = SnakeFactory.createTestSnake();
         for (int i = 0; i < 256; i++) {
             snake.tick();
             assertTrue(snake.getMaxWidth() >= Snake.MIN_WIDTH);
@@ -17,7 +17,7 @@ public class SnakeWidthTest {
 
     @Test
     void testUpperBound() {
-        final var snake = SnakeFactory.createSnake();
+        final var snake = SnakeFactory.createTestSnake();
         for (int i = 0; i < 256; i++) {
             snake.tick();
 
@@ -30,7 +30,7 @@ public class SnakeWidthTest {
 
     @Test
     void testBoundedMonotonicity() {
-        final var snake = SnakeFactory.createSnake();
+        final var snake = SnakeFactory.createTestSnake();
 
         for (int i = 0; i < 256; i++) {
             snake.tick();
@@ -48,7 +48,7 @@ public class SnakeWidthTest {
 
     @Test
     void testGrowingSnake() {
-        final var snake = SnakeFactory.createSnake();
+        final var snake = SnakeFactory.createTestSnake();
         snake.tick();
         var startWidth = snake.getMaxWidth();
 

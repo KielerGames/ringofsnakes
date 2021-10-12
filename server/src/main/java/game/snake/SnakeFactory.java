@@ -32,7 +32,7 @@ public class SnakeFactory {
         return snake;
     }
 
-    public static Snake createSnake() {
+    public static Snake createTestSnake() {
         return createSnake(new Vector(0, 0), new World());
     }
 

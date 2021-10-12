@@ -13,9 +13,12 @@ public class SnakePathPoint {
         this.localPathLength = localPathLength;
     }
 
+    public double getOffsetInChunk() {
+        return Math.max(0.0, snakeChunk.getLength() - localPathLength);
+    }
+
     public double getOffsetInSnake() {
-        final var relPathOffset = Math.max(0.0, snakeChunk.getLength() - localPathLength);
-        return snakeChunk.getOffset() + relPathOffset;
+        return snakeChunk.getOffset() + getOffsetInChunk();
     }
 
     public double getSnakeWidth() {

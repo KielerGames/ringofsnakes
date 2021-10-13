@@ -81,11 +81,6 @@ public class FinalSnakeChunk extends SnakeChunk {
         chunkByteBuffer.putFloat(BUFFER_OFFSET_POS, (float) offset);
     }
 
-    @Override
-    public boolean isJunk() {
-        return super.isJunk() || snakeOffset >= snake.getLength();
-    }
-
     public BoundingBox getBoundingBox() {
         return boundingBox;
     }

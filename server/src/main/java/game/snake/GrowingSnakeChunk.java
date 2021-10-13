@@ -24,7 +24,6 @@ public class GrowingSnakeChunk extends SnakeChunk {
     private int lastSteps = 0;
     private boolean lastFast = false;
     private int lastDirDelta = 0;
-    private boolean junk = false;
 
     public GrowingSnakeChunk(ChainCodeCoder coder, Snake snake, short chunkId) {
         super(snake);
@@ -120,7 +119,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
             throw new IllegalStateException();
         }
         BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
-        junk = true;
+        markAsJunk();
         final var finalPathData = this.pathData.toArray(new SnakePathPoint[0]);
         final var fsc = new FinalSnakeChunk(snake, chunkByteBuffer, box, length, List.of(finalPathData));
         this.pathData.forEach(pd -> pd.setFinalSnakeChunk(fsc));
@@ -162,11 +161,6 @@ public class GrowingSnakeChunk extends SnakeChunk {
     @Override
     public List<SnakePathPoint> getPathData() {
         return pathData;
-    }
-
-    @Override
-    public boolean isJunk() {
-        return junk || super.isJunk();
     }
 
     @Override

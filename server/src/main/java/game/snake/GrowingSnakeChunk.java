@@ -122,7 +122,9 @@ public class GrowingSnakeChunk extends SnakeChunk {
         BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
         junk = true;
         final var finalPathData = this.pathData.toArray(new SnakePathPoint[0]);
-        return new FinalSnakeChunk(snake, chunkByteBuffer, box, length, List.of(finalPathData));
+        final var fsc = new FinalSnakeChunk(snake, chunkByteBuffer, box, length, List.of(finalPathData));
+        this.pathData.forEach(pd -> pd.setFinalSnakeChunk(fsc));
+        return fsc;
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {

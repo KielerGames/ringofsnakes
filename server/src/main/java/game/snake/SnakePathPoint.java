@@ -5,9 +5,9 @@ import math.Vector;
 public class SnakePathPoint {
     public final Vector point;
     private final double localPathLength;
-    private final SnakeChunk snakeChunk;
+    private SnakeChunk snakeChunk;
 
-    public SnakePathPoint(SnakeChunk snakeChunk, Vector point, double localPathLength) {
+    public SnakePathPoint(GrowingSnakeChunk snakeChunk, Vector point, double localPathLength) {
         this.snakeChunk = snakeChunk;
         this.point = point;
         this.localPathLength = localPathLength;
@@ -26,5 +26,10 @@ public class SnakePathPoint {
     public double getSnakeWidth() {
         final var offset = getOffsetInSnake();
         return snakeChunk.getSnake().getWidthAt(offset);
+    }
+
+    public void setFinalSnakeChunk(FinalSnakeChunk snakeChunk) {
+        assert this.snakeChunk instanceof GrowingSnakeChunk;
+        this.snakeChunk = snakeChunk;
     }
 }

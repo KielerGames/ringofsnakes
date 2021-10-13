@@ -4,12 +4,13 @@ import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SnakePathDataTest {
+public class SnakeChunkTest {
     static GameConfig config = new GameConfig();
 
     static double computeSnakeChunkLength(SnakeChunk chunk) {
@@ -22,7 +23,7 @@ public class SnakePathDataTest {
     }
 
     static double computeSnakeLength(Snake snake) {
-        return snake.streamSnakeChunks().mapToDouble(SnakePathDataTest::computeSnakeChunkLength).sum();
+        return snake.streamSnakeChunks().mapToDouble(SnakeChunkTest::computeSnakeChunkLength).sum();
     }
 
     static void tickUntilFullLength(Snake snake) {
@@ -66,6 +67,14 @@ public class SnakePathDataTest {
 
         assertEquals(pathData.size(), n);
         assertEquals(n, m);
+    }
+
+    static <T> T getLastElement(List<T> list) {
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        return list.get(list.size() - 1);
     }
 
     @Test
@@ -129,7 +138,7 @@ public class SnakePathDataTest {
         tickUntilNewSnakeChunk(snake, random);
         assertTrue(snake.getSnakeChunks().size() > 1);
         final var snakeChunks = snake.getSnakeChunks();
-        final var lastSnakeChunk = snakeChunks.get(snakeChunks.size() - 1);
+        final var lastSnakeChunk = getLastElement(snakeChunks);
         assertFalse(lastSnakeChunk.isJunk());
         assertTrue(lastSnakeChunk.isFull());
 
@@ -143,5 +152,28 @@ public class SnakePathDataTest {
         }
 
         assertUniqueOffsets(lastSnakeChunk);
+    }
+
+    @Test
+    void testJunkChunksShouldStayJunk() {
+        final var random = new Random(1234);
+        final var world = new World(config);
+        final var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+
+        snake.grow(64.0);
+        tickUntilFullLength(snake);
+        final var lastChunk = getLastElement(snake.getSnakeChunks());
+        assertFalse(lastChunk.isJunk());
+
+        while (!lastChunk.isJunk()) {
+            snake.tick();
+            if (random.nextDouble() < 0.1) {
+                snake.setTargetDirection((float) ((2.0 * random.nextDouble() - 1.0) * Math.PI));
+            }
+        }
+
+        snake.grow(128.0);
+        snake.tick();
+        assertTrue(lastChunk.isJunk());
     }
 }

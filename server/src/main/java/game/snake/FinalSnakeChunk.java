@@ -16,6 +16,7 @@ public class FinalSnakeChunk extends SnakeChunk {
     private final BoundingBox boundingBox;
     private List<SnakePathPoint> pathData;
     private LinkedList<WorldChunk> linkedWorldChunks;
+    private double snakeOffset = 0.0;
 
     protected FinalSnakeChunk(
             Snake snake,
@@ -72,17 +73,17 @@ public class FinalSnakeChunk extends SnakeChunk {
 
     @Override
     public double getOffset() {
-        return chunkByteBuffer.getFloat(BUFFER_OFFSET_POS);
+        return snakeOffset;
     }
 
     public void setOffset(double offset) {
-        // TODO: also store as double
+        this.snakeOffset = offset;
         chunkByteBuffer.putFloat(BUFFER_OFFSET_POS, (float) offset);
     }
 
     @Override
     public boolean isJunk() {
-        return super.isJunk() || chunkByteBuffer.getFloat(BUFFER_OFFSET_POS) >= snake.getLength();
+        return super.isJunk() || snakeOffset >= snake.getLength();
     }
 
     public BoundingBox getBoundingBox() {

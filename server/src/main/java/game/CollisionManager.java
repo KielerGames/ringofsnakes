@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 public class CollisionManager {
     private final Game game;
+
+    // see comment on onCollisionDo method
     private final Set<BiConsumer<Snake, SnakeChunk>> collisionHandlers = new HashSet<>();
 
     public CollisionManager(Game game) {
@@ -78,7 +80,9 @@ public class CollisionManager {
     }
 
     /**
-     * Add a collision handler.
+     * Add a collision handler. For example
+     * {@code onCollisionDo((snake, chunk) -> System.out.println(snake.id + " collided".)); }
+     * If multiple collision handler are registered all of them will be called sequentially.
      *
      * @param handler A function that gets called for each collision.
      */

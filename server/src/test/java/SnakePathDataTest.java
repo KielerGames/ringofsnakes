@@ -83,12 +83,17 @@ public class SnakePathDataTest {
         assertFalse(lastSnakeChunk.isJunk());
         assertTrue(lastSnakeChunk.isFull());
 
+        var lastOffset = lastSnakeChunk.getOffset();
         var lastSnakeChunkLength = computeSnakeChunkLength(lastSnakeChunk);
         int sameValueTicks = 0;
 
         while (!lastSnakeChunk.isJunk()) {
-            snake.tick();
+            // move snake
             snake.setTargetDirection((float) ((2.0 * random.nextDouble() - 1.0) * Math.PI));
+            snake.tick();
+            assertTrue(lastOffset < lastSnakeChunk.getOffset());
+            lastOffset = lastSnakeChunk.getOffset();
+
             final var chunkLength = computeSnakeChunkLength(lastSnakeChunk);
             assertTrue(chunkLength <= lastSnakeChunkLength);
             if (chunkLength == lastSnakeChunkLength) {
@@ -96,6 +101,7 @@ public class SnakePathDataTest {
             } else {
                 sameValueTicks = 0;
             }
+
             assertTrue(sameValueTicks < 2, "Value did not change for " + sameValueTicks + " ticks.");
             lastSnakeChunkLength = chunkLength;
         }
@@ -121,6 +127,12 @@ public class SnakePathDataTest {
             assertTrue(0 <= localOffset);
             assertTrue(localOffset <= lastSnakeChunk.getLength());
         }
+
+        assertUniqueOffsets(lastSnakeChunk);
+    }
+
+    static void assertUniqueOffsets(SnakeChunk chunk) {
+        final var pathData = chunk.getPathData();
 
         int n = pathData.stream().map(SnakePathPoint::getOffsetInChunk).collect(Collectors.toSet()).size();
         int m = pathData.stream().map(SnakePathPoint::getOffsetInSnake).collect(Collectors.toSet()).size();

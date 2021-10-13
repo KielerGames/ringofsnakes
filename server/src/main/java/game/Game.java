@@ -25,16 +25,14 @@ public class Game {
     public final int id = 1; //TODO
     public final GameConfig config;
     public final World world;
+    public final CollisionManager collisionManager;
     private final ExceptionalExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
-    private final CollisionManager collisionManager;
     public List<Snake> snakes = new LinkedList<>();
     private List<Bot> bots = new LinkedList<>();
 
     public Game() {
-        config = new GameConfig();
-        world = new World(config);
-        executor = new ExceptionalExecutorService();
+        this(new GameConfig());
 
         // spawn some food
         for (int i = 0; i < 256; i++) {
@@ -42,6 +40,22 @@ public class Game {
         }
 
         DebugView.setGame(this);
+    }
+
+    /**
+     * For tests only.
+     */
+    protected Game(GameConfig config) {
+        this(config, new World(config));
+    }
+
+    /**
+     * For tests only.
+     */
+    protected Game(GameConfig config, World world) {
+        this.config = config;
+        this.world = world;
+        executor = new ExceptionalExecutorService();
         collisionManager = new CollisionManager(this);
     }
 
@@ -119,11 +133,9 @@ public class Game {
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
-
-
     }
 
-    private void tick() {
+    protected void tick() {
         synchronized (this) {
             snakes.forEach(snake -> {
                 if (snake.alive) {
@@ -135,7 +147,7 @@ public class Game {
         bots.forEach(Bot::act);
         synchronized (this) {
             eatFood();
-            collisionManager.manageCollisions();
+            collisionManager.detectCollisions();
         }
     }
 
@@ -151,7 +163,7 @@ public class Game {
 
     private void eatFood() {
         snakes.forEach(snake -> {
-            final var foodCollectRadius = snake.getWidth() * 1.1 + 1.0;
+            final var foodCollectRadius = snake.getMaxWidth() * 1.1 + 1.0;
             final var headPosition = snake.getHeadPosition();
             final var worldChunk = world.chunks.findChunk(headPosition);
 
@@ -159,11 +171,15 @@ public class Game {
                     .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
                     .collect(Collectors.toList());
 
+            if (collectedFood.isEmpty()) {
+                return;
+            }
+
             final var foodAmount = collectedFood.stream()
                     .mapToDouble(food -> food.size.value)
                     .map(v -> v * v)
                     .sum();
-            snake.grow((float) foodAmount * Food.nutritionalValue);
+            snake.grow(foodAmount * Food.nutritionalValue);
 
             synchronized (this) {
                 worldChunk.removeFood(collectedFood);
@@ -176,5 +192,9 @@ public class Game {
             System.out.println("Removing Snake " + s.id + " from Game, because it is leaving the map.");
             s.alive = false;
         }
+    }
+
+    public void stop() {
+        this.executor.shutdown();
     }
 }

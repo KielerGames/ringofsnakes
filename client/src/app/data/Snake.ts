@@ -8,7 +8,7 @@ export default class Snake {
     public readonly skin: number;
     private chunks: Map<number, SnakeChunk> = new Map();
     public length: number;
-    public width: number;
+    public maxWidth: number;
     private lastPosition: Vector;
     public speed: number;
     public direction: PredictedAngle;
@@ -18,7 +18,7 @@ export default class Snake {
         this.id = data.id;
         this.skin = data.skin;
         this.length = data.length;
-        this.width = data.width;
+        this.maxWidth = data.width;
         this.lastPosition = Vector.fromObject(data.position);
         this.speed = data.speed;
         this.direction = new PredictedAngle(data.direction);
@@ -30,7 +30,7 @@ export default class Snake {
         time: number
     ): void {
         this.length = data.length;
-        this.width = data.width;
+        this.maxWidth = data.width;
         this.lastPosition.set(data.position);
         this.direction.update(data.direction, data.targetDirection, time);
 

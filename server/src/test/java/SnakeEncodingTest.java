@@ -22,7 +22,7 @@ public class SnakeEncodingTest {
 
     @Test
     void testEarlyChunkBuilding() {
-        Snake snake = SnakeFactory.createSnake();
+        Snake snake = SnakeFactory.createTestSnake();
         final short chunkId = 42;
         GrowingSnakeChunk builder = new GrowingSnakeChunk(coder, snake, chunkId);
         assertFalse(builder.isFull());
@@ -34,7 +34,7 @@ public class SnakeEncodingTest {
 
     @Test
     void testSnakeInfoBuffer() {
-        Snake snake = SnakeFactory.createSnake();
+        Snake snake = SnakeFactory.createTestSnake();
         var snakeInfo = snake.encodeInfo();
         assertEquals(Snake.INFO_BYTE_SIZE, snakeInfo.capacity());
         var buffer = ByteBuffer.allocate(1 + Snake.INFO_BYTE_SIZE);
@@ -48,12 +48,12 @@ public class SnakeEncodingTest {
     void testSnakeChunkBuffer() {
         World world = new World(64.0, 20);
         Snake snake = SnakeFactory.createSnake(new Vector(0, 0), world);
-        var n = snake.chunks.size();
+        var n = snake.getSnakeChunks().size();
         var i = 0;
 
 
         // fill a chunk
-        while (snake.chunks.size() == n) {
+        while (snake.getSnakeChunks().size() == n) {
             snake.tick();
 
             if (i++ > 4096) {
@@ -61,7 +61,7 @@ public class SnakeEncodingTest {
             }
         }
 
-        var chunk = snake.chunks.get(n);
+        var chunk = snake.getSnakeChunks().get(n);
         assertFalse(chunk.isEmpty());
         var chunkBuffer = chunk.getBuffer();
         assertEquals(FinalSnakeChunk.BYTE_SIZE, chunkBuffer.capacity());

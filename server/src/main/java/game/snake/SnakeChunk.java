@@ -2,18 +2,17 @@ package game.snake;
 
 import game.world.WorldChunk;
 import math.BoundingBox;
-import util.SnakePointData;
 
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
+import java.util.List;
 
 public abstract class SnakeChunk {
 
     public final static int HEADER_BYTE_SIZE = 21;
     public final static int BUFFER_N_POS = 4;
     public final static int BUFFER_OFFSET_POS = 17;
-
     protected final Snake snake;
+    private boolean forceJunk = false;
 
     protected SnakeChunk(Snake snake) {
         this.snake = snake;
@@ -38,15 +37,33 @@ public abstract class SnakeChunk {
      */
     public abstract int getUniqueId();
 
-    public abstract float getLength();
+    public abstract double getLength();
 
-    public abstract LinkedList<SnakePointData> getPointData();
+    public abstract List<SnakePathPoint> getPathData();
 
-    public boolean isJunk() {
-        return !snake.alive;
+    public final boolean isJunk() {
+        // the length can increase and thus un-junk a snake chunk
+        // with the forceJunk flag we force a junk chunk to stay that way
+        if (forceJunk) {
+            return true;
+        }
+
+        final var junk = !snake.alive || getOffset() >= snake.getLength();
+
+        if (junk) {
+            markAsJunk();
+        }
+
+        return junk;
+    }
+
+    protected final void markAsJunk() {
+        forceJunk = true;
     }
 
     public abstract BoundingBox getBoundingBox();
 
     public abstract void linkWorldChunk(WorldChunk worldChunk);
+
+    public abstract double getOffset();
 }

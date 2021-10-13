@@ -34,7 +34,7 @@ public class World {
     }
 
     public void addSnake(Snake snake) {
-        snake.chunks.forEach(this::addSnakeChunk);
+        snake.streamSnakeChunks().forEach(this::addSnakeChunk);
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {

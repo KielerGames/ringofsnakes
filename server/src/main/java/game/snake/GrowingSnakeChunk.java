@@ -86,7 +86,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
         x += Math.cos(direction) * stepSize;
         y += Math.sin(direction) * stepSize;
         length += stepSize;
-        pathData.add(new SnakePathPoint(this, new Vector(x, y), length));
+        pathData.add(0, new SnakePathPoint(this, new Vector(x, y), length));
 
         // update chaincode
         if (canUpdatePreviousChainCode(dirDelta, fast)) {
@@ -122,7 +122,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
         BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
         junk = true;
         final var finalPathData = this.pathData.toArray(new SnakePathPoint[0]);
-        return new FinalSnakeChunk(snake, chunkByteBuffer, box, (float) length, List.of(finalPathData));
+        return new FinalSnakeChunk(snake, chunkByteBuffer, box, length, List.of(finalPathData));
     }
 
     private boolean canUpdatePreviousChainCode(int dirDelta, boolean fast) {
@@ -153,8 +153,8 @@ public class GrowingSnakeChunk extends SnakeChunk {
         return this.chunkByteBuffer.getInt(0);
     }
 
-    public float getLength() {
-        return (float) this.length;
+    public double getLength() {
+        return this.length;
     }
 
     @Override
@@ -178,7 +178,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
     }
 
     @Override
-    public float getOffset() {
+    public double getOffset() {
         return 0.0f;
     }
 

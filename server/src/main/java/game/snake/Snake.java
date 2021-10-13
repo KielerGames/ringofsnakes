@@ -93,7 +93,7 @@ public class Snake {
         if (currentChunk.isFull()) {
             beginChunk();
         }
-        float offset = currentChunk.getLength();
+        double offset = currentChunk.getLength();
         for (FinalSnakeChunk chunk : chunks) {
             chunk.setOffset(offset);
             offset += chunk.getLength();

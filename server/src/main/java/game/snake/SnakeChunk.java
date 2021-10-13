@@ -37,7 +37,7 @@ public abstract class SnakeChunk {
      */
     public abstract int getUniqueId();
 
-    public abstract float getLength();
+    public abstract double getLength();
 
     public abstract List<SnakePathPoint> getPathData();
 
@@ -49,5 +49,5 @@ public abstract class SnakeChunk {
 
     public abstract void linkWorldChunk(WorldChunk worldChunk);
 
-    public abstract float getOffset();
+    public abstract double getOffset();
 }

@@ -11,7 +11,7 @@ public class FinalSnakeChunk extends SnakeChunk {
     public final static int BYTE_SIZE = 96;
 
     private final ByteBuffer chunkByteBuffer;
-    private final float length;
+    private final double length;
     private final int uniqueId;
     private final BoundingBox boundingBox;
     private List<SnakePathPoint> pathData;
@@ -21,7 +21,7 @@ public class FinalSnakeChunk extends SnakeChunk {
             Snake snake,
             ByteBuffer buffer,
             BoundingBox box,
-            float length,
+            double length,
             List<SnakePathPoint> pathData
     ) {
         super(snake);
@@ -61,7 +61,7 @@ public class FinalSnakeChunk extends SnakeChunk {
         return this.uniqueId;
     }
 
-    public float getLength() {
+    public double getLength() {
         return this.length;
     }
 
@@ -71,12 +71,13 @@ public class FinalSnakeChunk extends SnakeChunk {
     }
 
     @Override
-    public float getOffset() {
+    public double getOffset() {
         return chunkByteBuffer.getFloat(BUFFER_OFFSET_POS);
     }
 
-    public void setOffset(float offset) {
-        chunkByteBuffer.putFloat(BUFFER_OFFSET_POS, offset);
+    public void setOffset(double offset) {
+        // TODO: also store as double
+        chunkByteBuffer.putFloat(BUFFER_OFFSET_POS, (float) offset);
     }
 
     @Override

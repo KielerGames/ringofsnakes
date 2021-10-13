@@ -8,6 +8,8 @@ public final class GameConfig {
     public final double fastSnakeSpeed;
     public final double maxTurnDelta;
     public final ChunkInfo chunkInfo;
+    public static final float snakeStartLength = 8f;
+    public static final float snakeMinWidth = 0.5f;
 
     public GameConfig() {
         snakeSpeed = 0.24;

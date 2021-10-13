@@ -10,12 +10,12 @@ import java.util.LinkedList;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 24;
-    public static final float START_LENGTH = 8f;
     public static final float MAX_WIDTH_GAIN = 4f;
     public static final float LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
-    public static final float MIN_WIDTH = 0.5f;
 
     public final GameConfig config = new GameConfig();
+    public static final float START_LENGTH = GameConfig.snakeStartLength;
+    public static final float MIN_WIDTH = GameConfig.snakeMinWidth;
     public final short id;
     public byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);

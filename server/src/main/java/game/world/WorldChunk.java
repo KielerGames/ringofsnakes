@@ -136,6 +136,6 @@ public class WorldChunk {
         }
 
         System.err.println("No clear spawn area found, spawning nonetheless!");
-        return position;
+        throw new RuntimeException("No free spawn position found!");
     }
 }

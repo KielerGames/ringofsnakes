@@ -1,14 +1,24 @@
+import game.GameConfig;
+import game.snake.FinalSnakeChunk;
 import game.snake.Snake;
+import game.snake.SnakeChunk;
 import game.snake.SnakeFactory;
 import game.world.World;
+import game.world.WorldChunk;
+import math.BoundingBox;
 import math.Vector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
+import java.util.Random;
 
 import static game.world.WorldChunkFactory.createChunks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 public class WorldChunkTest {
     @Test
@@ -61,4 +71,6 @@ public class WorldChunkTest {
                 .findFirst()
                 .orElseThrow();
     }
+
+
 }

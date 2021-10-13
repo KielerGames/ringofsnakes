@@ -40,7 +40,7 @@ public class SnakePathDataTest {
         assertEquals(snake.getLength(), lastLength, config.fastSnakeSpeed);
     }
 
-    static void tickUntilNewSnakeChunk(Snake snake) {
+    static void tickUntilNewSnakeChunk(Snake snake, Random random) {
         final var gsc = snake.streamSnakeChunks()
                 .filter(GrowingSnakeChunk.class::isInstance)
                 .findFirst()
@@ -52,7 +52,20 @@ public class SnakePathDataTest {
                 .orElseThrow() == gsc
         ) {
             snake.tick();
+            if (random.nextDouble() < 0.1) {
+                snake.setTargetDirection((float) ((2.0 * random.nextDouble() - 1.0) * Math.PI));
+            }
         }
+    }
+
+    static void assertUniqueOffsets(SnakeChunk chunk) {
+        final var pathData = chunk.getPathData();
+
+        int n = pathData.stream().map(SnakePathPoint::getOffsetInChunk).collect(Collectors.toSet()).size();
+        int m = pathData.stream().map(SnakePathPoint::getOffsetInSnake).collect(Collectors.toSet()).size();
+
+        assertEquals(pathData.size(), n);
+        assertEquals(n, m);
     }
 
     @Test
@@ -76,7 +89,7 @@ public class SnakePathDataTest {
         final var snake = SnakeFactory.createTestSnake();
         snake.grow(64.0);
         tickUntilFullLength(snake);
-        tickUntilNewSnakeChunk(snake);
+        tickUntilNewSnakeChunk(snake, random);
         assertTrue(snake.getSnakeChunks().size() > 1);
         final var snakeChunks = snake.getSnakeChunks();
         final var lastSnakeChunk = snakeChunks.get(snakeChunks.size() - 1);
@@ -109,10 +122,11 @@ public class SnakePathDataTest {
 
     @Test
     void testOffsetValues() {
+        final var random = new Random(666137);
         final var snake = SnakeFactory.createTestSnake();
         snake.grow(64.0);
         tickUntilFullLength(snake);
-        tickUntilNewSnakeChunk(snake);
+        tickUntilNewSnakeChunk(snake, random);
         assertTrue(snake.getSnakeChunks().size() > 1);
         final var snakeChunks = snake.getSnakeChunks();
         final var lastSnakeChunk = snakeChunks.get(snakeChunks.size() - 1);
@@ -129,15 +143,5 @@ public class SnakePathDataTest {
         }
 
         assertUniqueOffsets(lastSnakeChunk);
-    }
-
-    static void assertUniqueOffsets(SnakeChunk chunk) {
-        final var pathData = chunk.getPathData();
-
-        int n = pathData.stream().map(SnakePathPoint::getOffsetInChunk).collect(Collectors.toSet()).size();
-        int m = pathData.stream().map(SnakePathPoint::getOffsetInSnake).collect(Collectors.toSet()).size();
-
-        assertEquals(pathData.size(), n);
-        assertEquals(n, m);
     }
 }

@@ -16,6 +16,7 @@ public class FinalSnakeChunk extends SnakeChunk {
     private final BoundingBox boundingBox;
     public LinkedList<SnakePointData> pointData;
     private LinkedList<WorldChunk> linkedWorldChunks;
+    private boolean junk = false;
 
     protected FinalSnakeChunk(Snake snake, ByteBuffer buffer, BoundingBox box, float length,
                               LinkedList<SnakePointData> pointData) {
@@ -71,7 +72,14 @@ public class FinalSnakeChunk extends SnakeChunk {
 
     @Override
     public boolean isJunk() {
-        return super.isJunk() || chunkByteBuffer.getFloat(BUFFER_OFFSET_POS) >= snake.getLength();
+        if (junk) {
+            return true;
+        }
+        if (super.isJunk() || chunkByteBuffer.getFloat(BUFFER_OFFSET_POS) >= snake.getLength()) {
+            junk = true;
+            return true;
+        }
+        return false;
     }
 
     public BoundingBox getBoundingBox() {

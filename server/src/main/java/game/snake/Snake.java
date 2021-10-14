@@ -13,10 +13,10 @@ public class Snake {
     public static final float MAX_WIDTH_GAIN = 4f;
     public static final float LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
 
-    public final GameConfig config = new GameConfig();
+    final GameConfig config;
     public final short id;
     public byte skin;
-    final ChainCodeCoder coder = new ChainCodeCoder(config);
+    final ChainCodeCoder coder;
     Vector headPosition;
     private ByteBuffer snakeInfoBuffer;
     private final World world;
@@ -32,10 +32,12 @@ public class Snake {
     private float pointDataSnakeLength = 0f;
 
 
-    Snake(short id, World world) {
+    Snake(short id, World world, GameConfig config) {
         this.id = id;
         this.world = world;
         this.length = config.snakeStartLength;
+        this.config = config;
+        this.coder = new ChainCodeCoder(config);
     }
 
     public void setTargetDirection(float alpha) {

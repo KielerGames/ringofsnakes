@@ -1,6 +1,7 @@
 package game.world;
 
 import math.Vector;
+import util.ByteUtilities;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
@@ -9,7 +10,6 @@ import static util.ByteUtilities.toNormalizedDouble;
 
 public class Food {
     public static final int BYTE_SIZE = 3;
-    public static final float nutritionalValue = 1f;
     private static final Random rand = new Random();
 
     public final Vector position;
@@ -17,11 +17,16 @@ public class Food {
     public final byte color;
     private final byte byteX, byteY;
 
-    public Food(Vector position, byte color) {
-        this.color = color;
-        this.position = position;
-        // TODO: round to nearest byte position & store byte position
-        throw new IllegalCallerException("Not yet implemented");
+    public Food(Vector position, WorldChunk chunk) {
+        this.color = (byte) rand.nextInt(64);
+        this.size = Size.SMALL;
+        var px = (position.x - chunk.box.minX) / chunk.box.getWidth();
+        var py = (position.y - chunk.box.minY) / chunk.box.getHeight();
+        this.byteX = ByteUtilities.fromNormalizedDoubleToByte(px);
+        this.byteY = ByteUtilities.fromNormalizedDoubleToByte(py);
+        final var x = chunk.box.minX + toNormalizedDouble(byteX) * chunk.box.getWidth();
+        final var y = chunk.box.minY + toNormalizedDouble(byteY) * chunk.box.getHeight();
+        this.position = new Vector(x, y);
     }
 
     public Food(WorldChunk chunk) {

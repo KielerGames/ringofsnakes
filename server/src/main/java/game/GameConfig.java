@@ -9,6 +9,9 @@ public final class GameConfig {
     public final double maxTurnDelta;
     public final ChunkInfo chunkInfo;
 
+    public final float foodNutritionalValue = 1f;
+    public final float foodConversionEfficiency = 1.6f;
+
     public GameConfig() {
         snakeSpeed = 0.24;
         fastSnakeSpeed = 2.0 * snakeSpeed;

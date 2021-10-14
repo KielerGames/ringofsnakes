@@ -15,11 +15,12 @@ public class World {
     public final WorldChunkCollection chunks;
     public double height;
     public double width;
-    private static Random rnd = new Random();
-    private final Game game;
+    private static Random random = new Random();
+    private final GameConfig config;
+
 
     public World(double chunkSize, int repetitions) {
-        this.game = new Game();
+        this.config = new GameConfig();
         chunks = WorldChunkFactory.createChunks(this, chunkSize, repetitions, repetitions);
         height = chunkSize * repetitions;
         width = chunkSize * repetitions;
@@ -29,8 +30,8 @@ public class World {
         this(32.0, 16);
     }
 
-    public World(GameConfig config, Game game) {
-        this.game = game;
+    public World(GameConfig config) {
+        this.config = config;
         chunks = WorldChunkFactory.createChunks(this, config.chunkInfo);
         height = config.chunkInfo.chunkSize * config.chunkInfo.rows;
         width = config.chunkInfo.chunkSize * config.chunkInfo.columns;
@@ -38,7 +39,7 @@ public class World {
 
     public Vector findSpawnPosition() {
         var worldChunkToSpawnIn = findRandomWorldChunkWithMinSnakeChunkCount();
-        return worldChunkToSpawnIn.findSnakeSpawnPosition(rnd);
+        return worldChunkToSpawnIn.findSnakeSpawnPosition(World.random);
     }
 
     private WorldChunk findRandomWorldChunkWithMinSnakeChunkCount() {
@@ -46,7 +47,7 @@ public class World {
         var minimalSnakeChunkCount = chunks.stream().mapToInt(WorldChunk::getSnakeChunkCount).min().orElseThrow();
         var worldChunksWithMinimalSnakeChunkCount = chunks.stream()
                 .filter(worldChunk -> worldChunk.getSnakeChunkCount() == minimalSnakeChunkCount).collect(Collectors.toList());
-        int randomIndex = rnd.nextInt(worldChunksWithMinimalSnakeChunkCount.size());
+        int randomIndex = World.random.nextInt(worldChunksWithMinimalSnakeChunkCount.size());
         return worldChunksWithMinimalSnakeChunkCount.get(randomIndex);
     }
 
@@ -74,11 +75,11 @@ public class World {
      *
      * @param random
      */
-    public void setRnd(Random random) {
-        rnd = random;
+    public static void setRandom(Random random) {
+        World.random = random;
     }
 
-    public Game getGame() {
-        return this.game;
+    public GameConfig getConfig() {
+        return this.config;
     }
 }

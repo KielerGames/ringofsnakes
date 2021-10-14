@@ -14,8 +14,6 @@ public class Snake {
     public static final float LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
 
     public final GameConfig config = new GameConfig();
-    public final float START_LENGTH;
-    public final float MIN_WIDTH;
     public final short id;
     public byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);
@@ -37,9 +35,7 @@ public class Snake {
     Snake(short id, World world) {
         this.id = id;
         this.world = world;
-        this.START_LENGTH = config.snakeStartLength;
-        this.MIN_WIDTH = config.snakeMinWidth;
-        this.length = START_LENGTH;
+        this.length = config.snakeStartLength;
     }
 
     public void setTargetDirection(float alpha) {
@@ -178,7 +174,7 @@ public class Snake {
     public float getWidth() {
         //sigmoid(3) is roughly  0.95
         var x = 3 * (length - config.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
-        return (float) (MIN_WIDTH + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
+        return (float) (config.snakeMinWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
 
     }
 

@@ -118,7 +118,7 @@ public class WorldChunk {
     }
 
     public Vector findSnakeSpawnPosition(Random rnd) {
-        GameConfig config = world.getGame().config;
+        GameConfig config = world.getConfig();
         final int NUMBER_OF_ATTEMPTS = 42;
         Vector position = new Vector(rnd, box);
         if (snakeChunks.isEmpty()) {

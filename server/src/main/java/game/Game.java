@@ -33,7 +33,7 @@ public class Game {
 
     public Game() {
         config = new GameConfig();
-        world = new World(config, this);
+        world = new World(config);
         executor = new ExceptionalExecutorService();
 
         // spawn some food

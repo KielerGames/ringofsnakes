@@ -36,10 +36,9 @@ public class Snake {
     private boolean fast = false;
     private double lengthBuffer = 0;
     private double maxWidth = MIN_WIDTH;
-    private Vector tailPosition;
 
     //TODO: Find a better name, but good luck with that!
-    private float lengthLossForFoodSpawnSavingsAccount = 0f;
+    private float foodTrailBuffer = 0f;
 
     Snake(short id, World world) {
         this.id = id;
@@ -160,15 +159,15 @@ public class Snake {
         var newLength = Math.max(config.minLength, length - snakeAmount);
         var deltaLength = length - newLength;
         length = newLength;
-        lengthLossForFoodSpawnSavingsAccount += deltaLength;
-        if (lengthLossForFoodSpawnSavingsAccount * config.foodConversionEfficiency >= config.foodNutritionalValue) {
-            lengthLossForFoodSpawnSavingsAccount = 0;
-            spawnFoodAtTailPosition();
+        foodTrailBuffer += deltaLength;
+        if (foodTrailBuffer * config.foodConversionEfficiency >= config.foodNutritionalValue) {
+            foodTrailBuffer = 0;
+            spawnFoodAtTailPosition(getTailPosition());
         }
 
     }
 
-    private void spawnFoodAtTailPosition() {
+    private void spawnFoodAtTailPosition(Vector tailPosition) {
         var worldChunk = world.chunks.findChunk(getTailPosition());
         Food f = new Food(tailPosition, worldChunk);
         worldChunk.addFood(f);
@@ -221,11 +220,19 @@ public class Snake {
     }
 
     public Vector getTailPosition() {
-        var sp = streamSnakeChunks().filter(chunk -> !chunk.isJunk())
+        final var lastSnakeChunk = chunks.isEmpty() ? currentChunk : chunks.getLast();
+        var spp = streamSnakeChunks().filter(chunk -> !chunk.isJunk())
                 .flatMap(chunk -> chunk.getPathData().stream())
                 .filter(snakePathPoint -> snakePathPoint.getOffsetInSnake() < length)
                 .max(Comparator.comparing(SnakePathPoint::getOffsetInSnake));
-        sp.ifPresent(snakePathPoint -> tailPosition = snakePathPoint.point);
-        return tailPosition;
+
+        var sp = lastSnakeChunk.getPathData().stream()
+                .filter(snakePathPoint -> snakePathPoint.getOffsetInSnake() < length)
+                .max(Comparator.comparing(SnakePathPoint::getOffsetInSnake));
+
+        if (sp.isPresent()) {
+            return sp.get().point;
+        }
+        return headPosition.clone();
     }
 }

@@ -1,5 +1,6 @@
 package game.world;
 
+import game.Game;
 import game.GameConfig;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
@@ -15,9 +16,11 @@ public class World {
     public double height;
     public double width;
     private static Random rnd = new Random();
+    private final Game game;
 
     public World(double chunkSize, int repetitions) {
-        chunks = WorldChunkFactory.createChunks(chunkSize, repetitions, repetitions);
+        this.game = new Game();
+        chunks = WorldChunkFactory.createChunks(this, chunkSize, repetitions, repetitions);
         height = chunkSize * repetitions;
         width = chunkSize * repetitions;
     }
@@ -26,8 +29,9 @@ public class World {
         this(32.0, 16);
     }
 
-    public World(GameConfig config) {
-        chunks = WorldChunkFactory.createChunks(config.chunkInfo);
+    public World(GameConfig config, Game game) {
+        this.game = game;
+        chunks = WorldChunkFactory.createChunks(this, config.chunkInfo);
         height = config.chunkInfo.chunkSize * config.chunkInfo.rows;
         width = config.chunkInfo.chunkSize * config.chunkInfo.columns;
     }
@@ -39,13 +43,11 @@ public class World {
 
     private WorldChunk findRandomWorldChunkWithMinSnakeChunkCount() {
         assert (chunks.numberOfChunks() > 0);
-        var worldChunksSortedBySnakeChunkCount =
-                chunks.stream().sorted(Comparator.comparing(WorldChunk::getSnakeChunkCount)).collect(Collectors.toList());
-        var minimalSnakeChunkCount = worldChunksSortedBySnakeChunkCount.get(0).getSnakeChunkCount();
-        var worldChunksWithMinimalSnakeChunkCount = worldChunksSortedBySnakeChunkCount.stream()
+        var minimalSnakeChunkCount = chunks.stream().mapToInt(WorldChunk::getSnakeChunkCount).min().orElseThrow();
+        var worldChunksWithMinimalSnakeChunkCount = chunks.stream()
                 .filter(worldChunk -> worldChunk.getSnakeChunkCount() == minimalSnakeChunkCount).collect(Collectors.toList());
         int randomIndex = rnd.nextInt(worldChunksWithMinimalSnakeChunkCount.size());
-        return worldChunksSortedBySnakeChunkCount.get(randomIndex);
+        return worldChunksWithMinimalSnakeChunkCount.get(randomIndex);
     }
 
     public void addSnake(Snake snake) {
@@ -73,6 +75,10 @@ public class World {
      * @param random
      */
     public void setRnd(Random random) {
-        this.rnd = random;
+        rnd = random;
+    }
+
+    public Game getGame() {
+        return this.game;
     }
 }

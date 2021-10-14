@@ -7,11 +7,11 @@ public class WorldChunkFactory {
     private WorldChunkFactory() {
     }
 
-    public static WorldChunkCollection createChunks(GameConfig.ChunkInfo info) {
-        return createChunks(info.chunkSize, info.rows, info.columns);
+    public static WorldChunkCollection createChunks(World world, GameConfig.ChunkInfo info) {
+        return createChunks(world, info.chunkSize, info.rows, info.columns);
     }
 
-    public static WorldChunkCollection createChunks(double chunkSize, int rows, int columns) {
+    public static WorldChunkCollection createChunks(World world, double chunkSize, int rows, int columns) {
         assert (chunkSize > 0.0);
         assert (rows > 0 && columns > 0);
 
@@ -23,6 +23,7 @@ public class WorldChunkFactory {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 chunks[getIndex(i, j, columns)] = new WorldChunk(
+                        world,
                         offsetX + j * chunkSize,
                         offsetY + i * chunkSize,
                         chunkSize, chunkSize,

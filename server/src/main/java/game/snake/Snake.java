@@ -14,8 +14,8 @@ public class Snake {
     public static final float LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
 
     public final GameConfig config = new GameConfig();
-    public static final float START_LENGTH = GameConfig.snakeStartLength;
-    public static final float MIN_WIDTH = GameConfig.snakeMinWidth;
+    public final float START_LENGTH;
+    public final float MIN_WIDTH;
     public final short id;
     public byte skin;
     final ChainCodeCoder coder = new ChainCodeCoder(config);
@@ -25,7 +25,7 @@ public class Snake {
     public LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     public GrowingSnakeChunk chunkBuilder;
     float headDirection;
-    private float length = START_LENGTH;
+    private float length;
     private short nextChunkId = 0;
     private float targetDirection;
     private boolean fast = false;
@@ -37,6 +37,9 @@ public class Snake {
     Snake(short id, World world) {
         this.id = id;
         this.world = world;
+        this.START_LENGTH = config.snakeStartLength;
+        this.MIN_WIDTH = config.snakeMinWidth;
+        this.length = START_LENGTH;
     }
 
     public void setTargetDirection(float alpha) {

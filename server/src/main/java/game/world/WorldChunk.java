@@ -1,5 +1,6 @@
 package game.world;
 
+import game.GameConfig;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import math.BoundingBox;
@@ -17,10 +18,11 @@ public class WorldChunk {
     private final List<SnakeChunk> snakeChunks = new LinkedList<>();
     private final byte x, y;
     private int foodVersion = 0;
+    private final World world;
 
     private List<Food> foodList = new LinkedList<>();
 
-    public WorldChunk(double left, double bottom, double width, double height, int x, int y) {
+    public WorldChunk(World world, double left, double bottom, double width, double height, int x, int y) {
         assert (width > 0.0);
         assert (height > 0.0);
 
@@ -28,6 +30,7 @@ public class WorldChunk {
         this.y = (byte) y;
 
         box = new BoundingBox(left, left + width, bottom, bottom + height);
+        this.world = world;
     }
 
     private void onFoodChange() {
@@ -115,6 +118,7 @@ public class WorldChunk {
     }
 
     public Vector findSnakeSpawnPosition(Random rnd) {
+        GameConfig config = world.getGame().config;
         final int NUMBER_OF_ATTEMPTS = 42;
         Vector position = new Vector(rnd, box);
         if (snakeChunks.isEmpty()) {
@@ -123,8 +127,8 @@ public class WorldChunk {
 
         for (int i = 0; i < NUMBER_OF_ATTEMPTS; i++) {
             BoundingBox potentialSpawnArea =
-                    new BoundingBox(position, Snake.START_LENGTH + Snake.MIN_WIDTH,
-                            Snake.START_LENGTH + Snake.MIN_WIDTH);
+                    new BoundingBox(position, config.snakeStartLength + config.snakeMinWidth,
+                            config.snakeStartLength + config.snakeMinWidth);
 
             var areaClear = snakeChunks.stream().noneMatch(snakeChunk ->
                     BoundingBox.intersect(potentialSpawnArea, snakeChunk.getBoundingBox()));
@@ -134,8 +138,6 @@ public class WorldChunk {
                 position = new Vector(rnd, box);
             }
         }
-
-        System.err.println("No clear spawn area found, spawning nonetheless!");
         throw new RuntimeException("No free spawn position found!");
     }
 }

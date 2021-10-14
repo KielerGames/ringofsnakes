@@ -1,3 +1,4 @@
+import game.Game;
 import game.GameConfig;
 import game.snake.FinalSnakeChunk;
 import game.world.WorldChunk;
@@ -29,9 +30,11 @@ class findSnakeSpawnPositionTest {
     @Test
     void testFindSnakeSpawnPosition() {
         Random rnd = new Random(42);
+        Game game = new Game();
+        GameConfig config = game.config;
 
-        var space = GameConfig.snakeStartLength + GameConfig.snakeMinWidth;
-        var chunk = new WorldChunk(-space, -space, 2 * space, 2 * space, 0, 0);
+        var space = config.snakeStartLength + config.snakeMinWidth;
+        var chunk = new WorldChunk(game.world, -space, -space, 2 * space, 2 * space, 0, 0);
 
         BoundingBox b1 = new BoundingBox(-space, 0, -space, 0);
         BoundingBox b2 = new BoundingBox(0, space, -space, 0);
@@ -58,7 +61,7 @@ class findSnakeSpawnPositionTest {
         //Test for full chunk
 
         chunk.addSnakeChunk(sc4);
-        assertThrows(Exception.class, () ->
+        assertThrows(RuntimeException.class, () ->
                 chunk.findSnakeSpawnPosition(rnd));
     }
 }

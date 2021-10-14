@@ -36,8 +36,6 @@ public class Snake {
     private boolean fast = false;
     private double lengthBuffer = 0;
     private double maxWidth = MIN_WIDTH;
-
-    //TODO: Find a better name, but good luck with that!
     private float foodTrailBuffer = 0f;
 
     Snake(short id, World world) {
@@ -156,19 +154,22 @@ public class Snake {
         final var bufferAmount = Math.min(lengthBuffer, amount);
         lengthBuffer -= bufferAmount;
         final var snakeAmount = amount - bufferAmount;
-        var newLength = Math.max(config.minLength, length - snakeAmount);
-        var deltaLength = length - newLength;
+        final var newLength = Math.max(config.minLength, length - snakeAmount);
+        final var deltaLength = length - newLength;
         length = newLength;
-        foodTrailBuffer += deltaLength;
-        if (foodTrailBuffer * config.foodConversionEfficiency >= config.foodNutritionalValue) {
-            foodTrailBuffer = 0;
-            spawnFoodAtTailPosition(getTailPosition());
+        final var smallFoodNutritionalValue = config.foodNutritionalValue * Food.Size.SMALL.value * Food.Size.SMALL.value;
+        foodTrailBuffer += deltaLength * config.foodConversionEfficiency;
+
+        if (foodTrailBuffer >= smallFoodNutritionalValue) {
+            foodTrailBuffer -= smallFoodNutritionalValue;
+            spawnFoodAtTailPosition();
         }
 
     }
 
-    private void spawnFoodAtTailPosition(Vector tailPosition) {
-        var worldChunk = world.chunks.findChunk(getTailPosition());
+    private void spawnFoodAtTailPosition() {
+        final var tailPosition = getTailPosition();
+        final var worldChunk = world.chunks.findChunk(getTailPosition());
         Food f = new Food(tailPosition, worldChunk);
         worldChunk.addFood(f);
     }
@@ -221,12 +222,7 @@ public class Snake {
 
     public Vector getTailPosition() {
         final var lastSnakeChunk = chunks.isEmpty() ? currentChunk : chunks.getLast();
-        var spp = streamSnakeChunks().filter(chunk -> !chunk.isJunk())
-                .flatMap(chunk -> chunk.getPathData().stream())
-                .filter(snakePathPoint -> snakePathPoint.getOffsetInSnake() < length)
-                .max(Comparator.comparing(SnakePathPoint::getOffsetInSnake));
-
-        var sp = lastSnakeChunk.getPathData().stream()
+        final var sp = lastSnakeChunk.getPathData().stream()
                 .filter(snakePathPoint -> snakePathPoint.getOffsetInSnake() < length)
                 .max(Comparator.comparing(SnakePathPoint::getOffsetInSnake));
 

@@ -19,6 +19,8 @@ import util.ExceptionalExecutorService;
 
 import javax.websocket.Session;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -69,31 +71,22 @@ public class Game {
         }
     }
 
-    public Player createPlayer(Session session) {
+    public Future<Player> createPlayer(Session session) {
         final var spawnPos = world.findSpawnPosition();
-        final Snake snake;
 
-        synchronized (this) {
-            snake = SnakeFactory.createSnake(spawnPos, world);
+        return CompletableFuture.supplyAsync(() -> {
+            final var snake = SnakeFactory.createSnake(spawnPos, world);
             snakes.add(snake);
-        }
-
-        final var player = new Player(snake, session);
-
-        synchronized (this) {
-            clients.put(session.getId(), player);
-        }
-
-        var data = gson.toJson(new SpawnInfo(config, snake));
-        player.sendSync(data);
-
-        executor.schedule(() -> {
-            synchronized (this) {
-                addBotsNextToPlayer(player, 25.0, 2);
+            return snake;
+        }, executor).thenApply(snake -> {
+            final var player = new Player(snake, session);
+            synchronized (clients) {
+                clients.put(session.getId(), player);
             }
-        }, 1, TimeUnit.SECONDS);
-
-        return player;
+            player.sendSync(gson.toJson(new SpawnInfo(config, snake)));
+            executor.schedule(() -> addBotsNextToPlayer(player, 25.0, 2), 1, TimeUnit.SECONDS);
+            return player;
+        });
     }
 
     public void addBotsNextToPlayer(Player player, double radius, int n) {
@@ -113,7 +106,12 @@ public class Game {
     }
 
     public void removeClient(String sessionId) {
-        var client = clients.remove(sessionId);
+        final Client client;
+
+        synchronized (clients) {
+            client = clients.remove(sessionId);
+        }
+
         if (client instanceof Player) {
             final var snake = ((Player) client).snake;
             snake.kill();
@@ -126,38 +124,28 @@ public class Game {
             updateClients();
         }, 0, (long) (1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 
-        executor.scheduleAtFixedRate(() -> {
-            synchronized (this) {
-                world.spawnFood();
-            }
-        }, 100, (long) (25 * 1000 * config.tickDuration), TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(world::spawnFood, 100, (long) (25 * 1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
-            synchronized (this) {
-                // garbage-collection
-                snakes.removeIf(Predicate.not(Snake::isAlive));
-                world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
-                bots.removeIf(Predicate.not(Bot::isAlive));
-            }
+            // garbage-collection
+            snakes.removeIf(Predicate.not(Snake::isAlive));
+            world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
+            bots.removeIf(Predicate.not(Bot::isAlive));
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
 
-    protected void tick() {
-        synchronized (this) {
-            snakes.forEach(snake -> {
-                if (snake.isAlive()) {
-                    snake.tick();
-                    killDesertingSnakes(snake);
-                }
-            });
-        }
+    protected synchronized void tick() {
+        snakes.forEach(snake -> {
+            if (snake.isAlive()) {
+                snake.tick();
+                killDesertingSnakes(snake);
+            }
+        });
         bots.stream().filter(Bot::isAlive).forEach(Bot::act);
-        synchronized (this) {
-            eatFood();
-            collisionManager.detectCollisions();
-        }
+        eatFood();
+        collisionManager.detectCollisions();
     }
 
     private void updateClients() {
@@ -190,9 +178,7 @@ public class Game {
                     .sum();
             snake.grow(foodAmount * Food.nutritionalValue);
 
-            synchronized (this) {
-                worldChunk.removeFood(collectedFood);
-            }
+            worldChunk.removeFood(collectedFood);
         });
     }
 

@@ -12,6 +12,17 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
         exception.printStackTrace();
     };
 
+    private Runnable createExceptionalRunnable(Runnable runnable) {
+        return () -> {
+            try {
+                runnable.run();
+            } catch (Exception e) {
+                executor.shutdown();
+                exceptionHandler.accept(e);
+            }
+        };
+    }
+
     @Override
     public ScheduledFuture<?> schedule(Runnable runnable, long l, TimeUnit timeUnit) {
         return executor.schedule(runnable, l, timeUnit);
@@ -24,14 +35,7 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
 
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long l, long l1, TimeUnit timeUnit) {
-        return executor.scheduleAtFixedRate(() -> {
-            try {
-                runnable.run();
-            } catch (Exception e) {
-                executor.shutdown();
-                exceptionHandler.accept(e);
-            }
-        }, l, l1, timeUnit);
+        return executor.scheduleAtFixedRate(createExceptionalRunnable(runnable), l, l1, timeUnit);
     }
 
     @Override
@@ -101,6 +105,6 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
 
     @Override
     public void execute(Runnable runnable) {
-        throw new UnsupportedOperationException("Method not implemented.");
+        executor.execute(createExceptionalRunnable(runnable));
     }
 }

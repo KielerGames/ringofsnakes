@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SnakeCollisionTest {
     @Test
@@ -61,9 +62,13 @@ public class SnakeCollisionTest {
         // collide
         testGame.tickN(64, true);
 
-        assertFalse(testGame.collisions.isEmpty(), "Snakes should have collided.");
+        assertEquals(1, testGame.collisions.size(), "Snakes should have collided.");
         final var collision = testGame.collisions.get(0);
         assertEquals(collision.snake, snake2, "snake2 should be the colliding snake.");
+
+        testGame.collisions.clear();
+        testGame.tickN(1, true);
+        assertTrue(testGame.collisions.isEmpty(), "A snake may only collide once!");
     }
 
     private static class TestGame extends Game {

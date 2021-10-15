@@ -32,11 +32,11 @@ public class Snake {
     private float pointDataSnakeLength = 0f;
 
 
-    Snake(short id, World world, GameConfig config) {
+    Snake(short id, World world) {
         this.id = id;
         this.world = world;
+        this.config = world.getConfig();
         this.length = config.snakeStartLength;
-        this.config = config;
         this.coder = new ChainCodeCoder(config);
     }
 

@@ -14,7 +14,7 @@ public class SnakeFactory {
     }
 
     public static Snake createSnake(Vector position, World world){
-        Snake snake = new Snake(nextSnakeId++, world, world.getConfig());
+        Snake snake = new Snake(nextSnakeId++, world);
         snake.setSkin((byte) (random.nextInt(100) % 3));
 
         ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);

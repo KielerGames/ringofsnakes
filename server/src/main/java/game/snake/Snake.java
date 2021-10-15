@@ -49,7 +49,7 @@ public class Snake {
     }
 
     public void setTargetDirection(float alpha) {
-        if (Math.abs(alpha) > Math.PI) {
+        if (Math.abs(alpha) > Math.PI + 1e-4) {
             System.err.println("Alpha out of range: " + alpha);
         } else {
             this.targetDirection = alpha;

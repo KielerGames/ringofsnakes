@@ -2,6 +2,7 @@ package game;
 
 import game.snake.Snake;
 import game.snake.SnakeChunk;
+import game.world.Collidable;
 import game.world.WorldChunk;
 import math.Vector;
 
@@ -14,7 +15,7 @@ public class CollisionManager {
     private final Game game;
 
     // see comment on onCollisionDo method
-    private final Set<BiConsumer<Snake, SnakeChunk>> collisionHandlers = new HashSet<>();
+    private final Set<BiConsumer<Snake, Collidable>> collisionHandlers = new HashSet<>();
 
     public CollisionManager(Game game) {
         this.game = game;
@@ -86,7 +87,7 @@ public class CollisionManager {
      *
      * @param handler A function that gets called for each collision.
      */
-    public void onCollisionDo(BiConsumer<Snake, SnakeChunk> handler) {
+    public void onCollisionDo(BiConsumer<Snake, Collidable> handler) {
         collisionHandlers.add(handler);
     }
 

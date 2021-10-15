@@ -5,7 +5,9 @@ import debugview.DebugView;
 import game.ai.Bot;
 import game.ai.StupidBot;
 import game.snake.Snake;
+import game.snake.SnakeChunk;
 import game.snake.SnakeFactory;
+import game.world.Collidable;
 import game.world.Food;
 import game.world.World;
 import game.world.WorldChunk;
@@ -54,9 +56,15 @@ public class Game {
         this.world = world;
         executor = new ExceptionalExecutorService();
         collisionManager = new CollisionManager(this);
-        collisionManager.onCollisionDo(
-                (s, sc) -> System.out.println("Snake " + s.id + " collided with snake " + sc.getSnake().id + ".")
-        );
+        collisionManager.onCollisionDo(this::onCollision);
+    }
+
+    private void onCollision(Snake snake, Collidable object) {
+        if (object instanceof SnakeChunk) {
+            final var snakeChunk = (SnakeChunk) object;
+            final var otherSnake = snakeChunk.getSnake();
+            System.out.println("Snake " + snake.id + " collided with snake " + otherSnake.id + ".");
+        }
     }
 
     public Player createPlayer(Session session) {

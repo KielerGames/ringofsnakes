@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -31,10 +32,10 @@ public class Game {
     public final GameConfig config;
     public final World world;
     public final CollisionManager collisionManager;
+    public final List<Snake> snakes = new LinkedList<>();
     private final ExceptionalExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
-    public List<Snake> snakes = new LinkedList<>();
-    private List<Bot> bots = new LinkedList<>();
+    private final List<Bot> bots = new LinkedList<>();
 
     public Game() {
         this(new GameConfig());
@@ -136,8 +137,15 @@ public class Game {
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
 
+    /**
+     * Run a method for each snake that is alive.
+     */
+    private void forEachSnake(Consumer<Snake> snakeConsumer) {
+        snakes.stream().filter(Snake::isAlive).forEach(snakeConsumer);
+    }
+
     protected synchronized void tick() {
-        snakes.forEach(snake -> {
+        forEachSnake(snake -> {
             if (snake.isAlive()) {
                 snake.tick();
                 killDesertingSnakes(snake);
@@ -159,7 +167,7 @@ public class Game {
     }
 
     private void eatFood() {
-        snakes.forEach(snake -> {
+        forEachSnake(snake -> {
             final var foodCollectRadius = snake.getMaxWidth() * 1.1 + 1.0;
             final var headPosition = snake.getHeadPosition();
             final var worldChunk = world.chunks.findChunk(headPosition);

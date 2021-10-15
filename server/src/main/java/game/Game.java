@@ -14,6 +14,7 @@ import game.world.WorldChunk;
 import math.Vector;
 import server.Client;
 import server.Player;
+import server.protocol.SnakeDeathInfo;
 import server.protocol.SpawnInfo;
 import util.ExceptionalExecutorService;
 
@@ -69,6 +70,9 @@ public class Game {
             final var otherSnake = snakeChunk.getSnake();
             System.out.println("Snake " + snake.id + " collided with snake " + otherSnake.id + ".");
             snake.kill();
+
+            final var killMessage = gson.toJson(new SnakeDeathInfo(snake));
+            executor.schedule(() -> clients.forEach((sId, client) -> client.send(killMessage)), 0, TimeUnit.MILLISECONDS);
         }
     }
 

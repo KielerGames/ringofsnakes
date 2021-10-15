@@ -49,7 +49,7 @@ public abstract class SnakeChunk implements Collidable {
             return true;
         }
 
-        final var junk = !snake.alive || getOffset() >= snake.getLength();
+        final var junk = !snake.isAlive() || getOffset() >= snake.getLength();
 
         if (junk) {
             markAsJunk();

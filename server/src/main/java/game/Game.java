@@ -20,6 +20,7 @@ import util.ExceptionalExecutorService;
 import javax.websocket.Session;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Game {
@@ -64,6 +65,7 @@ public class Game {
             final var snakeChunk = (SnakeChunk) object;
             final var otherSnake = snakeChunk.getSnake();
             System.out.println("Snake " + snake.id + " collided with snake " + otherSnake.id + ".");
+            snake.kill();
         }
     }
 
@@ -113,12 +115,8 @@ public class Game {
     public void removeClient(String sessionId) {
         var client = clients.remove(sessionId);
         if (client instanceof Player) {
-            var snake = ((Player) client).snake;
-            // TODO: generate food (?), consider changing list to another data structure
-            synchronized (this) {
-                snakes.remove(snake);
-            }
-            snake.alive = false;
+            final var snake = ((Player) client).snake;
+            snake.kill();
         }
     }
 
@@ -136,7 +134,10 @@ public class Game {
 
         executor.scheduleAtFixedRate(() -> {
             synchronized (this) {
+                // garbage-collection
+                snakes.removeIf(Predicate.not(Snake::isAlive));
                 world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
+                bots.removeIf(Predicate.not(Bot::isAlive));
             }
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
@@ -146,13 +147,13 @@ public class Game {
     protected void tick() {
         synchronized (this) {
             snakes.forEach(snake -> {
-                if (snake.alive) {
+                if (snake.isAlive()) {
                     snake.tick();
                     killDesertingSnakes(snake);
                 }
             });
         }
-        bots.forEach(Bot::act);
+        bots.stream().filter(Bot::isAlive).forEach(Bot::act);
         synchronized (this) {
             eatFood();
             collisionManager.detectCollisions();
@@ -198,7 +199,7 @@ public class Game {
     private void killDesertingSnakes(Snake s) {
         if (Math.abs(s.getHeadPosition().x) > world.width / 2.0 - 3 || Math.abs(s.getHeadPosition().y) > world.height / 2.0 - 3) {
             System.out.println("Removing Snake " + s.id + " from Game, because it is leaving the map.");
-            s.alive = false;
+            s.kill();
         }
     }
 

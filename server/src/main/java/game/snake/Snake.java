@@ -24,9 +24,9 @@ public class Snake {
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     public byte skin;
     public GrowingSnakeChunk currentChunk;
-    public boolean alive = true;
     Vector headPosition;
     float headDirection;
+    private boolean alive = true;
     private LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private double length = START_LENGTH;
     private short nextChunkId = 0;
@@ -200,5 +200,13 @@ public class Snake {
 
     public List<SnakeChunk> getSnakeChunks() {
         return streamSnakeChunks().collect(Collectors.toList());
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void kill() {
+        alive = false;
     }
 }

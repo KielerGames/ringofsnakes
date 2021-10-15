@@ -19,7 +19,7 @@ public class Snake {
 
     public final GameConfig config = new GameConfig();
     public final short id;
-    final ChainCodeCoder coder = new ChainCodeCoder(config);
+    private final ChainCodeCoder coder = new ChainCodeCoder(config);
     private final World world;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     public byte skin;
@@ -27,7 +27,7 @@ public class Snake {
     Vector headPosition;
     float headDirection;
     private boolean alive = true;
-    private LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
+    private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private double length = START_LENGTH;
     private short nextChunkId = 0;
     private float targetDirection;

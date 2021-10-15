@@ -49,14 +49,14 @@ public class Game {
         this(config, new World(config));
     }
 
-    /**
-     * For tests only.
-     */
     protected Game(GameConfig config, World world) {
         this.config = config;
         this.world = world;
         executor = new ExceptionalExecutorService();
         collisionManager = new CollisionManager(this);
+        collisionManager.onCollisionDo(
+                (s, sc) -> System.out.println("Snake " + s.id + " collided with snake " + sc.getSnake().id + ".")
+        );
     }
 
     public Player createPlayer(Session session) {

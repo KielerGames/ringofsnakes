@@ -44,9 +44,6 @@ public class SnakeServer {
                     });
 
             server.start();
-            game.collisionManager.onCollisionDo(
-                    (s, sc) -> System.out.println("Snake " + s.id + " collided with snake " + sc.getSnake().id + ".")
-            );
             game.start();
             server.join();
         } catch (Throwable t) {

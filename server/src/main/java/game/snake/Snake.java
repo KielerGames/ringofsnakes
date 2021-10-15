@@ -169,7 +169,7 @@ public class Snake {
 
     private void spawnFoodAtTailPosition() {
         final var tailPosition = getTailPosition();
-        final var worldChunk = world.chunks.findChunk(getTailPosition());
+        final var worldChunk = world.chunks.findChunk(tailPosition);
         Food f = new Food(tailPosition, worldChunk);
         worldChunk.addFood(f);
     }

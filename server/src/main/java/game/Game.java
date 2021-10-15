@@ -79,7 +79,7 @@ public class Game {
 
         executor.schedule(() -> {
             synchronized (this) {
-                addBotsNextToPlayer(player, 25.0, 2);
+                addBotsNextToPlayer(player, 25.0, 3);
             }
         }, 1, TimeUnit.SECONDS);
 
@@ -179,7 +179,7 @@ public class Game {
                     .mapToDouble(food -> food.size.value)
                     .map(v -> v * v)
                     .sum();
-            snake.grow(foodAmount * Food.nutritionalValue);
+            snake.grow(foodAmount * config.foodNutritionalValue);
 
             synchronized (this) {
                 worldChunk.removeFood(collectedFood);

@@ -10,7 +10,7 @@ public final class GameConfig {
     public final ChunkInfo chunkInfo;
 
     public final float foodNutritionalValue = 1f;
-    public final float foodConversionEfficiency = 1f;
+    public final float foodConversionEfficiency = 0.5f;
 
     public GameConfig() {
         snakeSpeed = 0.24;

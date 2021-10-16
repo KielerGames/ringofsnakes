@@ -89,7 +89,7 @@ public class Game {
                 clients.put(session.getId(), player);
             }
             player.sendSync(gson.toJson(new SpawnInfo(config, snake)));
-            executor.schedule(() -> addBotsNextToPlayer(player, 25.0, 2), 1, TimeUnit.SECONDS);
+            executor.schedule(() -> addBotsNextToPlayer(player, 25.0, 3), 1, TimeUnit.SECONDS);
             return player;
         });
     }
@@ -188,7 +188,7 @@ public class Game {
                     .mapToDouble(food -> food.size.value)
                     .map(v -> v * v)
                     .sum();
-            snake.grow(foodAmount * Food.nutritionalValue);
+            snake.grow(foodAmount * config.foodNutritionalValue);
 
             worldChunk.removeFood(collectedFood);
         });

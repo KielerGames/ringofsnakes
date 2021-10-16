@@ -17,6 +17,7 @@ public class DebugView extends Application {
 
     private static final double ZOOM = 8.0;
     private static final boolean FOLLOW_PLAYER = true;
+    private static final boolean DRAW_TAILS = true;
     private static Game game;
     private Vector camera = new Vector(0, 0);
 
@@ -100,6 +101,17 @@ public class DebugView extends Application {
                                 300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
                                 snakeSize * ZOOM, snakeSize * ZOOM);
                     });
+
+            if (DRAW_TAILS) {
+                g.setFill(Color.ORANGE);
+                g.setStroke(Color.ORANGE);
+                var tailPosition = snake.getTailPosition();
+                final var x = tailPosition.x;
+                final var y = tailPosition.y;
+                g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,
+                        300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
+                        snakeSize * ZOOM * 1.3, snakeSize * ZOOM * 1.3);
+            }
         });
     }
 

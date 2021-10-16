@@ -105,6 +105,14 @@
                                     <mainClass>server.SnakeServer</mainClass>
                                 </transformer>
                             </transformers>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>junit:junit</exclude>
+                                    <exclude>org.apache.maven:*</exclude>
+                                    <exclude>org.mockito:*</exclude>
+                                    <exclude>org.openjfx:*</exclude>
+                                </excludes>
+                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>

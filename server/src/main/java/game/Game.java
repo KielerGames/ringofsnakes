@@ -1,12 +1,10 @@
 package game;
 
 import com.google.gson.Gson;
-import debugview.DebugView;
 import game.ai.Bot;
 import game.ai.StupidBot;
 import game.snake.Snake;
 import game.snake.SnakeFactory;
-import game.world.Food;
 import game.world.World;
 import game.world.WorldChunk;
 import math.Vector;
@@ -38,8 +36,6 @@ public class Game {
         for (int i = 0; i < 256; i++) {
             world.spawnFood();
         }
-
-        DebugView.setGame(this);
     }
 
     /**

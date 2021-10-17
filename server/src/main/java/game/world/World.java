@@ -28,6 +28,10 @@ public class World {
         this(32.0, 16);
     }
 
+    public World(GameConfig.ChunkInfo chunkInfo) {
+        this(chunkInfo.chunkSize, chunkInfo.rows);
+    }
+
     public World(GameConfig config) {
         this.config = config;
         chunks = WorldChunkFactory.createChunks(this);

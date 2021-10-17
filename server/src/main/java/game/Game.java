@@ -7,7 +7,6 @@ import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.snake.SnakeFactory;
 import game.world.Collidable;
-import game.world.Food;
 import game.world.World;
 import game.world.WorldChunk;
 import math.Vector;

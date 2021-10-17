@@ -6,9 +6,7 @@ import game.world.World;
 import math.Vector;
 
 import java.nio.ByteBuffer;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,6 +16,7 @@ public class Snake {
     public static final double MAX_WIDTH_GAIN = 4f;
     public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
     public static final double MIN_WIDTH = 0.5f;
+    private static final Random rnd = new Random();
 
     public final GameConfig config = new GameConfig();
     public final short id;
@@ -168,7 +167,7 @@ public class Snake {
     }
 
     private void spawnFoodAtTailPosition() {
-        final var tailPosition = getTailPosition();
+        final var tailPosition = getTail().point;
         final var worldChunk = world.chunks.findChunk(tailPosition);
         Food f = new Food(tailPosition, worldChunk);
         worldChunk.addFood(f);
@@ -225,18 +224,51 @@ public class Snake {
     }
 
     public void kill() {
+        recycleSnake();
         alive = false;
     }
 
-    public Vector getTailPosition() {
+    public SnakePathPoint getTail() {
         final var lastSnakeChunk = chunks.isEmpty() ? currentChunk : chunks.getLast();
         final var sp = lastSnakeChunk.getPathData().stream()
                 .filter(snakePathPoint -> snakePathPoint.getOffsetInSnake() < length)
                 .max(Comparator.comparing(SnakePathPoint::getOffsetInSnake));
 
         if (sp.isPresent()) {
-            return sp.get().point;
+            return sp.get();
         }
-        return headPosition.clone();
+        return new SnakePathPoint(currentChunk, headPosition, 0);
+    }
+
+    //TODO:
+    // - consider spawning larger food items for larger snakes
+    // - possible performance optimization by calling findChunk only once per snakeChunk
+    // - fine adjust food value per dead snake
+    private void recycleSnake() {
+        final double foodScattering = 1;
+        final var tail = getTail();
+        final var tailOffset = tail.getOffsetInSnake();
+        final var caloricValueOfSnake = length / 2.0; //TODO: adjust
+        final var caloricValueOfFoodSpawn = Food.Size.MEDIUM.value * Food.Size.MEDIUM.value * config.foodNutritionalValue;
+        final int numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
+        final double lengthUntilFoodSpawn = length / numberOfFoodSpawns;
+        double lastSpawnOffset = tailOffset;
+
+        var points = streamSnakeChunks().flatMap(chunk -> chunk.getPathData().stream())
+                .filter(snakePathPoint -> snakePathPoint.getOffsetInSnake() < length)
+                .collect(Collectors.toList());
+
+        Collections.reverse(points);
+
+        for (SnakePathPoint spp : points) {
+            if (lastSpawnOffset - spp.getOffsetInSnake() > lengthUntilFoodSpawn) {
+                final var spawnPosition = spp.point;
+                spawnPosition.addScaled(new Vector(rnd.nextDouble(), rnd.nextDouble()), foodScattering);
+                final var worldChunk = world.chunks.findChunk(spawnPosition); //TODO: optimization?
+                final var food = new Food(spawnPosition, worldChunk);
+                worldChunk.addFood(food);
+                lastSpawnOffset = spp.getOffsetInSnake();
+            }
+        }
     }
 }

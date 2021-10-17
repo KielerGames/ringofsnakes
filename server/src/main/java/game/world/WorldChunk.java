@@ -1,12 +1,15 @@
 package game.world;
 
+import game.GameConfig;
 import game.snake.SnakeChunk;
 import math.BoundingBox;
+import math.Vector;
 
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
 
 public class WorldChunk {
     public final BoundingBox box;
@@ -15,10 +18,11 @@ public class WorldChunk {
     private final List<SnakeChunk> snakeChunks = new LinkedList<>();
     private final byte x, y;
     private int foodVersion = 0;
+    private final World world;
 
     private List<Food> foodList = new LinkedList<>();
 
-    public WorldChunk(double left, double bottom, double width, double height, int x, int y) {
+    public WorldChunk(World world, double left, double bottom, double width, double height, int x, int y) {
         assert (width > 0.0);
         assert (height > 0.0);
 
@@ -26,6 +30,7 @@ public class WorldChunk {
         this.y = (byte) y;
 
         box = new BoundingBox(left, left + width, bottom, bottom + height);
+        this.world = world;
     }
 
     private void onFoodChange() {
@@ -115,5 +120,29 @@ public class WorldChunk {
     public int getFoodVersion() {
         assert foodVersion >= 0;
         return foodVersion;
+    }
+
+    public Vector findSnakeSpawnPosition(Random rnd) {
+        GameConfig config = world.getConfig();
+        final int NUMBER_OF_ATTEMPTS = 42;
+        Vector position = new Vector(rnd, box);
+        if (snakeChunks.isEmpty()) {
+            return position;
+        }
+
+        for (int i = 0; i < NUMBER_OF_ATTEMPTS; i++) {
+            BoundingBox potentialSpawnArea =
+                    new BoundingBox(position, config.snakeStartLength + config.snakeMinWidth,
+                            config.snakeStartLength + config.snakeMinWidth);
+
+            var areaClear = snakeChunks.stream().noneMatch(snakeChunk ->
+                    BoundingBox.intersect(potentialSpawnArea, snakeChunk.getBoundingBox()));
+            if (areaClear) {
+                return position;
+            } else {
+                position = new Vector(rnd, box);
+            }
+        }
+        throw new RuntimeException("No free spawn position found!");
     }
 }

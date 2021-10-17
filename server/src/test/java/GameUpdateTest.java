@@ -1,3 +1,4 @@
+import game.world.World;
 import game.world.WorldChunk;
 import math.BoundingBox;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GameUpdateTest {
+    World world = new World();
+
     @Test
     void testEmptyUpdate() {
         var update = new GameUpdate();
@@ -27,7 +30,7 @@ public class GameUpdateTest {
 
     @Test
     void testUpdateNotEmpty() {
-        var chunk = new WorldChunk(0, 0, 42, 42, 0, 0);
+        var chunk = new WorldChunk(world, 0, 0, 42, 42, 0, 0);
         var update = new GameUpdate();
         update.addFoodChunk(chunk);
         assertFalse(update.isEmpty());
@@ -67,7 +70,7 @@ public class GameUpdateTest {
     @Test
     void testBinarySameChunkOnce() {
         var client = new TestClient(session);
-        var chunk = new WorldChunk(0, 0, 42, 42, 0, 0);
+        var chunk = new WorldChunk(world, 0, 0, 42, 42, 0, 0);
 
         client.updateClientFoodChunk(chunk);
         var update1 = captureUpdateData(client);
@@ -84,7 +87,7 @@ public class GameUpdateTest {
     @Test
     void testBinarySameChunkUpdated() {
         var client = new TestClient(session);
-        var chunk = new WorldChunk(0, 0, 42, 42, 0, 0);
+        var chunk = new WorldChunk(world, 0, 0, 42, 42, 0, 0);
         chunk.addFood();
 
         client.updateClientFoodChunk(chunk);

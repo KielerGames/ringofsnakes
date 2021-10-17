@@ -14,39 +14,40 @@ import java.util.stream.Stream;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
-    public static final double START_LENGTH = 8f;
     public static final double MAX_WIDTH_GAIN = 4f;
     public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
-    public static final double MIN_WIDTH = 0.5f;
 
     public final GameConfig config = new GameConfig();
     public final short id;
     private final ChainCodeCoder coder = new ChainCodeCoder(config);
     private final World world;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
+    private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     public byte skin;
     public GrowingSnakeChunk currentChunk;
     Vector headPosition;
     float headDirection;
     private boolean alive = true;
-    private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
-    private double length = START_LENGTH;
+    private double length;
     private short nextChunkId = 0;
     private float targetDirection;
     private boolean fast = false;
     private double lengthBuffer = 0;
-    private double maxWidth = MIN_WIDTH;
+    private double maxWidth; // TODO @tim-we rename to something less confusing
     private float foodTrailBuffer = 0f;
 
     Snake(short id, World world) {
         this.id = id;
         this.world = world;
+        final var config = world.getConfig();
+        length = config.snakeStartLength;
+        maxWidth = config.snakeMinWidth;
     }
 
     private static double computeMaxWidthFromLength(double length, GameConfig config) {
         //sigmoid(3) is roughly  0.95
         final var x = 3.0 * (length - config.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
-        return (MIN_WIDTH + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
+        return (config.snakeMinWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
     }
 
     public void setTargetDirection(float alpha) {

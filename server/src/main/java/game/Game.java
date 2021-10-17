@@ -85,7 +85,7 @@ public class Game {
                 clients.put(session.getId(), player);
             }
             player.sendSync(gson.toJson(new SpawnInfo(config, snake)));
-            executor.schedule(() -> addBotsNextToPlayer(player, 25.0, 3), 1, TimeUnit.SECONDS);
+            executor.schedule(() -> addBotsRandomly(25), 1, TimeUnit.SECONDS);
             return player;
         });
     }
@@ -103,6 +103,15 @@ public class Game {
             snakes.add(bot.getSnake());
             bots.add(bot);
             System.out.println("Bot added!");
+        }
+    }
+
+    public void addBotsRandomly(int n) {
+        for (int i = 0; i < n; i++) {
+            StupidBot bot = new StupidBot(this, this.world.findSpawnPosition());
+            snakes.add(bot.getSnake());
+            bots.add(bot);
+            System.out.println("Bot added randomly!");
         }
     }
 

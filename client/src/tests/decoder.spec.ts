@@ -7,6 +7,8 @@ import { createSnakeChunkBuffer } from "./data/snake";
 
 const cfg: GameConfig = {
     snakeSpeed: 0.24,
+    snakeStartLength: 8,
+    snakeMinWidth: 0.5,
     fastSnakeSpeed: 0.48,
     maxTurnDelta: Math.PI / 30,
     tickDuration: 1.0 / 25,

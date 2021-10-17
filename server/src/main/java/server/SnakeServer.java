@@ -9,6 +9,7 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 import javax.websocket.Session;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class SnakeServer {
     private final static Map<String, Player> players = new HashMap<>(64);
@@ -53,7 +54,13 @@ public class SnakeServer {
 
     public static void onNewClientConnected(Session session) {
         System.out.println("A new client has connected.");
-        var player = game.createPlayer(session);
+        Player player;
+        try {
+            player = game.createPlayer(session).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return;
+        }
 
         players.put(session.getId(), player);
     }

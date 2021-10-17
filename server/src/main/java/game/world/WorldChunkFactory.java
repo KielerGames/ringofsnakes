@@ -7,7 +7,8 @@ public class WorldChunkFactory {
     private WorldChunkFactory() {
     }
 
-    public static WorldChunkCollection createChunks(World world, GameConfig.ChunkInfo info) {
+    public static WorldChunkCollection createChunks(World world) {
+        var info = world.getConfig().chunkInfo;
         return createChunks(world, info.chunkSize, info.rows, info.columns);
     }
 

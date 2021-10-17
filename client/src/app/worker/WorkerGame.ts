@@ -3,9 +3,9 @@ import assert from "../utilities/assert";
 import * as GUD from "./decoder/GameUpdateDecoder";
 import {
     SnakeChunkData,
-    SnakeData,
+    SnakeDataDTO,
     MainThreadGameDataUpdate
-} from "./GameDataUpdate";
+} from "./MainThreadGameDataUpdate";
 import WorkerSnakeChunk from "./WorkerSnakeChunk";
 import WorkerSnake from "./WorkerSnake";
 import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
@@ -98,7 +98,18 @@ export default class WorkerGame {
         json: Readonly<ServerToClientJSONMessage>
     ): void {
         switch (json.tag) {
-            // TODO
+            case "SnakeDeathInfo": {
+                console.log(`Snake ${json.snakeId} has died.`);
+                this.snakes.delete(json.snakeId);
+                const snakeChunksToRemove: SnakeChunkId[] = [];
+                this.snakeChunks.forEach((chunk) =>
+                    snakeChunksToRemove.push(chunk.id)
+                );
+                snakeChunksToRemove.forEach((chunkId) =>
+                    this.snakeChunks.delete(chunkId)
+                );
+                break;
+            }
             default: {
                 throw new Error(
                     `Unexpected message from server. (tag = ${json.tag})`
@@ -142,7 +153,7 @@ export default class WorkerGame {
 
     public getDataChanges(): MainThreadGameDataUpdate {
         const snakeChunks: SnakeChunkData[] = new Array(this.snakeChunks.size);
-        const snakes: SnakeData[] = new Array(this.snakes.size);
+        const snakes: SnakeDataDTO[] = new Array(this.snakes.size);
 
         // snake chunk updates
         {

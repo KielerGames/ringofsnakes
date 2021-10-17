@@ -1,6 +1,5 @@
 package game.world;
 
-import game.Game;
 import game.GameConfig;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
@@ -18,7 +17,6 @@ public class World {
     private static Random random = new Random();
     private final GameConfig config;
 
-
     public World(double chunkSize, int repetitions) {
         this.config = new GameConfig();
         chunks = WorldChunkFactory.createChunks(this, chunkSize, repetitions, repetitions);
@@ -32,7 +30,7 @@ public class World {
 
     public World(GameConfig config) {
         this.config = config;
-        chunks = WorldChunkFactory.createChunks(this, config.chunkInfo);
+        chunks = WorldChunkFactory.createChunks(this);
         height = config.chunkInfo.chunkSize * config.chunkInfo.rows;
         width = config.chunkInfo.chunkSize * config.chunkInfo.columns;
     }
@@ -52,7 +50,7 @@ public class World {
     }
 
     public void addSnake(Snake snake) {
-        snake.chunks.forEach(this::addSnakeChunk);
+        snake.streamSnakeChunks().forEach(this::addSnakeChunk);
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {
@@ -72,6 +70,7 @@ public class World {
 
     /**
      * Sets the random object, useful for debugging
+     * and for deterministic tests
      *
      * @param random
      */

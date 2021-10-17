@@ -2,7 +2,7 @@ import * as Comlink from "comlink";
 import Rectangle, { TransferableBox } from "../math/Rectangle";
 import { ClientToServerMessage, ServerToClientJSONMessage } from "../protocol";
 import { GameConfig } from "../types/GameConfig";
-import { MainThreadGameDataUpdate } from "./GameDataUpdate";
+import { MainThreadGameDataUpdate } from "./MainThreadGameDataUpdate";
 import WorkerGame from "./WorkerGame";
 
 let game: WorkerGame | null = null;

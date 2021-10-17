@@ -1,7 +1,6 @@
 package game.world;
 
 import game.GameConfig;
-import game.snake.Snake;
 import game.snake.SnakeChunk;
 import math.BoundingBox;
 import math.Vector;
@@ -10,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
 
 public class WorldChunk {
     public final BoundingBox box;
@@ -46,6 +46,11 @@ public class WorldChunk {
 
     public void addFood() {
         addFood(Collections.singletonList(new Food(this)));
+    }
+
+    public void addFood(Food food) {
+        foodList.add(food);
+        onFoodChange();
     }
 
     public void addFood(Collection<Food> foodItemsToAdd) {

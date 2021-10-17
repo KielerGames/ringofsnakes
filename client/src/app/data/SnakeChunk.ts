@@ -1,6 +1,6 @@
 import Rectangle from "../math/Rectangle";
 import Vector from "../math/Vector";
-import { SnakeChunkData } from "../worker/GameDataUpdate";
+import { SnakeChunkData } from "../worker/MainThreadGameDataUpdate";
 import Snake from "./Snake";
 
 export default class SnakeChunk {
@@ -59,7 +59,7 @@ export default class SnakeChunk {
 
         this.boundingBox = this.boundingBox.extendTo(
             end,
-            0.5 * this.snake.width
+            0.5 * this.snake.maxWidth
         );
     }
 

@@ -3,7 +3,6 @@ import game.GameConfig;
 import game.snake.FinalSnakeChunk;
 import game.world.WorldChunk;
 import math.BoundingBox;
-import math.Vector;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

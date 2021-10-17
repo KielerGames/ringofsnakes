@@ -1,7 +1,8 @@
 import Vector from "../math/Vector";
 import { GameConfig } from "../types/GameConfig";
 import { SnakeInfo } from "./decoder/SnakeInfoDecoder";
-import { SnakeData } from "./GameDataUpdate";
+import { SnakeDataDTO } from "./MainThreadGameDataUpdate";
+import WorkerSnakeChunk from "./WorkerSnakeChunk";
 
 export default class WorkerSnake {
     public readonly id: number;
@@ -52,12 +53,16 @@ export default class WorkerSnake {
         return this.data.direction;
     }
 
+    public get headSnakeChunkId(): number {
+        return this.data.currentChunkId;
+    }
+
     private speed(): number {
         const cfg = this.gameConfig;
         return this.fast ? cfg.fastSnakeSpeed : cfg.snakeSpeed;
     }
 
-    public createTransferData(): SnakeData {
+    public createTransferData(): SnakeDataDTO {
         const currentSpeed = this.speed();
         // correction for the main thread prediction
         const offsetCorrection = this.correctOffset - this.offsetPrediction;
@@ -75,7 +80,8 @@ export default class WorkerSnake {
             direction: this.direction,
             targetDirection: this.data.targetDirection,
             speed: currentSpeed,
-            offsetCorrection
+            offsetCorrection,
+            headChunkId: this.headSnakeChunkId
         };
     }
 }
@@ -84,11 +90,10 @@ function computeWidthFromLength(
     length: number,
     config: Readonly<GameConfig>
 ): number {
-    const minWidth = 0.5;
+    const minWidth = config.snakeMinWidth;
     const maxWidthGain = 4.0;
     const LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700.0;
     const denominator = 1.0 / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
-
     const x = 3.0 * (length - config.minLength) * denominator;
     const sigmoid = 1.0 / (1.0 + Math.exp(-x)) - 0.5;
     return 2.0 * (minWidth + sigmoid * maxWidthGain);

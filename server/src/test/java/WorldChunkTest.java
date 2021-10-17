@@ -1,4 +1,3 @@
-
 import game.snake.SnakeFactory;
 import game.world.World;
 import math.Vector;

@@ -1,6 +1,6 @@
 import Rectangle from "../math/Rectangle";
 import { GameConfig } from "../types/GameConfig";
-import { MainThreadGameDataUpdate } from "../worker/GameDataUpdate";
+import { MainThreadGameDataUpdate } from "../worker/MainThreadGameDataUpdate";
 import FoodChunk from "./FoodChunk";
 import Snake from "./Snake";
 import SnakeChunk from "./SnakeChunk";
@@ -26,9 +26,12 @@ export default class GameData {
         // camera
         this.targetSnakeId = data.targetSnakeId;
 
+        const localSnakeIds = new Set(this.snakes.keys());
+
         // update & add new snakes
         data.snakes.forEach((snakeData) => {
             const snake = this.snakes.get(snakeData.id);
+            localSnakeIds.delete(snakeData.id);
             if (snake) {
                 snake.update(
                     snakeData,
@@ -38,6 +41,15 @@ export default class GameData {
             } else {
                 this.snakes.set(snakeData.id, new Snake(snakeData));
             }
+        });
+
+        // remove snakes
+        localSnakeIds.forEach((snakeId) => {
+            const snake = this.snakes.get(snakeId)!;
+            snake
+                .getSnakeChunks()
+                .forEach((chunk) => this.snakeChunks.delete(chunk.id));
+            this.snakes.delete(snakeId);
         });
 
         // add new snake chunks

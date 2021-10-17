@@ -246,11 +246,11 @@ public class Snake {
         // - consider spawning larger food items for larger snakes
         // - possible performance optimization by calling findChunk only once per snakeChunk
         // - fine adjust food value per dead snake
-        final double foodScattering = 1;
+        final var foodScattering = 1.0;
         final var caloricValueOfSnake = length / 2.0; //TODO: adjust
         final var caloricValueOfFoodSpawn = Food.Size.MEDIUM.value * Food.Size.MEDIUM.value * config.foodNutritionalValue;
-        final int numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
-        final double lengthUntilFoodSpawn = length / Math.max(1, numberOfFoodSpawns);
+        final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
+        final var lengthUntilFoodSpawn = length / Math.max(1, numberOfFoodSpawns);
         final double[] lastSpawn = {0};
 
         streamSnakeChunks().flatMap(chunk -> chunk.getPathData().stream())

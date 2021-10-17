@@ -103,6 +103,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <outputFile>snake-server-${project.version}.jar</outputFile>
                             <minimizeJar>true</minimizeJar>
                             <transformers>
                                 <transformer

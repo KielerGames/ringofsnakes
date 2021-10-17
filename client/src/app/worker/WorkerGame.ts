@@ -98,7 +98,18 @@ export default class WorkerGame {
         json: Readonly<ServerToClientJSONMessage>
     ): void {
         switch (json.tag) {
-            // TODO
+            case "SnakeDeathInfo": {
+                console.log(`Snake ${json.snakeId} has died.`);
+                this.snakes.delete(json.snakeId);
+                const snakeChunksToRemove: SnakeChunkId[] = [];
+                this.snakeChunks.forEach((chunk) =>
+                    snakeChunksToRemove.push(chunk.id)
+                );
+                snakeChunksToRemove.forEach((chunkId) =>
+                    this.snakeChunks.delete(chunkId)
+                );
+                break;
+            }
             default: {
                 throw new Error(
                     `Unexpected message from server. (tag = ${json.tag})`

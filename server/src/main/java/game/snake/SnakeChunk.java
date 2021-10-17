@@ -1,12 +1,13 @@
 package game.snake;
 
+import game.world.Collidable;
 import game.world.WorldChunk;
 import math.BoundingBox;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 
-public abstract class SnakeChunk {
+public abstract class SnakeChunk implements Collidable {
 
     public final static int HEADER_BYTE_SIZE = 21;
     public final static int BUFFER_N_POS = 4;
@@ -48,7 +49,7 @@ public abstract class SnakeChunk {
             return true;
         }
 
-        final var junk = !snake.alive || getOffset() >= snake.getLength();
+        final var junk = !snake.isAlive() || getOffset() >= snake.getLength();
 
         if (junk) {
             markAsJunk();

@@ -12,7 +12,7 @@ const PATH_VERTEX_SIZE = 4;
 
 export default class WorkerSnakeChunk {
     private snake: WorkerSnake;
-    private id: number;
+    public readonly id: number;
     private _full: boolean;
     private pathData: Float32Array;
     private pathLength: number;

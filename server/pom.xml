@@ -103,6 +103,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <minimizeJar>true</minimizeJar>
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -111,11 +112,12 @@
                             </transformers>
                             <artifactSet>
                                 <excludes>
-                                    <exclude>junit:junit</exclude>
                                     <exclude>org.apache.maven:*</exclude>
-                                    <exclude>org.mockito:*</exclude>
+                                    <!-- JavaFX is only required for the DebugView -->
                                     <exclude>org.openjfx:*</exclude>
+                                    <!-- ByteBuddy is a dependency of Mockito and not required in the final build -->
                                     <exclude>net.bytebuddy:*</exclude>
+                                    <exclude>org.mockito:*</exclude>
                                 </excludes>
                             </artifactSet>
                         </configuration>

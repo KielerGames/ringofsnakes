@@ -35,3 +35,11 @@ jobs:
     - name: Build & run tests with Maven
       run: mvn -B test --file pom.xml
       working-directory: server
+    - name: Create Uber Jar
+      run: mvn -B package --file pom.xml
+      working-directory: server
+    - name: Upload Uber Jar
+      uses: actions/upload-artifact@v2
+      with:
+        name: server-uber-jar
+        path: server/snake-server-*.jar

@@ -13,10 +13,12 @@ import java.util.concurrent.ExecutionException;
 
 public class SnakeServer {
     private final static Map<String, Player> players = new HashMap<>(64);
-    @SuppressWarnings("FieldMayBeFinal")
-    private static Game game = new Game();
 
-    public static void main(String[] args) {
+    private static Game game;
+
+    public static Server startServerWithGame(Game game) {
+        SnakeServer.game = game;
+
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(8080);
@@ -28,28 +30,35 @@ public class SnakeServer {
         context.setContextPath("/");
         server.setHandler(context);
 
+        // Initialize javax.websocket layer
+        WebSocketServerContainerInitializer.configure(context,
+                (servletContext, wsContainer) ->
+                {
+                    // This lambda will be called at the appropriate place in the
+                    // ServletContext initialization phase where you can initialize
+                    // and configure  your websocket container.
+
+                    // Configure defaults for container
+                    wsContainer.setDefaultMaxTextMessageBufferSize(65535);
+
+                    // Add WebSocket endpoint to javax.websocket layer
+                    wsContainer.addEndpoint(EventSocket.class);
+                });
+
         try {
-            // Initialize javax.websocket layer
-            WebSocketServerContainerInitializer.configure(context,
-                    (servletContext, wsContainer) ->
-                    {
-                        // This lambda will be called at the appropriate place in the
-                        // ServletContext initialization phase where you can initialize
-                        // and configure  your websocket container.
-
-                        // Configure defaults for container
-                        wsContainer.setDefaultMaxTextMessageBufferSize(65535);
-
-                        // Add WebSocket endpoint to javax.websocket layer
-                        wsContainer.addEndpoint(EventSocket.class);
-                    });
-
             server.start();
-            game.start();
-            server.join();
-        } catch (Throwable t) {
-            t.printStackTrace(System.err);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
         }
+
+        return server;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        game = new Game();
+        final var server = startServerWithGame(game);
+        game.start();
+        server.join();
     }
 
     public static void onNewClientConnected(Session session) {

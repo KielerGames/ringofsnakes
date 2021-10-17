@@ -22,8 +22,13 @@ public class DebugView extends Application {
     private Vector camera = new Vector(0, 0);
 
     public static void main(String[] args) {
+        game = new Game();
+
         // start game server
-        new Thread(() -> SnakeServer.main(null)).start();
+        new Thread(() -> {
+            SnakeServer.startServerWithGame(game);
+            game.start();
+        }).start();
 
         // create debug window
         launch(args);

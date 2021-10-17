@@ -6,15 +6,20 @@ import game.snake.SnakeChunk;
 import math.Vector;
 
 import java.util.Comparator;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class World {
     private static final int FOOD_THRESHOLD = 16;
     public final WorldChunkCollection chunks;
     public double height;
     public double width;
+    private static Random random = new Random();
+    private final GameConfig config;
 
     public World(double chunkSize, int repetitions) {
-        chunks = WorldChunkFactory.createChunks(chunkSize, repetitions, repetitions);
+        this.config = new GameConfig();
+        chunks = WorldChunkFactory.createChunks(this, chunkSize, repetitions, repetitions);
         height = chunkSize * repetitions;
         width = chunkSize * repetitions;
     }
@@ -24,13 +29,24 @@ public class World {
     }
 
     public World(GameConfig config) {
-        chunks = WorldChunkFactory.createChunks(config.chunkInfo);
+        this.config = config;
+        chunks = WorldChunkFactory.createChunks(this);
         height = config.chunkInfo.chunkSize * config.chunkInfo.rows;
         width = config.chunkInfo.chunkSize * config.chunkInfo.columns;
     }
 
     public Vector findSpawnPosition() {
-        return new Vector(0.0, 0.0); //TODO
+        var worldChunkToSpawnIn = findRandomWorldChunkWithMinSnakeChunkCount();
+        return worldChunkToSpawnIn.findSnakeSpawnPosition(World.random);
+    }
+
+    private WorldChunk findRandomWorldChunkWithMinSnakeChunkCount() {
+        assert (chunks.numberOfChunks() > 0);
+        var minimalSnakeChunkCount = chunks.stream().mapToInt(WorldChunk::getSnakeChunkCount).min().orElseThrow();
+        var worldChunksWithMinimalSnakeChunkCount = chunks.stream()
+                .filter(worldChunk -> worldChunk.getSnakeChunkCount() == minimalSnakeChunkCount).collect(Collectors.toList());
+        int randomIndex = World.random.nextInt(worldChunksWithMinimalSnakeChunkCount.size());
+        return worldChunksWithMinimalSnakeChunkCount.get(randomIndex);
     }
 
     public void addSnake(Snake snake) {
@@ -50,5 +66,19 @@ public class World {
                 .sorted(Comparator.comparingInt(WorldChunk::getFoodCount))
                 .limit(numberOfChunksToSpawnSimultaneously)
                 .forEach(WorldChunk::addFood);
+    }
+
+    /**
+     * Sets the random object, useful for debugging
+     * and for deterministic tests
+     *
+     * @param random
+     */
+    public static void setRandom(Random random) {
+        World.random = random;
+    }
+
+    public GameConfig getConfig() {
+        return this.config;
     }
 }

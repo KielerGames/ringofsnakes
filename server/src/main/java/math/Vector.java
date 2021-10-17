@@ -23,6 +23,17 @@ public class Vector implements Cloneable {
         this.y = (2.0 * rand.nextDouble() - 1.0) * maxValue;
     }
 
+    /**
+     * Returns a randomly chosen Vector within the bounds of the provided bounding box b.
+     *
+     * @param rand instance of Random which is used
+     * @param b    bounding box defining the bounds of the vector
+     */
+    public Vector(Random rand, BoundingBox b) {
+        this.x = b.minX + rand.nextDouble() * b.getWidth();
+        this.y = b.minY + rand.nextDouble() * b.getHeight();
+    }
+
     public static double distance(Vector a, Vector b) {
         final double dx = a.x - b.x,
                 dy = a.y - b.y;

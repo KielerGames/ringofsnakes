@@ -8,6 +8,8 @@ public final class GameConfig {
     public final double fastSnakeSpeed;
     public final double maxTurnDelta;
     public final ChunkInfo chunkInfo;
+    public final float snakeStartLength = 8f;
+    public final float snakeMinWidth = 0.5f;
 
     public final float foodNutritionalValue = 1f;
     public final float foodConversionEfficiency = 0.5f;

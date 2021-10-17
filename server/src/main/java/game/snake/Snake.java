@@ -250,7 +250,7 @@ public class Snake {
         final var caloricValueOfSnake = length / 2.0; //TODO: adjust
         final var caloricValueOfFoodSpawn = Food.Size.MEDIUM.value * Food.Size.MEDIUM.value * config.foodNutritionalValue;
         final int numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
-        final double lengthUntilFoodSpawn = length / numberOfFoodSpawns;
+        final double lengthUntilFoodSpawn = length / Math.max(1, numberOfFoodSpawns);
         final double[] lastSpawn = {0};
 
         streamSnakeChunks().flatMap(chunk -> chunk.getPathData().stream())

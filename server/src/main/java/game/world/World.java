@@ -11,15 +11,15 @@ import java.util.stream.Collectors;
 
 public class World {
     private static final int FOOD_THRESHOLD = 16;
+    private static Random random = new Random();
     public final WorldChunkCollection chunks;
+    private final GameConfig config;
     public double height;
     public double width;
-    private static Random random = new Random();
-    private final GameConfig config;
 
     public World(double chunkSize, int repetitions) {
-        this.config = new GameConfig();
-        chunks = WorldChunkFactory.createChunks(this, chunkSize, repetitions, repetitions);
+        this.config = new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions));
+        chunks = WorldChunkFactory.createChunks(this);
         height = chunkSize * repetitions;
         width = chunkSize * repetitions;
     }
@@ -28,15 +28,21 @@ public class World {
         this(32.0, 16);
     }
 
-    public World(GameConfig.ChunkInfo chunkInfo) {
-        this(chunkInfo.chunkSize, chunkInfo.rows);
-    }
-
     public World(GameConfig config) {
         this.config = config;
         chunks = WorldChunkFactory.createChunks(this);
         height = config.chunkInfo.chunkSize * config.chunkInfo.rows;
         width = config.chunkInfo.chunkSize * config.chunkInfo.columns;
+    }
+
+    /**
+     * Sets the random object, useful for debugging
+     * and for deterministic tests
+     *
+     * @param random The random instance to use
+     */
+    public static void setRandom(Random random) {
+        World.random = random;
     }
 
     public Vector findSpawnPosition() {
@@ -70,16 +76,6 @@ public class World {
                 .sorted(Comparator.comparingInt(WorldChunk::getFoodCount))
                 .limit(numberOfChunksToSpawnSimultaneously)
                 .forEach(WorldChunk::addFood);
-    }
-
-    /**
-     * Sets the random object, useful for debugging
-     * and for deterministic tests
-     *
-     * @param random
-     */
-    public static void setRandom(Random random) {
-        World.random = random;
     }
 
     public GameConfig getConfig() {

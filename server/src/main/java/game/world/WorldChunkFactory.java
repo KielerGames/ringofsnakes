@@ -1,6 +1,5 @@
 package game.world;
 
-import game.GameConfig;
 import math.Vector;
 
 public class WorldChunkFactory {
@@ -8,7 +7,7 @@ public class WorldChunkFactory {
     }
 
     public static WorldChunkCollection createChunks(World world) {
-        var info = world.getConfig().chunkInfo;
+        final var info = world.getConfig().chunkInfo;
         return createChunks(world, info.chunkSize, info.rows, info.columns);
     }
 

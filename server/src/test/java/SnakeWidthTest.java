@@ -1,4 +1,3 @@
-import game.snake.Snake;
 import game.snake.SnakeFactory;
 import org.junit.jupiter.api.Test;
 
@@ -9,9 +8,11 @@ public class SnakeWidthTest {
     @Test
     void testLowerBound() {
         final var snake = SnakeFactory.createTestSnake();
+        final var config = snake.config;
+
         for (int i = 0; i < 256; i++) {
             snake.tick();
-            assertTrue(snake.getMaxWidth() >= Snake.MIN_WIDTH);
+            assertTrue(snake.getMaxWidth() >= config.snakeMinWidth);
         }
     }
 

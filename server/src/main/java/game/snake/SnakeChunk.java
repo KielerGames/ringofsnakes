@@ -3,6 +3,7 @@ package game.snake;
 import game.world.Collidable;
 import game.world.WorldChunk;
 import math.BoundingBox;
+import math.Vector;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -67,4 +68,32 @@ public abstract class SnakeChunk implements Collidable {
     public abstract void linkWorldChunk(WorldChunk worldChunk);
 
     public abstract double getOffset();
+
+    public Vector getPositionAt(double inSnakeOffset) {
+        final var inChunkOffset = inSnakeOffset - getOffset();
+        assert 0.0 <= inChunkOffset && inChunkOffset <= getLength();
+
+        // TODO: use binary search instead
+
+        double minError = Double.POSITIVE_INFINITY;
+        Vector minPoint = null;
+
+        for (final var pd : getPathData()) {
+            final var offset = pd.getOffsetInChunk();
+            final var error = Math.abs(inChunkOffset - offset);
+
+            if (error > minError) {
+                // path data list is ordered, so it's only going to get worse
+                break;
+            }
+
+            if (error < minError) {
+                minError = error;
+                minPoint = pd.point;
+            }
+        }
+
+        assert minPoint != null;
+        return minPoint;
+    }
 }

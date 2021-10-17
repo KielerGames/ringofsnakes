@@ -4,6 +4,7 @@ import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -175,5 +176,27 @@ public class SnakeChunkTest {
         snake.grow(128.0);
         snake.tick();
         assertTrue(lastChunk.isJunk());
+    }
+
+    @Test
+    void testGetPositionAtMethod() {
+        final var random = new Random(314159);
+        final var snake = SnakeFactory.createTestSnake();
+        snake.grow(64.0);
+        tickUntilNewSnakeChunk(snake, random);
+        assertTrue(snake.getSnakeChunks().size() > 1);
+
+        final var snakeChunk = snake.getSnakeChunks().get(1);
+        assertFalse(snakeChunk.isJunk());
+        assertFalse(snakeChunk.isEmpty());
+
+        final var startOffset = snakeChunk.getOffset();
+        final var endOffset = startOffset + snakeChunk.getLength();
+
+        for(var offset = startOffset; offset <= endOffset; offset += 0.05) {
+            final var point = snakeChunk.getPositionAt(offset);
+            assertNotNull(point);
+            assertEquals(0.0, snakeChunk.getBoundingBox().distance(point));
+        }
     }
 }

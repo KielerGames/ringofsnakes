@@ -110,7 +110,7 @@ public class DebugView extends Application {
             if (DRAW_TAILS) {
                 g.setFill(Color.ORANGE);
                 g.setStroke(Color.ORANGE);
-                var tailPosition = snake.getTail().point;
+                var tailPosition = snake.getTailPosition();
                 final var x = tailPosition.x;
                 final var y = tailPosition.y;
                 g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,

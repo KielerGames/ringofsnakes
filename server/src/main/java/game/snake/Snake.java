@@ -21,15 +21,15 @@ public class Snake {
 
     public final GameConfig config = new GameConfig();
     public final short id;
-    final ChainCodeCoder coder = new ChainCodeCoder(config);
+    private final ChainCodeCoder coder = new ChainCodeCoder(config);
     private final World world;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     public byte skin;
     public GrowingSnakeChunk currentChunk;
-    public boolean alive = true;
     Vector headPosition;
     float headDirection;
-    private LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
+    private boolean alive = true;
+    private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private double length = START_LENGTH;
     private short nextChunkId = 0;
     private float targetDirection;
@@ -218,6 +218,14 @@ public class Snake {
 
     public List<SnakeChunk> getSnakeChunks() {
         return streamSnakeChunks().collect(Collectors.toList());
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void kill() {
+        alive = false;
     }
 
     public Vector getTailPosition() {

@@ -33,6 +33,8 @@ export function createSnakeChunkBuffer(
 export function createGameConfig(speed: number = 0.24): GameConfig {
     return {
         snakeSpeed: speed,
+        snakeStartLength: 8,
+        snakeMinWidth: 0.5,
         fastSnakeSpeed: 2 * speed,
         maxTurnDelta: Math.PI / 30,
         tickDuration: 1.0 / 25,

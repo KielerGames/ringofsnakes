@@ -1,5 +1,7 @@
 export type GameConfig = Readonly<{
     snakeSpeed: number;
+    snakeStartLength: number;
+    snakeMinWidth: number;
     fastSnakeSpeed: number;
     maxTurnDelta: number;
     tickDuration: number;

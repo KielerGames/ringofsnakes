@@ -236,11 +236,6 @@ public class Snake {
         alive = false;
     }
 
-
-    public void remove() {
-        alive = false;
-    }
-
     public Vector getTailPosition() {
         final var lastSnakeChunk = chunks.isEmpty() ? currentChunk : chunks.getLast();
         final var sp = lastSnakeChunk.getPathData().stream()
@@ -283,6 +278,7 @@ public class Snake {
         for(int i = 0; i < numberOfFoodSpawns; i++){
             final var offset = i * lengthUntilFoodSpawn;
             final var spawnPosition = getPositionAt(offset);
+            if(spawnPosition == null) {continue;}
             spawnPosition.addScaled(new Vector(rnd.nextDouble(), rnd.nextDouble()), foodScattering);
             final var worldChunk = world.chunks.findChunk(spawnPosition); //TODO: optimization?
             final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM);

@@ -8,6 +8,8 @@ public class SnakePathPoint {
     private SnakeChunk snakeChunk;
 
     public SnakePathPoint(GrowingSnakeChunk snakeChunk, Vector point, double localPathLength) {
+        assert snakeChunk != null;
+
         this.snakeChunk = snakeChunk;
         this.point = point;
         this.localPathLength = localPathLength;
@@ -31,5 +33,10 @@ public class SnakePathPoint {
     public void setFinalSnakeChunk(FinalSnakeChunk snakeChunk) {
         assert this.snakeChunk instanceof GrowingSnakeChunk;
         this.snakeChunk = snakeChunk;
+    }
+
+    public boolean isJunk() {
+        final var offset = getOffsetInSnake();
+        return offset > snakeChunk.getSnake().getLength();
     }
 }

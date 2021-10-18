@@ -213,6 +213,7 @@ public class Snake {
 
     /**
      * Returns the (maximum) width of the snake.
+     *
      * @return width
      */
     public double getWidth() {
@@ -275,10 +276,12 @@ public class Snake {
         final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
         final var lengthUntilFoodSpawn = length / Math.max(1, numberOfFoodSpawns);
 
-        for(int i = 0; i < numberOfFoodSpawns; i++){
+        for (int i = 0; i < numberOfFoodSpawns; i++) {
             final var offset = i * lengthUntilFoodSpawn;
             final var spawnPosition = getPositionAt(offset);
-            if(spawnPosition == null) {continue;}
+            if (spawnPosition == null) {
+                continue;
+            }
             spawnPosition.addScaled(new Vector(rnd.nextDouble(), rnd.nextDouble()), foodScattering);
             final var worldChunk = world.chunks.findChunk(spawnPosition); //TODO: optimization?
             final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM);

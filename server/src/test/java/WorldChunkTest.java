@@ -1,4 +1,3 @@
-import game.snake.Snake;
 import game.snake.SnakeFactory;
 import game.world.World;
 import math.Vector;
@@ -10,12 +9,15 @@ import java.util.HashSet;
 import static game.world.WorldChunkFactory.createChunks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
 public class WorldChunkTest {
+    World world = new World();
+
     @Test
     void testNumberOfChunks() {
         int n = 4;
         int m = 4;
-        var chunks = createChunks(32.0, n, m);
+        var chunks = createChunks(world, 32.0, n, m);
 
         assertEquals(n * m, chunks.numberOfChunks());
     }
@@ -24,14 +26,14 @@ public class WorldChunkTest {
     void testNoNulls() {
         int n = 6;
         int m = 6;
-        var chunks = createChunks(16.0, n, m);
+        var chunks = createChunks(world, 16.0, n, m);
         chunks.forEach(Assertions::assertNotNull);
     }
 
     @Test
     void testNeighbors() {
         int m = 4;
-        var chunks = createChunks(32.0, m, m);
+        var chunks = createChunks(world, 32.0, m, m);
 
         int n = chunks.numberOfChunks();
 
@@ -61,4 +63,6 @@ public class WorldChunkTest {
                 .findFirst()
                 .orElseThrow();
     }
+
+
 }

@@ -143,6 +143,11 @@ public class Game {
             bots.removeIf(Predicate.not(Bot::isAlive));
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
+        executor.scheduleAtFixedRate(() -> {
+            final var topTen = new TopNList(this, 10);
+            System.out.println(topTen);
+        }, 10, 10, TimeUnit.SECONDS);
+
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
 
@@ -205,6 +210,8 @@ public class Game {
             s.kill();
         }
     }
+
+
 
     public void stop() {
         this.executor.shutdown();

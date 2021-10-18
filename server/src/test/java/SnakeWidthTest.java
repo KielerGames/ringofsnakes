@@ -12,7 +12,7 @@ public class SnakeWidthTest {
 
         for (int i = 0; i < 256; i++) {
             snake.tick();
-            assertTrue(snake.getMaxWidth() >= config.snakeMinWidth);
+            assertTrue(snake.getWidth() >= config.snakeMinWidth);
         }
     }
 
@@ -24,7 +24,7 @@ public class SnakeWidthTest {
 
             for (double t = 0.0; t <= 1.0; t += 0.01) {
                 final var width = snake.getWidthAt(t * snake.getLength());
-                assertTrue(width <= snake.getMaxWidth());
+                assertTrue(width <= snake.getWidth());
             }
         }
     }
@@ -37,7 +37,7 @@ public class SnakeWidthTest {
             snake.tick();
         }
 
-        var lastWidth = snake.getMaxWidth();
+        var lastWidth = snake.getWidth();
 
         for (double t = 0.0; t <= 1.0; t += 0.01) {
             final var width = snake.getWidthAt(t * snake.getLength());
@@ -51,11 +51,11 @@ public class SnakeWidthTest {
     void testGrowingSnake() {
         final var snake = SnakeFactory.createTestSnake();
         snake.tick();
-        var startWidth = snake.getMaxWidth();
+        var startWidth = snake.getWidth();
 
         for (int i = 0; i < 64; i++) {
             snake.tick();
-            assertEquals(startWidth, snake.getMaxWidth(), 1e-6);
+            assertEquals(startWidth, snake.getWidth(), 1e-6);
         }
 
         snake.grow(64.0);
@@ -64,9 +64,9 @@ public class SnakeWidthTest {
         snake.tick();
         int growingTicks = 0;
 
-        while (snake.getMaxWidth() > lastWidth) {
+        while (snake.getWidth() > lastWidth) {
             snake.tick();
-            lastWidth = snake.getMaxWidth();
+            lastWidth = snake.getWidth();
             growingTicks++;
         }
 

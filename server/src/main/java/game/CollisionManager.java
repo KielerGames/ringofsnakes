@@ -25,8 +25,8 @@ public class CollisionManager {
     private static boolean collidesWithSnakeChunk(Snake snake, SnakeChunk snakeChunk) {
         final var otherSnake = snakeChunk.getSnake();
         final var otherSnakeLength = otherSnake.getLength();
-        final var radius1 = 0.5 * snake.getMaxWidth();
-        final var radius2 = 0.5 * otherSnake.getMaxWidth();
+        final var radius1 = 0.5 * snake.getWidth();
+        final var radius2 = 0.5 * otherSnake.getWidth();
         final var collisionBound = (radius1 + radius2) * (radius1 + radius2);
         final var headPosition = snake.getHeadPosition();
 
@@ -57,7 +57,7 @@ public class CollisionManager {
                 continue;
             }
 
-            final var snakeRadius = snake.getMaxWidth() / 2.0;
+            final var snakeRadius = snake.getWidth() / 2.0;
             final var headPosition = snake.getHeadPosition();
             final var snakeChunksToConsider = getNearbySnakeChunks(snake);
 
@@ -66,7 +66,7 @@ public class CollisionManager {
                     .filter(snakeChunk ->
                             snakeChunk.getBoundingBox().isWithinRange(
                                     headPosition,
-                                    snakeRadius + 0.5 * snakeChunk.getSnake().getMaxWidth()
+                                    snakeRadius + 0.5 * snakeChunk.getSnake().getWidth()
                             )
                     )
                     .filter(snakeChunk -> collidesWithSnakeChunk(snake, snakeChunk))

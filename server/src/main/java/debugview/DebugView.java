@@ -93,7 +93,7 @@ public class DebugView extends Application {
                 }
             }
 
-            final var snakeSize = snake.getMaxWidth();
+            final var snakeSize = snake.getWidth();
             final var snakeLength = snake.getLength();
 
             snake.streamSnakeChunks()

@@ -17,9 +17,9 @@ public class Food {
     public final byte color;
     private final byte byteX, byteY;
 
-    public Food(Vector position, WorldChunk chunk) {
+    public Food(Vector position, WorldChunk chunk, Size size) {
         this.color = (byte) rand.nextInt(64);
-        this.size = Size.SMALL;
+        this.size = size;
         var px = (position.x - chunk.box.minX) / chunk.box.getWidth();
         var py = (position.y - chunk.box.minY) / chunk.box.getHeight();
         this.byteX = ByteUtilities.fromNormalizedDoubleToByte(px);

@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,6 +17,7 @@ public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
     public static final double MAX_WIDTH_GAIN = 4f;
     public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
+    private static final Random rnd = new Random();
 
     public final GameConfig config = new GameConfig();
     public final short id;
@@ -39,6 +41,9 @@ public class Snake {
     Snake(short id, World world) {
         this.id = id;
         this.world = world;
+        final var config = world.getConfig();
+        length = config.snakeStartLength;
+        maxWidth = config.snakeMinWidth;
     }
 
     private static double computeMaxWidthFromLength(double length, GameConfig config) {

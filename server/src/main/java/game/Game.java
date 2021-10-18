@@ -14,6 +14,7 @@ import server.Client;
 import server.Player;
 import server.protocol.SnakeDeathInfo;
 import server.protocol.SpawnInfo;
+import server.protocol.TopNList;
 import util.ExceptionalExecutorService;
 
 import javax.websocket.Session;
@@ -144,8 +145,9 @@ public class Game {
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
-            final var topTen = new TopNList(this, 10);
-            System.out.println(topTen);
+            final var topTen = gson.toJson(new TopNList(this, 10));
+            System.out.println("Highscore: " + topTen);
+            clients.forEach((sId, client) -> client.send(topTen));
         }, 10, 10, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));

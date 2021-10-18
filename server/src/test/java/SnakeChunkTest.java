@@ -194,9 +194,9 @@ public class SnakeChunkTest {
         final var endOffset = startOffset + snakeChunk.getLength();
 
         for(var offset = startOffset; offset <= endOffset; offset += 0.05) {
-            final var point = snakeChunk.getPositionAt(offset);
+            final var point = snake.getPositionAt(offset);
             assertNotNull(point);
-            assertEquals(0.0, snakeChunk.getBoundingBox().distance(point));
+            assertEquals(0.0, snakeChunk.getBoundingBox().distance(point), 1e-4);
         }
     }
 }

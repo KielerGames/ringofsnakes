@@ -240,4 +240,19 @@ public class Snake {
         }
         return headPosition.clone();
     }
+
+    public Vector getPositionAt(double offset) {
+        final var chunk = streamSnakeChunks()
+                .filter(snakeChunk -> {
+                    final var sco = snakeChunk.getOffset();
+                    return sco <= offset && offset <= sco + snakeChunk.getLength();
+                })
+                .findFirst();
+
+        if (chunk.isEmpty()) {
+            return null;
+        }
+
+        return chunk.get().getPositionAt(offset);
+    }
 }

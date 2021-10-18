@@ -10,7 +10,7 @@ export default class TopNList {
     }
 
     public printToConsole = () => {
-        console.log("Printing highscore: ")
+        console.log("Printing highscore: ");
 
         var i : number = 0;
         this.ids.forEach(id  => {

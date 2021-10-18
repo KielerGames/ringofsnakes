@@ -70,8 +70,8 @@ public class Vector implements Cloneable {
     }
 
     public void addScaled(Vector v, double s) {
-        this.x = s * v.x;
-        this.y = s * v.y;
+        this.x += s * v.x;
+        this.y += s * v.y;
     }
 
     @Override

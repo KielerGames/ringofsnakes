@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,6 +17,7 @@ public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
     public static final double MAX_WIDTH_GAIN = 4f;
     public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
+    private static final Random rnd = new Random();
 
     public final GameConfig config = new GameConfig();
     public final short id;
@@ -171,7 +173,7 @@ public class Snake {
     private void spawnFoodAtTailPosition() {
         final var tailPosition = getTailPosition();
         final var worldChunk = world.chunks.findChunk(tailPosition);
-        Food f = new Food(tailPosition, worldChunk);
+        Food f = new Food(tailPosition, worldChunk, Food.Size.SMALL);
         worldChunk.addFood(f);
     }
 
@@ -211,6 +213,7 @@ public class Snake {
 
     /**
      * Returns the (maximum) width of the snake.
+     *
      * @return width
      */
     public double getWidth() {
@@ -230,6 +233,7 @@ public class Snake {
     }
 
     public void kill() {
+        recycleSnake();
         alive = false;
     }
 
@@ -258,5 +262,30 @@ public class Snake {
         }
 
         return chunk.get().getPositionAt(offset);
+    }
+
+
+    private void recycleSnake() {
+        //TODO:
+        // - consider spawning larger food items for larger snakes
+        // - possible performance optimization by calling findChunk only once per snakeChunk
+        // - fine adjust food value per dead snake
+        final var foodScattering = 1.0;
+        final var caloricValueOfSnake = length / 2.0; //TODO: adjust
+        final var caloricValueOfFoodSpawn = Food.Size.MEDIUM.value * Food.Size.MEDIUM.value * config.foodNutritionalValue;
+        final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
+        final var lengthUntilFoodSpawn = length / Math.max(1, numberOfFoodSpawns);
+
+        for (int i = 0; i < numberOfFoodSpawns; i++) {
+            final var offset = i * lengthUntilFoodSpawn;
+            final var spawnPosition = getPositionAt(offset);
+            if (spawnPosition == null) {
+                continue;
+            }
+            spawnPosition.addScaled(new Vector(rnd.nextDouble(), rnd.nextDouble()), foodScattering);
+            final var worldChunk = world.chunks.findChunk(spawnPosition); //TODO: optimization?
+            final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM);
+            worldChunk.addFood(food);
+        }
     }
 }

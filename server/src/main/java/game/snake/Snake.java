@@ -33,7 +33,7 @@ public class Snake {
     private float targetDirection;
     private boolean fast = false;
     private double lengthBuffer = 0;
-    private double maxWidth; // TODO @tim-we rename to something less confusing
+    private double width;
     private float foodTrailBuffer = 0f;
 
     Snake(short id, World world) {
@@ -41,7 +41,7 @@ public class Snake {
         this.world = world;
         final var config = world.getConfig();
         length = config.snakeStartLength;
-        maxWidth = config.snakeMinWidth;
+        width = config.snakeMinWidth;
     }
 
     private static double computeMaxWidthFromLength(double length, GameConfig config) {
@@ -87,7 +87,7 @@ public class Snake {
         }
 
         // update width
-        maxWidth = computeMaxWidthFromLength(length, config);
+        width = computeMaxWidthFromLength(length, config);
 
         // update chunks
         currentChunk.append(encDirDelta, fast);
@@ -199,18 +199,22 @@ public class Snake {
         final var thinningStart = Math.min(0.75, length * 0.025) * length;
 
         if (offset <= thinningStart) {
-            return maxWidth;
+            return width;
         }
 
         // thinning parameter: 0 -> thinning start, 1 -> snake end
         final var t = (offset - thinningStart) / (length - thinningStart);
 
         final var thinningFactor = 1.0 - (t * t * t);
-        return thinningFactor * maxWidth;
+        return thinningFactor * width;
     }
 
-    public double getMaxWidth() {
-        return maxWidth;
+    /**
+     * Returns the (maximum) width of the snake.
+     * @return width
+     */
+    public double getWidth() {
+        return width;
     }
 
     public Stream<SnakeChunk> streamSnakeChunks() {
@@ -239,5 +243,20 @@ public class Snake {
             return sp.get().point;
         }
         return headPosition.clone();
+    }
+
+    public Vector getPositionAt(double offset) {
+        final var chunk = streamSnakeChunks()
+                .filter(snakeChunk -> {
+                    final var sco = snakeChunk.getOffset();
+                    return sco <= offset && offset <= sco + snakeChunk.getLength();
+                })
+                .findFirst();
+
+        if (chunk.isEmpty()) {
+            return null;
+        }
+
+        return chunk.get().getPositionAt(offset);
     }
 }

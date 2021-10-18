@@ -236,6 +236,11 @@ public class Snake {
         alive = false;
     }
 
+
+    public void remove() {
+        alive = false;
+    }
+
     public Vector getTailPosition() {
         final var lastSnakeChunk = chunks.isEmpty() ? currentChunk : chunks.getLast();
         final var sp = lastSnakeChunk.getPathData().stream()
@@ -274,7 +279,6 @@ public class Snake {
         final var caloricValueOfFoodSpawn = Food.Size.MEDIUM.value * Food.Size.MEDIUM.value * config.foodNutritionalValue;
         final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
         final var lengthUntilFoodSpawn = length / Math.max(1, numberOfFoodSpawns);
-        final double[] lastSpawn = {0};
 
         for(int i = 0; i < numberOfFoodSpawns; i++){
             final var offset = i * lengthUntilFoodSpawn;

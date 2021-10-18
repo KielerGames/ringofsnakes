@@ -85,7 +85,7 @@ public class Game {
                 clients.put(session.getId(), player);
             }
             player.sendSync(gson.toJson(new SpawnInfo(config, snake)));
-            executor.schedule(() -> addBotsNextToPlayer(player, 5, 2), 1, TimeUnit.SECONDS);
+            executor.schedule(() -> addBotsRandomly(50), 1, TimeUnit.SECONDS);
             return player;
         });
     }
@@ -202,7 +202,7 @@ public class Game {
     private void killDesertingSnakes(Snake s) {
         if (Math.abs(s.getHeadPosition().x) > world.width / 2.0 - 3 || Math.abs(s.getHeadPosition().y) > world.height / 2.0 - 3) {
             System.out.println("Removing Snake " + s.id + " from Game, because it is leaving the map.");
-            s.kill();
+            s.remove();
         }
     }
 

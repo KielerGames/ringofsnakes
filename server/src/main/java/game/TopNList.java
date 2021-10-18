@@ -13,7 +13,7 @@ public class TopNList {
 
     Gson gson = new Gson();
 
-    public TopNList(Game game, int n){
+    public TopNList(Game game, int n) {
         final var length = Math.min(n, game.snakes.size());
         ids = new short[length];
         scores = new int[length];
@@ -24,9 +24,9 @@ public class TopNList {
 
         int i = 0;
         for (Snake snake : topSnakes) {
-            if(i < n) {
+            if (i < n) {
                 ids[i] = snake.id;
-                scores[i]= (int) snake.getLength();
+                scores[i] = (int) snake.getLength();
             }
             i++;
         }

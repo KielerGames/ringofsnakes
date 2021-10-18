@@ -276,16 +276,13 @@ public class Snake {
         final var lengthUntilFoodSpawn = length / Math.max(1, numberOfFoodSpawns);
         final double[] lastSpawn = {0};
 
-        streamSnakeChunks().flatMap(chunk -> chunk.getPathData().stream())
-                .forEach(spp -> {
-                    if (spp.getOffsetInSnake() < length && spp.getOffsetInSnake() > lastSpawn[0] + lengthUntilFoodSpawn) {
-                        final var spawnPosition = spp.point;
-                        spawnPosition.addScaled(new Vector(rnd.nextDouble(), rnd.nextDouble()), foodScattering);
-                        final var worldChunk = world.chunks.findChunk(spawnPosition); //TODO: optimization?
-                        final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM);
-                        worldChunk.addFood(food);
-                        lastSpawn[0] = spp.getOffsetInSnake();
-                    }
-                });
+        for(int i = 0; i < numberOfFoodSpawns; i++){
+            final var offset = i * lengthUntilFoodSpawn;
+            final var spawnPosition = getPositionAt(offset);
+            spawnPosition.addScaled(new Vector(rnd.nextDouble(), rnd.nextDouble()), foodScattering);
+            final var worldChunk = world.chunks.findChunk(spawnPosition); //TODO: optimization?
+            final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM);
+            worldChunk.addFood(food);
+        }
     }
 }

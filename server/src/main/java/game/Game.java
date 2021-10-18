@@ -85,7 +85,7 @@ public class Game {
                 clients.put(session.getId(), player);
             }
             player.sendSync(gson.toJson(new SpawnInfo(config, snake)));
-            executor.schedule(() -> addBotsRandomly(25), 1, TimeUnit.SECONDS);
+            executor.schedule(() -> addBotsNextToPlayer(player, 5, 2), 1, TimeUnit.SECONDS);
             return player;
         });
     }

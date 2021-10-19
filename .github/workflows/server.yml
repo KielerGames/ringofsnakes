@@ -14,32 +14,38 @@ on:
     paths:
       - "server/src/**"
       - "server.pom.xml"
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.14
-    - name: Cache Maven packages
-      uses: actions/cache@v2.1.4
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
-    - name: Build & run tests with Maven
-      run: mvn -B test --file pom.xml
-      working-directory: server
-    - name: Create Uber Jar
-      run: mvn -B package --file pom.xml
-      working-directory: server
-    - name: Upload Uber Jar
-      uses: actions/upload-artifact@v2
-      with:
-        name: server-uber-jar
-        path: server/snake-server-*.jar
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.14
+
+      - name: Cache Maven packages
+        uses: actions/cache@v2.1.4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build & run tests with Maven
+        run: mvn -B test --file pom.xml
+        working-directory: server
+
+      - name: Create Uber Jar
+        run: mvn -B package --file pom.xml
+        working-directory: server
+
+      - name: Upload Uber Jar
+        uses: actions/upload-artifact@v2
+        with:
+          name: server-uber-jar
+          path: server/snake-server-*.jar

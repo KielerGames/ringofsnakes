@@ -74,6 +74,12 @@ public class Vector implements Cloneable {
         this.y += s * v.y;
     }
 
+    public void normalize(){
+        var length = distance(this, new Vector(0, 0));
+        this.x = x/length;
+        this.y = y/length;
+    }
+
     @Override
     public Vector clone() {
         try {

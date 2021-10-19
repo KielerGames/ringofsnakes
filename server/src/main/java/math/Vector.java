@@ -74,10 +74,10 @@ public class Vector implements Cloneable {
         this.y += s * v.y;
     }
 
-    public void normalize(){
-        var length = distance(this, new Vector(0, 0));
-        this.x = x/length;
-        this.y = y/length;
+    public void normalize() {
+        final var s = 1.0 / distance(this, ORIGIN);
+        this.x = s * x;
+        this.y = s * y;
     }
 
     @Override

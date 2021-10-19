@@ -10,7 +10,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import math.Vector;
+import server.Player;
 import server.SnakeServer;
+
+import java.util.OptionalInt;
 
 
 public class DebugView extends Application {
@@ -37,10 +40,6 @@ public class DebugView extends Application {
         System.exit(0);
     }
 
-    public static void setGame(Game g) {
-        game = g;
-    }
-
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("SnakeRoyal Debug GUI");
@@ -58,10 +57,12 @@ public class DebugView extends Application {
 
                 if (game != null && game.snakes.size() != 0) {
                     synchronized (game) {
-                        drawSnakes(ctx);
+                        final var playerId = game.streamClients().filter(Player.class::isInstance).mapToInt(p -> ((Player) p).snake.id).findFirst();
+
+                        drawSnakes(ctx, playerId);
                         drawFood(ctx);
                         drawCurrentWorldChunk(ctx);
-                        drawSnakeChunksBoundingBoxes(ctx);
+                        drawSnakeChunksBoundingBoxes(ctx, playerId);
                     }
                 }
             }
@@ -81,11 +82,11 @@ public class DebugView extends Application {
         }));
     }
 
-    private void drawSnakes(GraphicsContext g) {
+    private void drawSnakes(GraphicsContext g, OptionalInt playerId) {
         game.snakes.forEach(snake -> {
             g.setFill(Color.BLACK);
             g.setStroke(Color.BLACK);
-            if (snake.id == 0) {
+            if (playerId.isPresent() && snake.id == playerId.getAsInt()) {
                 g.setFill(Color.BLUE);
                 g.setStroke(Color.BLUE);
                 if (FOLLOW_PLAYER) {
@@ -136,7 +137,7 @@ public class DebugView extends Application {
         }
     }
 
-    private void drawSnakeChunksBoundingBoxes(GraphicsContext g) {
+    private void drawSnakeChunksBoundingBoxes(GraphicsContext g, OptionalInt playerId) {
         game.world.chunks.forEach(chunk -> chunk.streamSnakeChunks()
                 .forEach(snakeChunk -> {
                     var boundingBox = snakeChunk.getBoundingBox();
@@ -145,7 +146,7 @@ public class DebugView extends Application {
                     var height = boundingBox.getHeight();
                     var width = boundingBox.getWidth();
                     g.setFill(Color.TRANSPARENT);
-                    if (snakeChunk.getSnake().id == 0) {
+                    if (playerId.isPresent() && snakeChunk.getSnake().id == playerId.getAsInt()) {
                         g.setStroke(Color.BLUE);
                     } else {
                         g.setStroke(Color.BLACK);

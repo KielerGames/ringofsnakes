@@ -3,6 +3,7 @@ package game.world;
 import game.GameConfig;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
+import math.BoundingBox;
 import math.Vector;
 
 import java.util.Comparator;
@@ -14,14 +15,12 @@ public class World {
     private static Random random = new Random();
     public final WorldChunkCollection chunks;
     private final GameConfig config;
-    public double height;
-    public double width;
+    public BoundingBox box;
 
     public World(double chunkSize, int repetitions) {
         this.config = new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions));
         chunks = WorldChunkFactory.createChunks(this);
-        height = chunkSize * repetitions;
-        width = chunkSize * repetitions;
+        box = new BoundingBox(new Vector(0, 0), chunkSize * repetitions, chunkSize * repetitions);
     }
 
     public World() {
@@ -31,8 +30,7 @@ public class World {
     public World(GameConfig config) {
         this.config = config;
         chunks = WorldChunkFactory.createChunks(this);
-        height = config.chunkInfo.chunkSize * config.chunkInfo.rows;
-        width = config.chunkInfo.chunkSize * config.chunkInfo.columns;
+        box = new BoundingBox(new Vector(0, 0), config.chunkInfo.chunkSize * config.chunkInfo.columns, config.chunkInfo.chunkSize * config.chunkInfo.rows);
     }
 
     /**

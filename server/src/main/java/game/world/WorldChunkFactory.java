@@ -73,7 +73,7 @@ public class WorldChunkFactory {
                     TODO: Fix this somehow.
                      */
                     System.out.println("Point out of bound Exception in WorldChunkFactory.");
-                    throw new IllegalArgumentException("Point is out of bounds.");
+                    throw new IllegalArgumentException("Point is out of bounds. " + point);
                 }
 
                 return getIndex(y, x, columns);

@@ -12,6 +12,7 @@ public final class GameConfig {
     public final double snakeMinWidth = 0.5;
     public final double foodNutritionalValue = 1.0;
     public final double foodConversionEfficiency = 0.5;
+    public final int targetSnakePopulation = 32;
 
     public GameConfig() {
         this(new ChunkInfo(32.0, 16));

@@ -23,8 +23,8 @@ public class StupidBot extends Bot {
 
     @Override
     public void act() {
-        Snake snake = this.getSnake();
-        float turningRate = (float) Math.PI / 120;
+        var snake = this.getSnake();
+        var turningRate = (float) Math.PI / 120;
 
         if (Math.abs(snake.getHeadPosition().x) > getWorldWidth() / 2.0 - keepThisDistanceToMapEdge
                 || (Math.abs(snake.getHeadPosition().y) > getWorldHeight() / 2.0 - keepThisDistanceToMapEdge)) {
@@ -58,7 +58,7 @@ public class StupidBot extends Bot {
 
     private void moveTowardsPosition(Snake snake, Vector targetPosition) {
         if (!this.movingToPoint) {
-            Vector targetDirection = determineTargetDirection(snake.getHeadPosition(), targetPosition);
+            var targetDirection = determineTargetDirection(snake.getHeadPosition(), targetPosition);
             var directionAlpha = (float) Math.atan2(targetDirection.y, targetDirection.x);
             snake.setTargetDirection(directionAlpha);
         }
@@ -68,7 +68,6 @@ public class StupidBot extends Bot {
         var direction = targetPosition.clone();
         direction.addScaled(headPosition, -1);
         direction.normalize();
-        //System.out.println("direction: x = " + direction.x + ", y = " + direction.y);
         return direction;
     }
 

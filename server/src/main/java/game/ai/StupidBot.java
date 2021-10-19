@@ -2,6 +2,7 @@ package game.ai;
 
 import game.Game;
 import game.snake.Snake;
+import game.world.World;
 import math.Vector;
 
 import java.util.Random;
@@ -10,6 +11,7 @@ public class StupidBot extends Bot {
 
     private final static Random random = new Random();
     private final double keepThisDistanceToMapEdge = 40;
+    private final World world;
 
     private boolean turnClockwise = true;
     private boolean movingToPosition = false;
@@ -18,19 +20,20 @@ public class StupidBot extends Bot {
     private int changeDirectionAtCounter = 120;
     private int stepsTakenTowardsPositions = 0; //a "step" is a call of act()
 
+
     private float alpha = (float) -Math.PI;
+    private float turningRate = (float) Math.PI / 120;
 
     public StupidBot(Game game, Vector spawnPosition) {
         super(game, spawnPosition);
+        this.world = game.world;
     }
 
     @Override
     public void act() {
         final var snake = this.getSnake();
-        final var turningRate = (float) Math.PI / 120;
 
-        if (Math.abs(snake.getHeadPosition().x) > getWorldWidth() / 2.0 - keepThisDistanceToMapEdge
-                || (Math.abs(snake.getHeadPosition().y) > getWorldHeight() / 2.0 - keepThisDistanceToMapEdge)) {
+        if (!world.box.isWithinSubBox(snake.getHeadPosition(), keepThisDistanceToMapEdge)) {
             moveTowardsPosition(snake, new Vector(0, 0));
             movingToPosition = true;
         }
@@ -52,6 +55,7 @@ public class StupidBot extends Bot {
 
         if (counter > changeDirectionAtCounter) {
             turnClockwise = random.nextBoolean();
+            turningRate = (float) Math.PI / 60 * random.nextFloat();
             changeDirectionAtCounter = 60 + random.nextInt(120);
             counter = 0;
         }

@@ -21,6 +21,6 @@ export type SnakeDeathInfo = Readonly<{
 
 export type TopNList = Readonly<{
     tag: "TopNList";
-    ids: Array<number>;
-    scores: Array<number>;
+    ids: number[];
+    scores: number[];
 }>;

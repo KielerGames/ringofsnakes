@@ -1,10 +1,8 @@
-
-
 export default class TopNList {
-    public readonly ids: Array<number>
-    public readonly scores: Array<number>;
+    public readonly ids: number[];
+    public readonly scores: number[];
 
-    public constructor(ids : Array<number>, scores : Array<number>) {
+    public constructor(ids: Array<number>, scores: Array<number>) {
         this.ids = ids;
         this.scores = scores;
     }
@@ -12,11 +10,10 @@ export default class TopNList {
     public printToConsole = () => {
         console.log("Printing highscore: ");
 
-        var i : number = 0;
-        this.ids.forEach(id  => {
-            console.log("id = " + id + ", score = " + this.scores[i]); 
+        let i: number = 0;
+        this.ids.forEach((id) => {
+            console.log("id = " + id + ", score = " + this.scores[i]);
             i++;
         });
-    }
-
+    };
 }

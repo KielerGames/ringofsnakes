@@ -8,14 +8,17 @@ import java.util.Random;
 
 public class StupidBot extends Bot {
 
-    private static Random random = new Random();
-    private float alpha = (float) -Math.PI;
-    private int counter = 1;
-    private boolean turnClockwise = true;
-    private int changeDirectionAtCounter = 120;
-    private boolean movingToPoint = false;
-    private int stepsTakenTowardsPoint = 0;
+    private final static Random random = new Random();
     private final double keepThisDistanceToMapEdge = 40;
+
+    private boolean turnClockwise = true;
+    private boolean movingToPosition = false;
+
+    private int counter = 1;
+    private int changeDirectionAtCounter = 120;
+    private int stepsTakenTowardsPositions = 0; //a "step" is a call of act()
+
+    private float alpha = (float) -Math.PI;
 
     public StupidBot(Game game, Vector spawnPosition) {
         super(game, spawnPosition);
@@ -23,20 +26,20 @@ public class StupidBot extends Bot {
 
     @Override
     public void act() {
-        var snake = this.getSnake();
-        var turningRate = (float) Math.PI / 120;
+        final var snake = this.getSnake();
+        final var turningRate = (float) Math.PI / 120;
 
         if (Math.abs(snake.getHeadPosition().x) > getWorldWidth() / 2.0 - keepThisDistanceToMapEdge
                 || (Math.abs(snake.getHeadPosition().y) > getWorldHeight() / 2.0 - keepThisDistanceToMapEdge)) {
             moveTowardsPosition(snake, new Vector(0, 0));
-            movingToPoint = true;
+            movingToPosition = true;
         }
 
-        if (movingToPoint) {
-            stepsTakenTowardsPoint++;
-            if (stepsTakenTowardsPoint > 50) {
-                movingToPoint = false;
-                stepsTakenTowardsPoint = 0;
+        if (movingToPosition) {
+            stepsTakenTowardsPositions++;
+            if (stepsTakenTowardsPositions > 50) {
+                movingToPosition = false;
+                stepsTakenTowardsPositions = 0;
             }
             return;
         }
@@ -57,15 +60,15 @@ public class StupidBot extends Bot {
     }
 
     private void moveTowardsPosition(Snake snake, Vector targetPosition) {
-        if (!this.movingToPoint) {
-            var targetDirection = determineTargetDirection(snake.getHeadPosition(), targetPosition);
-            var directionAlpha = (float) Math.atan2(targetDirection.y, targetDirection.x);
+        if (!this.movingToPosition) {
+            final var targetDirection = determineTargetDirection(snake.getHeadPosition(), targetPosition);
+            final var directionAlpha = (float) Math.atan2(targetDirection.y, targetDirection.x);
             snake.setTargetDirection(directionAlpha);
         }
     }
 
     private Vector determineTargetDirection(Vector headPosition, Vector targetPosition) {
-        var direction = targetPosition.clone();
+        final var direction = targetPosition.clone();
         direction.addScaled(headPosition, -1);
         direction.normalize();
         return direction;

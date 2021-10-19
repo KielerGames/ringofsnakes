@@ -26,15 +26,15 @@ public class StupidBot extends Bot {
         Snake snake = this.getSnake();
         float turningRate = (float) Math.PI / 120;
 
-        if(Math.abs(snake.getHeadPosition().x) > getWorldWidth()/2.0 - keepThisDistanceToMapEdge
-        || (Math.abs(snake.getHeadPosition().y) > getWorldHeight()/2.0 - keepThisDistanceToMapEdge) ){
+        if (Math.abs(snake.getHeadPosition().x) > getWorldWidth() / 2.0 - keepThisDistanceToMapEdge
+                || (Math.abs(snake.getHeadPosition().y) > getWorldHeight() / 2.0 - keepThisDistanceToMapEdge)) {
             moveTowardsPosition(snake, new Vector(0, 0));
             movingToPoint = true;
         }
 
-        if(movingToPoint){
+        if (movingToPoint) {
             stepsTakenTowardsPoint++;
-            if(stepsTakenTowardsPoint > 50){
+            if (stepsTakenTowardsPoint > 50) {
                 movingToPoint = false;
                 stepsTakenTowardsPoint = 0;
             }
@@ -57,16 +57,16 @@ public class StupidBot extends Bot {
     }
 
     private void moveTowardsPosition(Snake snake, Vector targetPosition) {
-        if(!this.movingToPoint){
-        Vector targetDirection = determineTargetDirection(snake.getHeadPosition(), targetPosition);
-        var directionAlpha = (float) Math.atan2(targetDirection.y, targetDirection.x);
-        snake.setTargetDirection(directionAlpha);
+        if (!this.movingToPoint) {
+            Vector targetDirection = determineTargetDirection(snake.getHeadPosition(), targetPosition);
+            var directionAlpha = (float) Math.atan2(targetDirection.y, targetDirection.x);
+            snake.setTargetDirection(directionAlpha);
         }
     }
 
     private Vector determineTargetDirection(Vector headPosition, Vector targetPosition) {
         var direction = targetPosition.clone();
-        direction.addScaled(headPosition , -1);
+        direction.addScaled(headPosition, -1);
         direction.normalize();
         //System.out.println("direction: x = " + direction.x + ", y = " + direction.y);
         return direction;

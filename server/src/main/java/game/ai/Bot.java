@@ -26,7 +26,7 @@ public abstract class Bot {
         return snake.isAlive();
     }
 
-    public double getWorldHeight(){
+    public double getWorldHeight() {
         return this.worldHeight;
     }
 

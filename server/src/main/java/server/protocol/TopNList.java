@@ -17,7 +17,7 @@ public class TopNList extends ServerToClientJSONMessage{
 
         final var topSnakes = game.snakes.stream().filter(Snake::isAlive)
                 .sorted(Comparator.comparing(Snake::getLength)
-                        .reversed()).collect(Collectors.toList());
+                        .reversed()).limit(length).collect(Collectors.toList());
 
         int i = 0;
         for (Snake snake : topSnakes) {

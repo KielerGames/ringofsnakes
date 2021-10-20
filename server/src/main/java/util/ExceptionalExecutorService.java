@@ -7,10 +7,11 @@ import java.util.function.Consumer;
 
 public class ExceptionalExecutorService implements ScheduledExecutorService {
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    private Consumer<Exception> exceptionHandler = (exception) -> {
-        System.err.println("A " + exception.getClass().getSimpleName() + " was thrown in a scheduled task.");
-        exception.printStackTrace();
-    };
+    private Consumer<Exception> exceptionHandler;
+
+    public void onExceptionDo(Consumer<Exception> exceptionHandler) {
+        this.exceptionHandler = exceptionHandler;
+    }
 
     private Runnable createExceptionalRunnable(Runnable runnable) {
         return () -> {
@@ -18,7 +19,9 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
                 runnable.run();
             } catch (Exception e) {
                 executor.shutdown();
-                exceptionHandler.accept(e);
+                if(exceptionHandler != null) {
+                    exceptionHandler.accept(e);
+                }
             }
         };
     }

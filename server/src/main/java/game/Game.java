@@ -59,6 +59,10 @@ public class Game {
         this.config = config;
         this.world = world;
         executor = new ExceptionalExecutorService();
+        executor.onExceptionDo((exception) -> {
+            exception.printStackTrace();
+            System.exit(1);
+        });
         collisionManager = new CollisionManager(this);
         collisionManager.onCollisionDo(this::onCollision);
     }

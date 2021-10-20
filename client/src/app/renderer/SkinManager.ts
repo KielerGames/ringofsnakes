@@ -43,7 +43,7 @@ const skinData: Uint8Array = (() => {
 
     skins.forEach((skin, index) => {
         const i1 = 4 * index;
-        const i2 = (data.length / 2) + i1;
+        const i2 = data.length / 2 + i1;
 
         data[i1] = skin.snakeBody[0];
         data[i1 + 1] = skin.snakeBody[1];
@@ -67,22 +67,25 @@ export function init(glCtx: WebGLRenderingContext): void {
 
     texture = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+
+    // I do not know why but for textures
+    // with height > 1 RGB does not work
+    const format = gl.RGBA;
 
     gl.texImage2D(
         gl.TEXTURE_2D,
         0, // mipmap level
-        gl.RGBA,
+        format,
         skins.length, // width
         2, // height
         0,
-        gl.RGBA,
+        format,
         gl.UNSIGNED_BYTE,
         skinData
     );
-
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 }
 
 export function setSkinTexture(
@@ -94,5 +97,5 @@ export function setSkinTexture(
 
 export function getSnakeColor(skinId: number): Color {
     // @ts-ignore
-    return skins[skinId % skins.length].snakeBody.map(v => v/255);
+    return skins[skinId % skins.length].snakeBody.map((v) => v / 255);
 }

@@ -73,7 +73,7 @@ function createGPUData(
     for (let fi = 0; fi < items.length; fi++) {
         const f = items[fi];
         const offset = fi * floatsPerFood;
-        const color = (f.color % 4) / 3;
+        const color = (f.color % 6) / 6 + (0.5/6);
 
         for (let bi = 0; bi < boxCoords.length; bi++) {
             const [u, v] = boxCoords[bi];

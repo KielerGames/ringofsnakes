@@ -5,6 +5,7 @@ import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
 import * as FoodRenderer from "./FoodRenderer";
 import * as BoxRenderer from "./BoxRenderer";
 import * as BufferManager from "../webgl/BufferManager";
+import * as SkinManager from "./SkinManager";
 
 let gl: WebGLRenderingContext;
 
@@ -32,6 +33,7 @@ export function init(parentNode: HTMLElement = document.body): void {
     SnakeChunkRenderer.init(gl);
     SnakeHeadRenderer.init(gl);
     FoodRenderer.init(gl);
+    SkinManager.init(gl);
 
     if (__DEBUG__) {
         BoxRenderer.init(gl);
@@ -54,6 +56,8 @@ export function render(
     const transform = camera.getTransformMatrix(canvas.width, canvas.height);
 
     const pTime = data.timeSinceLastUpdate(time);
+
+    SkinManager.setSkinTexture(gl.TEXTURE0);
 
     FoodRenderer.render(data.getFoodChunks(), data.targetSnake, transform);
 

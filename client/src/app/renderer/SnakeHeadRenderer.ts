@@ -5,7 +5,6 @@ import * as SkinManager from "./SkinManager";
 
 declare const __VERTEXSHADER_HEAD__: string;
 declare const __FRAGMENTSHADER_HEAD__: string;
-type Color = [number, number, number];
 
 let gl: WebGLRenderingContext;
 let buffer: WebGLBuffer;
@@ -57,7 +56,7 @@ export function render(
             "uHeadRotation",
             snake.direction.predict(timeSinceLastTick) + rotOffset
         );
-        shader.setUniform("uColor", SkinManager.getSnakeColor(snake.skin));
+        SkinManager.setColor(shader, "uSkin", snake.skin);
 
         shader.run(vertexData.length / VERTEX_SIZE, {
             mode: gl.TRIANGLE_STRIP

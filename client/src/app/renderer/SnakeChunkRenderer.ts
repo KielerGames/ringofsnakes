@@ -34,12 +34,12 @@ export function render(
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
+    shader.setUniform("uColorSampler", 0);
 
     for (const chunk of chunks) {
         const snake = chunk.snake;
 
-        basicMaterialShader.setUniform("uColor", SkinManager.getSnakeColor(snake.skin));
-
+        SkinManager.setColor(shader, "uSkin", snake.skin);
         shader.setUniform("uChunkPathOffset", chunk.offset(timeSinceLastTick));
         shader.setUniform("uSnakeLength", snake.length);
         shader.setUniform("uSnakeMaxWidth", snake.maxWidth);

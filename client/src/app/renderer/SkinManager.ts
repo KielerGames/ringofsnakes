@@ -1,3 +1,5 @@
+import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
+
 type Color = [number, number, number];
 
 type Skin = {
@@ -95,7 +97,11 @@ export function setSkinTexture(
     gl.bindTexture(gl.TEXTURE_2D, texture);
 }
 
-export function getSnakeColor(skinId: number): Color {
-    // @ts-ignore
-    return skins[skinId % skins.length].snakeBody.map((v) => v / 255);
+export function setColor(
+    shader: WebGLShaderProgram,
+    uniform: string,
+    skinId: number
+): void {
+    const u = ((skinId % skins.length) + 0.5) / skins.length;
+    shader.setUniform(uniform, u);
 }

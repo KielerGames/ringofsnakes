@@ -16,6 +16,7 @@ public class World {
     public final WorldChunkCollection chunks;
     private final GameConfig config;
     public BoundingBox box;
+    public final Vector center = new Vector(0,0);
 
     public World(double chunkSize, int repetitions) {
         this.config = new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions));

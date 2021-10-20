@@ -102,6 +102,9 @@ export function setColor(
     uniform: string,
     skinId: number
 ): void {
-    const u = ((skinId % skins.length) + 0.5) / skins.length;
-    shader.setUniform(uniform, u);
+    shader.setUniform(uniform, getColorPosition(skinId));
+}
+
+export function getColorPosition(skinId: number): number {
+    return ((skinId % skins.length) + 0.5) / skins.length;
 }

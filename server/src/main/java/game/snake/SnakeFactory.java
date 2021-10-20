@@ -19,7 +19,7 @@ public class SnakeFactory {
 
     public static Snake createSnake(Vector position, double direction, World world) {
         Snake snake = new Snake(nextSnakeId++, world);
-        snake.setSkin((byte) (random.nextInt(100) % 6));
+        snake.setSkin((byte) (random.nextInt(100) % 7));
 
         // start position & rotation
         snake.headPosition = position.clone();

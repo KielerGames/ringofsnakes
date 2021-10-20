@@ -48,9 +48,9 @@ public class StupidBot extends Bot {
         }
 
         if (!turnClockwise) {
-            alpha = alpha > Math.PI ? (float) -Math.PI : alpha + turningRate;
+            alpha = alpha + turningRate > Math.PI ? (float) -Math.PI : alpha + turningRate  ;
         } else {
-            alpha = alpha < -Math.PI ? (float) Math.PI : alpha - turningRate;
+            alpha = alpha - turningRate < -Math.PI ? (float) Math.PI : alpha - turningRate;
         }
 
         if (counter > changeDirectionAtCounter) {

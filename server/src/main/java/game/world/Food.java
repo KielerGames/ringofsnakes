@@ -17,16 +17,28 @@ public class Food {
     public final byte color;
     private final byte byteX, byteY;
 
-    public Food(Vector position, WorldChunk chunk, Size size) {
-        this.color = (byte) rand.nextInt(64);
+    private Food(WorldChunk chunk, byte bx, byte by, Size size, byte color) {
+        final var dx = chunk.box.minX + toNormalizedDouble(bx) * chunk.box.getWidth();
+        final var dy = chunk.box.minY + toNormalizedDouble(by) * chunk.box.getHeight();
+        this.position = new Vector(dx, dy);
+        this.byteX = bx;
+        this.byteY = by;
+        this.color = color;
         this.size = size;
-        var px = (position.x - chunk.box.minX) / chunk.box.getWidth();
-        var py = (position.y - chunk.box.minY) / chunk.box.getHeight();
-        this.byteX = ByteUtilities.fromNormalizedDoubleToByte(px);
-        this.byteY = ByteUtilities.fromNormalizedDoubleToByte(py);
-        final var x = chunk.box.minX + toNormalizedDouble(byteX) * chunk.box.getWidth();
-        final var y = chunk.box.minY + toNormalizedDouble(byteY) * chunk.box.getHeight();
-        this.position = new Vector(x, y);
+    }
+
+    public Food(Vector position, WorldChunk chunk, Size size, byte color) {
+        this(
+                chunk,
+                ByteUtilities.fromNormalizedDoubleToByte((position.x - chunk.box.minX) / chunk.box.getWidth()),
+                ByteUtilities.fromNormalizedDoubleToByte((position.y - chunk.box.minY) / chunk.box.getHeight()),
+                size,
+                color
+        );
+    }
+
+    public Food(Vector position, WorldChunk chunk, Size size) {
+        this(position, chunk, size, (byte) rand.nextInt(64));
     }
 
     public Food(WorldChunk chunk) {

@@ -40,7 +40,7 @@ const skins: Skin[] = [
     },
     {
         // gray
-        snakeBody: [72, 71, 70],
+        snakeBody: [112, 111, 110],
         food: [128, 182, 222]
     }
 ];

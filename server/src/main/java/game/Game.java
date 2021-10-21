@@ -135,9 +135,8 @@ public class Game {
 
         executor.scheduleAtFixedRate(() -> {
             final var topTen = gson.toJson(new TopNList(this, 10));
-            System.out.println("Highscore: " + topTen);
             clients.forEach((sId, client) -> client.send(topTen));
-        }, 10, 10, TimeUnit.SECONDS);
+        }, 1, 1, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(() -> {
             final var n = snakes.stream().filter(Snake::isAlive).count();

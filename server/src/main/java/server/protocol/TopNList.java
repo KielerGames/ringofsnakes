@@ -7,14 +7,11 @@ import java.util.stream.Collectors;
 
 public class TopNList extends ServerToClientJSONMessage{
 
-    public final short[] ids;
-    public final int[] scores;
+    public final TopNListEntry[] list;
 
     public TopNList(Game game, int n){
         final var length = Math.min(n, game.snakes.size());
-        ids = new short[length];
-        scores = new int[length];
-
+        list = new TopNListEntry[length];
         final var topSnakes = game.snakes.stream().filter(Snake::isAlive)
                 .sorted(Comparator.comparing(Snake::getLength)
                         .reversed()).limit(length).collect(Collectors.toList());
@@ -22,10 +19,20 @@ public class TopNList extends ServerToClientJSONMessage{
         int i = 0;
         for (Snake snake : topSnakes) {
             if(i < n) {
-                ids[i] = snake.id;
-                scores[i]= (int) snake.getLength();
+                list[i] = new TopNListEntry(snake.id, (int) snake.getLength());
             }
             i++;
+        }
+    }
+
+    private class TopNListEntry {
+
+        private final short id;
+        private final int score;
+
+        private TopNListEntry(short id, int score){
+            this.id = id;
+            this.score = score;
         }
     }
 }

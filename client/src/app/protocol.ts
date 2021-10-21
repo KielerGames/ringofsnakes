@@ -1,4 +1,5 @@
 import { GameConfig } from "./types/GameConfig";
+import { TopNListEntry } from "./types/TopNListEntry";
 
 export type ClientToServerMessage = UpdatePlayerName;
 export type ServerToClientJSONMessage = SpawnInfo | SnakeDeathInfo | TopNList;
@@ -21,6 +22,5 @@ export type SnakeDeathInfo = Readonly<{
 
 export type TopNList = Readonly<{
     tag: "TopNList";
-    ids: number[];
-    scores: number[];
+    list: TopNListEntry[];
 }>;

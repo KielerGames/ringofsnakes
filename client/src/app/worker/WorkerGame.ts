@@ -11,7 +11,7 @@ import WorkerSnake from "./WorkerSnake";
 import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
 import Rectangle from "../math/Rectangle";
 import { GameConfig } from "../types/GameConfig";
-import TopNList from "../data/TopNList";
+import { TopNList } from "../protocol";
 
 export default class WorkerGame {
     socket: WebSocket;
@@ -113,8 +113,8 @@ export default class WorkerGame {
                 break;
             }
             case "TopNList": {
-                this.topNList = new TopNList(json.ids, json.scores);
-                this.topNList.printToConsole();
+                this.topNList = json;
+                console.log(this.topNList);
                 break;
             }
             default: {

@@ -1,0 +1,59 @@
+import { Component } from "preact";
+import GameData from "../data/GameData";
+import { TopNList, TopNListEntry } from "../protocol";
+
+
+
+type ScoreboardProps = {
+    data: Readonly<GameData>;
+};
+
+export default class Scoreboard extends Component<ScoreboardProps> {
+    private timer: number;
+
+
+    public constructor(props: ScoreboardProps) {
+        super(props);
+    }
+
+    public componentDidMount() {
+        this.timer = window.setInterval(() => {
+            this.forceUpdate();
+        }, 500);
+    }
+
+    public componentWillUnmount() {
+        window.clearInterval(this.timer);
+    }
+
+
+    public render() {
+        const leaderboard = this.props.data.getTopNList();
+        if(leaderboard === undefined) { return null; }
+         
+        return (
+            <div id="leaderboard">    
+    
+            {leaderboard.list.map((entry) => (
+                <Leaderboard key={entry.name} data={entry}/>
+            ))}
+
+            </div>
+        );
+}
+
+}
+
+type Props = {
+    data: TopNListEntry;
+};
+
+function Leaderboard(props: Readonly<Props>) {
+    const entry = props.data;
+
+    return (
+        <div class="entry">
+            <div class="entry">{entry.name}: {entry.score}</div>
+        </div>
+    );
+}

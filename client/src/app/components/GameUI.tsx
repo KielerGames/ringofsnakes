@@ -4,7 +4,7 @@ import FPSStats from "./debug/FPSStats";
 import SnakeList from "./debug/SnakeList";
 import SnakeInfoUI from "./SnakeInfoUI";
 import UserInput from "./UserInput";
-import Highscore from "./Leaderboard"
+import Scoreboard from "./Scoreboard";
 
 type Props = {
     game: Game;
@@ -16,7 +16,7 @@ export default class GameUI extends Component<Props> {
         
         return (
             <>
-                <Highscore data={game.data} />
+                <Scoreboard data={game.data} />
                 <FPSStats />
                 <SnakeInfoUI game={game} />
                 {__DEBUG__ ? <SnakeList data={game.data} /> : null}

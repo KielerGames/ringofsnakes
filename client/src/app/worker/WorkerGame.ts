@@ -114,7 +114,6 @@ export default class WorkerGame {
             }
             case "TopNList": {
                 this.topNList = json;
-                console.log(this.topNList);
                 break;
             }
             default: {

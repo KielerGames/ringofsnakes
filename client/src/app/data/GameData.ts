@@ -1,7 +1,6 @@
 import Rectangle from "../math/Rectangle";
 import { TopNList } from "../protocol";
 import { GameConfig } from "../types/GameConfig";
-import { TopNListEntry } from "../types/TopNListEntry";
 import { MainThreadGameDataUpdate } from "../worker/MainThreadGameDataUpdate";
 import FoodChunk from "./FoodChunk";
 import Snake from "./Snake";
@@ -30,9 +29,6 @@ export default class GameData {
         this.targetSnakeId = data.targetSnakeId;
 
         const localSnakeIds = new Set(this.snakes.keys());
-
-        // topNList
-
         this.topNList = data.topNList;
 
         // update & add new snakes

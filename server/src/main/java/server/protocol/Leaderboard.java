@@ -7,12 +7,12 @@ import server.Player;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Leaderboard extends ServerToClientJSONMessage{
+public class Leaderboard extends ServerToClientJSONMessage {
 
     private final List<LeaderboardEntry> list;
 
-    public Leaderboard(Game game, int n){
-         list = game.streamClients().filter(Player.class::isInstance)
+    public Leaderboard(Game game, int n) {
+        list = game.streamClients().filter(Player.class::isInstance)
                 .map(client -> ((Player) client).snake)
                 .filter(Snake::isAlive)
                 .sorted(Comparator.comparing(Snake::getLength).reversed())
@@ -26,7 +26,7 @@ public class Leaderboard extends ServerToClientJSONMessage{
         private final String name;
         private final int score;
 
-        private LeaderboardEntry(Snake s){
+        private LeaderboardEntry(Snake s) {
             this.name = "Snake " + s.id;
             this.score = (int) s.getLength();
         }

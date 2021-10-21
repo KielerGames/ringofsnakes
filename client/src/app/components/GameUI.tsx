@@ -4,7 +4,7 @@ import FPSStats from "./debug/FPSStats";
 import SnakeList from "./debug/SnakeList";
 import SnakeInfoUI from "./SnakeInfoUI";
 import UserInput from "./UserInput";
-import Highscore from "./Highscore"
+import Highscore from "./Leaderboard"
 
 type Props = {
     game: Game;

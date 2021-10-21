@@ -1,4 +1,5 @@
 import { TransferableBox } from "../math/Rectangle";
+import { LeaderboardData } from "../protocol";
 import { FoodChunkDTO } from "./decoder/FoodDecoder";
 
 export type MainThreadGameDataUpdate = {
@@ -8,6 +9,7 @@ export type MainThreadGameDataUpdate = {
     foodChunks: FoodChunkDTO[];
     snakes: SnakeDataDTO[];
     targetSnakeId: number;
+    leaderboardData: LeaderboardData;
 };
 
 /* Vertex buffer triangle strip:

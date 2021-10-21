@@ -1,4 +1,5 @@
 import Rectangle from "../math/Rectangle";
+import { LeaderboardData } from "../protocol";
 import { GameConfig } from "../types/GameConfig";
 import { MainThreadGameDataUpdate } from "../worker/MainThreadGameDataUpdate";
 import FoodChunk from "./FoodChunk";
@@ -12,6 +13,7 @@ export default class GameData {
     private targetSnakeId: number = -1;
     private lastUpdateTime: number = performance.now();
     public readonly config: GameConfig;
+    private leaderboardData: LeaderboardData;
 
     public constructor(config: GameConfig) {
         this.config = config;
@@ -27,6 +29,7 @@ export default class GameData {
         this.targetSnakeId = data.targetSnakeId;
 
         const localSnakeIds = new Set(this.snakes.keys());
+        this.leaderboardData = data.leaderboardData;
 
         // update & add new snakes
         data.snakes.forEach((snakeData) => {
@@ -81,6 +84,10 @@ export default class GameData {
 
     public getSnakes(): IterableIterator<Snake> {
         return this.snakes.values();
+    }
+
+    public getLeaderboardData(): LeaderboardData {
+        return this.leaderboardData;
     }
 
     public garbageCollectFoodChunks(viewBox: Rectangle): void {

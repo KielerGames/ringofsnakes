@@ -13,6 +13,7 @@ import server.Client;
 import server.Player;
 import server.protocol.SnakeDeathInfo;
 import server.protocol.SpawnInfo;
+import server.protocol.Leaderboard;
 import util.ExceptionalExecutorService;
 
 import javax.websocket.Session;
@@ -135,6 +136,11 @@ public class Game {
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
+            final var topTen = gson.toJson(new Leaderboard(this, 10));
+            clients.forEach((sId, client) -> client.send(topTen));
+        }, 1, 1, TimeUnit.SECONDS);
+
+        executor.scheduleAtFixedRate(() -> {
             final var n = snakes.stream().filter(Snake::isAlive).count();
 
             if (n < config.targetSnakePopulation) {
@@ -206,6 +212,7 @@ public class Game {
             s.kill();
         }
     }
+
 
     public void stop() {
         this.executor.shutdown();

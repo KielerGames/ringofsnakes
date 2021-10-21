@@ -11,6 +11,7 @@ import WorkerSnake from "./WorkerSnake";
 import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
 import Rectangle from "../math/Rectangle";
 import { GameConfig } from "../types/GameConfig";
+import { LeaderboardData } from "../protocol";
 
 export default class WorkerGame {
     socket: WebSocket;
@@ -21,6 +22,7 @@ export default class WorkerGame {
     readonly snakes: Map<SnakeId, WorkerSnake> = new Map();
     readonly snakeChunks: Map<SnakeChunkId, WorkerSnakeChunk> = new Map();
     readonly foodChunks: Map<FoodChunkId, FoodChunkDTO> = new Map();
+    public leaderboardData: LeaderboardData;
 
     lastServerUpdateTime: number;
     ticksSinceLastMainThreadUpdate: number = 0;
@@ -110,6 +112,10 @@ export default class WorkerGame {
                 );
                 break;
             }
+            case "Leaderboard": {
+                this.leaderboardData = json;
+                break;
+            }
             default: {
                 throw new Error(
                     `Unexpected message from server. (tag = ${json.tag})`
@@ -196,7 +202,8 @@ export default class WorkerGame {
             newSnakeChunks: snakeChunks,
             snakes,
             foodChunks,
-            targetSnakeId: this.targetPlayerId
+            targetSnakeId: this.targetPlayerId,
+            leaderboardData: this.leaderboardData
         };
     }
 }

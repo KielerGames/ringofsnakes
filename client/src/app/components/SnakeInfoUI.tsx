@@ -18,7 +18,10 @@ export default class SnakeInfoUI extends Component<Props> {
         return (
             <div id="snake-info">
                 <div id="snake-name">A snake name</div>
-                <div id="snake-length">Length: <span class="value">{Math.round(snake.length)}</span></div>
+                <div id="snake-length">
+                    Length:{" "}
+                    <span class="value">{Math.round(snake.length)}</span>
+                </div>
             </div>
         );
     }

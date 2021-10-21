@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 
 public class TopNList extends ServerToClientJSONMessage{
 
-    public final ArrayList<TopNListEntry> list;
+    private final List<TopNListEntry> list;
 
     public TopNList(Game game, int n){
         final var length = Math.min(n, game.snakes.size());
-        list = new ArrayList<>(game.snakes.stream().filter(Snake::isAlive)
-                .sorted(Comparator.comparing(Snake::getLength)
-                        .reversed()).limit(length)
+        list = (game.snakes.stream().filter(Snake::isAlive)
+                .sorted(Comparator.comparing(Snake::getLength).reversed())
+                .limit(length)
                 .map(snake -> new TopNListEntry(snake.id, (int) snake.getLength()))
                 .collect(Collectors.toList()));
     }

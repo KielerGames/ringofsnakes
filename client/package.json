@@ -12,9 +12,9 @@
         "build:js:watch": "webpack --watch --config webpack.config.js",
         "build": "npm run build:js",
         "build:production": "webpack --config webpack.config.production.js",
-        "format": "prettier --write \"src/**/*.ts\"",
+        "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\"",
         "lint": "tslint -p tsconfig.json",
-        "check:format": "prettier --check --no-color \"src/**/*.ts\""
+        "check:format": "prettier --check --no-color \"src/**/*.ts\" \"src/**/*.tsx\""
     },
     "author": "Tim Weißenfels",
     "devDependencies": {

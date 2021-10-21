@@ -20,7 +20,7 @@ export default class UserInput extends Component<Props, State> {
         this.state = {
             alpha: props.initial ?? 0.0,
             fast: false,
-            lastChange: -Infinity,
+            lastChange: -Infinity
         };
 
         this.clickHandler = this.clickHandler.bind(this);
@@ -91,7 +91,7 @@ export default class UserInput extends Component<Props, State> {
                     return {
                         alpha:
                             x === 0.0 && y === 0.0 ? alpha : Math.atan2(y, x),
-                        lastChange: performance.now(),
+                        lastChange: performance.now()
                     };
                 } else {
                     const x = e.pageX - 0.5 * window.innerWidth;
@@ -99,7 +99,7 @@ export default class UserInput extends Component<Props, State> {
 
                     return {
                         alpha: Math.atan2(y, x),
-                        lastChange: performance.now(),
+                        lastChange: performance.now()
                     };
                 }
             },

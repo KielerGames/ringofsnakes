@@ -40,7 +40,7 @@ document.body.appendChild(root);
 
     // cleanup
     window.setInterval(() => {
-        if(!game.ended) {
+        if (!game.ended) {
             const viewBox = game.camera.getViewBox();
             game.data.garbageCollectFoodChunks(viewBox);
         }

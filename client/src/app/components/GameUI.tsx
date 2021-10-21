@@ -24,7 +24,6 @@ export default class GameUI extends Component<Props> {
                     initial={0.0}
                     onChange={game.updateUserData.bind(game)}
                 />
-                
             </>
         );
     }

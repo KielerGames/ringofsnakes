@@ -203,12 +203,9 @@ export default class WorkerGame {
             newSnakeChunks: snakeChunks,
             snakes,
             foodChunks,
-            targetSnakeId: this.targetPlayerId
+            targetSnakeId: this.targetPlayerId,
+            topNList: this.topNList
         };
-    }
-
-    public getTopNList() : TopNList {
-        return this.topNList;
     }
 }
 

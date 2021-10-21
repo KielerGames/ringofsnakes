@@ -10,12 +10,11 @@ public class Leaderboard extends ServerToClientJSONMessage{
     private final List<LeaderboardEntry> list;
 
     public Leaderboard(Game game, int n){
-        final var length = Math.min(n, game.snakes.size());
-        list = (game.snakes.stream().filter(Snake::isAlive)
+        list = game.snakes.stream().filter(Snake::isAlive)
                 .sorted(Comparator.comparing(Snake::getLength).reversed())
-                .limit(length)
+                .limit(Math.min(n, game.snakes.size()))
                 .map(LeaderboardEntry::new)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
 
     private class LeaderboardEntry {

@@ -13,7 +13,7 @@ type Props = {
 export default class GameUI extends Component<Props> {
     public render() {
         const game = this.props.game;
-        
+
         return (
             <>
                 <Scoreboard data={game.data} />

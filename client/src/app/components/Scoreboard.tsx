@@ -11,15 +11,10 @@ type ScoreboardProps = {
 export default class Scoreboard extends Component<ScoreboardProps> {
     private timer: number;
 
-
-    public constructor(props: ScoreboardProps) {
-        super(props);
-    }
-
     public componentDidMount() {
         this.timer = window.setInterval(() => {
             this.forceUpdate();
-        }, 500);
+        }, 1000);
     }
 
     public componentWillUnmount() {

@@ -83,9 +83,11 @@ public class Game {
         final var spawnPos = world.findSpawnPosition();
 
         return CompletableFuture.supplyAsync(() -> {
-            final var snake = SnakeFactory.createSnake(spawnPos, world);
-            snakes.add(snake);
-            return snake;
+            synchronized (this) {
+                final var snake = SnakeFactory.createSnake(spawnPos, world);
+                snakes.add(snake);
+                return snake;
+            }
         }, executor).thenApply(snake -> {
             final var player = new Player(snake, session);
             synchronized (clients) {
@@ -163,13 +165,15 @@ public class Game {
     }
 
     private void updateClients() {
-        clients.forEach((id, client) -> {
-            final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
-            worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
-            worldChunks.forEach(client::updateClientFoodChunk);
-            client.sendUpdate();
-            client.cleanupKnowledge();
-        });
+        synchronized (clients) {
+            clients.forEach((__, client) -> {
+                final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
+                worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
+                worldChunks.forEach(client::updateClientFoodChunk);
+                client.sendUpdate();
+                client.cleanupKnowledge();
+            });
+        }
     }
 
     private void eatFood() {

@@ -35,7 +35,7 @@ export default class Scoreboard extends Component<ScoreboardProps> {
             <div id="leaderboard">    
     
             {leaderboard.list.map((entry, index) => (
-                <Leaderboard key={entry.name} data={entry} index={index}/>
+                <ScoreboardEntry key={entry.name} data={entry} index={index}/>
             ))}
 
             </div>
@@ -49,7 +49,7 @@ type Props = {
     index: number
 };
 
-function Leaderboard(props: Readonly<Props>) {
+function ScoreboardEntry(props: Readonly<Props>) {
     const entry = props.data;
     const index = props.index;
 

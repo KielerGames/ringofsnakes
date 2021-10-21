@@ -197,7 +197,7 @@ public class Game {
     }
 
     private void killDesertingSnakes(Snake s) {
-        if (world.box.distance(s.getHeadPosition()) > 0.0) {
+        if (!world.box.isWithinSubBox(s.getHeadPosition(), 0.5 * s.getWidth())) {
             System.out.println("Removing Snake " + s.id + " from Game, because it is leaving the map.");
             s.kill();
         }

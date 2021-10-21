@@ -2,11 +2,11 @@ import { Component } from "preact";
 import GameData from "../data/GameData";
 import { LeaderboardData, LeaderboardEntry } from "../protocol";
 
-type ScoreboardProps = {
+type LeaderboardProps = {
     data: Readonly<GameData>;
 };
 
-export default class Scoreboard extends Component<ScoreboardProps> {
+export default class Leaderboard extends Component<LeaderboardProps> {
     private timer: number;
 
     public componentDidMount() {

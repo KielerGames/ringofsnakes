@@ -24,7 +24,7 @@ public class TopNList extends ServerToClientJSONMessage{
         private final int score;
 
         private TopNListEntry(Snake s){
-            this.name = "Snake" + s.id;
+            this.name = "Snake " + s.id;
             this.score = (int) s.getLength();
         }
     }

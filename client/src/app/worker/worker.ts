@@ -9,7 +9,7 @@ let game: WorkerGame | null = null;
 
 export class WorkerAPI {
     public async init(name: string): Promise<void> {
-        const websocket = new WebSocket("ws://b:8080/game");
+        const websocket = new WebSocket("ws://127.0.0.1:8080/game");
         websocket.binaryType = "arraybuffer";
 
         await new Promise<void>((resolve) => {

@@ -206,6 +206,10 @@ export default class WorkerGame {
             targetSnakeId: this.targetPlayerId
         };
     }
+
+    public getTopNList() : TopNList {
+        return this.topNList;
+    }
 }
 
 type SnakeChunkId = number;

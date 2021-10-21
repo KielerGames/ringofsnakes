@@ -1,4 +1,5 @@
 import Rectangle from "../math/Rectangle";
+import { TopNList } from "../protocol";
 import { GameConfig } from "../types/GameConfig";
 import { MainThreadGameDataUpdate } from "../worker/MainThreadGameDataUpdate";
 import FoodChunk from "./FoodChunk";
@@ -12,6 +13,7 @@ export default class GameData {
     private targetSnakeId: number = -1;
     private lastUpdateTime: number = performance.now();
     public readonly config: GameConfig;
+    private topNList : TopNList;
 
     public constructor(config: GameConfig) {
         this.config = config;

@@ -19,6 +19,7 @@ document.body.appendChild(root);
     const game = await Game.joinAs("SnakeForceOne");
     const start = performance.now();
     const lastTime = start;
+    const workerGame = 
 
     function renderLoop(time: number) {
         const elapsed = (time - start) / 1000;

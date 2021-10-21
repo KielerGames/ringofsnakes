@@ -4,14 +4,18 @@ import FPSStats from "./debug/FPSStats";
 import SnakeList from "./debug/SnakeList";
 import SnakeInfoUI from "./SnakeInfoUI";
 import UserInput from "./UserInput";
+import Highscore from "./Highscore"
+import WorkerGame from "../worker/WorkerGame";
 
 type Props = {
     game: Game;
+    workerGame: WorkerGame
 };
 
 export default class GameUI extends Component<Props> {
     public render() {
         const game = this.props.game;
+        const workerGame = this.props.workerGame;
 
         return (
             <>
@@ -22,6 +26,7 @@ export default class GameUI extends Component<Props> {
                     initial={0.0}
                     onChange={game.updateUserData.bind(game)}
                 />
+                <Highscore data={workerGame} />
             </>
         );
     }

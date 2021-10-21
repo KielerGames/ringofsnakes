@@ -4,24 +4,13 @@ import Matrix from "../math/Matrix";
 import Vector from "../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as BoxRenderer from "./BoxRenderer";
+import * as SkinManager from "./SkinManager";
 
 declare const __VERTEXSHADER_FOOD__: string;
 declare const __FRAGMENTSHADER_FOOD__: string;
 
 let gl: WebGLRenderingContext;
 let shader: WebGLShaderProgram;
-let texture: WebGLTexture;
-
-const colors = new Uint8Array([
-    // red
-    255, 25, 12,
-    // blue
-    0, 128, 255,
-    // green
-    25, 255, 42,
-    // pink
-    255, 0, 255
-]);
 
 const FOOD_VERTEX_SIZE = FoodChunk.FOOD_VERTEX_SIZE;
 const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -35,23 +24,6 @@ export function init(glCtx: WebGLRenderingContext): void {
         __FRAGMENTSHADER_FOOD__,
         ["aPosition", "aLocalPos", "aColorIndex"]
     );
-
-    texture = gl.createTexture()!;
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGB,
-        colors.length / 3,
-        1,
-        0,
-        gl.RGB,
-        gl.UNSIGNED_BYTE,
-        colors
-    );
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 }
 
 export function render(
@@ -62,8 +34,6 @@ export function render(
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
     shader.setUniform("uColorSampler", 0);
     shader.setUniform("uTransform", transform.data);
 

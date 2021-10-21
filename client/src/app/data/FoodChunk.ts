@@ -1,6 +1,7 @@
 import { FoodChunkDTO, FoodItemDTO } from "../worker/decoder/FoodDecoder";
 import * as BufferManager from "../webgl/BufferManager";
 import Rectangle from "../math/Rectangle";
+import * as SkinManager from "../renderer/SkinManager";
 
 const boxCoords = [
     // triangle 1
@@ -73,7 +74,7 @@ function createGPUData(
     for (let fi = 0; fi < items.length; fi++) {
         const f = items[fi];
         const offset = fi * floatsPerFood;
-        const color = (f.color % 4) / 3;
+        const color = SkinManager.getColorPosition(f.color);
 
         for (let bi = 0; bi < boxCoords.length; bi++) {
             const [u, v] = boxCoords[bi];

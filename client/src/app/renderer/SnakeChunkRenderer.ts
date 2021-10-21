@@ -1,22 +1,15 @@
 import SnakeChunk from "../data/SnakeChunk";
-import assert from "../utilities/assert";
 import Matrix from "../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as BoxRenderer from "./BoxRenderer";
+import * as SkinManager from "./SkinManager";
 
 declare const __VERTEXSHADER_SNAKE__: string;
 declare const __FRAGMENTSHADER_SNAKE__: string;
-type Color = [number, number, number];
 
 let gl: WebGLRenderingContext;
 let basicMaterialShader: WebGLShaderProgram;
 let buffer: WebGLBuffer;
-
-const snakeColors: Color[] = [
-    [0.5, 0.75, 1.0],
-    [1.0, 0.75, 0.5],
-    [0.75, 1.0, 0.5]
-];
 
 export function init(glCtx: WebGLRenderingContext): void {
     gl = glCtx;
@@ -29,8 +22,6 @@ export function init(glCtx: WebGLRenderingContext): void {
     );
 
     buffer = gl.createBuffer()!;
-
-    assert(snakeColors.length > 0);
 }
 
 export function render(
@@ -43,10 +34,12 @@ export function render(
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
+    shader.setUniform("uColorSampler", 0);
 
     for (const chunk of chunks) {
         const snake = chunk.snake;
-        setSkin(snake.skin);
+
+        SkinManager.setColor(shader, "uSkin", snake.skin);
         shader.setUniform("uChunkPathOffset", chunk.offset(timeSinceLastTick));
         shader.setUniform("uSnakeLength", snake.length);
         shader.setUniform("uSnakeMaxWidth", snake.maxWidth);
@@ -65,9 +58,4 @@ export function render(
             );
         }
     }
-}
-
-function setSkin(skin: number): void {
-    const colorIdx = Math.max(0, skin % snakeColors.length);
-    basicMaterialShader.setUniform("uColor", snakeColors[colorIdx]);
 }

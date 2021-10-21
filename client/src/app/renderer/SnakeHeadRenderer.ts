@@ -1,10 +1,10 @@
 import Snake from "../data/Snake";
 import Matrix from "../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
+import * as SkinManager from "./SkinManager";
 
 declare const __VERTEXSHADER_HEAD__: string;
 declare const __FRAGMENTSHADER_HEAD__: string;
-type Color = [number, number, number];
 
 let gl: WebGLRenderingContext;
 let buffer: WebGLBuffer;
@@ -17,12 +17,6 @@ const vertexData = mirror([
     [0.4, 2.0]
 ]);
 const rotOffset = -0.5 * Math.PI;
-
-const snakeColors: Color[] = [
-    [0.5, 0.75, 1.0],
-    [1.0, 0.75, 0.5],
-    [0.75, 1.0, 0.5]
-];
 
 export function init(glCtx: WebGLRenderingContext): void {
     gl = glCtx;
@@ -62,7 +56,8 @@ export function render(
             "uHeadRotation",
             snake.direction.predict(timeSinceLastTick) + rotOffset
         );
-        setSkin(snake.skin);
+        SkinManager.setColor(shader, "uSkin", snake.skin);
+
         shader.run(vertexData.length / VERTEX_SIZE, {
             mode: gl.TRIANGLE_STRIP
         });
@@ -83,9 +78,4 @@ function mirror(points: [number, number][]): Float32Array {
     }
 
     return data;
-}
-
-function setSkin(skin: number): void {
-    const colorIdx = Math.max(0, skin % snakeColors.length);
-    shader.setUniform("uColor", snakeColors[colorIdx]);
 }

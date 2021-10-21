@@ -15,7 +15,7 @@ const float cMoveDist = 7.5;
 
 void main(void) {
     varPos = aLocalPos;
-    vColor = texture2D(uColorSampler, vec2(aColorIndex, 0.5)).rgb;
+    vColor = texture2D(uColorSampler, vec2(aColorIndex, 0.75)).rgb;
 
     float d = distance(aPosition, uPlayerPosition);
     float s = min(1.0, d * 0.25);

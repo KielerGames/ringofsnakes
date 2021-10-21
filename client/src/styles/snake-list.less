@@ -8,48 +8,37 @@
     font-size: 12px;
     min-width: 230px;
     font-family: monospace;
-}
 
-#snake-list .snake {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 5px;
-    border-radius: 6px;
-    overflow: hidden;
-    padding: 2px;
-}
+    .snake {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 5px;
+        border-radius: 6px;
+        overflow: hidden;
+        padding: 2px;
+        background-color: rgb(190, 190, 190);
 
-#snake-list .snake:last-child {
-    margin-bottom: 0;
-}
+        &:last-child {
+            margin-bottom: 0;
+        }
 
-#snake-list .snake .snake-info {
-    color: black;
-}
+        .snake-info {
+            color: black;
+        }
 
-#snake-list .snake.skin0 {
-    background-color: rgb(128, 191, 255);
-}
+        .chunks {
+            display: flex;
+            flex-direction: row;
+            gap: 2px;
+            margin-left: 5px;
 
-#snake-list .snake.skin1 {
-    background-color: rgb(255, 191, 128);
-}
-
-#snake-list .snake.skin2 {
-    background-color: rgb(191, 255, 128);
-}
-
-#snake-list .snake .chunks {
-    display: flex;
-    flex-direction: row;
-    gap: 2px;
-    margin-left: 5px;
-}
-
-#snake-list .snake .chunks .chunk-info {
-    background-color: rgb(94, 94, 94);
-    border-radius: 4px;
-    min-width: 50px;
-    text-align: center;
-    padding: 0px 2px;
+            .chunk-info {
+                background-color: rgb(94, 94, 94);
+                border-radius: 4px;
+                min-width: 50px;
+                text-align: center;
+                padding: 0px 2px;
+            }
+        }
+    }
 }

@@ -9,7 +9,6 @@ import game.snake.SnakeFactory;
 import game.world.Collidable;
 import game.world.World;
 import game.world.WorldChunk;
-import math.Vector;
 import server.Client;
 import server.Player;
 import server.protocol.SnakeDeathInfo;
@@ -18,13 +17,17 @@ import server.protocol.TopNList;
 import util.ExceptionalExecutorService;
 
 import javax.websocket.Session;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Game {
     private static final Gson gson = new Gson();
@@ -57,6 +60,10 @@ public class Game {
         this.config = config;
         this.world = world;
         executor = new ExceptionalExecutorService();
+        executor.onExceptionDo((exception) -> {
+            exception.printStackTrace();
+            System.exit(1);
+        });
         collisionManager = new CollisionManager(this);
         collisionManager.onCollisionDo(this::onCollision);
     }
@@ -86,25 +93,8 @@ public class Game {
                 clients.put(session.getId(), player);
             }
             player.sendSync(gson.toJson(new SpawnInfo(config, snake)));
-            executor.schedule(() -> addBotsRandomly(50), 1, TimeUnit.SECONDS);
             return player;
         });
-    }
-
-    public void addBotsNextToPlayer(Player player, double radius, int n) {
-        //adds n stupid bots next to the player at the start of the game
-        Random random = new Random();
-
-        final var position = player.snake.getHeadPosition();
-
-        for (int i = 0; i < n; i++) {
-            final var spawnPosition = new Vector(position.x + (random.nextDouble() * 2 - 1.0) * radius,
-                    position.y + (random.nextDouble() * 2 - 1.0) * radius);
-            StupidBot bot = new StupidBot(this, spawnPosition);
-            snakes.add(bot.getSnake());
-            bots.add(bot);
-            System.out.println("Bot added!");
-        }
     }
 
     public void addBotsRandomly(int n) {
@@ -112,7 +102,6 @@ public class Game {
             StupidBot bot = new StupidBot(this, this.world.findSpawnPosition());
             snakes.add(bot.getSnake());
             bots.add(bot);
-            System.out.println("Bot added randomly!");
         }
     }
 
@@ -149,6 +138,14 @@ public class Game {
             System.out.println("Highscore: " + topTen);
             clients.forEach((sId, client) -> client.send(topTen));
         }, 10, 10, TimeUnit.SECONDS);
+
+        executor.scheduleAtFixedRate(() -> {
+            final var n = snakes.stream().filter(Snake::isAlive).count();
+
+            if (n < config.targetSnakePopulation) {
+                addBotsRandomly((int) Math.min(4, config.targetSnakePopulation - n));
+            }
+        }, 1, 25, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
@@ -207,7 +204,7 @@ public class Game {
     }
 
     private void killDesertingSnakes(Snake s) {
-        if (Math.abs(s.getHeadPosition().x) > world.width / 2.0 - 3 || Math.abs(s.getHeadPosition().y) > world.height / 2.0 - 3) {
+        if (world.box.distance(s.getHeadPosition()) > 0.0) {
             System.out.println("Removing Snake " + s.id + " from Game, because it is leaving the map.");
             s.kill();
         }
@@ -216,5 +213,9 @@ public class Game {
 
     public void stop() {
         this.executor.shutdown();
+    }
+
+    public Stream<Client> streamClients() {
+        return clients.values().stream();
     }
 }

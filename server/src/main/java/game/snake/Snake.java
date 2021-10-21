@@ -268,7 +268,6 @@ public class Snake {
     private void recycleSnake() {
         //TODO:
         // - consider spawning larger food items for larger snakes
-        // - possible performance optimization by calling findChunk only once per snakeChunk
         // - fine adjust food value per dead snake
         final var foodScattering = 1.0;
         final var caloricValueOfSnake = length / 2.0; //TODO: adjust
@@ -283,7 +282,10 @@ public class Snake {
                 continue;
             }
             spawnPosition.addScaled(new Vector(rnd.nextDouble(), rnd.nextDouble()), foodScattering);
-            final var worldChunk = world.chunks.findChunk(spawnPosition); //TODO: optimization?
+            if (!world.box.isWithinSubBox(spawnPosition, 1.0)) {
+                continue;
+            }
+            final var worldChunk = world.chunks.findChunk(spawnPosition);
             final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM);
             worldChunk.addFood(food);
         }

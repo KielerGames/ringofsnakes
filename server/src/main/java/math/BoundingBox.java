@@ -127,6 +127,13 @@ public class BoundingBox {
         return distance2(p) < range * range;
     }
 
+    public boolean isWithinSubBox(Vector p, double inset) {
+        assert (inset >= 0.0);
+        final var x = minX + inset <= p.x && p.x <= maxX - inset;
+        final var y = minY + inset <= p.y && p.y <= maxY - inset;
+        return x && y;
+    }
+
     public Vector getCenter() {
         return new Vector(
                 minX + 0.5 * (maxX - minX),

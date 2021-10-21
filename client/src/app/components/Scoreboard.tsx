@@ -49,8 +49,6 @@ function ScoreboardEntry(props: Readonly<Props>) {
     const index = props.index;
 
     return (
-        <div class="entry">
-            <div class="entry">{index + 1}. {entry.name}:   {entry.score}</div>
-        </div>
+        <div class="entry">{index + 1}. {entry.name}:   {entry.score}</div>
     );
 }

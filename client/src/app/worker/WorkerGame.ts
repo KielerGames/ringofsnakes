@@ -11,7 +11,7 @@ import WorkerSnake from "./WorkerSnake";
 import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
 import Rectangle from "../math/Rectangle";
 import { GameConfig } from "../types/GameConfig";
-import { TopNList } from "../protocol";
+import { LeaderboardData } from "../protocol";
 
 export default class WorkerGame {
     socket: WebSocket;
@@ -22,7 +22,7 @@ export default class WorkerGame {
     readonly snakes: Map<SnakeId, WorkerSnake> = new Map();
     readonly snakeChunks: Map<SnakeChunkId, WorkerSnakeChunk> = new Map();
     readonly foodChunks: Map<FoodChunkId, FoodChunkDTO> = new Map();
-    public topNList: TopNList;
+    public leaderboardData: LeaderboardData;
 
     lastServerUpdateTime: number;
     ticksSinceLastMainThreadUpdate: number = 0;
@@ -112,8 +112,8 @@ export default class WorkerGame {
                 );
                 break;
             }
-            case "TopNList": {
-                this.topNList = json;
+            case "Leaderboard": {
+                this.leaderboardData = json;
                 break;
             }
             default: {
@@ -203,7 +203,7 @@ export default class WorkerGame {
             snakes,
             foodChunks,
             targetSnakeId: this.targetPlayerId,
-            topNList: this.topNList
+            leaderboardData: this.leaderboardData
         };
     }
 }

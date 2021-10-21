@@ -1,6 +1,6 @@
 import { Component } from "preact";
 import GameData from "../data/GameData";
-import { TopNList, TopNListEntry } from "../protocol";
+import { LeaderboardData, LeaderboardEntry } from "../protocol";
 
 type ScoreboardProps = {
     data: Readonly<GameData>;
@@ -20,15 +20,15 @@ export default class Scoreboard extends Component<ScoreboardProps> {
     }
 
     public render() {
-        const leaderboard = this.props.data.getTopNList();
-        if (leaderboard === undefined) {
+        const leaderboardData = this.props.data.getLeaderboardData();
+        if (leaderboardData === undefined) {
             return null;
         }
 
         return (
             <div id="leaderboard">
-                {leaderboard.list.map((entry, index) => (
-                    <ScoreboardEntry
+                {leaderboardData.list.map((entry, index) => (
+                    <LeaderboardView
                         key={entry.name}
                         data={entry}
                         index={index}
@@ -40,11 +40,11 @@ export default class Scoreboard extends Component<ScoreboardProps> {
 }
 
 type Props = {
-    data: TopNListEntry;
+    data: LeaderboardEntry;
     index: number;
 };
 
-function ScoreboardEntry(props: Readonly<Props>) {
+function LeaderboardView(props: Readonly<Props>) {
     const entry = props.data;
     const index = props.index;
 

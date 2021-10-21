@@ -14,7 +14,7 @@ public class TopNList extends ServerToClientJSONMessage{
         list = (game.snakes.stream().filter(Snake::isAlive)
                 .sorted(Comparator.comparing(Snake::getLength).reversed())
                 .limit(length)
-                .map(snake -> new TopNListEntry(snake.id, (int) snake.getLength()))
+                .map(TopNListEntry::new)
                 .collect(Collectors.toList()));
     }
 
@@ -23,9 +23,9 @@ public class TopNList extends ServerToClientJSONMessage{
         private final String name;
         private final int score;
 
-        private TopNListEntry(short id, int score){
-            this.name = "Snake" + id;
-            this.score = score;
+        private TopNListEntry(Snake s){
+            this.name = "Snake" + s.id;
+            this.score = (int) s.getLength();
         }
     }
 }

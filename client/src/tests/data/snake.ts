@@ -43,6 +43,7 @@ export function createGameConfig(speed: number = 0.24): GameConfig {
             speed: speed,
             startLength: 8,
             minWidth: 0.5,
+            maxWidth: 6.0,
             fastSpeed: 2 * speed,
             burnRate: 0.1
         },

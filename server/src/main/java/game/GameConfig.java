@@ -41,6 +41,7 @@ public final class GameConfig {
         public final double minLength = 6.0;
         public final double startLength = 8.0;
         public final double minWidth = 0.5;
+        public final double maxWidth = 6.0;
         public final double burnRate = 1 / 10.0;
 
         public SnakeInfo(double speed) {

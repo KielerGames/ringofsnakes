@@ -18,6 +18,7 @@ const cfg: GameConfig = {
         fastSpeed: 0.48,
         maxTurnDelta: Math.PI / 30,
         minLength: 6.0,
+        maxWidth: 6.0,
         burnRate: 0.1
     },
     tickDuration: 1.0 / 25,

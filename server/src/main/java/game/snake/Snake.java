@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
-    public static final double MAX_WIDTH_GAIN = 4f;
     public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
     private static final Random random = new Random();
 
@@ -50,7 +49,8 @@ public class Snake {
     private static double computeMaxWidthFromLength(double length, GameConfig config) {
         //sigmoid(3) is roughly  0.95
         final var x = 3.0 * (length - config.snakes.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
-        return (config.snakes.minWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
+        final var maxWidthGain = config.snakes.maxWidth - config.snakes.minWidth;
+        return (config.snakes.minWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * maxWidthGain);
     }
 
     public void setTargetDirection(float alpha) {

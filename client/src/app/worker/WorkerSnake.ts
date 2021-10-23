@@ -90,7 +90,7 @@ function computeWidthFromLength(
     config: Readonly<GameConfig>
 ): number {
     const minWidth = config.snakes.minWidth;
-    const maxWidthGain = 4.0;
+    const maxWidthGain = config.snakes.maxWidth - config.snakes.minWidth;
     const LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700.0;
     const denominator = 1.0 / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
     const x = 3.0 * (length - config.snakes.minLength) * denominator;

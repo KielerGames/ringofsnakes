@@ -20,5 +20,6 @@ type SnakeInfo = {
     minLength: number;
     startLength: number;
     minWidth: number;
+    maxWidth: number;
     burnRate: number;
 };

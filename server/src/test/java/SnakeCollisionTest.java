@@ -57,7 +57,7 @@ public class SnakeCollisionTest {
         assertTrue(snake1.getLength() > snake2.getLength());
 
         // set snake2 on collision course
-        snake2.setTargetDirection((float) (0.5 * Math.PI));
+        snake2.setTargetDirection(0.5 * Math.PI);
 
         // collide
         testGame.tickN(64, true);

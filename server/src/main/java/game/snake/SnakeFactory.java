@@ -2,6 +2,7 @@ package game.snake;
 
 import game.world.World;
 import math.Vector;
+import util.Direction;
 
 import java.util.Random;
 
@@ -13,7 +14,7 @@ public class SnakeFactory {
     }
 
     public static Snake createSnake(Vector position, World world) {
-        final double direction = (random.nextDouble() * 2.0 - 1.0) * Math.PI;
+        final double direction = Direction.getRandom(random);
         return createSnake(position, direction, world);
     }
 
@@ -23,7 +24,7 @@ public class SnakeFactory {
 
         // start position & rotation
         snake.headPosition = position.clone();
-        snake.headDirection = (float) direction;
+        snake.headDirection = direction;
         snake.setTargetDirection(snake.headDirection);
         snake.beginChunk();
 

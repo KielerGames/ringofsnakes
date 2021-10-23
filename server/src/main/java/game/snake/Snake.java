@@ -17,12 +17,12 @@ public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
     public static final double MAX_WIDTH_GAIN = 4f;
     public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
-    private static final Random rnd = new Random();
+    private static final Random random = new Random();
 
-    public final GameConfig config = new GameConfig();
+    public final GameConfig config;
     public final short id;
-    private final ChainCodeCoder coder = new ChainCodeCoder(config);
-    private final World world;
+    protected final World world;
+    private final ChainCodeCoder coder;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     public byte skin;
@@ -41,7 +41,8 @@ public class Snake {
     Snake(short id, World world) {
         this.id = id;
         this.world = world;
-        final var config = world.getConfig();
+        config = world.getConfig();
+        coder = new ChainCodeCoder(config);
         length = config.snakeStartLength;
         width = config.snakeMinWidth;
     }
@@ -116,7 +117,6 @@ public class Snake {
 
             var snakeChunk = currentChunk.build();
             chunks.add(0, snakeChunk);
-            //world.removeSnakeChunk(chunkBuilder);
             world.addSnakeChunk(snakeChunk);
         }
 
@@ -281,7 +281,7 @@ public class Snake {
             if (spawnPosition == null) {
                 continue;
             }
-            spawnPosition.addScaled(new Vector(rnd.nextDouble(), rnd.nextDouble()), foodScattering);
+            spawnPosition.addScaled(new Vector(random.nextDouble(), random.nextDouble()), foodScattering);
             if (!world.box.isWithinSubBox(spawnPosition, 1.0)) {
                 continue;
             }

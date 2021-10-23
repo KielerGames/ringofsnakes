@@ -49,7 +49,8 @@ export function createGameConfig(speed: number = 0.24): GameConfig {
         },
         tickDuration: 1.0 / 25,
         foodNutritionalValue: 1.0,
-        foodConversionEfficiency: 0.5
+        foodConversionEfficiency: 0.5,
+        selfCollision: false
     };
 }
 

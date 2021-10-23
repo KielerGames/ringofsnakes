@@ -37,4 +37,18 @@ public class SnakeFactory {
         return createSnake(new Vector(0, 0), new World());
     }
 
+    public static BoundarySnake createBoundarySnake(World world) {
+        final var snake = new BoundarySnake(nextSnakeId++, world);
+        snake.setSkin((byte) random.nextInt(7));
+
+        snake.beginChunk();
+        world.addSnake(snake);
+
+        final int iterations = (int) Math.ceil(snake.getLength() / world.getConfig().snakeSpeed);
+        for (int i = 0; i < iterations; i++) {
+            snake.tick();
+        }
+
+        return snake;
+    }
 }

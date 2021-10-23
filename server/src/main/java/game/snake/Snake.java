@@ -48,10 +48,10 @@ public class Snake {
         width = config.snakeMinWidth;
     }
 
-    private static double computeMaxWidthFromLength(double length, GameConfig config) {
+    protected void updateWidth() {
         //sigmoid(3) is roughly  0.95
         final var x = 3.0 * (length - config.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
-        return (config.snakeMinWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
+        width = (config.snakeMinWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
     }
 
     public void setTargetDirection(double alpha) {
@@ -86,8 +86,7 @@ public class Snake {
             headPosition.addDirection(headDirection, config.snakeSpeed);
         }
 
-        // update width
-        width = computeMaxWidthFromLength(length, config);
+        updateWidth();
 
         // update chunks
         currentChunk.append(encDirDelta, fast);

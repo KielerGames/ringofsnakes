@@ -5,8 +5,11 @@ import math.BoundingBox;
 import math.Vector;
 import util.Direction;
 
+import java.util.Random;
+
 public class BoundarySnake extends Snake {
     private BoundingBox bottom, right, up, left;
+    private Random random = new Random();
 
     BoundarySnake(short id, World world) {
         super(id, world);
@@ -19,7 +22,7 @@ public class BoundarySnake extends Snake {
         updateLengthAndWidth();
 
         final var wb = world.box;
-        final var boxWidth = Math.min(2 * getWidth(), world.getConfig().chunkInfo.chunkSize);
+        final var boxWidth = Math.min(3 * getWidth(), world.getConfig().chunkInfo.chunkSize);
 
         /*
          * Position of up and bottom BoundingBox within world:
@@ -56,7 +59,7 @@ public class BoundarySnake extends Snake {
     }
 
     private void updateTargetDirection() {
-        final var distanceFromBorder = 0.75 * getWidth();
+        final var distanceFromBorder = getWidth();
         final var p = headPosition;
         final var wb = world.box;
         Vector target = null;
@@ -79,7 +82,9 @@ public class BoundarySnake extends Snake {
             throw new IllegalStateException("Boundary snake does not know where to go.");
         }
 
-        final var direction = Direction.getFromTo(p, target);
+        var direction = Direction.getFromTo(p, target);
+        // scattering
+        direction = Direction.normalize(direction + random.nextDouble() * 0.05);
         setTargetDirection(direction);
     }
 
@@ -91,5 +96,15 @@ public class BoundarySnake extends Snake {
     @Override
     public void kill() {
         System.err.println("Boundary snake can not be killed.");
+    }
+
+    @Override
+    public void grow(double amount) {
+        // don't do anything
+    }
+
+    @Override
+    public void shrink(double amount) {
+        // don't do anything
     }
 }

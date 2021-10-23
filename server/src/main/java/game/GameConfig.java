@@ -5,6 +5,7 @@ public final class GameConfig {
     public final double foodNutritionalValue = 1.0;
     public final double foodConversionEfficiency = 0.5;
     public final int targetSnakePopulation = 32;
+    public final boolean selfCollision = false;
 
     public final ChunkInfo chunks;
     public final SnakeInfo snakes;

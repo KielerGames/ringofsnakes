@@ -9,17 +9,20 @@ import math.Vector;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CollisionManager {
     private final Game game;
+    private final boolean selfCollision;
 
     // see comment on onCollisionDo method
     private final Set<BiConsumer<Snake, Collidable>> collisionHandlers = new HashSet<>();
 
     public CollisionManager(Game game) {
         this.game = game;
+        this.selfCollision = game.config.selfCollision;
     }
 
     private static boolean collidesWithSnakeChunk(Snake snake, SnakeChunk snakeChunk) {
@@ -60,9 +63,12 @@ public class CollisionManager {
             final var snakeRadius = snake.getWidth() / 2.0;
             final var headPosition = snake.getHeadPosition();
             final var snakeChunksToConsider = getNearbySnakeChunks(snake);
+            final Predicate<SnakeChunk> snakeFilter = selfCollision ?
+                    (snakeChunk -> true) :
+                    (snakeChunk -> !snakeChunk.getSnake().equals(snake));
 
             final var collidedChunk = snakeChunksToConsider.stream()
-                    .filter(snakeChunk -> !snakeChunk.getSnake().equals(snake))
+                    .filter(snakeFilter)
                     .filter(snakeChunk ->
                             snakeChunk.getBoundingBox().isWithinRange(
                                     headPosition,

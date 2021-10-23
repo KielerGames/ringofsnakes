@@ -5,6 +5,7 @@ export type GameConfig = Readonly<{
     tickDuration: number;
     foodNutritionalValue: number;
     foodConversionEfficiency: number;
+    selfCollision: boolean;
 }>;
 
 type ChunkInfo = {

@@ -1,14 +1,24 @@
 export type GameConfig = Readonly<{
-    snakeSpeed: number;
-    snakeStartLength: number;
-    snakeMinWidth: number;
-    fastSnakeSpeed: number;
-    maxTurnDelta: number;
+    chunks: Readonly<ChunkInfo>;
+    snakes: Readonly<SnakeInfo>;
+
     tickDuration: number;
-    minLength: number;
-    chunkInfo: Readonly<{
-        chunkSize: number;
-        columns: number;
-        rows: number;
-    }>;
+    foodNutritionalValue: number;
+    foodConversionEfficiency: number;
 }>;
+
+type ChunkInfo = {
+    chunkSize: number;
+    columns: number;
+    rows: number;
+};
+
+type SnakeInfo = {
+    speed: number;
+    fastSpeed: number;
+    maxTurnDelta: number;
+    minLength: number;
+    startLength: number;
+    minWidth: number;
+    burnRate: number;
+};

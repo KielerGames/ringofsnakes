@@ -13,15 +13,15 @@ export function decode(
     config: GameConfig
 ): DecodeResult<FoodChunkDTO> {
     const view = new DataView(buffer, offset);
-    const chunkSize = config.chunkInfo.chunkSize;
+    const chunkSize = config.chunks.chunkSize;
 
     const column = view.getUint8(0);
     const row = view.getUint8(1);
     const n = view.getUint16(2, false);
     const chunkId = view.getUint16(0, false);
 
-    const xOffset = (column - 0.5 * config.chunkInfo.columns) * chunkSize;
-    const yOffset = (row - 0.5 * config.chunkInfo.rows) * chunkSize;
+    const xOffset = (column - 0.5 * config.chunks.columns) * chunkSize;
+    const yOffset = (row - 0.5 * config.chunks.rows) * chunkSize;
 
     const foodItems: FoodItemDTO[] = new Array(n);
 

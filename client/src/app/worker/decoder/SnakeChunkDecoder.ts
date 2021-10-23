@@ -98,7 +98,7 @@ export function decode(
         alpha = normalizeAngle(alpha + dirDelta);
 
         // compute next position
-        const s = steps * (fast ? config.fastSnakeSpeed : config.snakeSpeed);
+        const s = steps * (fast ? config.snakes.fastSpeed : config.snakes.speed);
         x += s * Math.cos(alpha);
         y += s * Math.sin(alpha);
         length += s;
@@ -145,5 +145,5 @@ export function decode(
 function decodeDirectionChange(config: GameConfig, data: number) {
     const sign = 1 - ((data & 1) << 1);
     const k = sign * Math.floor(data / 2);
-    return (k * config.maxTurnDelta) / 7.0;
+    return (k * config.snakes.maxTurnDelta) / 7.0;
 }

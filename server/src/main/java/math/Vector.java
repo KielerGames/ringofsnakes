@@ -75,7 +75,7 @@ public class Vector implements Cloneable {
     }
 
     public void normalize() {
-        final var s = 1.0 / distance(this, ORIGIN);
+        final var s = 1.0 / Math.max(distance(this, ORIGIN), Double.MIN_NORMAL);
         this.x = s * x;
         this.y = s * y;
     }

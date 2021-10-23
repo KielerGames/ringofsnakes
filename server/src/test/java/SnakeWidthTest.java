@@ -12,7 +12,7 @@ public class SnakeWidthTest {
 
         for (int i = 0; i < 256; i++) {
             snake.tick();
-            assertTrue(snake.getWidth() >= config.snakeMinWidth);
+            assertTrue(snake.getWidth() >= config.snake.minWidth);
         }
     }
 

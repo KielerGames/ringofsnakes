@@ -32,7 +32,7 @@ class findSnakeSpawnPositionTest {
         Game game = new Game();
         GameConfig config = game.config;
 
-        var space = config.snakeStartLength + config.snakeMinWidth;
+        var space = config.snake.startLength + config.snake.minWidth;
         var chunk = new WorldChunk(game.world, -space, -space, 2 * space, 2 * space, 0, 0);
 
         BoundingBox b1 = new BoundingBox(-space, 0, -space, 0);

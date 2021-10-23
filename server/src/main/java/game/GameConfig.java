@@ -38,7 +38,7 @@ public final class GameConfig {
         public final double speed;
         public final double fastSpeed;
         public final double maxTurnDelta = Math.toRadians(6);
-        public final float minLength = 6f;
+        public final double minLength = 6f;
         public final double startLength = 8.0;
         public final double minWidth = 0.5;
         public final double burnRate = 1 / 10f;

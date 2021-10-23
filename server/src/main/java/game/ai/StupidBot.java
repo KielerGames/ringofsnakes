@@ -60,16 +60,7 @@ public class StupidBot extends Bot {
 
     private void moveTowardsPosition(Snake snake, Vector targetPosition) {
         this.movingToPosition = true;
-        final var targetDirection = determineTargetDirection(snake.getHeadPosition(), targetPosition);
-        final var directionAlpha = Math.atan2(targetDirection.y, targetDirection.x);
-        snake.setTargetDirection(directionAlpha);
+        final var targetDirection = Direction.getFromTo(snake.getHeadPosition(), targetPosition);
+        snake.setTargetDirection(targetDirection);
     }
-
-    private Vector determineTargetDirection(Vector headPosition, Vector targetPosition) {
-        final var direction = targetPosition.clone();
-        direction.addScaled(headPosition, -1);
-        direction.normalize();
-        return direction;
-    }
-
 }

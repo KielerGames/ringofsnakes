@@ -1,5 +1,7 @@
 package util;
 
+import math.Vector;
+
 import java.util.Random;
 
 public final class Direction {
@@ -24,5 +26,11 @@ public final class Direction {
 
     public static double getRandom(Random random) {
         return (random.nextDouble() * 2.0 - 1.0) * Math.PI;
+    }
+
+    public static double getFromTo(Vector from, Vector to) {
+        Vector delta = new Vector(to.x - from.x, to.y - from.y);
+        delta.normalize();
+        return delta.getAlpha();
     }
 }

@@ -26,7 +26,7 @@ const skins: Skin[] = [
     {
         // yellow
         snakeBody: [250, 255, 80],
-        food: [255, 25, 12]
+        food: [255, 255, 22]
     },
     {
         // pink

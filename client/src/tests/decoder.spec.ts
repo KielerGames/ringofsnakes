@@ -63,9 +63,12 @@ describe("Decoder", () => {
 
             const s = 4.2;
             const fasterCfg: GameConfig = Object.assign({}, cfg, {
-                snakeSpeed: s * cfg.snakes.speed,
-                fastSnakeSpeed: s * cfg.snakes.fastSpeed
+                snakes: Object.assign({}, cfg.snakes, {
+                    speed: s * cfg.snakes.speed,
+                    fastSpeed: s * cfg.snakes.fastSpeed
+                })
             });
+            console.log("init path length " + pathLength);
             assert.approximately(
                 SCD.decode(buffer, 0, fasterCfg).data.pathLength,
                 4.2 * pathLength,

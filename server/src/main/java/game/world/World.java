@@ -31,7 +31,7 @@ public class World {
     public World(GameConfig config) {
         this.config = config;
         chunks = WorldChunkFactory.createChunks(this);
-        box = new BoundingBox(new Vector(0, 0), config.chunk.chunkSize * config.chunk.columns, config.chunk.chunkSize * config.chunk.rows);
+        box = new BoundingBox(new Vector(0, 0), config.chunks.chunkSize * config.chunks.columns, config.chunks.chunkSize * config.chunks.rows);
     }
 
     /**

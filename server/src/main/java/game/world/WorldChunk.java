@@ -132,8 +132,8 @@ public class WorldChunk {
 
         for (int i = 0; i < NUMBER_OF_ATTEMPTS; i++) {
             BoundingBox potentialSpawnArea =
-                    new BoundingBox(position, config.snake.startLength + config.snake.minWidth,
-                            config.snake.startLength + config.snake.minWidth);
+                    new BoundingBox(position, config.snakes.startLength + config.snakes.minWidth,
+                            config.snakes.startLength + config.snakes.minWidth);
 
             var areaClear = snakeChunks.stream().noneMatch(snakeChunk ->
                     BoundingBox.intersect(potentialSpawnArea, snakeChunk.getBoundingBox()));

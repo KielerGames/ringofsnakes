@@ -43,14 +43,14 @@ public class Snake {
         this.world = world;
         config = world.getConfig();
         coder = new ChainCodeCoder(config);
-        length = config.snake.startLength;
-        width = config.snake.minWidth;
+        length = config.snakes.startLength;
+        width = config.snakes.minWidth;
     }
 
     private static double computeMaxWidthFromLength(double length, GameConfig config) {
         //sigmoid(3) is roughly  0.95
-        final var x = 3.0 * (length - config.snake.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
-        return (config.snake.minWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
+        final var x = 3.0 * (length - config.snakes.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
+        return (config.snakes.minWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
     }
 
     public void setTargetDirection(float alpha) {
@@ -62,7 +62,7 @@ public class Snake {
     }
 
     public void setFast(boolean wantsFast) {
-        if (length > config.snake.minLength) {
+        if (length > config.snakes.minLength) {
             this.fast = wantsFast;
         } else {
             this.fast = false;
@@ -81,12 +81,12 @@ public class Snake {
 
         // move head & handle length change
         if (fast) {
-            shrink(config.snake.burnRate);
-            handleLengthChange(config.snake.fastSpeed);
-            headPosition.addDirection(headDirection, config.snake.fastSpeed);
+            shrink(config.snakes.burnRate);
+            handleLengthChange(config.snakes.fastSpeed);
+            headPosition.addDirection(headDirection, config.snakes.fastSpeed);
         } else {
-            handleLengthChange(config.snake.speed);
-            headPosition.addDirection(headDirection, config.snake.speed);
+            handleLengthChange(config.snakes.speed);
+            headPosition.addDirection(headDirection, config.snakes.speed);
         }
 
         // update width
@@ -157,7 +157,7 @@ public class Snake {
         final var bufferAmount = Math.min(lengthBuffer, amount);
         lengthBuffer -= bufferAmount;
         final var snakeAmount = amount - bufferAmount;
-        final var newLength = Math.max(config.snake.minLength, length - snakeAmount);
+        final var newLength = Math.max(config.snakes.minLength, length - snakeAmount);
         final var deltaLength = length - newLength;
         length = newLength;
         final var smallFoodNutritionalValue = config.foodNutritionalValue * Food.Size.SMALL.value * Food.Size.SMALL.value;

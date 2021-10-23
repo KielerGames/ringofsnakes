@@ -81,7 +81,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
         }
 
         direction += coder.decodeDirectionChange(dirDelta);
-        final double stepSize = fast ? snake.config.snake.fastSpeed : snake.config.snake.speed;
+        final double stepSize = fast ? snake.config.snakes.fastSpeed : snake.config.snakes.speed;
         x += Math.cos(direction) * stepSize;
         y += Math.sin(direction) * stepSize;
         length += stepSize;

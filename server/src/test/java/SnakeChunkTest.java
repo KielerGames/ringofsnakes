@@ -39,7 +39,7 @@ public class SnakeChunkTest {
         } while (nextLength > lastLength);
 
         assertTrue(ticks > 1);
-        assertEquals(snake.getLength(), lastLength, config.fastSnakeSpeed);
+        assertEquals(snake.getLength(), lastLength, config.snakes.fastSpeed);
     }
 
     static void tickUntilNewSnakeChunk(Snake snake, Random random) {
@@ -89,7 +89,7 @@ public class SnakeChunkTest {
             snake.tick();
             final var length = computeSnakeLength(snake);
             assertTrue(length < snake.getLength());
-            assertEquals(snake.getLength(), length, config.fastSnakeSpeed);
+            assertEquals(snake.getLength(), length, config.snakes.fastSpeed);
         }
     }
 

@@ -1,35 +1,26 @@
 package game;
 
 public final class GameConfig {
-    public final float minLength = 5f;
-    public final float burnRate = 1 / 10f;
     public final double tickDuration = 1.0 / 25.0; // in seconds
-    public final double snakeSpeed;
-    public final double fastSnakeSpeed;
-    public final double maxTurnDelta;
-    public final ChunkInfo chunkInfo;
-    public final double snakeStartLength = 8.0;
-    public final double snakeMinWidth = 0.5;
     public final double foodNutritionalValue = 1.0;
     public final double foodConversionEfficiency = 0.5;
     public final int targetSnakePopulation = 32;
+    public final boolean selfCollision = false;
+
+    public final ChunkInfo chunks;
+    public final SnakeInfo snakes;
 
     public GameConfig() {
         this(new ChunkInfo(32.0, 16));
     }
 
     public GameConfig(ChunkInfo chunkInfo) {
-        this.chunkInfo = chunkInfo;
-
-        snakeSpeed = 0.24;
-        fastSnakeSpeed = 2.0 * snakeSpeed;
-
-        // max degrees per tick
-        maxTurnDelta = Math.toRadians(6);
+        this.chunks = chunkInfo;
+        this.snakes = new SnakeInfo(0.24);
     }
 
     public static class ChunkInfo {
-        public final double chunkSize;
+        public final double size;
         public final int columns;
         public final int rows;
 
@@ -38,9 +29,25 @@ public final class GameConfig {
                 throw new IllegalArgumentException();
             }
 
-            chunkSize = size;
+            this.size = size;
             columns = n;
             rows = n;
+        }
+    }
+
+    public static class SnakeInfo {
+        public final double speed;
+        public final double fastSpeed;
+        public final double maxTurnDelta = Math.toRadians(6);
+        public final double minLength = 6.0;
+        public final double startLength = 8.0;
+        public final double minWidth = 0.5;
+        public final double maxWidth = 6.0;
+        public final double burnRate = 1 / 10.0;
+
+        public SnakeInfo(double speed) {
+            this.speed = speed;
+            fastSpeed = 2.0 * speed;
         }
     }
 }

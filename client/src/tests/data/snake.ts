@@ -32,18 +32,25 @@ export function createSnakeChunkBuffer(
 
 export function createGameConfig(speed: number = 0.24): GameConfig {
     return {
-        snakeSpeed: speed,
-        snakeStartLength: 8,
-        snakeMinWidth: 0.5,
-        fastSnakeSpeed: 2 * speed,
-        maxTurnDelta: Math.PI / 30,
-        tickDuration: 1.0 / 25,
-        minLength: 3.0,
-        chunkInfo: {
-            chunkSize: 32,
+        chunks: {
+            size: 32,
             columns: 16,
             rows: 16
-        }
+        },
+        snakes: {
+            minLength: 6.0,
+            maxTurnDelta: Math.PI / 30,
+            speed: speed,
+            startLength: 8,
+            minWidth: 0.5,
+            maxWidth: 6.0,
+            fastSpeed: 2 * speed,
+            burnRate: 0.1
+        },
+        tickDuration: 1.0 / 25,
+        foodNutritionalValue: 1.0,
+        foodConversionEfficiency: 0.5,
+        selfCollision: false
     };
 }
 

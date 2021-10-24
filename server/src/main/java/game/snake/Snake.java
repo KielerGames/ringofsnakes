@@ -16,8 +16,7 @@ import java.util.stream.Stream;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
-    public static final double MAX_WIDTH_GAIN = 4f;
-    public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
+    public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 1024.0;
     private static final Random random = new Random();
 
     public final GameConfig config;
@@ -44,14 +43,15 @@ public class Snake {
         this.world = world;
         config = world.getConfig();
         coder = new ChainCodeCoder(config);
-        length = config.snakeStartLength;
-        width = config.snakeMinWidth;
+        length = config.snakes.startLength;
+        width = config.snakes.minWidth;
     }
 
     protected void updateWidth() {
         //sigmoid(3) is roughly  0.95
-        final var x = 3.0 * (length - config.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
-        width = (config.snakeMinWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * MAX_WIDTH_GAIN);
+        final var x = 3.0 * (length - config.snakes.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
+        final var maxWidthGain = config.snakes.maxWidth - config.snakes.minWidth;
+        width = (config.snakes.minWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * maxWidthGain);
     }
 
     public void setTargetDirection(double alpha) {
@@ -63,7 +63,7 @@ public class Snake {
     }
 
     public void setFast(boolean wantsFast) {
-        if (length > config.minLength) {
+        if (length > config.snakes.minLength) {
             this.fast = wantsFast;
         } else {
             this.fast = false;
@@ -78,12 +78,12 @@ public class Snake {
 
         // move head & handle length change
         if (fast) {
-            shrink(config.burnRate);
-            handleLengthChange(config.fastSnakeSpeed);
-            headPosition.addDirection(headDirection, config.fastSnakeSpeed);
+            shrink(config.snakes.burnRate);
+            handleLengthChange(config.snakes.fastSpeed);
+            headPosition.addDirection(headDirection, config.snakes.fastSpeed);
         } else {
-            handleLengthChange(config.snakeSpeed);
-            headPosition.addDirection(headDirection, config.snakeSpeed);
+            handleLengthChange(config.snakes.speed);
+            headPosition.addDirection(headDirection, config.snakes.speed);
         }
 
         updateWidth();
@@ -153,7 +153,7 @@ public class Snake {
         final var bufferAmount = Math.min(lengthBuffer, amount);
         lengthBuffer -= bufferAmount;
         final var snakeAmount = amount - bufferAmount;
-        final var newLength = Math.max(config.minLength, length - snakeAmount);
+        final var newLength = Math.max(config.snakes.minLength, length - snakeAmount);
         final var deltaLength = length - newLength;
         length = newLength;
         final var smallFoodNutritionalValue = config.foodNutritionalValue * Food.Size.SMALL.value * Food.Size.SMALL.value;

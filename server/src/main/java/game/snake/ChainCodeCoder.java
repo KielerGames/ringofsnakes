@@ -11,7 +11,7 @@ public class ChainCodeCoder {
     private static final int FAST_BIT = 1 << 7;
 
     public ChainCodeCoder(GameConfig config) {
-        MAX_DELTA = config.maxTurnDelta;
+        MAX_DELTA = config.snakes.maxTurnDelta;
     }
 
     /**

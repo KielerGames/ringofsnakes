@@ -44,7 +44,7 @@ public class SnakeFactory {
         snake.beginChunk();
         world.addSnake(snake);
 
-        final int iterations = (int) Math.ceil(snake.getLength() / world.getConfig().snakeSpeed);
+        final int iterations = (int) Math.ceil(snake.getLength() / world.getConfig().snakes.speed);
         for (int i = 0; i < iterations; i++) {
             snake.tick();
         }

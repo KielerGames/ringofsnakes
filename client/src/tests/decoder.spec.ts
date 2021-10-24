@@ -6,18 +6,25 @@ import * as SID from "../app/worker/decoder/SnakeInfoDecoder";
 import { createSnakeChunkBuffer } from "./data/snake";
 
 const cfg: GameConfig = {
-    snakeSpeed: 0.24,
-    snakeStartLength: 8,
-    snakeMinWidth: 0.5,
-    fastSnakeSpeed: 0.48,
-    maxTurnDelta: Math.PI / 30,
-    tickDuration: 1.0 / 25,
-    minLength: 3.0,
-    chunkInfo: {
-        chunkSize: 32,
+    chunks: {
+        size: 32,
         columns: 16,
         rows: 16
-    }
+    },
+    snakes: {
+        speed: 0.24,
+        startLength: 8,
+        minWidth: 0.5,
+        fastSpeed: 0.48,
+        maxTurnDelta: Math.PI / 30,
+        minLength: 6.0,
+        maxWidth: 6.0,
+        burnRate: 0.1
+    },
+    tickDuration: 1.0 / 25,
+    foodNutritionalValue: 1.0,
+    foodConversionEfficiency: 0.5,
+    selfCollision: false
 };
 
 describe("Decoder", () => {
@@ -53,13 +60,16 @@ describe("Decoder", () => {
             const n = 42;
             const buffer = createSnakeChunkBuffer(n);
             const pathLength = SCD.decode(buffer, 0, cfg).data.pathLength;
-            assert.isAtLeast(pathLength, n * cfg.snakeSpeed);
+            assert.isAtLeast(pathLength, n * cfg.snakes.speed);
 
             const s = 4.2;
             const fasterCfg: GameConfig = Object.assign({}, cfg, {
-                snakeSpeed: s * cfg.snakeSpeed,
-                fastSnakeSpeed: s * cfg.fastSnakeSpeed
+                snakes: Object.assign({}, cfg.snakes, {
+                    speed: s * cfg.snakes.speed,
+                    fastSpeed: s * cfg.snakes.fastSpeed
+                })
             });
+            console.log("init path length " + pathLength);
             assert.approximately(
                 SCD.decode(buffer, 0, fasterCfg).data.pathLength,
                 4.2 * pathLength,

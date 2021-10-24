@@ -23,7 +23,7 @@ public class BoundarySnake extends Snake {
         updateLengthAndWidth();
 
         final var wb = world.box;
-        final var boxWidth = Math.min(3 * getWidth(), world.getConfig().chunkInfo.chunkSize);
+        final var boxWidth = Math.min(3 * getWidth(), world.getConfig().chunks.size);
 
         /*
          * Position of up and bottom BoundingBox within world:
@@ -46,7 +46,7 @@ public class BoundarySnake extends Snake {
     public void updateLengthAndWidth() {
         final var worldWidth = world.box.getWidth();
         final var worldHeight = world.box.getHeight();
-        final var chunkSize = world.getConfig().chunkInfo.chunkSize;
+        final var chunkSize = world.getConfig().chunks.size;
 
         length = 2 * (worldWidth + worldHeight) + 0.75 * chunkSize;
 

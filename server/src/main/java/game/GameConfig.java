@@ -20,7 +20,7 @@ public final class GameConfig {
     }
 
     public static class ChunkInfo {
-        public final double chunkSize;
+        public final double size;
         public final int columns;
         public final int rows;
 
@@ -29,7 +29,7 @@ public final class GameConfig {
                 throw new IllegalArgumentException();
             }
 
-            chunkSize = size;
+            this.size = size;
             columns = n;
             rows = n;
         }

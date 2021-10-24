@@ -14,9 +14,9 @@ public class World {
     private static final int FOOD_THRESHOLD = 16;
     private static Random random = new Random();
     public final WorldChunkCollection chunks;
+    public final Vector center = new Vector(0, 0);
     private final GameConfig config;
     public BoundingBox box;
-    public final Vector center = new Vector(0,0);
 
     public World(double chunkSize, int repetitions) {
         this.config = new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions));
@@ -31,7 +31,7 @@ public class World {
     public World(GameConfig config) {
         this.config = config;
         chunks = WorldChunkFactory.createChunks(this);
-        box = new BoundingBox(new Vector(0, 0), config.chunks.chunkSize * config.chunks.columns, config.chunks.chunkSize * config.chunks.rows);
+        box = new BoundingBox(new Vector(0, 0), config.chunks.size * config.chunks.columns, config.chunks.size * config.chunks.rows);
     }
 
     /**

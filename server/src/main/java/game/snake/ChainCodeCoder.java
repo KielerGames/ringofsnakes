@@ -2,16 +2,31 @@ package game.snake;
 
 import game.GameConfig;
 
-public class ChainCodeCoder {
-    final double MAX_DELTA;
+import static util.NumberUtilities.clamp;
 
+public class ChainCodeCoder {
     public static final int STEPS_MASK = 7 << 4;
     public static final int DIRECTION_MASK = 15;
     public static final int MAX_STEPS = 8;
     private static final int FAST_BIT = 1 << 7;
+    private static final double VALUE_RANGE = 6.0/7.0;
+    private final double MAX_DELTA;
+    private final double MIN_DELTA;
+    private final GameConfig config;
+    private final Snake snake;
 
-    public ChainCodeCoder(GameConfig config) {
+    public ChainCodeCoder(Snake snake) {
+        this.snake = snake;
+        this.config = snake.config;
         MAX_DELTA = config.snakes.maxTurnDelta;
+        MIN_DELTA = config.snakes.maxTurnDelta / 7.0;
+    }
+
+    private double getMaxTurnDelta() {
+        final var width = snake.getWidth();
+        final var x = (width - config.snakes.minWidth) / (config.snakes.maxWidth - config.snakes.minWidth);
+        final var scale = 1.0 - VALUE_RANGE * x;
+        return scale * MAX_DELTA;
     }
 
     /**
@@ -45,8 +60,9 @@ public class ChainCodeCoder {
         }
         assert Math.abs(delta) <= Math.PI;
 
-        // clamp delta angle
-        delta = Math.max(-MAX_DELTA, Math.min(delta, MAX_DELTA));
+        final double maxDelta = getMaxTurnDelta();
+        assert maxDelta >= MIN_DELTA;
+        delta = clamp(delta, -maxDelta, maxDelta);
 
         // angle sampling [0,15]
         int k = (byte) Math.round((7 * delta) / MAX_DELTA);

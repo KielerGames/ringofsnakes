@@ -105,7 +105,9 @@ public class Game {
     public void addBotsRandomly(int n) {
         for (int i = 0; i < n; i++) {
             StupidBot bot = new StupidBot(this, this.world.findSpawnPosition());
-            snakes.add(bot.getSnake());
+            synchronized (this) {
+                snakes.add(bot.getSnake());
+            }
             bots.add(bot);
         }
     }
@@ -133,7 +135,9 @@ public class Game {
 
         executor.scheduleAtFixedRate(() -> {
             // garbage-collection
-            snakes.removeIf(Predicate.not(Snake::isAlive));
+            synchronized (this) {
+                snakes.removeIf(Predicate.not(Snake::isAlive));
+            }
             world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
             bots.removeIf(Predicate.not(Bot::isAlive));
         }, 250, 1000, TimeUnit.MILLISECONDS);

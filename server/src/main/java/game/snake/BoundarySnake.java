@@ -14,13 +14,13 @@ public class BoundarySnake extends Snake {
 
     BoundarySnake(short id, World world) {
         super(id, world);
+        updateLengthAndWidth();
+
         // start at bottom center
-        headPosition = new Vector(0.0, world.box.minY + 0.75 * getWidth());
+        headPosition = new Vector(0.0, world.box.minY + getWidth());
         // go right
         headDirection = 0.0;
         setTargetDirection(headDirection);
-
-        updateLengthAndWidth();
 
         final var wb = world.box;
         final var boxWidth = Math.min(3 * getWidth(), world.getConfig().chunks.size);

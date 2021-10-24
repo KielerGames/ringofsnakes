@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
-    public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 700f;
+    public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 1024.0;
     private static final Random random = new Random();
 
     public final GameConfig config;

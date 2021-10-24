@@ -10,7 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,7 +30,7 @@ class findSnakeSpawnPositionTest {
     @Test
     void testFindSnakeSpawnPosition() {
         Random rnd = new Random(42);
-        Game game = new Game();
+        Game game = new TestGame();
         GameConfig config = game.config;
 
         var space = config.snakes.startLength + config.snakes.minWidth;

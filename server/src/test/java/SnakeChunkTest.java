@@ -3,6 +3,7 @@ import game.snake.*;
 import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Test;
+import util.Direction;
 
 import java.util.List;
 import java.util.Random;
@@ -54,7 +55,7 @@ public class SnakeChunkTest {
         ) {
             snake.tick();
             if (random.nextDouble() < 0.1) {
-                snake.setTargetDirection((float) ((2.0 * random.nextDouble() - 1.0) * Math.PI));
+                snake.setTargetDirection(Direction.getRandom(random));
             }
         }
     }
@@ -111,7 +112,7 @@ public class SnakeChunkTest {
 
         while (!lastSnakeChunk.isJunk()) {
             // move snake
-            snake.setTargetDirection((float) ((2.0 * random.nextDouble() - 1.0) * Math.PI));
+            snake.setTargetDirection(Direction.getRandom(random));
             snake.tick();
             assertTrue(lastOffset < lastSnakeChunk.getOffset());
             lastOffset = lastSnakeChunk.getOffset();
@@ -168,7 +169,7 @@ public class SnakeChunkTest {
         while (!lastChunk.isJunk()) {
             snake.tick();
             if (random.nextDouble() < 0.1) {
-                snake.setTargetDirection((float) ((2.0 * random.nextDouble() - 1.0) * Math.PI));
+                snake.setTargetDirection(Direction.getRandom(random));
             }
         }
 

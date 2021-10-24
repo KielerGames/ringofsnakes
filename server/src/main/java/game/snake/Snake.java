@@ -4,6 +4,7 @@ import game.GameConfig;
 import game.world.Food;
 import game.world.World;
 import math.Vector;
+import util.Direction;
 
 import java.nio.ByteBuffer;
 import java.util.Comparator;
@@ -26,12 +27,12 @@ public class Snake {
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     public byte skin;
     public GrowingSnakeChunk currentChunk;
+    protected double length;
     Vector headPosition;
-    float headDirection;
+    double headDirection;
     private boolean alive = true;
-    private double length;
     private short nextChunkId = 0;
-    private float targetDirection;
+    private double targetDirection;
     private boolean fast = false;
     private double lengthBuffer = 0;
     private double width;
@@ -46,14 +47,14 @@ public class Snake {
         width = config.snakes.minWidth;
     }
 
-    private static double computeMaxWidthFromLength(double length, GameConfig config) {
+    protected void updateWidth() {
         //sigmoid(3) is roughly  0.95
         final var x = 3.0 * (length - config.snakes.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
         final var maxWidthGain = config.snakes.maxWidth - config.snakes.minWidth;
-        return (config.snakes.minWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * maxWidthGain);
+        width = (config.snakes.minWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * maxWidthGain);
     }
 
-    public void setTargetDirection(float alpha) {
+    public void setTargetDirection(double alpha) {
         if (Math.abs(alpha) > Math.PI + 1e-4) {
             System.err.println("Alpha out of range: " + alpha);
         } else {
@@ -73,11 +74,7 @@ public class Snake {
         // update direction
         int encDirDelta = coder.sampleDirectionChange(targetDirection, headDirection);
         double dirDelta = coder.decodeDirectionChange(encDirDelta);
-        headDirection += dirDelta;
-        // normalize direction
-        if (Math.abs(headDirection) > Math.PI) {
-            headDirection -= Math.signum(headDirection) * 2.0 * Math.PI;
-        }
+        headDirection = Direction.normalize(headDirection + dirDelta);
 
         // move head & handle length change
         if (fast) {
@@ -89,8 +86,7 @@ public class Snake {
             headPosition.addDirection(headDirection, config.snakes.speed);
         }
 
-        // update width
-        width = computeMaxWidthFromLength(length, config);
+        updateWidth();
 
         // update chunks
         currentChunk.append(encDirDelta, fast);
@@ -115,7 +111,7 @@ public class Snake {
         if (currentChunk != null) {
             assert currentChunk.isFull();
 
-            var snakeChunk = currentChunk.build();
+            final var snakeChunk = currentChunk.build();
             chunks.add(0, snakeChunk);
             world.addSnakeChunk(snakeChunk);
         }
@@ -135,8 +131,8 @@ public class Snake {
         buffer.put(4, skin);
         buffer.put(5, (byte) (fast ? 1 : 0));
         buffer.putFloat(6, (float) length);
-        buffer.putFloat(10, headDirection);
-        buffer.putFloat(14, targetDirection);
+        buffer.putFloat(10, (float) headDirection);
+        buffer.putFloat(14, (float) targetDirection);
         buffer.putFloat(18, (float) headPosition.x);
         buffer.putFloat(22, (float) headPosition.y);
         buffer.position(INFO_BYTE_SIZE);

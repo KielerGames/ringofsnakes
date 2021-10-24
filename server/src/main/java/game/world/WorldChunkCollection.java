@@ -25,19 +25,15 @@ public abstract class WorldChunkCollection {
     }
 
     public Set<WorldChunk> findIntersectingChunks(BoundingBox box) {
-        var center = box.getCenter();
+        final var center = box.getCenter();
 
-        if (center == null) {
-            throw new IllegalArgumentException();
-        }
-
-        var queue = new LinkedList<WorldChunk>();
+        final var queue = new LinkedList<WorldChunk>();
         queue.add(findChunk(center));
 
-        var intersectingChunks = new HashSet<WorldChunk>();
+        final var intersectingChunks = new HashSet<WorldChunk>();
 
         while (queue.size() > 0) {
-            var chunk = queue.removeFirst();
+            final var chunk = queue.removeFirst();
             intersectingChunks.add(chunk);
             chunk.neighbors.stream()
                     .filter(nc -> !intersectingChunks.contains(nc))

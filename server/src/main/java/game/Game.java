@@ -47,6 +47,9 @@ public class Game {
         for (int i = 0; i < 256; i++) {
             world.spawnFood();
         }
+
+        final var boundarySnake = SnakeFactory.createBoundarySnake(world);
+        snakes.add(boundarySnake);
     }
 
     /**

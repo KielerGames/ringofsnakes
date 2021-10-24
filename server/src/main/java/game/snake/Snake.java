@@ -36,13 +36,13 @@ public class Snake {
     private boolean fast = false;
     private double lengthBuffer = 0;
     private double width;
-    private float foodTrailBuffer = 0f;
+    private double foodTrailBuffer = 0f;
 
     Snake(short id, World world) {
         this.id = id;
         this.world = world;
         config = world.getConfig();
-        coder = new ChainCodeCoder(config);
+        coder = new ChainCodeCoder(this);
         length = config.snakes.startLength;
         width = config.snakes.minWidth;
     }

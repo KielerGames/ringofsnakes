@@ -2,6 +2,7 @@ package game;
 
 import game.snake.Snake;
 import game.snake.SnakeChunk;
+import game.snake.SnakePathPoint;
 import game.world.Collidable;
 import game.world.WorldChunk;
 import math.Vector;
@@ -25,21 +26,27 @@ public class CollisionManager {
         this.selfCollision = game.config.selfCollision;
     }
 
-    private static boolean collidesWithSnakeChunk(Snake snake, SnakeChunk snakeChunk) {
+    private boolean collidesWithSnakeChunk(Snake snake, SnakeChunk snakeChunk) {
         final var otherSnake = snakeChunk.getSnake();
         final var otherSnakeLength = otherSnake.getLength();
         final var radius1 = 0.5 * snake.getWidth();
         final var radius2 = 0.5 * otherSnake.getWidth();
         final var collisionBound = (radius1 + radius2) * (radius1 + radius2);
         final var headPosition = snake.getHeadPosition();
+        final var selfCollisionBound = 1.25 * snake.getWidth();
+
+        Predicate<SnakePathPoint> pdFilter = selfCollision && snake.equals(snakeChunk.getSnake()) ? (
+                pd -> pd.getOffsetInSnake() > selfCollisionBound
+        ) : (pd -> true);
 
         return snakeChunk.getPathData().stream()
                 .filter(pd -> pd.getOffsetInSnake() < otherSnakeLength)
+                .filter(pdFilter)
                 .filter(pd -> Vector.distance2(headPosition, pd.point) < collisionBound)
                 .anyMatch(pd -> {
                     final var width = pd.getSnakeWidth();
 
-                    if (width < 1e-4) {
+                    if (width < 1e-2) {
                         // no collision if the snake is very thin
                         return false;
                     }

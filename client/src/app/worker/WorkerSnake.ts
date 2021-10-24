@@ -92,8 +92,14 @@ function computeWidthFromLength(
     const minWidth = config.snakes.minWidth;
     const maxWidthGain = config.snakes.maxWidth - config.snakes.minWidth;
     const LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 1024.0;
-    const denominator = 1.0 / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
-    const x = 3.0 * (length - config.snakes.minLength) * denominator;
-    const sigmoid = 1.0 / (1.0 + Math.exp(-x)) - 0.5;
-    return 2.0 * (minWidth + sigmoid * maxWidthGain);
+
+    const x =
+        (length - config.snakes.minLength) *
+        (LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH - config.snakes.minLength);
+    const gain = 2.0 * (sigmoid(3.0 * x) - 0.5);
+    return minWidth + gain * maxWidthGain;
+}
+
+function sigmoid(x: number): number {
+    return 1.0 / (1.0 + Math.exp(-x));
 }

@@ -14,6 +14,8 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static util.MathFunctions.sigmoid;
+
 public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
     public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 1024.0;
@@ -45,13 +47,20 @@ public class Snake {
         coder = new ChainCodeCoder(config);
         length = config.snakes.startLength;
         width = config.snakes.minWidth;
+
+        updateWidth();
     }
 
     protected void updateWidth() {
-        //sigmoid(3) is roughly  0.95
-        final var x = 3.0 * (length - config.snakes.minLength) / LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH;
+        // x in [0,1]
+        final var x = (length - config.snakes.minLength) / (LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH - config.snakes.minLength);
+
         final var maxWidthGain = config.snakes.maxWidth - config.snakes.minWidth;
-        width = (config.snakes.minWidth + (1.0 / (1 + Math.exp(-x)) - 0.5) * maxWidthGain);
+
+        //sigmoid(3) is roughly  0.95
+        final var gain = 2.0 * (sigmoid(3.0 * x) - 0.5);
+
+        width = config.snakes.minWidth + gain * maxWidthGain;
     }
 
     public void setTargetDirection(double alpha) {

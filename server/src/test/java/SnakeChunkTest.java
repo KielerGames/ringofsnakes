@@ -3,8 +3,8 @@ import game.snake.*;
 import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Test;
+import util.Direction;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -55,7 +55,7 @@ public class SnakeChunkTest {
         ) {
             snake.tick();
             if (random.nextDouble() < 0.1) {
-                snake.setTargetDirection((float) ((2.0 * random.nextDouble() - 1.0) * Math.PI));
+                snake.setTargetDirection(Direction.getRandom(random));
             }
         }
     }
@@ -112,7 +112,7 @@ public class SnakeChunkTest {
 
         while (!lastSnakeChunk.isJunk()) {
             // move snake
-            snake.setTargetDirection((float) ((2.0 * random.nextDouble() - 1.0) * Math.PI));
+            snake.setTargetDirection(Direction.getRandom(random));
             snake.tick();
             assertTrue(lastOffset < lastSnakeChunk.getOffset());
             lastOffset = lastSnakeChunk.getOffset();
@@ -169,7 +169,7 @@ public class SnakeChunkTest {
         while (!lastChunk.isJunk()) {
             snake.tick();
             if (random.nextDouble() < 0.1) {
-                snake.setTargetDirection((float) ((2.0 * random.nextDouble() - 1.0) * Math.PI));
+                snake.setTargetDirection(Direction.getRandom(random));
             }
         }
 
@@ -193,7 +193,7 @@ public class SnakeChunkTest {
         final var startOffset = snakeChunk.getOffset();
         final var endOffset = startOffset + snakeChunk.getLength();
 
-        for(var offset = startOffset; offset <= endOffset; offset += 0.05) {
+        for (var offset = startOffset; offset <= endOffset; offset += 0.05) {
             final var point = snake.getPositionAt(offset);
             assertNotNull(point);
             assertEquals(0.0, snakeChunk.getBoundingBox().distance(point), 1e-4);

@@ -32,7 +32,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
 
         end = snake.headPosition.clone();
         pathData.add(new SnakePathPoint(this, end.clone(), 0.0));
-        endDirection = snake.headDirection;
+        endDirection = (float) snake.headDirection;
         direction = endDirection;
 
         minX = maxX = x = end.x;

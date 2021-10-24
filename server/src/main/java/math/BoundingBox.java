@@ -134,6 +134,10 @@ public class BoundingBox {
         return x && y;
     }
 
+    public boolean contains(Vector p) {
+        return isWithinSubBox(p, 0.0);
+    }
+
     public Vector getCenter() {
         return new Vector(
                 minX + 0.5 * (maxX - minX),

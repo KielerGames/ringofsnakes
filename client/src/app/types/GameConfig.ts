@@ -9,7 +9,7 @@ export type GameConfig = Readonly<{
 }>;
 
 type ChunkInfo = {
-    chunkSize: number;
+    size: number;
     columns: number;
     rows: number;
 };

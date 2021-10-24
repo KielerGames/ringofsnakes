@@ -7,7 +7,7 @@ import { createSnakeChunkBuffer } from "./data/snake";
 
 const cfg: GameConfig = {
     chunks: {
-        chunkSize: 32,
+        size: 32,
         columns: 16,
         rows: 16
     },

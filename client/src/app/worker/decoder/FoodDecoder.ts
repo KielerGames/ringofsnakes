@@ -13,7 +13,7 @@ export function decode(
     config: GameConfig
 ): DecodeResult<FoodChunkDTO> {
     const view = new DataView(buffer, offset);
-    const chunkSize = config.chunks.chunkSize;
+    const chunkSize = config.chunks.size;
 
     const column = view.getUint8(0);
     const row = view.getUint8(1);

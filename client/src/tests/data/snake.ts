@@ -33,7 +33,7 @@ export function createSnakeChunkBuffer(
 export function createGameConfig(speed: number = 0.24): GameConfig {
     return {
         chunks: {
-            chunkSize: 32,
+            size: 32,
             columns: 16,
             rows: 16
         },

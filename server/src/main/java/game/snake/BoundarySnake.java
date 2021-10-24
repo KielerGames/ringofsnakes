@@ -8,6 +8,7 @@ import util.Direction;
 import java.util.Random;
 
 public class BoundarySnake extends Snake {
+    private static final double DIRECTION_SCATTERING = Math.toRadians(1.5);
     private BoundingBox bottom, right, up, left;
     private Random random = new Random();
 
@@ -64,27 +65,27 @@ public class BoundarySnake extends Snake {
         final var wb = world.box;
         Vector target = null;
 
-        if(bottom.contains(p)) {
+        if (bottom.contains(p)) {
             // go right
             target = new Vector(wb.maxX, wb.minY + distanceFromBorder);
-        } else if(right.contains(p)) {
+        } else if (right.contains(p)) {
             // go up
             target = new Vector(wb.maxX - distanceFromBorder, wb.maxY);
-        } else if(up.contains(p)) {
+        } else if (up.contains(p)) {
             // go left
             target = new Vector(wb.minX, wb.maxY - distanceFromBorder);
-        } else if(left.contains(p)) {
+        } else if (left.contains(p)) {
             // go down
             target = new Vector(wb.minX + distanceFromBorder, wb.minY);
         }
 
-        if(target == null) {
+        if (target == null) {
             throw new IllegalStateException("Boundary snake does not know where to go.");
         }
 
         var direction = Direction.getFromTo(p, target);
         // scattering
-        direction = Direction.normalize(direction + random.nextDouble() * 0.05);
+        direction = Direction.normalize(direction + random.nextDouble() * DIRECTION_SCATTERING);
         setTargetDirection(direction);
     }
 

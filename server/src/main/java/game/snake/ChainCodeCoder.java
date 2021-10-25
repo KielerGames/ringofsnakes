@@ -25,8 +25,13 @@ public class ChainCodeCoder {
 
     private double getMaxTurnDelta() {
         final var width = snake.getWidth();
+
+        // x in [0, 1] (relative width)
         final var x = (width - config.snakes.minWidth) / (config.snakes.maxWidth - config.snakes.minWidth);
+
+        // scale in [1/7, 1]
         final var scale = 1.0 - SCALE_RANGE * x;
+
         return scale * config.snakes.maxTurnDelta;
     }
 

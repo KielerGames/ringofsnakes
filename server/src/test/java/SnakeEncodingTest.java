@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SnakeEncodingTest {
-    private static final ChainCodeCoder coder = new ChainCodeCoder(new GameConfig());
+    private static final ChainCodeCoder coder = new ChainCodeCoder(SnakeFactory.createTestSnake());
 
     @SuppressWarnings("ConstantConditions")
     @Test

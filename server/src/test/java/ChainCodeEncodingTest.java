@@ -1,5 +1,6 @@
 import game.GameConfig;
 import game.snake.ChainCodeCoder;
+import game.snake.SnakeFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class ChainCodeEncodingTest {
 
-    final ChainCodeCoder coder = null;//new ChainCodeCoder(new GameConfig()); //TODO
+    final ChainCodeCoder coder = new ChainCodeCoder(SnakeFactory.createTestSnake());
 
     @Test
     void testAllEncodings() {

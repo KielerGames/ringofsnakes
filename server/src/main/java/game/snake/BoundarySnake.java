@@ -23,7 +23,7 @@ public class BoundarySnake extends Snake {
         setTargetDirection(headDirection);
 
         final var wb = world.box;
-        final var boxWidth = Math.min(3 * getWidth(), world.getConfig().chunks.size);
+        final var boxWidth = Math.min(3.14 * getWidth(), world.getConfig().chunks.size);
 
         /*
          * Position of up and bottom BoundingBox within world:

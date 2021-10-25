@@ -9,24 +9,25 @@ public class ChainCodeCoder {
     public static final int DIRECTION_MASK = 15;
     public static final int MAX_STEPS = 8;
     private static final int FAST_BIT = 1 << 7;
-    private static final double VALUE_RANGE = 6.0/7.0;
-    private final double MAX_DELTA;
-    private final double MIN_DELTA;
+    private static final double SCALE_RANGE = 6.0/7.0 - Double.MIN_NORMAL;
+
     private final GameConfig config;
     private final Snake snake;
+    private final double DIR_STEP;
+    private final double INV_MAX_DELTA;
 
     public ChainCodeCoder(Snake snake) {
         this.snake = snake;
         this.config = snake.config;
-        MAX_DELTA = config.snakes.maxTurnDelta;
-        MIN_DELTA = config.snakes.maxTurnDelta / 7.0;
+        DIR_STEP = config.snakes.maxTurnDelta / 7.0;
+        INV_MAX_DELTA = 1.0 / config.snakes.maxTurnDelta;
     }
 
     private double getMaxTurnDelta() {
         final var width = snake.getWidth();
         final var x = (width - config.snakes.minWidth) / (config.snakes.maxWidth - config.snakes.minWidth);
-        final var scale = 1.0 - VALUE_RANGE * x;
-        return scale * MAX_DELTA;
+        final var scale = 1.0 - SCALE_RANGE * x;
+        return scale * config.snakes.maxTurnDelta;
     }
 
     /**
@@ -61,18 +62,17 @@ public class ChainCodeCoder {
         assert Math.abs(delta) <= Math.PI;
 
         final double maxDelta = getMaxTurnDelta();
-        assert maxDelta >= MIN_DELTA;
         delta = clamp(delta, -maxDelta, maxDelta);
 
         // angle sampling [0,15]
-        int k = (byte) Math.round((7 * delta) / MAX_DELTA);
+        int k = (byte) Math.round((7 * delta) * INV_MAX_DELTA);
         return 2 * Math.abs(k) + (k < 0 ? 1 : 0);
     }
 
     public double decodeDirectionChange(int direction) {
         int sign = 1 - ((direction & 1) << 1);
         int k = sign * (direction / 2);
-        return k * MAX_DELTA / 7.0;
+        return k * DIR_STEP;
     }
 
     public DecodedData decode(byte b) {

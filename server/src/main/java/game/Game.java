@@ -11,9 +11,9 @@ import game.world.World;
 import game.world.WorldChunk;
 import server.Client;
 import server.Player;
+import server.protocol.Leaderboard;
 import server.protocol.SnakeDeathInfo;
 import server.protocol.SpawnInfo;
-import server.protocol.Leaderboard;
 import util.ExceptionalExecutorService;
 
 import javax.websocket.Session;
@@ -75,11 +75,14 @@ public class Game {
         if (object instanceof SnakeChunk) {
             final var snakeChunk = (SnakeChunk) object;
             final var otherSnake = snakeChunk.getSnake();
-            System.out.println("Snake " + snake.id + " collided with snake " + otherSnake.id + ".");
+            System.out.println(snake + " collided with " + otherSnake + ".");
             snake.kill();
 
-            final var killMessage = gson.toJson(new SnakeDeathInfo(snake));
-            executor.schedule(() -> clients.forEach((sId, client) -> client.send(killMessage)), 0, TimeUnit.MILLISECONDS);
+            if (!snake.isAlive()) {
+                // some snakes, such as the BoundarySnake are not killable
+                final var killMessage = gson.toJson(new SnakeDeathInfo(snake));
+                executor.schedule(() -> clients.forEach((sId, client) -> client.send(killMessage)), 0, TimeUnit.MILLISECONDS);
+            }
         }
     }
 

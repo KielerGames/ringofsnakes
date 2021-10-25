@@ -108,4 +108,9 @@ public class BoundarySnake extends Snake {
     public void shrink(double amount) {
         // don't do anything
     }
+
+    @Override
+    public String toString() {
+        return "BoundarySnake";
+    }
 }

@@ -295,4 +295,9 @@ public class Snake {
             worldChunk.addFood(food);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Snake " + id;
+    }
 }

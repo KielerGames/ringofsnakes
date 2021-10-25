@@ -72,4 +72,18 @@ public class SnakeWidthTest {
 
         assertTrue(growingTicks > 0);
     }
+
+    @Test
+    void testMinWidth() {
+        final var snake = SnakeFactory.createTestSnake();
+        final var config = snake.config;
+
+        snake.shrink(100.0);
+
+        for(int i=0; i<50; i++) {
+            snake.tick();
+        }
+
+        assertEquals(config.snakes.minWidth, snake.getWidth(), 1e-8);
+    }
 }

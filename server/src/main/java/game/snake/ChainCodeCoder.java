@@ -2,7 +2,7 @@ package game.snake;
 
 import game.GameConfig;
 
-import static util.NumberUtilities.clamp;
+import static util.MathFunctions.clamp;
 
 public class ChainCodeCoder {
     public static final int STEPS_MASK = 7 << 4;

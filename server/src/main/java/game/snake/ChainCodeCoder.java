@@ -9,7 +9,7 @@ public class ChainCodeCoder {
     public static final int DIRECTION_MASK = 15;
     public static final int MAX_STEPS = 8;
     private static final int FAST_BIT = 1 << 7;
-    private static final double SCALE_RANGE = 6.0/7.0 - Double.MIN_NORMAL;
+    private static final double SCALE_RANGE = 6.0 / 7.0 - Double.MIN_NORMAL;
 
     private final GameConfig config;
     private final Snake snake;
@@ -30,7 +30,7 @@ public class ChainCodeCoder {
         final var x = (width - config.snakes.minWidth) / (config.snakes.maxWidth - config.snakes.minWidth);
 
         // scale in [1/7, 1]
-        final var scale = 1.0 - SCALE_RANGE * x;
+        final var scale = 1.0 - (config.snakes.turnRateLimiting * x) * SCALE_RANGE;
 
         return scale * config.snakes.maxTurnDelta;
     }

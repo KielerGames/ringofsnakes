@@ -54,7 +54,7 @@ export function render(
         shader.setUniform("uHeadPosition", [x, y]);
         shader.setUniform(
             "uHeadRotation",
-            snake.direction.predict(timeSinceLastTick) + rotOffset
+            snake.direction.predictValue(timeSinceLastTick) + rotOffset
         );
         SkinManager.setColor(shader, "uSkin", snake.skin);
 

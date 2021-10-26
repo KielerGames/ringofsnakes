@@ -1,8 +1,8 @@
 import assert from "../utilities/assert";
-import { normalizeAngle } from "./utils";
+import { normalizeAngle, toRadians } from "./utils";
 
-const MAX_PREDICTION_TIME = 1 / 15;
-const MAX_CHANGE = MAX_PREDICTION_TIME * ((25 * 5 * Math.PI) / 180);
+const MAX_PREDICTION_TIME = 1.0 / 15;
+const MAX_CHANGE = MAX_PREDICTION_TIME * toRadians(25 * 5); 
 const MAX_DIFF = 0.35;
 
 export default class PredictedAngle {
@@ -18,7 +18,7 @@ export default class PredictedAngle {
         this.dataTime = time;
     }
 
-    public predict(timeSinceLastUpdate: number): number {
+    public predictValue(timeSinceLastUpdate: number): number {
         const t =
             Math.min(timeSinceLastUpdate, MAX_PREDICTION_TIME) /
             MAX_PREDICTION_TIME;
@@ -35,7 +35,7 @@ export default class PredictedAngle {
     public update(angle: number, target: number, time: number): void {
         assert(time >= this.dataTime, "update from the past");
         const dt = time - this.dataTime;
-        this.angle = normalizeAngle(this.predict(dt));
+        this.angle = normalizeAngle(this.predictValue(dt));
         this.lastKnownAngle = angle;
         this.dataTime = time;
         let d = minDiff(this.angle, target);

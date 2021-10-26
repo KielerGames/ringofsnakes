@@ -4,3 +4,7 @@ export function normalizeAngle(alpha: number): number {
     }
     return alpha;
 }
+
+export function toRadians(degrees: number): number {
+    return (degrees * Math.PI) / 180;
+}

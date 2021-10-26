@@ -45,7 +45,8 @@ export function createGameConfig(speed: number = 0.24): GameConfig {
             minWidth: 0.5,
             maxWidth: 6.0,
             fastSpeed: 2 * speed,
-            burnRate: 0.1
+            burnRate: 0.1,
+            turnRateLimiting: 0.85
         },
         tickDuration: 1.0 / 25,
         foodNutritionalValue: 1.0,

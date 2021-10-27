@@ -4,7 +4,7 @@ export function normalizeAngle(alpha: number): number {
     }
 
     while (Math.abs(alpha) > Math.PI) {
-        alpha += (alpha < 0 ? 2 : -2) * Math.PI;
+        alpha -= Math.sign(alpha) * 2.0 * Math.PI;
     }
 
     return alpha;

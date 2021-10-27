@@ -57,8 +57,8 @@ public class Snake {
 
         final var maxWidthGain = config.snakes.maxWidth - config.snakes.minWidth;
 
-        //sigmoid(3) is roughly  0.95
-        final var gain = 2.0 * (sigmoid(3.0 * x) - 0.5);
+        // 2 * (sigmoid(3.66) - 0.5) is roughly  0.95
+        final var gain = 2.0 * (sigmoid(3.66 * x) - 0.5);
 
         width = config.snakes.minWidth + gain * maxWidthGain;
     }

@@ -1,30 +1,30 @@
 import assert from "../utilities/assert";
-import { normalizeAngle } from "./utils";
+import { normalizeAngle, toRadians } from "./utils";
 
-const MAX_PREDICTION_TIME = 1 / 15;
-const MAX_CHANGE = MAX_PREDICTION_TIME * ((25 * 5 * Math.PI) / 180);
-const MAX_DIFF = 0.35;
+const MAX_PREDICTION_TIME = 1.0 / 15;
+const MAX_CHANGE = MAX_PREDICTION_TIME * toRadians(100); // TODO tim-we
+const MAX_DIFF = toRadians(20);
 
 export default class PredictedAngle {
     private dataTime: number;
     private targetAngle: number;
-    private angle: number;
+    private currentAngle: number;
     private lastKnownAngle: number;
 
     public constructor(value: number, time = performance.now()) {
-        this.angle = value;
+        this.currentAngle = value;
         this.targetAngle = value;
         this.lastKnownAngle = value;
         this.dataTime = time;
     }
 
-    public predict(timeSinceLastUpdate: number): number {
+    public predictValue(timeSinceLastUpdate: number): number {
         const t =
             Math.min(timeSinceLastUpdate, MAX_PREDICTION_TIME) /
             MAX_PREDICTION_TIME;
-        const a = (1 - t) * this.angle + t * this.targetAngle;
+        const a = (1 - t) * this.currentAngle + t * this.targetAngle;
 
-        const d = minDiff(a, this.lastKnownAngle);
+        const d = minDiff(this.lastKnownAngle, a);
         if (Math.abs(d) > MAX_DIFF) {
             return this.lastKnownAngle + Math.sign(d) * MAX_DIFF;
         }
@@ -35,17 +35,25 @@ export default class PredictedAngle {
     public update(angle: number, target: number, time: number): void {
         assert(time >= this.dataTime, "update from the past");
         const dt = time - this.dataTime;
-        this.angle = normalizeAngle(this.predict(dt));
+
+        // set current angle to the current predicted angle
+        this.currentAngle = normalizeAngle(this.predictValue(dt));
+
         this.lastKnownAngle = angle;
         this.dataTime = time;
-        let d = minDiff(this.angle, target);
-        if (Math.abs(d) > MAX_CHANGE) {
+
+        // update target angle
+        let d = minDiff(this.currentAngle, target);
+        if (Math.abs(d) > MAX_CHANGE) { // TODO tim-we
             d *= MAX_CHANGE / Math.abs(d);
         }
-        this.targetAngle = this.angle + d;
+        this.targetAngle = this.currentAngle + d;
     }
 }
 
+/**
+ * a + minDiff(a,b) = b
+ */
 function minDiff(a: number, b: number): number {
     let d = b - a;
     let d2 = d - Math.sign(d) * 2 * Math.PI;

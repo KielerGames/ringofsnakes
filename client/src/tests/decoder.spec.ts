@@ -19,7 +19,8 @@ const cfg: GameConfig = {
         maxTurnDelta: Math.PI / 30,
         minLength: 6.0,
         maxWidth: 6.0,
-        burnRate: 0.1
+        burnRate: 0.1,
+        turnRateLimiting: 0.85
     },
     tickDuration: 1.0 / 25,
     foodNutritionalValue: 1.0,

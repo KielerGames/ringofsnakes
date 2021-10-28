@@ -96,7 +96,7 @@ function computeWidthFromLength(
     const x =
         (length - config.snakes.minLength) /
         (LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH - config.snakes.minLength);
-    const gain = 2.0 * (sigmoid(3.0 * x) - 0.5);
+    const gain = 2.0 * (sigmoid(3.66 * x) - 0.5);
     return minWidth + gain * maxWidthGain;
 }
 

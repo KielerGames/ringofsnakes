@@ -38,13 +38,13 @@ public class Snake {
     private boolean fast = false;
     private double lengthBuffer = 0;
     private double width;
-    private float foodTrailBuffer = 0f;
+    private double foodTrailBuffer = 0f;
 
     Snake(short id, World world) {
         this.id = id;
         this.world = world;
         config = world.getConfig();
-        coder = new ChainCodeCoder(config);
+        coder = new ChainCodeCoder(this);
         length = config.snakes.startLength;
         width = config.snakes.minWidth;
 
@@ -57,8 +57,8 @@ public class Snake {
 
         final var maxWidthGain = config.snakes.maxWidth - config.snakes.minWidth;
 
-        //sigmoid(3) is roughly  0.95
-        final var gain = 2.0 * (sigmoid(3.0 * x) - 0.5);
+        // 2 * (sigmoid(3.66) - 0.5) is roughly  0.95
+        final var gain = 2.0 * (sigmoid(3.66 * x) - 0.5);
 
         width = config.snakes.minWidth + gain * maxWidthGain;
     }

@@ -298,6 +298,6 @@ public class Snake {
 
     @Override
     public String toString() {
-        return "Snake " + id;
+        return "Snake " + ((int) id);
     }
 }

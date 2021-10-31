@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class GameUpdate {
     public static final int HEADER_SIZE = 3;
@@ -66,12 +65,6 @@ public class GameUpdate {
 
     @Override
     public String toString() {
-        final var snakes = this.snakes.stream()
-                .map(s -> String.valueOf(s.id))
-                .collect(Collectors.joining(","));
-        final var foodChunks = foodChunkBuffers.stream()
-                .map(fcb -> "(" + fcb.get(0) + "|" + fcb.get(1) + ":" + fcb.getShort(2) + ")")
-                .collect(Collectors.joining(", "));
-        return "GameUpdate { snakes: " + snakes + ", foodChunks: [" + foodChunks + "] }";
+        return "GameUpdate { snakes: " + snakes.size() + ", foodChunks: " + foodChunkBuffers.size() + " }";
     }
 }

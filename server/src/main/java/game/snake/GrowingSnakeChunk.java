@@ -46,13 +46,13 @@ public class GrowingSnakeChunk extends SnakeChunk {
      * <p>
      * Byte(s) | Description
      * ================= HEADER ===================
-     * 0-1       snake id (short)
-     * 2-3       chunk id (short)
-     * 4         n: number of chain codes in this chunk (byte)
-     * 5-8       end direction (single float)
-     * 9-12      end position x (single float)
-     * 13-16     end position y (single float)
-     * 17-20     offset within snake
+     * 0-1       snake id (16-bit integer)
+     * 2-3       chunk id (16-bit integer)
+     * 4         n: number of chain codes in this chunk (8-bit integer)
+     * 5-8       end direction (32-bit float)
+     * 9-12      end position x (32-bit float)
+     * 13-16     end position y (32-bit float)
+     * 17-20     offset within snake (32-bit float)
      * ================= CONTENT ===================
      * 21-(21+n) n ChainCodes (n bytes), 21+n < 128
      *

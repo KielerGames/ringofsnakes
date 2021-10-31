@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class GrowingSnakeChunk extends SnakeChunk {
-    public final short id;
+    public final char id;
     private final List<SnakePathPoint> pathData = new LinkedList<>();
     private final ChainCodeCoder coder;
     private final Vector end;
@@ -25,7 +25,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
     private boolean lastFast = false;
     private int lastDirDelta = 0;
 
-    public GrowingSnakeChunk(ChainCodeCoder coder, Snake snake, short chunkId) {
+    public GrowingSnakeChunk(ChainCodeCoder coder, Snake snake, char chunkId) {
         super(snake);
         this.id = chunkId;
         this.coder = coder;
@@ -62,8 +62,8 @@ public class GrowingSnakeChunk extends SnakeChunk {
         ByteBuffer buffer = ByteBuffer.allocate(FinalSnakeChunk.BYTE_SIZE);
 
         // chunk header
-        buffer.putShort(this.snake.id);
-        buffer.putShort(this.id);
+        buffer.putChar(this.snake.id);
+        buffer.putChar(this.id);
         buffer.put((byte) this.numberOfChainCodes);
         buffer.putFloat(this.endDirection);
         buffer.putFloat((float) this.end.x);

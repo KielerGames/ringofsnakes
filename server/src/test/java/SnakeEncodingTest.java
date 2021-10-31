@@ -23,7 +23,7 @@ public class SnakeEncodingTest {
     @Test
     void testEarlyChunkBuilding() {
         Snake snake = SnakeFactory.createTestSnake();
-        final short chunkId = 42;
+        final char chunkId = 42;
         GrowingSnakeChunk builder = new GrowingSnakeChunk(coder, snake, chunkId);
         assertFalse(builder.isFull());
         builder.append(0, false);

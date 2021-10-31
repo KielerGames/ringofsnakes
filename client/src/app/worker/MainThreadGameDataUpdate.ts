@@ -8,7 +8,7 @@ export type MainThreadGameDataUpdate = {
     newSnakeChunks: SnakeChunkData[];
     foodChunks: FoodChunkDTO[];
     snakes: SnakeDataDTO[];
-    targetSnakeId: number;
+    targetSnakeId?: number;
     leaderboardData: LeaderboardData;
 };
 

@@ -10,7 +10,7 @@ export default class GameData {
     private readonly snakes: Map<number, Snake> = new Map();
     private readonly snakeChunks: Map<number, SnakeChunk> = new Map();
     private readonly foodChunks: Map<number, FoodChunk> = new Map();
-    private targetSnakeId: number = -1;
+    private targetSnakeId: number | undefined = undefined;
     private lastUpdateTime: number = performance.now();
     public readonly config: GameConfig;
     private leaderboardData: LeaderboardData;
@@ -141,8 +141,10 @@ export default class GameData {
     }
 
     public get targetSnake(): Snake | undefined {
-        if (this.targetSnakeId >= 0) {
+        if (this.targetSnakeId !== undefined) {
             return this.snakes.get(this.targetSnakeId);
         }
+
+        return undefined;
     }
 }

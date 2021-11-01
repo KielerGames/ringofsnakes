@@ -210,8 +210,7 @@ public class Game {
                     .mapToDouble(food -> food.size.value)
                     .map(v -> v * v)
                     .sum();
-            snake.grow(foodAmount * config.foodNutritionalValue);
-
+            snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
             worldChunk.removeFood(collectedFood);
         });
     }

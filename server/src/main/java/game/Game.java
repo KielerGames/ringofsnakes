@@ -29,6 +29,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static util.TaskMeasurer.measure;
+
 public class Game {
     private static final Gson gson = new Gson();
     public final int id = 1; //TODO
@@ -125,10 +127,12 @@ public class Game {
     }
 
     public void start() {
-        executor.scheduleAtFixedRate(() -> {
-            tick();
-            updateClients();
-        }, 0, (long) (1000 * config.tickDuration), TimeUnit.MILLISECONDS);
+        final long tickDuration = (long) (1000 * config.tickDuration);
+        final long updateInterval = 100;
+
+        executor.scheduleAtFixedRate(measure("tick", this::tick), 0, tickDuration, TimeUnit.MILLISECONDS);
+
+        executor.scheduleAtFixedRate(measure("update-clients", this::updateClients), 0, updateInterval, TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(world::spawnFood, 100, (long) (25 * 1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 

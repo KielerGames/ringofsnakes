@@ -1,6 +1,5 @@
 package debugview;
 
-import game.Game;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -21,11 +20,11 @@ public class DebugView extends Application {
     private static final double ZOOM = 1.0;
     private static final boolean FOLLOW_PLAYER = true;
     private static final boolean DRAW_TAILS = true;
-    private static Game game;
+    private static DebugGame game;
     private Vector camera = new Vector(0, 0);
 
     public static void main(String[] args) {
-        game = new Game();
+        game = new DebugGame();
 
         // start game server
         new Thread(() -> {
@@ -49,14 +48,13 @@ public class DebugView extends Application {
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root));
 
-        AnimationTimer t = new AnimationTimer() {
+        AnimationTimer timer = new AnimationTimer() {
             @Override
-            @SuppressWarnings("SynchronizeOnNonFinalField")
             public void handle(long now) {
-                ctx.clearRect(0, 0, 800, 600);
+                game.awaitExecution(() -> {
+                    ctx.clearRect(0, 0, 800, 600);
 
-                if (game != null && game.snakes.size() != 0) {
-                    synchronized (game) {
+                    if (!game.snakes.isEmpty()) {
                         final var playerId = game.streamClients().filter(Player.class::isInstance).mapToInt(p -> ((Player) p).snake.id).findFirst();
 
                         drawSnakes(ctx, playerId);
@@ -64,10 +62,11 @@ public class DebugView extends Application {
                         drawCurrentWorldChunk(ctx);
                         drawSnakeChunksBoundingBoxes(ctx, playerId);
                     }
-                }
+                });
             }
         };
-        t.start();
+
+        timer.start();
         primaryStage.show();
     }
 

@@ -144,5 +144,7 @@ export default class GameData {
         if (this.targetSnakeId >= 0) {
             return this.snakes.get(this.targetSnakeId);
         }
+
+        return undefined;
     }
 }

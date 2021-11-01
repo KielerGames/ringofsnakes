@@ -128,11 +128,11 @@ public class Game {
 
     public void start() {
         final long tickDuration = (long) (1000 * config.tickDuration);
-        final long updateInterval = 100;
 
-        executor.scheduleAtFixedRate(measure("tick", this::tick), 0, tickDuration, TimeUnit.MILLISECONDS);
-
-        executor.scheduleAtFixedRate(measure("update-clients", this::updateClients), 0, updateInterval, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(measure("tick-and-update", () -> {
+            tick();
+            updateClients();
+        }), 0, tickDuration, TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(world::spawnFood, 100, (long) (25 * 1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 

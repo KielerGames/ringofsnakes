@@ -17,7 +17,7 @@ export default class WorkerGame {
     socket: WebSocket;
 
     readonly config: GameConfig;
-    targetPlayerId: number;
+    targetSnakeId: number;
 
     readonly snakes: Map<SnakeId, WorkerSnake> = new Map();
     readonly snakeChunks: Map<SnakeChunkId, WorkerSnakeChunk> = new Map();
@@ -34,7 +34,7 @@ export default class WorkerGame {
     constructor(socket: WebSocket, snakeId: number, gameConfig: GameConfig) {
         this.socket = socket;
         this.config = gameConfig;
-        this.targetPlayerId = snakeId;
+        this.targetSnakeId = snakeId;
 
         assert(socket.readyState === WebSocket.OPEN);
         assert(socket.binaryType === "arraybuffer");
@@ -147,12 +147,12 @@ export default class WorkerGame {
     }
 
     public get cameraPosition(): { x: number; y: number } {
-        const player = this.snakes.get(this.targetPlayerId);
+        const player = this.snakes.get(this.targetSnakeId);
 
         if (player) {
             return player.position.createTransferable();
         } else {
-            console.warn(`No snake info for ${this.targetPlayerId}`);
+            console.warn(`No snake info for ${this.targetSnakeId}`);
             return { x: 0, y: 0 };
         }
     }
@@ -202,7 +202,7 @@ export default class WorkerGame {
             newSnakeChunks: snakeChunks,
             snakes,
             foodChunks,
-            targetSnakeId: this.targetPlayerId,
+            targetSnakeId: this.targetSnakeId,
             leaderboardData: this.leaderboardData
         };
     }

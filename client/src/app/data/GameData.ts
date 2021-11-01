@@ -142,7 +142,13 @@ export default class GameData {
 
     public get targetSnake(): Snake | undefined {
         if (this.targetSnakeId >= 0) {
-            return this.snakes.get(this.targetSnakeId);
+            const snake = this.snakes.get(this.targetSnakeId);
+            if (!snake) {
+                throw new Error(
+                    `Target snake ${this.targetSnakeId} does not exist.`
+                );
+            }
+            return snake;
         }
 
         return undefined;

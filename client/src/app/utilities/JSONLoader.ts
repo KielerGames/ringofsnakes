@@ -20,7 +20,7 @@ export async function loadJSON<T>(
 
     const response = await fetch(path, {
         method: "GET",
-        cache: allowCache ? "default" : "no-store",
+        cache: allowCache ? "default" : "no-store"
     });
 
     if (!response.ok) {

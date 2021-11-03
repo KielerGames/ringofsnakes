@@ -11,6 +11,9 @@ import static util.ByteUtilities.toNormalizedDouble;
 public class Food {
     public static final int BYTE_SIZE = 3;
     private static final Random rand = new Random();
+    public static final double SMALL_SIZE_SQUARED = Size.SMALL.value*Size.SMALL.value;
+    public static final double MEDIUM_SIZE_SQUARED = Size.MEDIUM.value*Size.MEDIUM.value;
+    public static final double LARGE_SIZE_SQUARED = Size.LARGE.value*Size.LARGE.value;
 
     public final Vector position;
     public final Size size;
@@ -88,5 +91,9 @@ public class Food {
             this.value = value;
             this.byteValue = (byte) bv;
         }
+    }
+
+    public double getSizeSquared(){
+        return this.size.value*this.size.value;
     }
 }

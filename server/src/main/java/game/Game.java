@@ -29,6 +29,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static util.TaskMeasurer.measure;
+
 public class Game {
     private static final Gson gson = new Gson();
     public final int id = 1; //TODO
@@ -36,7 +38,7 @@ public class Game {
     public final World world;
     public final CollisionManager collisionManager;
     public final List<Snake> snakes = new LinkedList<>();
-    private final ExceptionalExecutorService executor;
+    protected final ExceptionalExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
     private final List<Bot> bots = new LinkedList<>();
 
@@ -90,11 +92,9 @@ public class Game {
         final var spawnPos = world.findSpawnPosition();
 
         return CompletableFuture.supplyAsync(() -> {
-            synchronized (this) {
-                final var snake = SnakeFactory.createSnake(spawnPos, world);
-                snakes.add(snake);
-                return snake;
-            }
+            final var snake = SnakeFactory.createSnake(spawnPos, world);
+            snakes.add(snake);
+            return snake;
         }, executor).thenApply(snake -> {
             final var player = new Player(snake, session);
             synchronized (clients) {
@@ -105,12 +105,10 @@ public class Game {
         });
     }
 
-    public void addBotsRandomly(int n) {
+    private void addBotsRandomly(int n) {
         for (int i = 0; i < n; i++) {
             StupidBot bot = new StupidBot(this, this.world.findSpawnPosition());
-            synchronized (this) {
-                snakes.add(bot.getSnake());
-            }
+            snakes.add(bot.getSnake());
             bots.add(bot);
         }
     }
@@ -129,18 +127,18 @@ public class Game {
     }
 
     public void start() {
-        executor.scheduleAtFixedRate(() -> {
+        final long tickDuration = (long) (1000 * config.tickDuration);
+
+        executor.scheduleAtFixedRate(measure("tick-and-update", () -> {
             tick();
             updateClients();
-        }, 0, (long) (1000 * config.tickDuration), TimeUnit.MILLISECONDS);
+        }), 0, tickDuration, TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(world::spawnFood, 100, (long) (25 * 1000 * config.tickDuration), TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
             // garbage-collection
-            synchronized (this) {
-                snakes.removeIf(Predicate.not(Snake::isAlive));
-            }
+            snakes.removeIf(Predicate.not(Snake::isAlive));
             world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
             bots.removeIf(Predicate.not(Bot::isAlive));
         }, 250, 1000, TimeUnit.MILLISECONDS);
@@ -156,7 +154,7 @@ public class Game {
             if (n < config.targetSnakePopulation) {
                 addBotsRandomly((int) Math.min(4, config.targetSnakePopulation - n));
             }
-        }, 1, 25, TimeUnit.SECONDS);
+        }, 1, 20, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }
@@ -168,7 +166,7 @@ public class Game {
         snakes.stream().filter(Snake::isAlive).forEach(snakeConsumer);
     }
 
-    protected synchronized void tick() {
+    protected void tick() {
         forEachSnake(snake -> {
             if (snake.isAlive()) {
                 snake.tick();

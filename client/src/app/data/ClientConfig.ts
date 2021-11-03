@@ -23,6 +23,6 @@ const configPromise: Promise<ClientConfig> = loadJSON<ClientConfig>(
     return defaultConfig;
 });
 
-export function get(): Promise<ClientConfig> {
+export function get(): Promise<Readonly<ClientConfig>> {
     return configPromise;
 }

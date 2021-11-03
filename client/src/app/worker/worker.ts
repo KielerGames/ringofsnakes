@@ -9,7 +9,10 @@ import WorkerGame from "./WorkerGame";
 let game: WorkerGame | null = null;
 
 export class WorkerAPI {
-    public async init(name: string, cfg: ClientConfig): Promise<void> {
+    public async init(
+        name: string,
+        cfg: Readonly<ClientConfig>
+    ): Promise<void> {
         const protocol = cfg.server.wss ? "wss" : "ws";
         const websocket = new WebSocket(
             `${protocol}://${cfg.server.host}:${cfg.server.port}/game`

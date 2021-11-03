@@ -22,7 +22,7 @@ public class Snake {
     private static final Random random = new Random();
 
     public final GameConfig config;
-    public final short id;
+    public final char id;
     protected final World world;
     private final ChainCodeCoder coder;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
@@ -33,14 +33,14 @@ public class Snake {
     Vector headPosition;
     double headDirection;
     private boolean alive = true;
-    private short nextChunkId = 0;
+    private char nextChunkId = 0;
     private double targetDirection;
     private boolean fast = false;
     private double lengthBuffer = 0;
     private double width;
     private double foodTrailBuffer = 0f;
 
-    Snake(short id, World world) {
+    Snake(char id, World world) {
         this.id = id;
         this.world = world;
         config = world.getConfig();
@@ -135,8 +135,8 @@ public class Snake {
 
     public ByteBuffer encodeInfo() {
         final var buffer = this.snakeInfoBuffer;
-        buffer.putShort(0, id);
-        buffer.putShort(2, currentChunk.id);
+        buffer.putChar(0, id);
+        buffer.putChar(2, currentChunk.id);
         buffer.put(4, skin);
         buffer.put(5, (byte) (fast ? 1 : 0));
         buffer.putFloat(6, (float) length);
@@ -298,6 +298,6 @@ public class Snake {
 
     @Override
     public String toString() {
-        return "Snake " + id;
+        return "Snake " + ((int) id);
     }
 }

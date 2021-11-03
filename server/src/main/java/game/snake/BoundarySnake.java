@@ -12,7 +12,7 @@ public class BoundarySnake extends Snake {
     private BoundingBox bottom, right, up, left;
     private Random random = new Random();
 
-    BoundarySnake(short id, World world) {
+    BoundarySnake(char id, World world) {
         super(id, world);
         updateLengthAndWidth();
 

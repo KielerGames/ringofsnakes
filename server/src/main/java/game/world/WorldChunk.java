@@ -79,7 +79,7 @@ public class WorldChunk {
 
         buffer.put(this.x);
         buffer.put(this.y);
-        buffer.putShort((short) foodList.size());
+        buffer.putChar((char) foodList.size());
 
         assert (foodList.isEmpty() || buffer.hasRemaining());
         foodList.forEach(food -> food.addToByteBuffer(buffer));

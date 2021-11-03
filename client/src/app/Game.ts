@@ -1,5 +1,5 @@
 import * as Comlink from "comlink";
-import { SnakeCamera } from "./data/Camera";
+import { Camera, SnakeCamera, TargetCamera } from "./data/Camera";
 import GameData from "./data/GameData";
 import { WorkerAPI } from "./worker/worker";
 
@@ -8,7 +8,7 @@ export default class Game {
     private _data: GameData;
     private updateInterval: number = -1;
     private _ended: boolean = false;
-    public camera: SnakeCamera = new SnakeCamera();
+    public camera: Camera = new TargetCamera(0,0);
 
     private constructor() {
         this.worker = Comlink.wrap<WorkerAPI>(
@@ -39,7 +39,15 @@ export default class Game {
         try {
             const diff = await this.worker.getGameDataUpdate();
             this._data.update(diff);
-            this.camera.setTargetSnake(this._data.targetSnake);
+            if(this._data.targetSnake) {
+                if(this.camera instanceof SnakeCamera) {
+                    this.camera.setTargetSnake(this._data.targetSnake);
+                } else {
+                    this.camera = new SnakeCamera(this._data.targetSnake);
+                }
+            } else {
+                // TODO
+            }
         } catch (e) {
             console.error(e);
             this.stop();

@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class SnakeFactory {
     private static final Random random = new Random();
-    private static short nextSnakeId = 0;
+    private static char nextSnakeId = 0;
 
     private SnakeFactory() {
     }

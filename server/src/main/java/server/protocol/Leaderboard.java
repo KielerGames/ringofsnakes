@@ -26,9 +26,9 @@ public class Leaderboard extends ServerToClientJSONMessage {
         private final String name;
         private final int score;
 
-        private LeaderboardEntry(Snake s) {
-            this.name = "Snake " + s.id;
-            this.score = (int) s.getLength();
+        private LeaderboardEntry(Snake snake) {
+            this.name = snake.toString();
+            this.score = (int) snake.getLength();
         }
     }
 }

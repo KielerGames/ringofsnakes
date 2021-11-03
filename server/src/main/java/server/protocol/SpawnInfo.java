@@ -10,5 +10,6 @@ public class SpawnInfo extends ServerToClientJSONMessage {
     public SpawnInfo(GameConfig config, Snake snake) {
         gameConfig = config;
         snakeId = snake.id;
+        assert snakeId >= 0;
     }
 }

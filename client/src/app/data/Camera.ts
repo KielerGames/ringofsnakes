@@ -95,25 +95,20 @@ export class TargetCamera extends Camera {
 }
 
 export class SnakeCamera extends Camera {
-    private snake: Snake | undefined;
+    private snake: Snake;
 
-    public constructor(snake?: Snake) {
-        super(new Vector(0, 0));
+    public constructor(snake: Snake) {
+        super(snake.getPredictedPosition(0));
         this.snake = snake;
-        if (snake) {
-            this.lastPosition.set(snake.getPredictedPosition(0));
-        }
     }
 
     public update(timeSinceLastUpdate: number): void {
-        if (this.snake) {
-            this.lastPosition.set(
-                this.snake.getPredictedPosition(timeSinceLastUpdate)
-            );
-        }
+        this.lastPosition.set(
+            this.snake.getPredictedPosition(timeSinceLastUpdate)
+        );
     }
 
-    public setTargetSnake(snake?: Snake) {
+    public setTargetSnake(snake: Snake) {
         this.snake = snake;
     }
 }

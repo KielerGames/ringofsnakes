@@ -128,13 +128,13 @@ public class Game {
 
     public void start() {
         final long tickDuration = (long) (1000 * config.tickDuration);
+        final long updateInterval = 2 * tickDuration;
 
-        executor.scheduleAtFixedRate(measure("tick-and-update", () -> {
-            tick();
-            updateClients();
-        }), 0, tickDuration, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(measure("game-tick", this::tick), 0, tickDuration, TimeUnit.MILLISECONDS);
 
-        executor.scheduleAtFixedRate(world::spawnFood, 100, (long) (25 * 1000 * config.tickDuration), TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(measure("client-update", this::updateClients), 10, updateInterval, TimeUnit.MILLISECONDS);
+
+        executor.scheduleAtFixedRate(world::spawnFood, 100, 1000, TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
             // garbage-collection
@@ -144,8 +144,8 @@ public class Game {
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
-            final var topTen = gson.toJson(new Leaderboard(this, 10));
-            clients.forEach((sId, client) -> client.send(topTen));
+            final var topTenJson = gson.toJson(new Leaderboard(this, 10));
+            clients.forEach((__, client) -> client.send(topTenJson));
         }, 1, 1, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(() -> {

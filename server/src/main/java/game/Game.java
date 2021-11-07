@@ -7,7 +7,6 @@ import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.snake.SnakeFactory;
 import game.world.Collidable;
-import game.world.Food;
 import game.world.World;
 import game.world.WorldChunk;
 import server.Client;
@@ -206,7 +205,7 @@ public class Game {
             }
 
             final var foodAmount = collectedFood.stream()
-                    .mapToDouble(food -> food.size.nutrionalValue)
+                    .mapToDouble(food -> food.size.nutritionalValue)
                     .sum();
             snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
             worldChunk.removeFood(collectedFood);

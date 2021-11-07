@@ -206,7 +206,7 @@ public class Game {
             }
 
             final var foodAmount = collectedFood.stream()
-                    .mapToDouble(Food::getSizeSquared)
+                    .mapToDouble(food -> food.size.nutrionalValue)
                     .sum();
             snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
             worldChunk.removeFood(collectedFood);

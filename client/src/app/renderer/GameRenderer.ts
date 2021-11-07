@@ -51,6 +51,7 @@ export function render(
     // background color
     gl.clearColor(0.1, 0.1, 0.1, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
+    
 
     const canvas = gl.canvas;
     const transform = camera.getTransformMatrix(canvas.width, canvas.height);
@@ -70,6 +71,8 @@ export function render(
     if (__DEBUG__) {
         BoxRenderer.renderAll(transform);
     }
+    
+
 }
 
 function resize(force: boolean = false) {

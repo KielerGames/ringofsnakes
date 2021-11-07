@@ -165,7 +165,7 @@ public class Snake {
         final var newLength = Math.max(config.snakes.minLength, length - snakeAmount);
         final var deltaLength = length - newLength;
         length = newLength;
-        final var smallFoodNutritionalValue = config.foodNutritionalValue * Food.SMALL_SIZE_SQUARED;
+        final var smallFoodNutritionalValue = config.foodNutritionalValue * Food.Size.SMALL.nutrionalValue;
         foodTrailBuffer += deltaLength * config.foodConversionEfficiency;
 
         if (foodTrailBuffer >= smallFoodNutritionalValue) {

@@ -2,6 +2,7 @@ import * as Comlink from "comlink";
 import { Camera, SnakeCamera, TargetCamera } from "./data/Camera";
 import * as ClientConfig from "./data/ClientConfig";
 import GameData from "./data/GameData";
+import Snake from "./data/Snake";
 import { WorkerAPI } from "./worker/worker";
 
 export default class Game {
@@ -26,7 +27,7 @@ export default class Game {
 
         game.updateInterval = window.setInterval(
             game.getUpdatesFromWorker.bind(game),
-            1000 * config.tickDuration
+            Math.max(32, 1000 * config.tickDuration)
         );
         game.worker.onEnd(Comlink.proxy(() => game.stop()));
 
@@ -41,18 +42,37 @@ export default class Game {
         try {
             const diff = await this.worker.getGameDataUpdate();
             this._data.update(diff);
-            if (this._data.targetSnake) {
-                if (this.camera instanceof SnakeCamera) {
-                    this.camera.setTargetSnake(this._data.targetSnake);
-                } else {
-                    this.camera = new SnakeCamera(this._data.targetSnake);
-                }
-            } else {
-                // TODO
-            }
+            this.updateCamera();
         } catch (e) {
             console.error(e);
             this.stop();
+        }
+    }
+
+    private updateCamera(): void {
+        let targetSnake: Snake | undefined;
+
+        // TODO: fix this mess
+        try {
+            targetSnake = this._data.targetSnake;
+        } catch(e) {
+            targetSnake = undefined;
+        }
+        
+        if (targetSnake) {
+            try {
+                if (this.camera instanceof SnakeCamera) {
+                    this.camera.setTargetSnake(targetSnake);
+                } else {
+                    this.camera = new SnakeCamera(targetSnake);
+                }
+            } catch(e) {
+                this.camera = new TargetCamera(0, 0);
+            }
+            
+        } else {
+            // TODO
+            this.camera = new TargetCamera(0, 0);
         }
     }
 

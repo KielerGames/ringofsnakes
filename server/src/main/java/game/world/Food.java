@@ -83,10 +83,12 @@ public class Food {
 
         public final double value;
         public final byte byteValue;
+        public final double nutritionalValue;
 
         Size(double value, int bv) {
             this.value = value;
             this.byteValue = (byte) bv;
+            this.nutritionalValue = value * value;
         }
     }
 }

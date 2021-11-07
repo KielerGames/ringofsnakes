@@ -1,4 +1,5 @@
 import * as Comlink from "comlink";
+import { ClientConfig } from "../data/ClientConfig";
 import Rectangle, { TransferableBox } from "../math/Rectangle";
 import { ClientToServerMessage, ServerToClientJSONMessage } from "../protocol";
 import { GameConfig } from "../types/GameConfig";
@@ -8,8 +9,14 @@ import WorkerGame from "./WorkerGame";
 let game: WorkerGame | null = null;
 
 export class WorkerAPI {
-    public async init(name: string): Promise<void> {
-        const websocket = new WebSocket("ws://127.0.0.1:8080/game");
+    public async init(
+        name: string,
+        cfg: Readonly<ClientConfig>
+    ): Promise<void> {
+        const protocol = cfg.server.wss ? "wss" : "ws";
+        const websocket = new WebSocket(
+            `${protocol}://${cfg.server.host}:${cfg.server.port}/game`
+        );
         websocket.binaryType = "arraybuffer";
 
         await new Promise<void>((resolve) => {

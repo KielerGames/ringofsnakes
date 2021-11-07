@@ -1,5 +1,6 @@
 import * as Comlink from "comlink";
 import { Camera, SnakeCamera, TargetCamera } from "./data/Camera";
+import * as ClientConfig from "./data/ClientConfig";
 import GameData from "./data/GameData";
 import { WorkerAPI } from "./worker/worker";
 
@@ -8,7 +9,7 @@ export default class Game {
     private _data: GameData;
     private updateInterval: number = -1;
     private _ended: boolean = false;
-    public camera: Camera = new TargetCamera(0,0);
+    public camera: Camera = new TargetCamera(0, 0);
 
     private constructor() {
         this.worker = Comlink.wrap<WorkerAPI>(
@@ -17,8 +18,9 @@ export default class Game {
     }
 
     public static async joinAs(name: string): Promise<Game> {
+        const clientConfig = await ClientConfig.get();
         const game = new Game();
-        await game.worker.init(name);
+        await game.worker.init(name, clientConfig);
         const config = await game.worker.getConfig();
         game._data = new GameData(config);
 
@@ -39,8 +41,8 @@ export default class Game {
         try {
             const diff = await this.worker.getGameDataUpdate();
             this._data.update(diff);
-            if(this._data.targetSnake) {
-                if(this.camera instanceof SnakeCamera) {
+            if (this._data.targetSnake) {
+                if (this.camera instanceof SnakeCamera) {
                     this.camera.setTargetSnake(this._data.targetSnake);
                 } else {
                     this.camera = new SnakeCamera(this._data.targetSnake);

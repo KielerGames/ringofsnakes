@@ -71,8 +71,6 @@ export function render(
     if (__DEBUG__) {
         BoxRenderer.renderAll(transform);
     }
-    
-
 }
 
 function resize(force: boolean = false) {

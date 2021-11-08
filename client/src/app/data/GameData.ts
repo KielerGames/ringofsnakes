@@ -23,7 +23,9 @@ export default class GameData {
         // time stuff
         const now = performance.now();
         const timeSinceLastUpdate = now - this.lastUpdateTime;
-        this.lastUpdateTime = now;
+        if(data.hasChanged) {
+            this.lastUpdateTime = now;
+        }
 
         // camera
         this.targetSnakeId = data.targetSnakeId;

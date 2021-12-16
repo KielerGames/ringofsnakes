@@ -127,7 +127,7 @@ export default class GameData {
      * @param now timestamp in ms
      * @returns delta time in seconds
      */
-    public timeSinceLastUpdate(now: number = performance.now()): number {
+    public timeSinceLastUpdate(now: number): number {
         return 0.001 * (now - this.lastUpdateTime);
     }
 

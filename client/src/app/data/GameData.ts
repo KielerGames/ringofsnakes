@@ -131,12 +131,12 @@ export default class GameData {
         return 0.001 * (now - this.lastUpdateTime);
     }
 
-    public predict(timeSinceLastTick: number): void {
+    public predict(secondsSinceLastTick: number): void {
         this.snakes.forEach((snake) => {
             const currentChunk = snake.getCurrentChunk();
 
             if (currentChunk) {
-                const pos = snake.getPredictedPosition(timeSinceLastTick);
+                const pos = snake.getPredictedPosition(secondsSinceLastTick);
                 currentChunk.updateEndPoint(pos);
             }
         });

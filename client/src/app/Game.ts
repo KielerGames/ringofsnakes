@@ -76,10 +76,13 @@ export default class Game {
         }
     }
 
+    /**
+     * @param time time since app start in ms
+     */
     public async frameTick(time: number): Promise<void> {
-        const t = this._data.timeSinceLastUpdate(time);
-        this.camera.update(t);
-        this._data.predict(t);
+        const secondsSinceLastUpdate = this._data.timeSinceLastUpdate(time);
+        this.camera.update(secondsSinceLastUpdate);
+        this._data.predict(secondsSinceLastUpdate);
     }
 
     public async updateUserData(

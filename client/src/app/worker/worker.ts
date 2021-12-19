@@ -61,6 +61,8 @@ export class WorkerAPI {
             );
         });
 
+        await game?.binaryDataReceived.wait();
+
         console.info(`WorkerGame init complete.`);
     }
 

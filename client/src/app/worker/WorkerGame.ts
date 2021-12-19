@@ -12,6 +12,7 @@ import { FoodChunkDTO, FoodChunkId } from "./decoder/FoodDecoder";
 import Rectangle from "../math/Rectangle";
 import { GameConfig } from "../types/GameConfig";
 import { LeaderboardData } from "../protocol";
+import AsyncEvent from "../utilities/AsyncEvent";
 
 export default class WorkerGame {
     socket: WebSocket;
@@ -31,6 +32,7 @@ export default class WorkerGame {
     wantsToBeFast: boolean = false;
     private viewBox: Rectangle;
     private newServerUpdate: boolean = false;
+    public readonly binaryDataReceived = new AsyncEvent();
 
     constructor(socket: WebSocket, snakeId: number, gameConfig: GameConfig) {
         this.socket = socket;
@@ -47,6 +49,7 @@ export default class WorkerGame {
 
             if (rawData instanceof ArrayBuffer) {
                 this.onBinaryMessageFromServer(rawData);
+                this.binaryDataReceived.set();
             } else {
                 this.onJsonMessageFromServer(
                     JSON.parse(rawData) as ServerToClientJSONMessage

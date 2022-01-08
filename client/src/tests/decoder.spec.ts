@@ -70,7 +70,6 @@ describe("Decoder", () => {
                     fastSpeed: s * cfg.snakes.fastSpeed
                 })
             });
-            console.log("init path length " + pathLength);
             assert.approximately(
                 SCD.decode(buffer, 0, fasterCfg).data.pathLength,
                 4.2 * pathLength,

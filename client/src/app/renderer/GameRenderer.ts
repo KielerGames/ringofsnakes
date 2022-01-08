@@ -55,6 +55,7 @@ export function render(
     const canvas = gl.canvas;
     const transform = camera.getTransformMatrix(canvas.width, canvas.height);
 
+    // prediction time
     const pTime = data.timeSinceLastUpdate(time);
 
     SkinManager.setSkinTexture(gl.TEXTURE0);

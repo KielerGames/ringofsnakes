@@ -10,7 +10,7 @@ export default class Snake {
     public length: number;
     public maxWidth: number;
     private lastPosition: Vector;
-    public speed: number;
+    public speed: number; // in units per seconds (not per tick)
     public direction: PredictedAngle;
     private currentChunk: SnakeChunk | null = null;
 

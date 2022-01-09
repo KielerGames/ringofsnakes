@@ -1,3 +1,4 @@
+import { config } from "chai";
 import Vector from "../math/Vector";
 import { GameConfig } from "../types/GameConfig";
 import { SnakeInfo } from "./decoder/SnakeInfoDecoder";
@@ -18,13 +19,13 @@ export default class WorkerSnake {
         this.gameConfig = cfg;
         this.headPosition = Vector.fromObject(info.position);
         this.data = info;
-        this.lastKnownSpeed = this.speed();
+        this.lastKnownSpeed = this.tickSpeed();
     }
 
     public updateFromServer(info: SnakeInfo): void {
         this.data = info;
         this.headPosition.set(info.position);
-        this.correctOffset += this.speed();
+        this.correctOffset += this.tickSpeed();
         this.offsetPrediction += this.lastKnownSpeed;
     }
 
@@ -56,9 +57,13 @@ export default class WorkerSnake {
         return this.data.currentChunkId;
     }
 
-    private speed(): number {
+    private tickSpeed(): number {
         const cfg = this.gameConfig;
         return this.fast ? cfg.snakes.fastSpeed : cfg.snakes.speed;
+    }
+
+    private speed(): number {
+        return this.tickSpeed() / this.gameConfig.tickDuration;
     }
 
     public createTransferData(): SnakeDataDTO {

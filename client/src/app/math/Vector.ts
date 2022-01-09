@@ -1,3 +1,7 @@
+const formatter = new Intl.NumberFormat("en-US", {
+    maximumSignificantDigits: 2
+});
+
 export default class Vector {
     public x: number;
     public y: number;
@@ -33,6 +37,11 @@ export default class Vector {
         const dx = a.x - b.x;
         const dy = a.y - b.y;
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public toString(): string {
+        const f = formatter.format;
+        return `<${f(this.x)},${f(this.y)}>`;
     }
 }
 

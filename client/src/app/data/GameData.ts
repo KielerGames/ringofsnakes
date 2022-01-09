@@ -22,7 +22,7 @@ export default class GameData {
     public update(data: MainThreadGameDataUpdate): void {
         // time stuff
         const now = performance.now();
-        const timeSinceLastUpdate = now - this.lastUpdateTime;
+        //const timeSinceLastUpdate = now - this.lastUpdateTime;
         if(data.hasChanged) {
             this.lastUpdateTime = now;
         }

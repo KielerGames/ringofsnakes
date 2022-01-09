@@ -40,7 +40,7 @@ export type SnakeDataDTO = {
     position: { x: number; y: number };
     direction: number;
     targetDirection: number;
-    speed: number;
+    speed: number; // in units per second (not per tick)
     offsetCorrection: number;
     headChunkId: number;
 };

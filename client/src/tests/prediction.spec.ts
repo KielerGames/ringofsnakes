@@ -17,7 +17,7 @@ describe("Snake Prediction", () => {
             headChunkId: 0
         });
 
-        for(let t=0; t<10; t++) {
+        for (let t = 0; t < 10; t++) {
             const pos = snake.getPredictedPosition(t);
             assert.approximately(pos.x, t, 1e-8);
         }
@@ -39,7 +39,7 @@ describe("Snake Prediction", () => {
 
         const camera = new SnakeCamera(snake);
 
-        for(let t=0; t<10; t++) {
+        for (let t = 0; t < 10; t++) {
             camera.update(t);
             const pos = camera.position;
             assert.approximately(pos.x, t, 1e-8);

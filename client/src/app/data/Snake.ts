@@ -46,7 +46,10 @@ export default class Snake {
 
     public getPredictedPosition(timeSinceLastTick: number): Vector {
         const pos = this.lastPosition.clone();
-        pos.addPolar(this.direction.predictValue(0), timeSinceLastTick * this.speed);
+        pos.addPolar(
+            this.direction.predictValue(0),
+            timeSinceLastTick * this.speed
+        );
         return pos;
     }
 

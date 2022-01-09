@@ -55,10 +55,10 @@ export default class Game {
         // TODO: fix this mess
         try {
             targetSnake = this._data.targetSnake;
-        } catch(e) {
+        } catch (e) {
             targetSnake = undefined;
         }
-        
+
         if (targetSnake) {
             try {
                 if (this.camera instanceof SnakeCamera) {
@@ -66,10 +66,9 @@ export default class Game {
                 } else {
                     this.camera = new SnakeCamera(targetSnake);
                 }
-            } catch(e) {
+            } catch (e) {
                 this.camera = new TargetCamera(0, 0);
             }
-            
         } else {
             // TODO
             this.camera = new TargetCamera(0, 0);

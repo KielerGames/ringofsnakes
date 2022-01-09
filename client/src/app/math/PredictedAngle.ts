@@ -44,7 +44,8 @@ export default class PredictedAngle {
 
         // update target angle
         let d = minDiff(this.currentAngle, target);
-        if (Math.abs(d) > MAX_CHANGE) { // TODO tim-we
+        if (Math.abs(d) > MAX_CHANGE) {
+            // TODO tim-we
             d *= MAX_CHANGE / Math.abs(d);
         }
         this.targetAngle = this.currentAngle + d;

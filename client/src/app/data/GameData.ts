@@ -23,7 +23,7 @@ export default class GameData {
         // time stuff
         const now = performance.now();
         //const timeSinceLastUpdate = now - this.lastUpdateTime;
-        if(data.hasChanged) {
+        if (data.hasChanged) {
             this.lastUpdateTime = now;
         }
 

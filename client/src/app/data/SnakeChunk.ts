@@ -11,8 +11,9 @@ export default class SnakeChunk {
     public readonly vertices: number;
     public readonly final: boolean;
     public readonly length: number;
-    private lastTickOffset: number;
 
+    private lastTickOffset: number;
+    private creationTime: number;
     private boundingBox: Rectangle;
 
     public constructor(snake: Snake, data: SnakeChunkData) {
@@ -24,6 +25,7 @@ export default class SnakeChunk {
         this.vertices = data.vertices;
         this.final = data.final;
         this.length = data.length;
+        this.creationTime = performance.now();
     }
 
     public addToOffset(diff: number): void {
@@ -65,5 +67,9 @@ export default class SnakeChunk {
 
     public getBoundingBox(): Readonly<Rectangle> {
         return this.boundingBox;
+    }
+
+    public getAgeInSeconds():number {
+        return 0.001 * (performance.now() - this.creationTime);
     }
 }

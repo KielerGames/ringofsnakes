@@ -1,5 +1,6 @@
 import SnakeChunk from "../data/SnakeChunk";
 import Matrix from "../math/Matrix";
+import { mix } from "../utilities/ColorUtils";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as BoxRenderer from "./BoxRenderer";
 import * as SkinManager from "./SkinManager";
@@ -52,9 +53,14 @@ export function render(
         shader.run(chunk.vertices, { mode: gl.TRIANGLE_STRIP });
 
         if (__DEBUG__) {
+            const age = chunk.getAgeInSeconds();
             BoxRenderer.addBox(
                 chunk.getBoundingBox(),
-                chunk.final ? [1, 1.0, 0.1, 0.42] : [1, 0.5, 0, 0.25]
+                mix(
+                    [0.1, 1, 1, 0.64],
+                    [0.5, 1.0, 0, 0.025 + 0.3 / Math.max(1.0, age)],
+                    2.0 * age
+                )
             );
         }
     }

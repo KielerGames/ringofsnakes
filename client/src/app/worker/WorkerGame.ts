@@ -96,7 +96,7 @@ export default class WorkerGame {
             this.foodChunks.set(chunk.id, chunk);
         });
 
-        this.ticksSinceLastMainThreadUpdate++;
+        this.ticksSinceLastMainThreadUpdate++; // TODO tim-we: this does not work anymore
         this.lastServerUpdateTime = performance.now();
         this.newServerUpdate = true;
     }

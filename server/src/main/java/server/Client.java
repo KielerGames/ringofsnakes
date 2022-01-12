@@ -25,12 +25,10 @@ public abstract class Client {
     }
 
     public void updateClientSnakeChunk(SnakeChunk chunk) {
-        // TODO Kilian: remove instanceof check
-        if (chunk instanceof FinalSnakeChunk) {
-            if (((FinalSnakeChunk) chunk).isJunk()) {
-                return;
-            }
+        if (chunk.isJunk()) {
+            return;
         }
+
         if (knownSnakeChunks.contains(chunk)) {
             nextUpdate.addSnake(chunk.getSnake());
         } else {
@@ -92,7 +90,7 @@ public abstract class Client {
                 .filter(chunk -> !BoundingBox.intersect(knowledgeBox, chunk.box))
                 .collect(Collectors.toList());
 
-        chunksToForget.forEach(chunk -> knownFoodChunks.remove(chunk));
+        chunksToForget.forEach(knownFoodChunks::remove);
     }
 
     public void setViewBoxRatio(float ratio) {

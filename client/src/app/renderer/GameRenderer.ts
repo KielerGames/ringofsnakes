@@ -60,7 +60,7 @@ export function render(
 
     SkinManager.setSkinTexture(gl.TEXTURE0);
 
-    FoodRenderer.render(data.getFoodChunks(), data.targetSnake, transform);
+    FoodRenderer.render(data.getFoodChunks(), data.targetSnake, transform, pTime);
 
     // render snake bodies
     SnakeChunkRenderer.render(data.getSnakeChunks(), transform, pTime);

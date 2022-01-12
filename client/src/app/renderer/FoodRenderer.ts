@@ -28,7 +28,8 @@ export function init(glCtx: WebGLRenderingContext): void {
 export function render(
     foodChunks: Iterable<FoodChunk>,
     targetSnake: Snake | undefined,
-    transform: Matrix
+    transform: Matrix,
+    predictionTime: number
 ) {
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
@@ -37,7 +38,7 @@ export function render(
     shader.setUniform("uTransform", transform.data);
 
     const attractor = targetSnake
-        ? targetSnake.getPredictedPosition(0)
+        ? targetSnake.getPredictedPosition(predictionTime)
         : FAR_AWAY;
     shader.setUniform("uPlayerPosition", [attractor.x, attractor.y]);
 

@@ -3,7 +3,7 @@ import * as SCD from "./SnakeChunkDecoder";
 import * as FCD from "./FoodDecoder";
 import { GameConfig } from "../../types/GameConfig";
 
-const UPDATE_HEADER_SIZE = 3;
+const UPDATE_HEADER_SIZE = 4;
 
 export function decode(
     config: GameConfig,
@@ -12,12 +12,14 @@ export function decode(
     const view = new DataView(buffer);
 
     // read update header
-    const numSnakeInfos = view.getUint8(0);
-    const numSnakeChunks = view.getUint8(1);
-    const numFoodChunks = view.getUint8(2);
+    const ticksSinceLastUpdate = view.getUint8(0);
+    const numSnakeInfos = view.getUint8(1);
+    const numSnakeChunks = view.getUint8(2);
+    const numFoodChunks = view.getUint8(3);
 
-    // read snake infos
     let byteOffset = UPDATE_HEADER_SIZE;
+    
+    // read snake infos
     const snakeInfos = new Array(numSnakeInfos);
     for (let i = 0; i < numSnakeInfos; i++) {
         const result = SID.decode(buffer, byteOffset);

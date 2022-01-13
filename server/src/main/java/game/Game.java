@@ -41,6 +41,7 @@ public class Game {
     protected final ExceptionalExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
     private final List<Bot> bots = new LinkedList<>();
+    private byte ticksSinceLastUpdate = 0;
 
     public Game() {
         this(new GameConfig());
@@ -176,6 +177,7 @@ public class Game {
         bots.stream().filter(Bot::isAlive).forEach(Bot::act);
         eatFood();
         collisionManager.detectCollisions();
+        ticksSinceLastUpdate++;
     }
 
     private void updateClients() {
@@ -184,10 +186,11 @@ public class Game {
                 final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
                 worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
                 worldChunks.forEach(client::updateClientFoodChunk);
-                client.sendUpdate();
+                client.sendUpdate(ticksSinceLastUpdate);
                 client.cleanupKnowledge();
             });
         }
+        ticksSinceLastUpdate = 0;
     }
 
     private void eatFood() {
@@ -218,7 +221,6 @@ public class Game {
             s.kill();
         }
     }
-
 
     public void stop() {
         this.executor.shutdown();

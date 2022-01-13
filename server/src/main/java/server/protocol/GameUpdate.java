@@ -11,13 +11,14 @@ import java.util.List;
 import java.util.Set;
 
 public class GameUpdate {
-    public static final int HEADER_SIZE = 3;
+    public static final int HEADER_SIZE = 4;
     private static final int ITEM_LIMIT = 255;
     private final List<ByteBuffer> snakeChunkBuffers = new LinkedList<>();
     private final List<ByteBuffer> foodChunkBuffers = new LinkedList<>();
     private final Set<Snake> snakes = new HashSet<>();
     private int snakeChunkBufferSize = 0;
     private int foodChunkBufferSize = 0;
+    private byte ticksSinceLastUpdate = 0;
 
     public void addSnakeChunk(SnakeChunk chunk) {
         if (!chunk.isEmpty()) {
@@ -55,6 +56,7 @@ public class GameUpdate {
         assert foodChunkBuffers.size() < 256;
 
         // update header
+        buffer.put(this.ticksSinceLastUpdate);
         buffer.put((byte) snakes.size());
         buffer.put((byte) snakeChunkBuffers.size());
         buffer.put((byte) foodChunkBuffers.size());
@@ -70,6 +72,11 @@ public class GameUpdate {
 
     public boolean isEmpty() {
         return snakes.isEmpty() && foodChunkBuffers.isEmpty();
+    }
+
+    public void setTicksSinceLastUpdate(byte ticks) {
+        assert ticks >= 0;
+        this.ticksSinceLastUpdate = ticks;
     }
 
     @Override

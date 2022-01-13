@@ -48,7 +48,7 @@ public class GameUpdateTest {
         when(session.isOpen()).thenReturn(true);
         when(session.getAsyncRemote()).thenReturn(remoteEndpoint);
 
-        client.sendUpdate();
+        client.sendUpdate((byte) 0);
 
         var captor = ArgumentCaptor.forClass(ByteBuffer.class);
         verify(remoteEndpoint).sendBinary(captor.capture());
@@ -62,9 +62,9 @@ public class GameUpdateTest {
         var updateData = captureUpdateData(client);
         assertNotNull(updateData);
         assertEquals(GameUpdate.HEADER_SIZE, updateData.capacity());
-        assertEquals(0, updateData.get(0));
         assertEquals(0, updateData.get(1));
         assertEquals(0, updateData.get(2));
+        assertEquals(0, updateData.get(3));
     }
 
     @Test
@@ -93,13 +93,13 @@ public class GameUpdateTest {
         client.updateClientFoodChunk(chunk);
         var update1 = captureUpdateData(client);
         assertNotNull(update1);
-        assertEquals(1, update1.get(2));
+        assertEquals(1, update1.get(3));
 
         chunk.addFood();
         client.updateClientFoodChunk(chunk);
         var update2 = captureUpdateData(client);
         assertNotNull(update2);
-        assertEquals(1, update2.get(2));
+        assertEquals(1, update2.get(3));
     }
 
     private static class TestClient extends Client {

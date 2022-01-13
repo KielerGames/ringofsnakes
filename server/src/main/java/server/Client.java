@@ -1,6 +1,5 @@
 package server;
 
-import game.snake.FinalSnakeChunk;
 import game.snake.SnakeChunk;
 import game.world.WorldChunk;
 import math.BoundingBox;
@@ -17,11 +16,10 @@ public abstract class Client {
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private final Map<WorldChunk, Integer> knownFoodChunks = new HashMap<>();
     protected float viewBoxRatio = 1f;
-    private GameUpdate nextUpdate;
+    private GameUpdate nextUpdate = new GameUpdate();
 
     public Client(Session session) {
         this.session = session;
-        nextUpdate = new GameUpdate();
     }
 
     public void updateClientSnakeChunk(SnakeChunk chunk) {
@@ -50,8 +48,9 @@ public abstract class Client {
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
     }
 
-    public void sendUpdate() {
-        var update = this.nextUpdate;
+    public void sendUpdate(byte ticksSinceLastUpdate) {
+        final var update = this.nextUpdate;
+        update.setTicksSinceLastUpdate(ticksSinceLastUpdate);
         this.nextUpdate = new GameUpdate();
         onBeforeUpdateBufferIsCreated(update);
         send(update.createUpdateBuffer());
@@ -94,7 +93,7 @@ public abstract class Client {
     }
 
     public void setViewBoxRatio(float ratio) {
-        assert(ratio > 0f && ratio < 3f);
+        assert (ratio > 0f && ratio < 3f);
         viewBoxRatio = ratio;
     }
 }

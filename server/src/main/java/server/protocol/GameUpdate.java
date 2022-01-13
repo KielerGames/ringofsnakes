@@ -51,12 +51,13 @@ public class GameUpdate {
         final int bufferSize = HEADER_SIZE + snakeInfoSize + snakeChunkBufferSize + foodChunkBufferSize;
         ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
 
+        assert ticksSinceLastUpdate >= 0; // TODO: should be > 0
         assert snakes.size() < 256;
         assert snakeChunkBuffers.size() < 256;
         assert foodChunkBuffers.size() < 256;
 
         // update header
-        buffer.put(this.ticksSinceLastUpdate);
+        buffer.put(ticksSinceLastUpdate);
         buffer.put((byte) snakes.size());
         buffer.put((byte) snakeChunkBuffers.size());
         buffer.put((byte) foodChunkBuffers.size());

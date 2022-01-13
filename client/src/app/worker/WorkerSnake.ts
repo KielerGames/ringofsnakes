@@ -22,10 +22,10 @@ export default class WorkerSnake {
         this.lastKnownSpeed = this.tickSpeed();
     }
 
-    public updateFromServer(info: SnakeInfo): void {
+    public updateFromServer(info: SnakeInfo, ticks: number): void {
         this.data = info;
         this.headPosition.set(info.position);
-        this.correctOffset += this.tickSpeed();
+        this.correctOffset += ticks * this.tickSpeed(); // TODO: use fast bit history to compute exact value
         this.offsetPrediction += this.lastKnownSpeed;
     }
 

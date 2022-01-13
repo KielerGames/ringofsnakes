@@ -69,7 +69,7 @@ export default class WorkerGame {
         data.snakeInfos.forEach((info) => {
             const snake = this.snakes.get(info.snakeId);
             if (snake) {
-                snake.updateFromServer(info);
+                snake.updateFromServer(info, data.ticksSinceLastUpdate);
             } else {
                 this.snakes.set(
                     info.snakeId,
@@ -96,7 +96,7 @@ export default class WorkerGame {
             this.foodChunks.set(chunk.id, chunk);
         });
 
-        this.ticksSinceLastMainThreadUpdate++; // TODO tim-we: this does not work anymore
+        this.ticksSinceLastMainThreadUpdate += data.ticksSinceLastUpdate;
         this.lastServerUpdateTime = performance.now();
         this.newServerUpdate = true;
     }

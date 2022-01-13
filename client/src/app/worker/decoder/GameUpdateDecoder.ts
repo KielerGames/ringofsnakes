@@ -18,7 +18,7 @@ export function decode(
     const numFoodChunks = view.getUint8(3);
 
     let byteOffset = UPDATE_HEADER_SIZE;
-    
+
     // read snake infos
     const snakeInfos = new Array(numSnakeInfos);
     for (let i = 0; i < numSnakeInfos; i++) {
@@ -49,6 +49,7 @@ export function decode(
     }
 
     return {
+        ticksSinceLastUpdate,
         snakeInfos,
         snakeChunkData: chunks,
         foodChunkData: foodChunks
@@ -56,6 +57,7 @@ export function decode(
 }
 
 export type GameUpdateData = {
+    ticksSinceLastUpdate: number;
     snakeInfos: SID.SnakeInfo[];
     snakeChunkData: SCD.DecodedSnakeChunk[];
     foodChunkData: FCD.FoodChunkDTO[];

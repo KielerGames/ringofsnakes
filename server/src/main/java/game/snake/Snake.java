@@ -4,6 +4,7 @@ import game.GameConfig;
 import game.world.Food;
 import game.world.World;
 import math.Vector;
+import util.BitWithShortHistory;
 import util.Direction;
 
 import java.nio.ByteBuffer;
@@ -27,6 +28,7 @@ public class Snake {
     private final ChainCodeCoder coder;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
+    private final BitWithShortHistory fastHistory = new BitWithShortHistory(false);
     public byte skin;
     public GrowingSnakeChunk currentChunk;
     protected double length;
@@ -35,7 +37,7 @@ public class Snake {
     private boolean alive = true;
     private char nextChunkId = 0;
     private double targetDirection;
-    private boolean fast = false;
+    private boolean userWantsFast = false;
     private double lengthBuffer = 0;
     private double width;
     private double foodTrailBuffer = 0f;
@@ -71,22 +73,28 @@ public class Snake {
         }
     }
 
-    public void setFast(boolean wantsFast) {
-        if (length > config.snakes.minLength) {
-            this.fast = wantsFast;
-        } else {
-            this.fast = false;
+    public boolean isFast() {
+        if (userWantsFast) {
+            return length > config.snakes.minLength;
         }
+
+        return false;
+    }
+
+    public void setUserFast(boolean wantsFast) {
+        userWantsFast = wantsFast;
     }
 
     public void tick() {
+        final boolean fast = isFast();
+
         // update direction
         int encDirDelta = coder.sampleDirectionChange(targetDirection, headDirection);
         double dirDelta = coder.decodeDirectionChange(encDirDelta);
         headDirection = Direction.normalize(headDirection + dirDelta);
 
         // move head & handle length change
-        if (fast) {
+        if (isFast()) {
             shrink(config.snakes.burnRate);
             handleLengthChange(config.snakes.fastSpeed);
             headPosition.addDirection(headDirection, config.snakes.fastSpeed);
@@ -138,7 +146,7 @@ public class Snake {
         buffer.putChar(0, id);
         buffer.putChar(2, currentChunk.id);
         buffer.put(4, skin);
-        buffer.put(5, (byte) (fast ? 1 : 0));
+        buffer.put(5, fastHistory.getHistory());
         buffer.putFloat(6, (float) length);
         buffer.putFloat(10, (float) headDirection);
         buffer.putFloat(14, (float) targetDirection);

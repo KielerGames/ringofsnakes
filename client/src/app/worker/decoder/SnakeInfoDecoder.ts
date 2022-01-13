@@ -18,7 +18,7 @@ export function decode(
         snakeId: view.getUint16(0, false),
         currentChunkId: view.getUint32(0, false),
         skin: view.getUint8(4),
-        fast: view.getUint8(5) !== 0,
+        fast: (view.getUint8(5) & 1) !== 0,
         length: view.getFloat32(6, false),
         direction: view.getFloat32(10, false),
         targetDirection: view.getFloat32(14, false),

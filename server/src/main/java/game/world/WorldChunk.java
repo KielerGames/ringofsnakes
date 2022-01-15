@@ -12,15 +12,14 @@ import java.util.stream.Stream;
 
 
 public class WorldChunk {
+    private static final int FOOD_HEADER_SIZE = 4;
     public final BoundingBox box;
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
-    private final int FOOD_HEADER_SIZE = 4;
     private final List<SnakeChunk> snakeChunks = new LinkedList<>();
     private final byte x, y;
-    private int foodVersion = 0;
     private final World world;
-
-    private List<Food> foodList = new LinkedList<>();
+    private int foodVersion = 0;
+    final private List<Food> foodList = new LinkedList<>();
 
     public WorldChunk(World world, double left, double bottom, double width, double height, int x, int y) {
         assert (width > 0.0);
@@ -71,7 +70,6 @@ public class WorldChunk {
         assert (BoundingBox.intersect(snakeChunk.getBoundingBox(), box));
 
         snakeChunks.add(snakeChunk);
-        snakeChunk.linkWorldChunk(this);
     }
 
     public ByteBuffer encodeFood() {
@@ -102,11 +100,9 @@ public class WorldChunk {
 
     /**
      * Removes snake chunks that are junk.
-     *
-     * @return true if any snake chunks have been removed
      */
-    public boolean removeOldSnakeChunks() {
-        return snakeChunks.removeIf(SnakeChunk::isJunk);
+    public void removeOldSnakeChunks() {
+        snakeChunks.removeIf(SnakeChunk::isJunk);
     }
 
     public String toString() {

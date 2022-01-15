@@ -1,6 +1,7 @@
 package game.snake;
 
 import game.world.WorldChunk;
+import lombok.Getter;
 import math.BoundingBox;
 
 import java.nio.ByteBuffer;
@@ -11,11 +12,10 @@ public class FinalSnakeChunk extends SnakeChunk {
     public final static int BYTE_SIZE = 96;
 
     private final ByteBuffer chunkByteBuffer;
-    private final double length;
-    private final int uniqueId;
+    @Getter private final double length;
+    @Getter private final int uniqueId;
     private final BoundingBox boundingBox;
-    private List<SnakePathPoint> pathData;
-    private LinkedList<WorldChunk> linkedWorldChunks;
+    final private List<SnakePathPoint> pathData;
     private double snakeOffset = 0.0;
 
     protected FinalSnakeChunk(
@@ -35,15 +35,10 @@ public class FinalSnakeChunk extends SnakeChunk {
         boundingBox = box;
         this.length = length;
         this.uniqueId = buffer.getInt(0); // bytes 0-3
-        linkedWorldChunks = new LinkedList<>();
     }
 
     public ByteBuffer getBuffer() {
         return chunkByteBuffer.asReadOnlyBuffer().flip();
-    }
-
-    public Snake getSnake() {
-        return this.snake;
     }
 
     public int getByteSize() {
@@ -56,14 +51,6 @@ public class FinalSnakeChunk extends SnakeChunk {
 
     public boolean isFull() {
         return true;
-    }
-
-    public int getUniqueId() {
-        return this.uniqueId;
-    }
-
-    public double getLength() {
-        return this.length;
     }
 
     @Override
@@ -83,11 +70,6 @@ public class FinalSnakeChunk extends SnakeChunk {
 
     public BoundingBox getBoundingBox() {
         return boundingBox;
-    }
-
-    @Override
-    public void linkWorldChunk(WorldChunk worldChunk) {
-        linkedWorldChunks.add((worldChunk));
     }
 
     @Override

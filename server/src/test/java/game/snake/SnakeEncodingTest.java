@@ -1,5 +1,5 @@
-import game.GameConfig;
-import game.snake.*;
+package game.snake;
+
 import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,8 @@
+package game.world;
+
 import game.Game;
 import game.GameConfig;
 import game.snake.FinalSnakeChunk;
-import game.world.WorldChunk;
 import math.BoundingBox;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class findSnakeSpawnPositionTest {
+public class WorldChunkFindSpawnPositionTest {
 
     @Mock
     FinalSnakeChunk sc1;

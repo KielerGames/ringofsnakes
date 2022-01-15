@@ -1,6 +1,5 @@
-import game.GameConfig;
-import game.snake.ChainCodeCoder;
-import game.snake.SnakeFactory;
+package game.snake;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,3 +1,5 @@
+package server.protocol;
+
 import game.world.World;
 import game.world.WorldChunk;
 import math.BoundingBox;
@@ -8,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import server.Client;
-import server.protocol.GameUpdate;
 
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
@@ -21,6 +22,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class GameUpdateTest {
     World world = new World();
+    @Mock
+    Session session;
 
     @Test
     void testEmptyUpdate() {
@@ -35,9 +38,6 @@ public class GameUpdateTest {
         update.addFoodChunk(chunk);
         assertFalse(update.isEmpty());
     }
-
-    @Mock
-    Session session;
 
     private ByteBuffer captureUpdateData(Client client) {
         var remoteEndpoint = Mockito.mock(RemoteEndpoint.Async.class);
@@ -103,11 +103,11 @@ public class GameUpdateTest {
     }
 
     private static class TestClient extends Client {
+        public BoundingBox knowledgeBox = new BoundingBox(0, 0, 100, 100);
+
         TestClient(Session session) {
             super(session);
         }
-
-        public BoundingBox knowledgeBox = new BoundingBox(0, 0, 100, 100);
 
         @Override
         public BoundingBox getKnowledgeBox() {

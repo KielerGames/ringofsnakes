@@ -3,6 +3,8 @@ package game.snake;
 import game.GameConfig;
 import game.world.Food;
 import game.world.World;
+import lombok.Getter;
+import lombok.Setter;
 import math.Vector;
 import util.BitWithShortHistory;
 import util.Direction;
@@ -29,17 +31,17 @@ public class Snake {
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private final BitWithShortHistory fastHistory = new BitWithShortHistory(false);
-    public byte skin;
     public GrowingSnakeChunk currentChunk;
-    protected double length;
-    Vector headPosition;
+    @Getter protected double length;
+    @Getter Vector headPosition;
     double headDirection;
-    private boolean alive = true;
+    @Setter private byte skin;
+    @Getter private boolean alive = true;
     private char nextChunkId = 0;
     private double targetDirection;
     private boolean userWantsFast = false;
     private double lengthBuffer = 0;
-    private double width;
+    @Getter private double width;
     private double foodTrailBuffer = 0f;
 
     Snake(char id, World world) {
@@ -137,10 +139,6 @@ public class Snake {
         world.addSnakeChunk(currentChunk);
     }
 
-    public double getLength() {
-        return this.length;
-    }
-
     public ByteBuffer encodeInfo() {
         final var buffer = this.snakeInfoBuffer;
         buffer.putChar(0, id);
@@ -154,10 +152,6 @@ public class Snake {
         buffer.putFloat(22, (float) headPosition.y);
         buffer.position(INFO_BYTE_SIZE);
         return buffer.asReadOnlyBuffer().flip();
-    }
-
-    public Vector getHeadPosition() {
-        return headPosition;
     }
 
     public void grow(double amount) {
@@ -197,10 +191,6 @@ public class Snake {
         lengthBuffer -= lengthChange;
     }
 
-    public void setSkin(byte skin) {
-        this.skin = skin;
-    }
-
     /**
      * Get the snake width at a specific point.
      *
@@ -224,25 +214,12 @@ public class Snake {
         return thinningFactor * width;
     }
 
-    /**
-     * Returns the (maximum) width of the snake.
-     *
-     * @return width
-     */
-    public double getWidth() {
-        return width;
-    }
-
     public Stream<SnakeChunk> streamSnakeChunks() {
         return Stream.concat(Stream.of(currentChunk), chunks.stream());
     }
 
     public List<SnakeChunk> getSnakeChunks() {
         return streamSnakeChunks().collect(Collectors.toList());
-    }
-
-    public boolean isAlive() {
-        return alive;
     }
 
     public void kill() {

@@ -3,6 +3,8 @@ package game.world;
 import game.GameConfig;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
+import lombok.Getter;
+import lombok.Setter;
 import math.BoundingBox;
 import math.Vector;
 
@@ -12,10 +14,10 @@ import java.util.stream.Collectors;
 
 public class World {
     private static final int FOOD_THRESHOLD = 16;
-    private static Random random = new Random();
+    @Setter private static Random random = new Random();
     public final WorldChunkCollection chunks;
     public final Vector center = new Vector(0, 0);
-    private final GameConfig config;
+    @Getter private final GameConfig config;
     public BoundingBox box;
 
     public World(double chunkSize, int repetitions) {
@@ -32,16 +34,6 @@ public class World {
         this.config = config;
         chunks = WorldChunkFactory.createChunks(this);
         box = new BoundingBox(new Vector(0, 0), config.chunks.size * config.chunks.columns, config.chunks.size * config.chunks.rows);
-    }
-
-    /**
-     * Sets the random object, useful for debugging
-     * and for deterministic tests
-     *
-     * @param random The random instance to use
-     */
-    public static void setRandom(Random random) {
-        World.random = random;
     }
 
     public Vector findSpawnPosition() {
@@ -75,9 +67,5 @@ public class World {
                 .sorted(Comparator.comparingInt(WorldChunk::getFoodCount))
                 .limit(numberOfChunksToSpawnSimultaneously)
                 .forEach(WorldChunk::addFood);
-    }
-
-    public GameConfig getConfig() {
-        return this.config;
     }
 }

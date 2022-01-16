@@ -1,7 +1,7 @@
+package game.snake;
+
 import game.Game;
 import game.GameConfig;
-import game.snake.Snake;
-import game.snake.SnakeFactory;
 import game.world.Collidable;
 import game.world.World;
 import math.Vector;

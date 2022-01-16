@@ -1,3 +1,5 @@
+package game.world;
+
 import game.Game;
 import game.GameConfig;
 

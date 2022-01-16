@@ -18,8 +18,8 @@ public class WorldChunk {
     private final List<SnakeChunk> snakeChunks = new LinkedList<>();
     private final byte x, y;
     private final World world;
+    private final List<Food> foodList = new LinkedList<>();
     private int foodVersion = 0;
-    final private List<Food> foodList = new LinkedList<>();
 
     public WorldChunk(World world, double left, double bottom, double width, double height, int x, int y) {
         assert (width > 0.0);

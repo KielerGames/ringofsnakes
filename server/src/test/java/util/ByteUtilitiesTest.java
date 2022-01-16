@@ -1,10 +1,12 @@
+package util;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static util.ByteUtilities.fromNormalizedDoubleToByte;
 import static util.ByteUtilities.toNormalizedDouble;
 
-public class UtilTest {
+public class ByteUtilitiesTest {
     @Test
     void testByteToNormalizedDoubleBound() {
         assertEquals(1.0, toNormalizedDouble(Byte.MAX_VALUE));

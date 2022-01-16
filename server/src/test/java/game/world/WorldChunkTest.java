@@ -1,5 +1,6 @@
+package game.world;
+
 import game.snake.SnakeFactory;
-import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

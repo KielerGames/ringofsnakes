@@ -1,5 +1,5 @@
-import math.BoundingBox;
-import math.Vector;
+package math;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;

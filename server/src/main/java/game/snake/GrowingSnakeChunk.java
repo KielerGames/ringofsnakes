@@ -1,6 +1,7 @@
 package game.snake;
 
 import game.world.WorldChunk;
+import lombok.Getter;
 import math.BoundingBox;
 import math.Vector;
 
@@ -14,13 +15,12 @@ public class GrowingSnakeChunk extends SnakeChunk {
     private final ChainCodeCoder coder;
     private final Vector end;
     private final float endDirection;
-    private final List<WorldChunk> linkedWorldChunks = new LinkedList<>();
     private final ByteBuffer chunkByteBuffer;
     private int numberOfChainCodes = 0;
     private double x, y;
     private float direction;
     private double minX, maxX, minY, maxY;
-    private double length = 0.0;
+    @Getter private double length = 0.0;
     private int lastSteps = 0;
     private boolean lastFast = false;
     private int lastDirDelta = 0;
@@ -154,10 +154,6 @@ public class GrowingSnakeChunk extends SnakeChunk {
         return this.chunkByteBuffer.getInt(0);
     }
 
-    public double getLength() {
-        return this.length;
-    }
-
     @Override
     public List<SnakePathPoint> getPathData() {
         return pathData;
@@ -166,11 +162,6 @@ public class GrowingSnakeChunk extends SnakeChunk {
     @Override
     public BoundingBox getBoundingBox() {
         return new BoundingBox(minX, maxX, minY, maxY);
-    }
-
-    @Override
-    public void linkWorldChunk(WorldChunk worldChunk) {
-        linkedWorldChunks.add((worldChunk));
     }
 
     @Override

@@ -1,4 +1,5 @@
-import game.snake.SnakeFactory;
+package game.snake;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -80,7 +81,7 @@ public class SnakeWidthTest {
 
         snake.shrink(100.0);
 
-        for(int i=0; i<50; i++) {
+        for (int i = 0; i < 50; i++) {
             snake.tick();
         }
 

@@ -31,7 +31,6 @@ export default class WorkerGame {
     targetAlpha: number = 0.0;
     wantsToBeFast: boolean = false;
     private viewBox: Rectangle;
-    private newServerUpdate: boolean = false;
     public readonly binaryDataReceived = new AsyncEvent();
 
     constructor(socket: WebSocket, snakeId: number, gameConfig: GameConfig) {
@@ -98,7 +97,6 @@ export default class WorkerGame {
 
         this.ticksSinceLastMainThreadUpdate += data.ticksSinceLastUpdate;
         this.lastServerUpdateTime = performance.now();
-        this.newServerUpdate = true;
     }
 
     private onJsonMessageFromServer(
@@ -200,8 +198,6 @@ export default class WorkerGame {
 
         const ticks = this.ticksSinceLastMainThreadUpdate;
         this.ticksSinceLastMainThreadUpdate = 0;
-        const hasChanged = this.newServerUpdate;
-        this.newServerUpdate = false;
 
         return {
             timeSinceLastTick: performance.now() - this.lastServerUpdateTime,
@@ -210,8 +206,7 @@ export default class WorkerGame {
             snakes,
             foodChunks,
             targetSnakeId: this.targetSnakeId,
-            leaderboardData: this.leaderboardData,
-            hasChanged
+            leaderboardData: this.leaderboardData
         };
     }
 }

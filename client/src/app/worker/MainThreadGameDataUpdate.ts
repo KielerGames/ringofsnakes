@@ -10,7 +10,6 @@ export type MainThreadGameDataUpdate = {
     snakes: SnakeDataDTO[];
     targetSnakeId: number;
     leaderboardData: LeaderboardData;
-    hasChanged: boolean;
 };
 
 /* Vertex buffer triangle strip:

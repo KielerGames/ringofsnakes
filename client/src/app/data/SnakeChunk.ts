@@ -45,7 +45,7 @@ export default class SnakeChunk {
      * @param timeSinceLastTick
      * @returns
      */
-    public offset(timeSinceLastTick: number = 0.0): number {
+    public offset(timeSinceLastTick: number): number {
         const t = timeSinceLastTick;
         return this.lastTickOffset + t * this.snake.speed;
     }

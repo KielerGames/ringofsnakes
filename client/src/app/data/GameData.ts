@@ -106,7 +106,7 @@ export default class GameData {
 
         // collect "garbage" snake chunks
         this.snakeChunks.forEach((chunk) => {
-            if (chunk.offset() >= chunk.snake.length) {
+            if (chunk.offset(0.0) >= chunk.snake.length) {
                 chunksToDelete.push(chunk);
             }
         });

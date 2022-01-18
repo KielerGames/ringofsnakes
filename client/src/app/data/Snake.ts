@@ -38,7 +38,11 @@ export default class Snake {
             // update chunk offsets
             const diff =
                 ticksSinceLastUpdate * this.speed + data.offsetCorrection;
-            this.chunks.forEach((chunk) => chunk.addToOffset(diff));
+            this.chunks.forEach((chunk) => {
+                if (chunk !== this.currentChunk) {
+                    chunk.addToOffset(diff);
+                }
+            });
         }
 
         this.speed = data.speed;

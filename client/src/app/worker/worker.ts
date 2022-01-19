@@ -105,7 +105,7 @@ export class WorkerAPI {
             throw new Error("No game.");
         }
 
-        game.socket.addEventListener("close", callback);
+        game.socket.addEventListener("close", () => callback());
     }
 
     public quitCurrentGame(): void {

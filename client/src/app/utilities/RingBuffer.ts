@@ -6,6 +6,7 @@ export default class RingBuffer {
     #start: number;
     #next: number;
     #length: number;
+    #total: number;
 
     constructor(capacity: number) {
         if (capacity <= 0) {
@@ -15,6 +16,7 @@ export default class RingBuffer {
         this.#length = 0;
         this.#start = 0;
         this.#next = 0;
+        this.#total = 0;
     }
 
     add(value: number): void {
@@ -28,9 +30,11 @@ export default class RingBuffer {
         }
 
         this.#length = newLength;
+        this.#total++;
     }
 
     getAll(): Float64Array {
+        console.info("ring buffer length: " + this.#length);
         const result = new Float64Array(this.#length);
         for(let i=0; i<this.#length; i++) {
             const j = (this.#start + i) % this.#data.length;
@@ -41,5 +45,9 @@ export default class RingBuffer {
 
     get size(): number {
         return this.#length;
+    }
+
+    get total(): number {
+        return this.#total;
     }
 }

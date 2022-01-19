@@ -13,6 +13,7 @@ describe("Utilities", () => {
                 assert.equal(rb.size, i+1);
             }
 
+            assert.equal(rb.total, n);
             const rbData = rb.getAll();
             assert.equal(rbData.length, n);
 
@@ -22,15 +23,18 @@ describe("Utilities", () => {
         });
 
         it("should remember the last value", () => {
+            const n = 42;
             const rb = new RingBuffer(1);
 
-            for(let i=0; i<42; i++) {
+            for(let i=0; i<n; i++) {
                 rb.add(i);
                 assert.equal(rb.size, 1);
                 const rbData = rb.getAll();
                 assert.equal(rbData.length, 1);
                 assert.equal(rbData[0], i);
             }
+
+            assert.equal(rb.total, n);
         })
     });
 });

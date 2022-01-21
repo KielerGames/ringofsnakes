@@ -1,6 +1,6 @@
 import { DecodeResult } from "./DecodeResult";
-import { normalizeAngle } from "../../math/utils";
-import { GameConfig } from "../../types/GameConfig";
+import { normalizeAngle } from "../../math/Angle";
+import { GameConfig } from "../../data/config/GameConfig";
 
 const SNAKE_CHUNK_MAX_BYTES = 96;
 export const SNAKE_CHUNK_HEADER_SIZE = 21;

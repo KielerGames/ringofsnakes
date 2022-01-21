@@ -1,117 +1,109 @@
 import * as Comlink from "comlink";
-import { ClientConfig } from "../data/ClientConfig";
-import Rectangle, { TransferableBox } from "../math/Rectangle";
-import { ClientToServerMessage, ServerToClientJSONMessage } from "../protocol";
-import { GameConfig } from "../types/GameConfig";
-import { MainThreadGameDataUpdate } from "./MainThreadGameDataUpdate";
-import WorkerGame from "./WorkerGame";
+import { ClientConfig } from "../data/config/ClientConfig";
+import { connect, Socket } from "./socket";
+import RateLimiter from "./util/RateLimiter";
+import GameDataBuffer from "./data/GameDataBuffer";
+import { GameConfig } from "../../oldapp/types/GameConfig";
+import { ClientData } from "./data/ClientData";
+import { Callback } from "../util/FunctionTypes";
+import { SpawnInfo } from "./data/JSONMessages";
 
-let game: WorkerGame | null = null;
+type TODO = any; // TODO remove
+type WorkerEvent = "server-update";
+
+let socket: Socket | null = null;
+
+const userInputRateLimiter = new RateLimiter<ClientData>(1000 / 30, (data) => {
+    if (socket) {
+        const buffer = new ArrayBuffer(9);
+        let view = new DataView(buffer);
+        view.setFloat32(0, data.viewBox.width / data.viewBox.height, false);
+        view.setFloat32(4, data.targetAlpha, false);
+        view.setUint8(8, data.wantsToBeFast ? 1 : 0);
+        socket.sendBinary(buffer);
+    }
+});
+
+const data = new GameDataBuffer();
+
+const eventListeners = new Map<WorkerEvent, Callback>();
 
 export class WorkerAPI {
-    public async init(
+    public static async connect(
         name: string,
         cfg: Readonly<ClientConfig>
-    ): Promise<void> {
+    ): Promise<GameConfig> {
+        if (socket !== null) {
+            throw new Error("Worker is already initialized.");
+        }
+
         const protocol = cfg.server.wss ? "wss" : "ws";
-        const websocket = new WebSocket(
-            `${protocol}://${cfg.server.host}:${cfg.server.port}/game`
-        );
-        websocket.binaryType = "arraybuffer";
+        const url = `${protocol}://${cfg.server.host}:${cfg.server.port}/game`;
+        socket = await connect(url);
 
-        await new Promise<void>((resolve) => {
-            websocket.onopen = () => {
-                websocket.onopen = null;
-                resolve();
-            };
-        });
-
-        console.info("Connection open.");
-
-        game = await new Promise((resolve) => {
-            websocket.onmessage = (event: MessageEvent) => {
-                if (typeof event.data === "string") {
-                    const json = JSON.parse(
-                        event.data
-                    ) as ServerToClientJSONMessage;
-                    if (json.tag === "SpawnInfo") {
-                        websocket.onmessage = null;
-                        resolve(
-                            new WorkerGame(
-                                websocket,
-                                json.snakeId,
-                                json.gameConfig
-                            )
-                        );
-                        // this was the expected message
-                        return;
-                    }
-                }
-
-                console.warn(
-                    `Game init: Unexpected websocket message from server. (${typeof event.data})`
-                );
-            };
-
-            websocket.send(
-                JSON.stringify({
-                    tag: "UpdatePlayerName",
-                    name
-                } as ClientToServerMessage)
+        const spawnInfo: SpawnInfo = await new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(
+                () => reject("SpawnInfo timeout."),
+                2000
             );
+
+            socket!.onJSONMessage = (message) => {
+                if (message.tag === "SpawnInfo") {
+                    clearTimeout(timeoutId);
+                    resolve(message);
+                } else {
+                    console.warn(
+                        `Game init: Unexpected message from server.`,
+                        message
+                    );
+                }
+            };
         });
 
-        await game?.binaryDataReceived.wait();
+        data.init(spawnInfo);
 
-        console.info(`WorkerGame init complete.`);
+        socket.onJSONMessage = (message) => {
+            switch (message.tag) {
+                default: {
+                    data.addJSONUpdate(message);
+                }
+            }
+        };
+
+        socket.onBinaryMessage = (message) => data.addBinaryUpdate(message);
+
+        socket.sendJSON({ tag: "UpdatePlayerName", name });
+
+        return data.config;
     }
 
-    public updateUserData(
+    public static async sendUserInput(
         alpha: number,
         wantsFast: boolean,
-        viewBox: TransferableBox
+        viewBox: TODO
+    ) {
+        userInputRateLimiter.setValue({
+            targetAlpha: alpha,
+            wantsToBeFast: wantsFast,
+            viewBox
+        });
+    }
+
+    public static getDataChanges(): TODO {
+        // TODO
+    }
+
+    public static quit(): void {
+        if (socket) {
+            socket.close();
+        }
+    }
+
+    public static addEventListener(
+        eventId: WorkerEvent,
+        callback: Callback
     ): void {
-        if (game) {
-            game.updateUserData(
-                alpha,
-                wantsFast,
-                Rectangle.fromTransferable(viewBox)
-            );
-        }
-    }
-
-    public getGameDataUpdate(): MainThreadGameDataUpdate {
-        if (game === null) {
-            throw new Error("Not initialized.");
-        }
-
-        const update = game.getDataChanges();
-        const transferables = update.newSnakeChunks.map(
-            (chunk) => chunk.data.buffer
-        );
-
-        return Comlink.transfer(update, transferables);
-    }
-
-    public getConfig(): GameConfig {
-        if (!game) {
-            throw new Error("No game config. (Game not fully initialized)");
-        }
-        return game.config;
-    }
-
-    public onEnd(callback: () => void): void {
-        if (game === null) {
-            throw new Error("No game.");
-        }
-
-        game.socket.addEventListener("close", () => callback());
-    }
-
-    public quitCurrentGame(): void {
-        if (game) {
-            game.socket.close();
-        }
+        eventListeners.set(eventId, callback);
     }
 }
 

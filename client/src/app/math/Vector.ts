@@ -3,43 +3,48 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 export default class Vector {
-    public x: number;
-    public y: number;
+    x: number;
+    y: number;
 
-    public static fromObject(p: PointLike): Vector {
-        return new Vector(p.x, p.y);
-    }
-
-    public constructor(x: number, y: number) {
+    constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }
 
-    public addPolar(alpha: number, distance: number): void {
-        this.x += distance * Math.cos(alpha);
-        this.y += distance * Math.sin(alpha);
+    static fromObject(p: PointLike): Vector {
+        return new Vector(p.x, p.y);
     }
 
-    public createTransferable(): PointLike {
-        return { x: this.x, y: this.y };
-    }
-
-    public set(data: PointLike): void {
-        this.x = data.x;
-        this.y = data.y;
-    }
-
-    public clone(): Vector {
-        return new Vector(this.x, this.y);
-    }
-
-    public static distance(a: Vector, b: Vector): number {
+    static distance(a: Vector, b: Vector): number {
         const dx = a.x - b.x;
         const dy = a.y - b.y;
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    public toString(): string {
+    static lerp(a: Vector, b: Vector, t: number): Vector {
+        const s = 1.0 - t;
+        return new Vector(s * a.x + t * b.x, s * a.y + t * b.y);
+    }
+
+    addPolar(alpha: number, distance: number): void {
+        this.x += distance * Math.cos(alpha);
+        this.y += distance * Math.sin(alpha);
+    }
+
+    createTransferable(): PointLike {
+        return { x: this.x, y: this.y };
+    }
+
+    set(data: PointLike): void {
+        this.x = data.x;
+        this.y = data.y;
+    }
+
+    clone(): Vector {
+        return new Vector(this.x, this.y);
+    }
+
+    toString(): string {
         const f = formatter.format;
         return `<${f(this.x)},${f(this.y)}>`;
     }

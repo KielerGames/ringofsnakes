@@ -6,7 +6,6 @@ import game.world.World;
 import lombok.Getter;
 import lombok.Setter;
 import math.Vector;
-import util.BitWithShortHistory;
 import util.Direction;
 
 import java.nio.ByteBuffer;
@@ -30,7 +29,6 @@ public class Snake {
     private final ChainCodeCoder coder;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
-    private final BitWithShortHistory fastHistory = new BitWithShortHistory(false);
     public GrowingSnakeChunk currentChunk;
     @Getter protected double length;
     @Getter Vector headPosition;
@@ -144,7 +142,7 @@ public class Snake {
         buffer.putChar(0, id);
         buffer.putChar(2, currentChunk.id);
         buffer.put(4, skin);
-        buffer.put(5, fastHistory.getHistory());
+        buffer.put(5, (byte) (isFast() ? 1 : 0));
         buffer.putFloat(6, (float) length);
         buffer.putFloat(10, (float) headDirection);
         buffer.putFloat(14, (float) targetDirection);

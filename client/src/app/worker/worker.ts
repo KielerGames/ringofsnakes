@@ -7,17 +7,19 @@ import { GameConfig } from "../../oldapp/types/GameConfig";
 import { ClientData } from "./data/ClientData";
 import { Callback } from "../util/FunctionTypes";
 import { SpawnInfo } from "./data/JSONMessages";
+import Rectangle, { TransferableBox } from "../math/Rectangle";
+import { DataUpdateDTO } from "../data/dto/DataUpdateDTO";
 
-type TODO = any; // TODO remove
-type WorkerEvent = "server-update";
+type WorkerEvent = "server-update" | "error";
 
 let socket: Socket | null = null;
 
 const userInputRateLimiter = new RateLimiter<ClientData>(1000 / 30, (data) => {
     if (socket) {
         const buffer = new ArrayBuffer(9);
-        let view = new DataView(buffer);
-        view.setFloat32(0, data.viewBox.width / data.viewBox.height, false);
+        const view = new DataView(buffer);
+        const box = Rectangle.fromTransferable(data.viewBox);
+        view.setFloat32(0, box.width / box.height, false);
         view.setFloat32(4, data.targetAlpha, false);
         view.setUint8(8, data.wantsToBeFast ? 1 : 0);
         socket.sendBinary(buffer);
@@ -29,10 +31,7 @@ const data = new GameDataBuffer();
 const eventListeners = new Map<WorkerEvent, Callback>();
 
 export class WorkerAPI {
-    public static async connect(
-        name: string,
-        cfg: Readonly<ClientConfig>
-    ): Promise<GameConfig> {
+    async init(name: string, cfg: Readonly<ClientConfig>): Promise<GameConfig> {
         if (socket !== null) {
             throw new Error("Worker is already initialized.");
         }
@@ -77,10 +76,10 @@ export class WorkerAPI {
         return data.config;
     }
 
-    public static async sendUserInput(
+    async sendUserInput(
         alpha: number,
         wantsFast: boolean,
-        viewBox: TODO
+        viewBox: TransferableBox
     ) {
         userInputRateLimiter.setValue({
             targetAlpha: alpha,
@@ -89,20 +88,17 @@ export class WorkerAPI {
         });
     }
 
-    public static getDataChanges(): TODO {
-        // TODO
+    getDataChanges(): DataUpdateDTO {
+        return data.nextUpdate();
     }
 
-    public static quit(): void {
+    quit(): void {
         if (socket) {
             socket.close();
         }
     }
 
-    public static addEventListener(
-        eventId: WorkerEvent,
-        callback: Callback
-    ): void {
+    addEventListener(eventId: WorkerEvent, callback: Callback): void {
         eventListeners.set(eventId, callback);
     }
 }

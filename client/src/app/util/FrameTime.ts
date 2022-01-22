@@ -10,6 +10,6 @@ export function now(): number {
 /**
  * This should be called once per frame.
  */
-export function update(): void {
-    currentTime = performance.now();
+export function update(time: number = performance.now()): void {
+    currentTime = time;
 }

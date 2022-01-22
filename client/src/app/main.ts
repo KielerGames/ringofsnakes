@@ -1,6 +1,7 @@
 import * as Preact from "preact";
 import Game from "./Game";
 import GameOverlay from "./ui/GameOverlay";
+import * as FrameTime from "./util/FrameTime";
 
 // create styles (in <head>)
 import "../styles/main.less";
@@ -16,6 +17,9 @@ document.body.appendChild(uiRoot);
     const game = await Game.joinAs("SnakeForceOne");
 
     function renderLoop(time: number) {
+        FrameTime.update(time);
+
+        setTimeout(() => game.update());
         window.requestAnimationFrame(renderLoop);
     }
 

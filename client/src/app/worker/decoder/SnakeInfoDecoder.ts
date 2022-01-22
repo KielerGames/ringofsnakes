@@ -21,6 +21,8 @@ export function decode(
     const currentDirection = view.getFloat32(10, false);
     const targetDirection = view.getFloat32(14, false);
 
+    // TODO fast bit history for chunk offset correction
+
     const data: SnakeDTO = {
         id: view.getUint16(0, false),
         headChunkId: view.getUint32(0, false),

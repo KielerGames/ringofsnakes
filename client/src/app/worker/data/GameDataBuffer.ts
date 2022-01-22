@@ -26,10 +26,14 @@ export default class GameDataBuffer {
         const leaderboard = this.#leaderboard;
         this.#leaderboard = undefined;
 
+        const snakeDeaths = this.#snakeDeaths;
+        this.#snakeDeaths = [];
+
         return {
+            ticksSinceLastUpdate: dataUpdate ? dataUpdate.ticksSinceLastUpdate : 0,
             snakes: dataUpdate ? dataUpdate.snakeInfos : [],
-            snakeChunks: [],
-            snakeDeaths: [],
+            snakeChunks: [], // TODO
+            snakeDeaths,
             leaderboard
         };
     }

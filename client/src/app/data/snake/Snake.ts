@@ -36,14 +36,14 @@ export default class Snake {
         this.#predictedHeadPosition = Vector.fromObject(dto.headPosition);
         this.#predictedDirection = dto.headDirection[0];
 
-        this.update(dto);
+        this.update(dto, 0);
     }
 
     /**
      * Update main thread snake data with new server data.
      * @param dto Decoded update data.
      */
-    update(dto: SnakeDTO): void {
+    update(dto: SnakeDTO, ticks: number): void {
         this.#lastUpdateTime = FrameTime.now();
         this.#length = dto.length;
         this.#headChunkId = dto.headChunkId;
@@ -51,7 +51,7 @@ export default class Snake {
         this.#lastKnownDirection = dto.headDirection[0];
         this.#targetDirection = dto.headDirection[1];
         this.#fast = dto.fast;
-        // TODO: use fast history
+        // TODO: use fast history for chunk offset correction
     }
 
     predict(): void {
@@ -73,6 +73,10 @@ export default class Snake {
             this.#predictedHeadPosition,
             0.85
         );
+
+        for(const snakeChunk of this.#chunks.values()) {
+            snakeChunk.predict();
+        }
     }
 
     registerSnakeChunk(chunk: SnakeChunk): void {

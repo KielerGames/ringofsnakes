@@ -48,6 +48,7 @@ export default class Game {
         }
 
         const changes = await this.#remote.getDataChanges();
+        const ticks = changes.ticksSinceLastUpdate;
 
         // update leaderboard
         if (changes.leaderboard) {
@@ -57,7 +58,7 @@ export default class Game {
         // update snakes
         for (const dto of changes.snakes) {
             if (this.snakes.has(dto.id)) {
-                this.snakes.get(dto.id)!.update(dto);
+                this.snakes.get(dto.id)!.update(dto, ticks);
             } else {
                 this.snakes.set(dto.id, new Snake(dto, this.#config));
             }

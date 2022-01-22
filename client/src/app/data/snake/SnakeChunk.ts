@@ -11,6 +11,8 @@ export default class SnakeChunk {
     constructor(snake: Snake, dto: SnakeChunkDTO) {
         this.snake = snake;
         this.id = dto.id;
+
+        snake.registerSnakeChunk(this);
     }
 
     update(dto: SnakeChunkDTO): void {

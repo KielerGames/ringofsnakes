@@ -3,10 +3,17 @@ import { WorkerAPI } from "./worker/worker";
 import * as ClientConfig from "./data/config/ClientConfig";
 import { GameConfig } from "./data/config/GameConfig";
 import Camera from "./data/camera/Camera";
+import Snake from "./data/snake/Snake";
+import SnakeChunk from "./data/snake/SnakeChunk";
+import { LeaderboardDTO } from "./data/dto/Leaderboard";
+import assert from "./util/assert";
 
 export default class Game {
     camera: Camera = new Camera();
-    
+    snakes: Map<SnakeId, Snake> = new Map();
+    snakeChunks: Map<SnakeChunkId, SnakeChunk> = new Map();
+    leaderboard: LeaderboardDTO = { list: [] };
+
     #remote: Comlink.Remote<WorkerAPI>;
     #config: GameConfig;
     #updateAvailable: boolean = false;
@@ -40,5 +47,48 @@ export default class Game {
         }
 
         const changes = await this.#remote.getDataChanges();
+
+        // update leaderboard
+        if (changes.leaderboard) {
+            this.leaderboard = changes.leaderboard;
+        }
+
+        // update snakes
+        for (const dto of changes.snakes) {
+            if (this.snakes.has(dto.id)) {
+                this.snakes.get(dto.id)!.update(dto);
+            } else {
+                this.snakes.set(dto.id, new Snake(dto, this.#config));
+            }
+        }
+
+        // update snake chunks
+        for (const dto of changes.snakeChunks) {
+            if (this.snakeChunks.has(dto.id)) {
+                this.snakeChunks.get(dto.id)!.update(dto);
+            } else {
+                const snake = this.snakes.get(dto.snakeId)!;
+                assert(snake !== undefined, "Data for unknown snake.");
+                this.snakeChunks.set(dto.id, new SnakeChunk(snake, dto));
+            }
+        }
+
+        // remove dead snakes
+        for (const snakeId of changes.snakeDeaths) {
+            const snake = this.snakes.get(snakeId);
+
+            if (!snake) {
+                continue;
+            }
+
+            for (const snakeChunk of snake.getSnakeChunksIterator()) {
+                this.snakeChunks.delete(snakeChunk.id);
+            }
+
+            this.snakes.delete(snakeId);
+        }
     }
 }
+
+type SnakeId = number;
+type SnakeChunkId = number;

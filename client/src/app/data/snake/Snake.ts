@@ -71,8 +71,16 @@ export default class Snake {
         this.#predictedHeadPosition = Vector.lerp(
             prediction,
             this.#predictedHeadPosition,
-            0.75
+            0.85
         );
+    }
+
+    registerSnakeChunk(chunk: SnakeChunk): void {
+        this.#chunks.set(chunk.id, chunk);
+    }
+
+    getSnakeChunksIterator(): IterableIterator<SnakeChunk> {
+        return this.#chunks.values();
     }
 
     get headChunk(): SnakeChunk | undefined {

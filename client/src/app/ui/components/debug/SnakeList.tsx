@@ -30,7 +30,7 @@ export default class SnakeList extends Component<SLProps> {
             <div id="snake-list" class="debug-ui">
                 {snakes.length > 0
                     ? snakes
-                          //.filter((snake) => snake.hasChunks())
+                          .filter((snake) => snake.hasChunks())
                           .slice(0, 7)
                           .map((snake) => (
                               <SnakeOverview key={snake.id} snake={snake} />

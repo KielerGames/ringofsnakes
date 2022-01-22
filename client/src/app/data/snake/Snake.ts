@@ -16,6 +16,7 @@ export default class Snake {
     #headChunkId: number;
     #length: number;
     #fast: boolean;
+    #width: number;
     #gameConfig: GameConfig;
 
     // head position & interpolation
@@ -51,10 +52,12 @@ export default class Snake {
         this.#lastKnownDirection = dto.headDirection[0];
         this.#targetDirection = dto.headDirection[1];
         this.#fast = dto.fast;
+        this.#width = dto.width;
         // TODO: use fast history for chunk offset correction
     }
 
     predict(): void {
+        // predict position
         const speed = this.speed;
         const distance1 =
             (speed * (FrameTime.now() - this.#lastPredictionTime)) / 1000;
@@ -74,7 +77,11 @@ export default class Snake {
             0.85
         );
 
-        for(const snakeChunk of this.#chunks.values()) {
+        // predict direction
+        // TODO
+        this.#predictedDirection = this.#lastKnownDirection;
+
+        for (const snakeChunk of this.#chunks.values()) {
             snakeChunk.predict();
         }
     }
@@ -85,6 +92,10 @@ export default class Snake {
 
     getSnakeChunksIterator(): IterableIterator<SnakeChunk> {
         return this.#chunks.values();
+    }
+
+    hasChunks(): boolean {
+        return this.#chunks.size > 0;
     }
 
     get headChunk(): SnakeChunk | undefined {
@@ -115,5 +126,19 @@ export default class Snake {
      */
     get position(): Vector {
         return this.#predictedHeadPosition;
+    }
+
+    /**
+     * Get the direction the snakes head is facing (in radians).
+     */
+    get direction(): number {
+        return this.#predictedDirection;
+    }
+
+    /**
+     * Get the maximum (tail gets thinner) width of the snake.
+     */
+    get width(): number {
+        return this.#width;
     }
 }

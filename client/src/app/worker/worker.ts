@@ -89,18 +89,29 @@ export class WorkerAPI {
     }
 
     getDataChanges(): DataUpdateDTO {
-        return data.nextUpdate();
+        const update = data.nextUpdate();
+
+        // avoid copying of ArrayBuffers
+        // instead move/transfer them to the main thread
+        const transferables: ArrayBuffer[] = []; // TODO
+
+        return Comlink.transfer(update, transferables);
     }
 
     quit(): void {
         if (socket) {
             socket.close();
         }
+        self.close();
     }
 
     addEventListener(eventId: WorkerEvent, callback: Callback): void {
         eventListeners.set(eventId, callback);
     }
 }
+
+self.onerror = (event, source, lineno, colno, error) => {
+    // TODO
+};
 
 Comlink.expose(new WorkerAPI());

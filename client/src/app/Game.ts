@@ -17,6 +17,7 @@ export default class Game {
     #remote: Comlink.Remote<WorkerAPI>;
     #config: GameConfig;
     #updateAvailable: boolean = false;
+    #targetSnakeId: number | undefined; //TODO
 
     private constructor() {
         this.#remote = Comlink.wrap<WorkerAPI>(
@@ -89,9 +90,18 @@ export default class Game {
         }
     }
 
+    predict(): void {
+        for (const snake of this.snakes.values()) {
+            snake.predict();
+        }
+    }
+
     get targetSnake(): Snake | undefined {
-        // TODO
-        return undefined;
+        if (this.#targetSnakeId === undefined) {
+            return undefined;
+        }
+
+        return this.snakes.get(this.#targetSnakeId);
     }
 }
 

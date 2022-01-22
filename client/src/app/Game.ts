@@ -88,6 +88,11 @@ export default class Game {
             this.snakes.delete(snakeId);
         }
     }
+
+    get targetSnake(): Snake | undefined {
+        // TODO
+        return undefined;
+    }
 }
 
 type SnakeId = number;

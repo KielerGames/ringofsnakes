@@ -1,51 +1,10 @@
 import WebGLShaderProgram from "./webgl/WebGLShaderProgram";
+import * as Skins from "../data/Skins";
+import * as WebGLContextProvider from "./WebGLContextProvider";
+import assert from "../util/assert";
 
-type Color = [number, number, number];
-
-type Skin = {
-    snakeBody: Color;
-    food: Color;
-};
-
-const skins: Skin[] = [
-    {
-        // blue
-        snakeBody: [128, 191, 255],
-        food: [0, 128, 255]
-    },
-    {
-        // orange
-        snakeBody: [255, 184, 114],
-        food: [255, 134, 14]
-    },
-    {
-        // green
-        snakeBody: [191, 255, 128],
-        food: [25, 255, 42]
-    },
-    {
-        // yellow
-        snakeBody: [250, 255, 80],
-        food: [255, 255, 22]
-    },
-    {
-        // pink
-        snakeBody: [230, 67, 197],
-        food: [255, 0, 255]
-    },
-    {
-        // red
-        snakeBody: [255, 81, 55],
-        food: [255, 25, 12]
-    },
-    {
-        // gray
-        snakeBody: [112, 111, 110],
-        food: [128, 182, 222]
-    }
-];
-
-const skinData: Uint8Array = (() => {
+const skinTextureData: Uint8Array = (() => {
+    const skins = Skins.getAllSkins();
     const data = new Uint8Array(2 * 4 * skins.length);
 
     skins.forEach((skin, index) => {
@@ -66,13 +25,14 @@ const skinData: Uint8Array = (() => {
     return data;
 })();
 
-let gl: WebGLRenderingContext;
 let texture: WebGLTexture;
 
-export function init(glCtx: WebGLRenderingContext): void {
-    gl = glCtx;
+(async () => {
+    const gl = await WebGLContextProvider.waitForContext();
 
     texture = gl.createTexture()!;
+    assert(texture !== null, "Failed to create texture.");
+
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -86,19 +46,19 @@ export function init(glCtx: WebGLRenderingContext): void {
         gl.TEXTURE_2D,
         0, // mipmap level
         format,
-        skins.length, // width
+        Skins.getAllSkins().length, // width
         2, // height
         0,
         format,
         gl.UNSIGNED_BYTE,
-        skinData
+        skinTextureData
     );
-}
+})();
 
-export function setSkinTexture(
-    textureSlot: number = WebGLRenderingContext.TEXTURE0
-): void {
-    gl.activeTexture(textureSlot);
+export function setSkinTexture(): void {
+    const gl = WebGLContextProvider.getContext();
+    const slot = WebGLRenderingContext.TEXTURE0;
+    gl.activeTexture(slot);
     gl.bindTexture(gl.TEXTURE_2D, texture);
 }
 
@@ -111,5 +71,6 @@ export function setColor(
 }
 
 export function getColorPosition(skinId: number): number {
+    const skins = Skins.getAllSkins();
     return ((skinId % skins.length) + 0.5) / skins.length;
 }

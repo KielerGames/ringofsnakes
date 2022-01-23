@@ -1,12 +1,13 @@
 import Snake from "../../data/snake/Snake";
 import Matrix from "../../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
-import * as SkinManager from "../SkinManager";
+import * as SkinManager from "../SkinLoader";
+import * as WebGLContextProvider from "../WebGLContextProvider";
+import assert from "../../util/assert";
 
 declare const __VERTEXSHADER_HEAD__: string;
 declare const __FRAGMENTSHADER_HEAD__: string;
 
-let gl: WebGLRenderingContext;
 let buffer: WebGLBuffer;
 let shader: WebGLShaderProgram;
 
@@ -18,10 +19,11 @@ const vertexData = mirror([
 ]);
 const rotOffset = -0.5 * Math.PI;
 
-// TODO
-export function init(glCtx: WebGLRenderingContext): void {
-    gl = glCtx;
+(async () => {
+    const gl = await WebGLContextProvider.waitForContext();
+
     buffer = gl.createBuffer()!;
+    assert(buffer !== null);
 
     shader = new WebGLShaderProgram(
         gl,
@@ -33,13 +35,11 @@ export function init(glCtx: WebGLRenderingContext): void {
     shader.use();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
-}
+})();
 
-export function render(
-    snakes: Iterable<Snake>,
-    transform: Matrix,
-    timeSinceLastTick: number
-) {
+export function render(snakes: Iterable<Snake>, transform: Matrix) {
+    const gl = WebGLContextProvider.getContext();
+
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -53,10 +53,7 @@ export function render(
         const { x, y } = snake.position;
         shader.setUniform("uSnakeWidth", 1.25 * snake.width);
         shader.setUniform("uHeadPosition", [x, y]);
-        shader.setUniform(
-            "uHeadRotation",
-            snake.direction + rotOffset
-        );
+        shader.setUniform("uHeadRotation", snake.direction + rotOffset);
         SkinManager.setColor(shader, "uSkin", snake.skin);
 
         shader.run(vertexData.length / VERTEX_SIZE, {

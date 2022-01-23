@@ -1,6 +1,15 @@
-let gl: WebGLRenderingContext | null = null;
+import AsyncEvent from "../util/AsyncEvent";
 
-const options: WebGLContextAttributes = {};
+const options: WebGLContextAttributes = {
+    alpha: false,
+    depth: false,
+    antialias: true,
+    preserveDrawingBuffer: false,
+    premultipliedAlpha: false
+};
+
+let gl: WebGLRenderingContext | null = null;
+let loaded = new AsyncEvent();
 
 export function init(canvas: HTMLCanvasElement): void {
     const ctx = canvas.getContext("webgl", options);
@@ -19,6 +28,7 @@ export function init(canvas: HTMLCanvasElement): void {
     }
 
     gl = ctx;
+    loaded.set();
 }
 
 export function getContext(): WebGLRenderingContext {
@@ -27,6 +37,14 @@ export function getContext(): WebGLRenderingContext {
     }
 
     return gl;
+}
+
+export async function waitForContext(): Promise<WebGLRenderingContext> {
+    if (!loaded.isSet()) {
+        await loaded.wait();
+    }
+
+    return getContext();
 }
 
 function updateSize() {

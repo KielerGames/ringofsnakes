@@ -11,8 +11,14 @@ export default class SnakeChunk {
     readonly snake: Snake;
     readonly id: number;
 
+    readonly #creationTime: number;
     #final: boolean = false;
     #boundingBox: Rectangle;
+    #length: number;
+
+    // buffer data
+    #buffer: Float32Array;
+    #vertices: number;
 
     // offset prediction
     #lastUpdateTime: number;
@@ -23,6 +29,7 @@ export default class SnakeChunk {
     constructor(snake: Snake, dto: SnakeChunkDTO) {
         this.snake = snake;
         this.id = dto.id;
+        this.#creationTime = FrameTime.now();
         snake.registerSnakeChunk(this);
         this.#predictedOffset = dto.offset;
         this.#lastPredictionTime = FrameTime.now();
@@ -35,6 +42,9 @@ export default class SnakeChunk {
         this.#lastUpdateTime = FrameTime.now();
         this.#lastKnownOffset = dto.offset;
         this.#boundingBox = Rectangle.fromTransferable(dto.boundingBox);
+        this.#buffer = dto.data;
+        this.#vertices = dto.vertices;
+        this.#length = dto.length;
     }
 
     updateOffset(offsetChange: number): void {
@@ -65,7 +75,17 @@ export default class SnakeChunk {
         this.#lastPredictionTime = FrameTime.now();
     }
 
+    /**
+     * Distance (along the snake path) between the start of this chunk and the snakes head.
+     */
     get offset(): number {
         return this.#predictedOffset;
+    }
+
+    /**
+     * Age of this chunk in seconds.
+     */
+    get age(): number {
+        return 0.001 * (FrameTime.now() - this.#creationTime);
     }
 }

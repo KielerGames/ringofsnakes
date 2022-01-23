@@ -53,7 +53,7 @@ export default class Snake {
         this.#targetDirection = dto.headDirection[1];
         this.#fast = dto.fast;
         this.#width = dto.width;
-        
+
         this.#updateChunkOffsets(ticks, dto.fastHistory);
     }
 
@@ -79,11 +79,12 @@ export default class Snake {
     predict(): void {
         // predict position
         const speed = this.speed;
-        const distance1 =
-            (speed * (FrameTime.now() - this.#lastPredictionTime)) / 1000;
-        const distance2 =
-            (speed * (FrameTime.now() - this.#lastUpdateTime)) / 1000;
+        const now = FrameTime.now();
 
+        const distance1 = (speed * (now - this.#lastPredictionTime)) / 1000;
+        const distance2 = (speed * (now - this.#lastUpdateTime)) / 1000;
+
+        // predictions based on previous prediction & last known data
         const prediction = this.#lastKnownHeadPosition.clone();
         prediction.addPolar(this.#predictedDirection, distance1);
         this.#predictedHeadPosition.addPolar(
@@ -91,6 +92,7 @@ export default class Snake {
             distance2
         );
 
+        // combine predictions
         this.#predictedHeadPosition = Vector.lerp(
             prediction,
             this.#predictedHeadPosition,

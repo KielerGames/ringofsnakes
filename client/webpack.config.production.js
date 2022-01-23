@@ -27,7 +27,7 @@ console.log("Done.");
 module.exports = {
     mode: "production",
     entry: {
-        main: path.join(__dirname, "src", "app", "main.tsx"),
+        main: path.join(__dirname, "src", "app", "main.ts"),
         worker: path.join(__dirname, "src", "app", "worker", "worker.ts"),
     },
     target: "web",

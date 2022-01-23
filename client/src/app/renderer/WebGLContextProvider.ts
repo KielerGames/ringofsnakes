@@ -52,7 +52,7 @@ function updateSize() {
         return;
     }
 
-    const canvas = gl.canvas;
+    const canvas = gl.canvas as HTMLCanvasElement;
 
     // get current canvas size in CSS pixels
     const displayWidth = canvas.clientWidth;

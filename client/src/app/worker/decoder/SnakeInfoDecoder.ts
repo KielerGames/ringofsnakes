@@ -17,17 +17,22 @@ export function decode(
         }
     }
 
+    const fastData = view.getUint8(5);
     const length = view.getFloat32(6, false);
     const currentDirection = view.getFloat32(10, false);
     const targetDirection = view.getFloat32(14, false);
 
-    // TODO fast bit history for chunk offset correction
+    const fastHistory: boolean[] = Array.from(
+        { length: 8 },
+        (_, i) => (fastData & (1 << i)) !== 0
+    );
 
     const data: SnakeDTO = {
         id: view.getUint16(0, false),
         headChunkId: view.getUint32(0, false),
         skin: view.getUint8(4),
-        fast: (view.getUint8(5) & 1) !== 0,
+        fast: fastHistory[0],
+        fastHistory,
         length,
         width: computeWidthFromLength(length, config),
         headDirection: [currentDirection, targetDirection],
@@ -43,10 +48,7 @@ export function decode(
     };
 }
 
-function computeWidthFromLength(
-    length: number,
-    config: GameConfig
-): number {
+function computeWidthFromLength(length: number, config: GameConfig): number {
     const minWidth = config.snakes.minWidth;
     const maxWidthGain = config.snakes.maxWidth - config.snakes.minWidth;
     const LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 1024.0;

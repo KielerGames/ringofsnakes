@@ -12,7 +12,7 @@ export type SnakeChunkDTO = {
 
     data: Float32Array;
     vertices: number;
-    boundingBox: TransferableBox;
+    boundingBox: TransferableBox; // ignores the snake width
 
     length: number;
     offset: number;

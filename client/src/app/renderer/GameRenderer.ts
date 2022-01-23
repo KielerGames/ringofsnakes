@@ -2,6 +2,7 @@ import Game from "../Game";
 import * as WebGLContextProvider from "./WebGLContextProvider";
 import * as SkinLoader from "./SkinLoader";
 import * as SnakeHeadRenderer from "./parts/SnakeHeadRenderer";
+import * as SnakeChunkRenderer from "./parts/SnakeChunkRenderer";
 import * as BoxRenderer from "./parts/BoxRenderer";
 import * as FoodRenderer from "./parts/FoodRenderer";
 
@@ -18,9 +19,8 @@ export function render(game: Readonly<Game>): void {
     SkinLoader.setSkinTexture();
 
     // render parts
-    
     FoodRenderer.render(game, transform);
-
+    SnakeChunkRenderer.render(game.snakeChunks.values(), transform);
     SnakeHeadRenderer.render(game.snakes.values(), transform);
 
     if (__DEBUG__) {

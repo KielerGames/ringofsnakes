@@ -3,6 +3,7 @@ import Game from "./Game";
 import GameOverlay from "./ui/GameOverlay";
 import * as FrameTime from "./util/FrameTime";
 import * as WebGLContextProvider from "./renderer/WebGLContextProvider";
+import * as GameRenderer from "./renderer/GameRenderer";
 
 // create styles (in <head>)
 import "../styles/main.less";
@@ -23,6 +24,8 @@ document.body.appendChild(uiRoot);
 
     function renderLoop(time: number) {
         FrameTime.update(time);
+        game.predict();
+        GameRenderer.render(game);
 
         setTimeout(() => game.update());
         window.requestAnimationFrame(renderLoop);

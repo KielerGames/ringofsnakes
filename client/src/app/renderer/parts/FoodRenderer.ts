@@ -1,21 +1,21 @@
 import FoodChunk from "../../data/world/FoodChunk";
-import Snake from "../../data/snake/Snake";
+import Game from "../../Game";
 import Matrix from "../../math/Matrix";
 import Vector from "../../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as BoxRenderer from "./BoxRenderer";
+import * as WebGLContextProvider from "../WebGLContextProvider";
 
 declare const __VERTEXSHADER_FOOD__: string;
 declare const __FRAGMENTSHADER_FOOD__: string;
 
-let gl: WebGLRenderingContext;
 let shader: WebGLShaderProgram;
 
 const FOOD_VERTEX_SIZE = FoodChunk.FOOD_VERTEX_SIZE;
 const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
 
-export function init(glCtx: WebGLRenderingContext): void {
-    gl = glCtx;
+(async () => {
+    const gl = await WebGLContextProvider.waitForContext();
 
     shader = new WebGLShaderProgram(
         gl,
@@ -23,13 +23,14 @@ export function init(glCtx: WebGLRenderingContext): void {
         __FRAGMENTSHADER_FOOD__,
         ["aPosition", "aLocalPos", "aColorIndex"]
     );
-}
+})();
 
-export function render(
-    foodChunks: Iterable<FoodChunk>,
-    targetSnake: Snake | undefined,
-    transform: Matrix
-) {
+export function render(game: Readonly<Game>, transform: Matrix) {
+    const gl = WebGLContextProvider.getContext();
+
+    const targetSnake = game.targetSnake;
+    const foodChunks = [] as FoodChunk[];
+
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 

@@ -3,6 +3,7 @@ import * as WebGLContextProvider from "./WebGLContextProvider";
 import * as SkinLoader from "./SkinLoader";
 import * as SnakeHeadRenderer from "./parts/SnakeHeadRenderer";
 import * as BoxRenderer from "./parts/BoxRenderer";
+import * as FoodRenderer from "./parts/FoodRenderer";
 
 export function render(game: Readonly<Game>): void {
     const gl = WebGLContextProvider.getContext();
@@ -17,7 +18,8 @@ export function render(game: Readonly<Game>): void {
     SkinLoader.setSkinTexture();
 
     // render parts
-    // TODO
+    
+    FoodRenderer.render(game, transform);
 
     SnakeHeadRenderer.render(game.snakes.values(), transform);
 

@@ -22,7 +22,8 @@ class SocketImpl implements Socket {
     constructor(websocket: WebSocket) {
         this.#websocket = websocket;
         this.#websocket.onclose = (e: CloseEvent) => {
-            console.info("WebSocket closed", e);
+            const { code, reason, wasClean } = e;
+            console.info("WebSocket closed", code, reason, wasClean);
             this.onclose();
         };
         this.#websocket.onerror = () => console.error("WebSocket error");

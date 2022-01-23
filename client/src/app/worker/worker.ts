@@ -3,12 +3,12 @@ import { ClientConfig } from "../data/config/ClientConfig";
 import { connect, Socket } from "./socket";
 import RateLimiter from "./util/RateLimiter";
 import GameDataBuffer from "./data/GameDataBuffer";
-import { GameConfig } from "../../oldapp/types/GameConfig";
 import { ClientData } from "./data/ClientData";
 import { Callback } from "../util/FunctionTypes";
 import { SpawnInfo } from "./data/JSONMessages";
 import Rectangle, { TransferableBox } from "../math/Rectangle";
 import { DataUpdateDTO } from "../data/dto/DataUpdateDTO";
+import { GameInfoDTO } from "../data/dto/GameInfoDTO";
 
 type WorkerEvent = "server-update" | "error";
 
@@ -31,7 +31,10 @@ const data = new GameDataBuffer();
 const eventListeners = new Map<WorkerEvent, Callback>();
 
 export class WorkerAPI {
-    async init(name: string, cfg: Readonly<ClientConfig>): Promise<GameConfig> {
+    async init(
+        name: string,
+        cfg: Readonly<ClientConfig>
+    ): Promise<GameInfoDTO> {
         if (socket !== null) {
             throw new Error("Worker is already initialized.");
         }
@@ -73,7 +76,11 @@ export class WorkerAPI {
 
         socket.sendJSON({ tag: "UpdatePlayerName", name });
 
-        return data.config;
+        return {
+            config: data.config,
+            targetSnakeId: spawnInfo.snakeId,
+            startPosition: { x: 0, y: 0 } // TODO
+        };
     }
 
     async sendUserInput(
@@ -93,7 +100,9 @@ export class WorkerAPI {
 
         // avoid copying of ArrayBuffers
         // instead move/transfer them to the main thread
-        const transferables: ArrayBuffer[] = []; // TODO
+        const transferables: ArrayBuffer[] = update.snakeChunks.map(
+            (chunk) => chunk.data.buffer
+        );
 
         return Comlink.transfer(update, transferables);
     }

@@ -7,6 +7,7 @@ import Snake from "./data/snake/Snake";
 import SnakeChunk from "./data/snake/SnakeChunk";
 import { LeaderboardDTO } from "./data/dto/Leaderboard";
 import assert from "./util/assert";
+import Vector from "./math/Vector";
 
 export default class Game {
     camera: Camera = new Camera();
@@ -17,7 +18,7 @@ export default class Game {
     #remote: Comlink.Remote<WorkerAPI>;
     #config: GameConfig;
     #updateAvailable: boolean = false;
-    #targetSnakeId: number | undefined; //TODO
+    #targetSnakeId: number | undefined;
 
     private constructor() {
         this.#remote = Comlink.wrap<WorkerAPI>(
@@ -30,7 +31,10 @@ export default class Game {
         const game = new Game();
         const remote = game.#remote;
 
-        game.#config = await remote.init(name, clientConfig);
+        const info = await remote.init(name, clientConfig);
+        game.#config = info.config;
+        game.camera.moveTo(Vector.fromObject(info.startPosition));
+        game.#targetSnakeId = info.targetSnakeId;
 
         remote.addEventListener(
             "server-update",

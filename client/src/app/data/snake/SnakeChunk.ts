@@ -16,9 +16,7 @@ export default class SnakeChunk {
     #boundingBox: Rectangle;
     #length: number;
 
-    // buffer data
-    #buffer: Float32Array;
-    #vertices: number;
+    #gpuData: GPUData;
 
     // offset prediction
     #lastUpdateTime: number;
@@ -38,12 +36,14 @@ export default class SnakeChunk {
 
     update(dto: SnakeChunkDTO): void {
         assert(!this.#final);
-        this.#final = dto.final;
+        this.#final = dto.full;
         this.#lastUpdateTime = FrameTime.now();
         this.#lastKnownOffset = dto.offset;
         this.#boundingBox = Rectangle.fromTransferable(dto.boundingBox);
-        this.#buffer = dto.data;
-        this.#vertices = dto.vertices;
+        this.#gpuData = {
+            buffer: dto.data,
+            vertices: dto.vertices
+        };
         this.#length = dto.length;
     }
 
@@ -88,4 +88,17 @@ export default class SnakeChunk {
     get age(): number {
         return 0.001 * (FrameTime.now() - this.#creationTime);
     }
+
+    get gpuData(): GPUData {
+        return this.#gpuData;
+    }
+
+    get boundingBox(): Readonly<Rectangle> {
+        return this.#boundingBox;
+    }
 }
+
+type GPUData = {
+    buffer: Float32Array;
+    vertices: number;
+};

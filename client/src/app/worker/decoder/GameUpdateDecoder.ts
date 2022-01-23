@@ -5,6 +5,7 @@ import * as ArrayDecoder from "./ArrayDecoder";
 import { GameConfig } from "../../data/config/GameConfig";
 import { FoodChunkDTO } from "../../data/dto/FoodChunkDTO";
 import { SnakeDTO } from "../../data/dto/SnakeDTO";
+import { SnakeChunkDTO } from "../../data/dto/SnakeChunkDTO";
 
 const UPDATE_HEADER_SIZE = 4;
 
@@ -66,6 +67,6 @@ export function decode(
 export type DecodedGameUpdate = {
     ticksSinceLastUpdate: number;
     snakeInfos: SnakeDTO[];
-    snakeChunkData: SCD.DecodedSnakeChunk[];
+    snakeChunkData: SnakeChunkDTO[];
     foodChunkData: FoodChunkDTO[];
 };

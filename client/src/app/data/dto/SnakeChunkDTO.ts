@@ -16,5 +16,5 @@ export type SnakeChunkDTO = {
 
     length: number;
     offset: number;
-    final: boolean;
+    full: boolean;
 };

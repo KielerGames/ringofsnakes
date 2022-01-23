@@ -53,7 +53,27 @@ export default class Snake {
         this.#targetDirection = dto.headDirection[1];
         this.#fast = dto.fast;
         this.#width = dto.width;
-        // TODO: use fast history for chunk offset correction
+        
+        this.#updateChunkOffsets(ticks, dto.fastHistory);
+    }
+
+    #updateChunkOffsets(ticks: number, fastHistory: boolean[]) {
+        const fastSpeed = this.#computeSpeed(true);
+        const slowSpeed = this.#computeSpeed(false);
+
+        let chunkOffset = 0;
+
+        for (let i = 0; i < ticks; i++) {
+            chunkOffset += fastHistory[i] ? fastSpeed : slowSpeed;
+        }
+
+        for (const chunk of this.#chunks.values()) {
+            if (chunk.id === this.#headChunkId) {
+                continue;
+            }
+
+            chunk.updateOffset(chunkOffset);
+        }
     }
 
     predict(): void {
@@ -84,6 +104,8 @@ export default class Snake {
         for (const snakeChunk of this.#chunks.values()) {
             snakeChunk.predict();
         }
+
+        this.#lastPredictionTime = FrameTime.now();
     }
 
     registerSnakeChunk(chunk: SnakeChunk): void {
@@ -110,15 +132,17 @@ export default class Snake {
         return this.#length;
     }
 
+    #computeSpeed(fast: boolean): number {
+        const config = this.#gameConfig;
+        const tickSpeed = fast ? config.snakes.fastSpeed : config.snakes.speed;
+        return tickSpeed / config.tickDuration;
+    }
+
     /**
      * The current snake speed in units per seconds (not units per tick).
      */
     get speed(): number {
-        const config = this.#gameConfig;
-        const tickSpeed = this.#fast
-            ? config.snakes.fastSpeed
-            : config.snakes.speed;
-        return tickSpeed / config.tickDuration;
+        return this.#computeSpeed(this.#fast);
     }
 
     /**

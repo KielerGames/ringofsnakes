@@ -1,25 +1,27 @@
 import assert from "../../util/assert";
+import * as WebGLContextProvider from "../WebGLContextProvider";
 
 const freeBuffers: WebGLBuffer[] = [];
-let ctx: WebGLRenderingContext;
+const initialBuffers = 16;
 
-export function init(gl: WebGLRenderingContext, buffers: number): void {
-    ctx = gl;
-    assert(buffers >= 0);
+(async () => {
+    assert(initialBuffers >= 0);
+    const gl = await WebGLContextProvider.waitForContext();
 
-    freeBuffers.length = 0;
-    for (let i = 0; i < buffers; i++) {
+    for (let i = 0; i < initialBuffers; i++) {
         const buffer = gl.createBuffer();
         assert(buffer != null, "Buffer is null");
         freeBuffers.push(buffer!);
     }
-}
+})();
 
 export function create(): WebGLBuffer {
+    const gl = WebGLContextProvider.getContext();
+
     if (freeBuffers.length > 0) {
         return freeBuffers.pop()!;
     } else {
-        const buffer = ctx.createBuffer();
+        const buffer = gl.createBuffer();
         assert(buffer != null, "Buffer is null");
         return buffer!;
     }

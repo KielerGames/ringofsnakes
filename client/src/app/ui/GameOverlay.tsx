@@ -10,6 +10,18 @@ type Props = {
 };
 
 export default class GameOverlay extends Component<Props> {
+    #timer: number;
+
+    componentDidMount() {
+        this.#timer = window.setInterval(() => {
+            this.forceUpdate();
+        }, 500);
+    }
+
+    componentWillUnmount() {
+        window.clearInterval(this.#timer);
+    }
+
     render() {
         const game = this.props.game;
         const snakeSupplier = () => game.snakes.values();

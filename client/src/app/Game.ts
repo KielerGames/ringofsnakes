@@ -53,6 +53,7 @@ export default class Game {
         }
 
         const changes = await this.#remote.getDataChanges();
+        this.#updateAvailable = false;
         const ticks = changes.ticksSinceLastUpdate;
 
         // update leaderboard
@@ -94,7 +95,8 @@ export default class Game {
 
             this.snakes.delete(snakeId);
 
-            if(snakeId === this.#targetSnakeId) { // TODO
+            if (snakeId === this.#targetSnakeId) {
+                // TODO
                 this.#stopped = true;
             }
         }
@@ -122,7 +124,7 @@ export default class Game {
         return this.snakes.get(this.#targetSnakeId);
     }
 
-    get playerAlive():boolean {
+    get playerAlive(): boolean {
         return !this.#stopped;
     }
 }

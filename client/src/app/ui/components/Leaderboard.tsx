@@ -6,18 +6,6 @@ type LeaderboardProps = {
 };
 
 export default class Leaderboard extends Component<LeaderboardProps> {
-    #timer: number;
-
-    componentDidMount() {
-        this.#timer = window.setInterval(() => {
-            this.forceUpdate();
-        }, 1000);
-    }
-
-    componentWillUnmount() {
-        window.clearInterval(this.#timer);
-    }
-
     render() {
         const leaderboardData = this.props.data;
         if (!leaderboardData) {

@@ -7,22 +7,6 @@ type SLProps = {
 };
 
 export default class SnakeList extends Component<SLProps> {
-    #timer: number;
-
-    constructor(props: SLProps) {
-        super(props);
-    }
-
-    componentDidMount() {
-        this.#timer = window.setInterval(() => {
-            this.forceUpdate();
-        }, 500);
-    }
-
-    componentWillUnmount() {
-        window.clearInterval(this.#timer);
-    }
-
     render() {
         const snakes = Array.from(this.props.supplier());
 

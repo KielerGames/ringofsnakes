@@ -6,8 +6,6 @@ type Props = {
 };
 
 export default class SnakeInfoUI extends Component<Props> {
-    #timer: number;
-
     render() {
         const snake = this.props.snake;
 
@@ -24,15 +22,5 @@ export default class SnakeInfoUI extends Component<Props> {
                 </div>
             </div>
         );
-    }
-
-    componentDidMount() {
-        this.#timer = window.setInterval(() => {
-            this.forceUpdate();
-        }, 333);
-    }
-
-    componentWillUnmount() {
-        window.clearInterval(this.#timer);
     }
 }

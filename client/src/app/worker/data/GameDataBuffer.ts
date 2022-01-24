@@ -32,7 +32,7 @@ export default class GameDataBuffer {
         return {
             ticksSinceLastUpdate: dataUpdate ? dataUpdate.ticksSinceLastUpdate : 0,
             snakes: dataUpdate ? dataUpdate.snakeInfos : [],
-            snakeChunks: [], // TODO
+            snakeChunks: dataUpdate ? dataUpdate.snakeChunkData : [],
             snakeDeaths,
             leaderboard
         };

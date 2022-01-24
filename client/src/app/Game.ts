@@ -19,6 +19,7 @@ export default class Game {
     #config: GameConfig;
     #updateAvailable: boolean = false;
     #targetSnakeId: number | undefined;
+    #stopped: boolean = false;
 
     private constructor() {
         this.#remote = Comlink.wrap<WorkerAPI>(
@@ -92,6 +93,10 @@ export default class Game {
             }
 
             this.snakes.delete(snakeId);
+
+            if(snakeId === this.#targetSnakeId) { // TODO
+                this.#stopped = true;
+            }
         }
     }
 
@@ -101,12 +106,24 @@ export default class Game {
         }
     }
 
+    sendUserInput(): void {
+        this.#remote.sendUserInput(0, false, this.camera.viewBox);
+    }
+
+    quit(): void {
+        this.#remote.quit();
+    }
+
     get targetSnake(): Snake | undefined {
         if (this.#targetSnakeId === undefined) {
             return undefined;
         }
 
         return this.snakes.get(this.#targetSnakeId);
+    }
+
+    get playerAlive():boolean {
+        return !this.#stopped;
     }
 }
 

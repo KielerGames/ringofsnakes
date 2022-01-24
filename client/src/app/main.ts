@@ -27,8 +27,14 @@ document.body.appendChild(uiRoot);
         game.predict();
         GameRenderer.render(game);
 
-        setTimeout(() => game.update());
-        window.requestAnimationFrame(renderLoop);
+        if (game.playerAlive) {
+            setTimeout(() => game.sendUserInput());
+            setTimeout(() => game.update());
+            window.requestAnimationFrame(renderLoop);
+        } else {
+            game.quit();
+            console.log("Game stopped.");
+        }
     }
 
     // start render loop

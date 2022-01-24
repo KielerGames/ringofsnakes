@@ -70,9 +70,13 @@ export class WorkerAPI {
                     data.addJSONUpdate(message);
                 }
             }
+            triggerEvent("server-update");
         };
 
-        socket.onBinaryMessage = (message) => data.addBinaryUpdate(message);
+        socket.onBinaryMessage = (message) => {
+            data.addBinaryUpdate(message);
+            triggerEvent("server-update");
+        };
 
         socket.sendJSON({ tag: "UpdatePlayerName", name });
 
@@ -119,8 +123,17 @@ export class WorkerAPI {
     }
 }
 
+function triggerEvent(event: WorkerEvent): void {
+    const listener = eventListeners.get(event);
+
+    if(listener) {
+        listener();
+    }
+}
+
 self.onerror = (event, source, lineno, colno, error) => {
     // TODO
+    triggerEvent("error");
 };
 
 Comlink.expose(new WorkerAPI());

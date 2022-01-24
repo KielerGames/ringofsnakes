@@ -37,9 +37,12 @@ export function render(chunks: Iterable<SnakeChunk>, transform: Matrix): void {
     shader.setUniform("uTransform", transform.data);
     shader.setUniform("uColorSampler", 0);
 
+    let n = 0;
+
     for (const chunk of chunks) {
         const snake = chunk.snake;
         const data = chunk.gpuData;
+        n++;
 
         SkinLoader.setColor(shader, "uSkin", snake.skin);
         shader.setUniform("uChunkPathOffset", chunk.offset);
@@ -56,7 +59,7 @@ export function render(chunks: Iterable<SnakeChunk>, transform: Matrix): void {
         if (__DEBUG__) {
             const age = chunk.age;
             BoxRenderer.addBox(
-                chunk.boundingBox,
+                chunk.boundingBox.createTransferable(0.5 * snake.width),
                 mix(
                     [0.1, 1, 1, 0.64],
                     [0.5, 1.0, 0, 0.025 + 0.3 / Math.max(1.0, age)],

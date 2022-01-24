@@ -1,5 +1,5 @@
 import Matrix from "../../math/Matrix";
-import Rectangle from "../../math/Rectangle";
+import { TransferableBox } from "../../math/Rectangle";
 import assert from "../../util/assert";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../WebGLContextProvider";
@@ -10,7 +10,7 @@ declare const __FRAGMENTSHADER_SOLIDCOLOR__: string;
 let shader: WebGLShaderProgram;
 let buffer: WebGLBuffer;
 const vertexData = new Float32Array(4 * 2);
-const boxesToDraw: { box: Rectangle; color: RGBAColor }[] = [];
+const boxesToDraw: { box: TransferableBox; color: RGBAColor }[] = [];
 
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
@@ -25,7 +25,7 @@ const boxesToDraw: { box: Rectangle; color: RGBAColor }[] = [];
     assert(buffer !== null);
 })();
 
-export function addBox(box: Rectangle, color: RGBAColor): void {
+export function addBox(box: TransferableBox, color: RGBAColor): void {
     boxesToDraw.push({ box, color });
 }
 

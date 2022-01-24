@@ -106,6 +106,9 @@ export default class Game {
         for (const snake of this.snakes.values()) {
             snake.predict();
         }
+        if (this.targetSnake) {
+            this.camera.moveToSnake(this.targetSnake);
+        }
     }
 
     sendUserInput(): void {

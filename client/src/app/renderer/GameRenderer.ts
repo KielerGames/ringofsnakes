@@ -8,6 +8,8 @@ import * as FoodRenderer from "./parts/FoodRenderer";
 
 export function render(game: Readonly<Game>): void {
     const gl = WebGLContextProvider.getContext();
+    const canvas = gl.canvas as HTMLCanvasElement;
+    game.camera.setRatio(canvas.clientWidth, canvas.clientHeight);
 
     // background color
     gl.clearColor(0.1, 0.1, 0.1, 1.0);

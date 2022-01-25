@@ -8,6 +8,8 @@ import * as FoodRenderer from "./parts/FoodRenderer";
 
 export function render(game: Readonly<Game>): void {
     const gl = WebGLContextProvider.getContext();
+    
+    updateSize(gl);
     const canvas = gl.canvas as HTMLCanvasElement;
     game.camera.setRatio(canvas.clientWidth, canvas.clientHeight);
 
@@ -27,5 +29,26 @@ export function render(game: Readonly<Game>): void {
 
     if (__DEBUG__) {
         BoxRenderer.renderAll(transform);
+    }
+}
+
+function updateSize(gl: WebGLRenderingContext) {
+    const canvas = gl.canvas as HTMLCanvasElement;
+
+    // get current canvas size in CSS pixels
+    const displayWidth = canvas.clientWidth;
+    const displayHeight = canvas.clientHeight;
+
+    if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+        if (__DEBUG__) {
+            console.info("Resizing canvas...");
+        }
+
+        // resize canvas
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+
+        // update clip space to screen pixel transformation
+        gl.viewport(0, 0, displayWidth, displayHeight);
     }
 }

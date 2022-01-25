@@ -1,5 +1,5 @@
 import WebGLShaderProgram from "./webgl/WebGLShaderProgram";
-import * as Skins from "../data/Skins";
+import * as Skins from "../data/misc/Skins";
 import * as WebGLContextProvider from "./WebGLContextProvider";
 import assert from "../util/assert";
 

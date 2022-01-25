@@ -1,5 +1,5 @@
 import * as Preact from "preact";
-import Game from "./Game";
+import Game from "./data/Game";
 import GameOverlay from "./ui/GameOverlay";
 import * as FrameTime from "./util/FrameTime";
 import * as WebGLContextProvider from "./renderer/WebGLContextProvider";
@@ -20,15 +20,15 @@ uiRoot.id = "root";
 document.body.appendChild(uiRoot);
 
 (async () => {
-    const game = await Game.joinAs("SnakeForceOne");
+    const [game, player] = await Game.joinAsPlayer("SnakeForceOne");
 
     function renderLoop(time: number) {
         FrameTime.update(time);
         game.predict();
         GameRenderer.render(game);
 
-        if (game.playerAlive) {
-            setTimeout(() => game.sendUserInput());
+        if (player.alive) {
+            setTimeout(() => player.sendUserInput());
             setTimeout(() => game.update());
             window.requestAnimationFrame(renderLoop);
         } else {

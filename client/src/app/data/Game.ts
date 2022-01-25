@@ -1,13 +1,14 @@
 import * as Comlink from "comlink";
-import { WorkerAPI } from "./worker/worker";
-import * as ClientConfig from "./data/config/ClientConfig";
-import { GameConfig } from "./data/config/GameConfig";
-import Camera from "./data/camera/Camera";
-import Snake from "./data/snake/Snake";
-import SnakeChunk from "./data/snake/SnakeChunk";
-import { LeaderboardDTO } from "./data/dto/Leaderboard";
-import assert from "./util/assert";
-import Vector from "./math/Vector";
+import { WorkerAPI } from "../worker/worker";
+import * as ClientConfig from "./config/ClientConfig";
+import { GameConfig } from "./config/GameConfig";
+import Camera from "./camera/Camera";
+import Snake from "./snake/Snake";
+import SnakeChunk from "./snake/SnakeChunk";
+import { LeaderboardDTO } from "./dto/Leaderboard";
+import assert from "../util/assert";
+import Vector from "../math/Vector";
+import Player from "./Player";
 
 export default class Game {
     camera: Camera = new Camera();
@@ -15,45 +16,51 @@ export default class Game {
     snakeChunks: Map<SnakeChunkId, SnakeChunk> = new Map();
     leaderboard: LeaderboardDTO = { list: [] };
 
-    #remote: Comlink.Remote<WorkerAPI>;
-    #config: GameConfig;
-    #updateAvailable: boolean = false;
-    #targetSnakeId: number | undefined;
-    #stopped: boolean = false;
+    private remote: Comlink.Remote<WorkerAPI>;
+    private config: GameConfig;
+    private updateAvailable: boolean = false;
+    private targetSnakeId: number | undefined;
+    private stopped: boolean = false;
 
     private constructor() {
-        this.#remote = Comlink.wrap<WorkerAPI>(
+        this.remote = Comlink.wrap<WorkerAPI>(
             new Worker("worker.bundle.js", { name: "SnakeWorker" })
         );
     }
 
-    static async joinAs(name: string): Promise<Game> {
+    static async joinAsPlayer(name: string): Promise<[Game, Player]> {
         const clientConfig = await ClientConfig.get();
         const game = new Game();
-        const remote = game.#remote;
+        const remote = game.remote;
 
         const info = await remote.init(name, clientConfig);
-        game.#config = info.config;
+        game.config = info.config;
         game.camera.moveTo(Vector.fromObject(info.startPosition));
-        game.#targetSnakeId = info.targetSnakeId;
+        game.targetSnakeId = info.targetSnakeId;
 
         remote.addEventListener(
             "server-update",
             Comlink.proxy(() => {
-                game.#updateAvailable = true;
+                game.updateAvailable = true;
             })
         );
 
-        return game;
+        const player = new Player(remote, info.targetSnakeId, game);
+
+        return [game, player];
+    }
+
+    static async joinAsSpectator(): Promise<Game> {
+        throw new Error("not implemented");
     }
 
     async update(): Promise<void> {
-        if (!this.#updateAvailable) {
+        if (!this.updateAvailable) {
             return;
         }
 
-        const changes = await this.#remote.getDataChanges();
-        this.#updateAvailable = false;
+        const changes = await this.remote.getDataChanges();
+        this.updateAvailable = false;
         const ticks = changes.ticksSinceLastUpdate;
 
         // update leaderboard
@@ -66,7 +73,7 @@ export default class Game {
             if (this.snakes.has(dto.id)) {
                 this.snakes.get(dto.id)!.update(dto, ticks);
             } else {
-                this.snakes.set(dto.id, new Snake(dto, this.#config));
+                this.snakes.set(dto.id, new Snake(dto, this.config));
             }
         }
 
@@ -95,9 +102,10 @@ export default class Game {
 
             this.snakes.delete(snakeId);
 
-            if (snakeId === this.#targetSnakeId) {
+            if (snakeId === this.targetSnakeId) {
+                this.targetSnakeId = undefined;
                 // TODO
-                this.#stopped = true;
+                this.stopped = true;
             }
         }
     }
@@ -111,24 +119,17 @@ export default class Game {
         }
     }
 
-    sendUserInput(): void {
-        this.#remote.sendUserInput(0, false, this.camera.viewBox);
-    }
-
     quit(): void {
-        this.#remote.quit();
+        this.remote.quit();
+        this.stopped = true;
     }
 
     get targetSnake(): Snake | undefined {
-        if (this.#targetSnakeId === undefined) {
+        if (this.targetSnakeId === undefined) {
             return undefined;
         }
 
-        return this.snakes.get(this.#targetSnakeId);
-    }
-
-    get playerAlive(): boolean {
-        return !this.#stopped;
+        return this.snakes.get(this.targetSnakeId);
     }
 }
 

@@ -1,5 +1,5 @@
 import FoodChunk from "../../data/world/FoodChunk";
-import Game from "../../Game";
+import Game from "../../data/Game";
 import Matrix from "../../math/Matrix";
 import Vector from "../../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";

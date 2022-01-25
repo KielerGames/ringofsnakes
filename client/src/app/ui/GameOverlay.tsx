@@ -1,5 +1,5 @@
 import { Component } from "preact";
-import Game from "../Game";
+import Game from "../data/Game";
 import FPSStats from "./components/debug/FPSStats";
 import SnakeList from "./components/debug/SnakeList";
 import Leaderboard from "./components/Leaderboard";

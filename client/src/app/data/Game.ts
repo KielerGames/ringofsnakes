@@ -9,11 +9,13 @@ import { LeaderboardDTO } from "./dto/Leaderboard";
 import assert from "../util/assert";
 import Vector from "../math/Vector";
 import Player from "./Player";
+import FoodChunk from "./world/FoodChunk";
 
 export default class Game {
     camera: Camera = new Camera();
-    snakes: Map<SnakeId, Snake> = new Map();
-    snakeChunks: Map<SnakeChunkId, SnakeChunk> = new Map();
+    readonly snakes: Map<SnakeId, Snake> = new Map();
+    readonly snakeChunks: Map<SnakeChunkId, SnakeChunk> = new Map();
+    readonly foodChunks: Map<FoodChunkId, FoodChunk> = new Map();
     leaderboard: LeaderboardDTO = { list: [] };
 
     private remote: Comlink.Remote<WorkerAPI>;
@@ -108,6 +110,11 @@ export default class Game {
                 this.stopped = true;
             }
         }
+
+        // update food chunks
+        for (const dto of changes.foodChunks) {
+            this.foodChunks.set(dto.id, new FoodChunk(dto));
+        }
     }
 
     predict(): void {
@@ -135,3 +142,4 @@ export default class Game {
 
 type SnakeId = number;
 type SnakeChunkId = number;
+type FoodChunkId = number;

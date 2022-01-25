@@ -1,3 +1,4 @@
+import { FoodChunkDTO } from "./FoodChunkDTO";
 import { LeaderboardDTO } from "./Leaderboard";
 import { SnakeChunkDTO } from "./SnakeChunkDTO";
 import { SnakeDTO } from "./SnakeDTO";
@@ -8,6 +9,7 @@ export type DataUpdateDTO = {
     snakeChunks: SnakeChunkDTO[];
     leaderboard?: LeaderboardDTO;
     snakeDeaths: SnakeId[];
+    foodChunks: FoodChunkDTO[];
 };
 
 type SnakeId = number;

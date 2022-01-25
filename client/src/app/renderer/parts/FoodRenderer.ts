@@ -29,7 +29,6 @@ export function render(game: Readonly<Game>, transform: Matrix) {
     const gl = WebGLContextProvider.getContext();
 
     const targetSnake = game.targetSnake;
-    const foodChunks = [] as FoodChunk[];
 
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
@@ -40,7 +39,7 @@ export function render(game: Readonly<Game>, transform: Matrix) {
     const attractor = targetSnake ? targetSnake.position : FAR_AWAY;
     shader.setUniform("uPlayerPosition", [attractor.x, attractor.y]);
 
-    for (const chunk of foodChunks) {
+    for (const chunk of game.foodChunks.values()) {
         chunk.useBuffer(gl);
 
         shader.run(chunk.numberOfVertices, {

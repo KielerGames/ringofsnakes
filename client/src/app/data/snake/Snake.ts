@@ -3,6 +3,8 @@ import { GameConfig } from "../config/GameConfig";
 import { SnakeDTO } from "../dto/SnakeDTO";
 import SnakeChunk from "./SnakeChunk";
 import * as FrameTime from "../../util/FrameTime";
+import { getMinDelta, normalizeAngle } from "../../math/Angle";
+import { clamp } from "../../math/CommonFunctions";
 
 /**
  * Represents a snake on the main thread.
@@ -57,48 +59,9 @@ export default class Snake {
         this.updateChunkOffsets(ticks, dto.fastHistory);
     }
 
-    private updateChunkOffsets(ticks: number, fastHistory: boolean[]) {
-        const fastSpeed = this.gameConfig.snakes.fastSpeed;
-        const slowSpeed = this.gameConfig.snakes.speed;
-
-        let chunkOffset = 0;
-
-        for (let i = 0; i < ticks; i++) {
-            chunkOffset += fastHistory[i] ? fastSpeed : slowSpeed;
-        }
-
-        for (const chunk of this.chunks.values()) {
-            if (chunk.id === this.headChunkId) {
-                continue;
-            }
-
-            chunk.updateOffset(chunkOffset);
-        }
-    }
-
     predict(): void {
-        // predict position
-        const speed = this.speed;
-        const now = FrameTime.now();
-
-        const distance1 = (speed * (now - this.lastPredictionTime)) / 1000;
-        const distance2 = (speed * (now - this.lastUpdateTime)) / 1000;
-
-        // predictions based on previous prediction & last known data
-        const prediction = this.lastKnownHeadPosition.clone();
-        prediction.addPolar(this.predictedDirection, distance1);
-        this.predictedHeadPosition.addPolar(this.predictedDirection, distance2);
-
-        // combine predictions
-        this.predictedHeadPosition = Vector.lerp(
-            prediction,
-            this.predictedHeadPosition,
-            0.85
-        );
-
-        // predict direction
-        // TODO
-        this.predictedDirection = this.lastKnownDirection;
+        this.predictPosition();
+        this.predictDirection();
 
         for (const snakeChunk of this.chunks.values()) {
             snakeChunk.predict();
@@ -139,12 +102,6 @@ export default class Snake {
         return this._length;
     }
 
-    private computeSpeed(fast: boolean): number {
-        const config = this.gameConfig;
-        const tickSpeed = fast ? config.snakes.fastSpeed : config.snakes.speed;
-        return tickSpeed / config.tickDuration;
-    }
-
     /**
      * The current snake speed in units per seconds (not units per tick).
      */
@@ -171,5 +128,74 @@ export default class Snake {
      */
     get width(): number {
         return this._width;
+    }
+
+    private predictPosition() {
+        const speed = this.speed;
+        const now = FrameTime.now();
+
+        const distance1 = (speed * (now - this.lastPredictionTime)) / 1000;
+        const distance2 = (speed * (now - this.lastUpdateTime)) / 1000;
+
+        // predictions based on previous prediction & last known data
+        const prediction = this.lastKnownHeadPosition.clone();
+        prediction.addPolar(this.predictedDirection, distance1);
+        this.predictedHeadPosition.addPolar(this.predictedDirection, distance2);
+
+        // combine predictions
+        this.predictedHeadPosition = Vector.lerp(
+            prediction,
+            this.predictedHeadPosition,
+            0.85
+        );
+    }
+
+    private predictDirection() {
+        const now = FrameTime.now();
+        const maxChangePerSecond =
+            this.gameConfig.snakes.maxTurnDelta / this.gameConfig.tickDuration;
+
+        const d1 = getMinDelta(this.predictedDirection, this.targetDirection);
+        const d2 = getMinDelta(this.lastKnownDirection, this.targetDirection);
+
+        const max1 =
+            (maxChangePerSecond * (now - this.lastPredictionTime)) / 1000;
+        const max2 = (maxChangePerSecond * (now - this.lastUpdateTime)) / 1000;
+
+        const p1 = normalizeAngle(
+            this.predictedDirection + clamp(-max1, d1, max1)
+        );
+        const p2 = normalizeAngle(
+            this.lastKnownDirection + clamp(-max2, d2, max2)
+        );
+
+        this.predictedDirection = normalizeAngle(
+            p1 + 0.15 * getMinDelta(p1, p2)
+        );
+    }
+
+    private computeSpeed(fast: boolean): number {
+        const config = this.gameConfig;
+        const tickSpeed = fast ? config.snakes.fastSpeed : config.snakes.speed;
+        return tickSpeed / config.tickDuration;
+    }
+
+    private updateChunkOffsets(ticks: number, fastHistory: boolean[]) {
+        const fastSpeed = this.gameConfig.snakes.fastSpeed;
+        const slowSpeed = this.gameConfig.snakes.speed;
+
+        let chunkOffset = 0;
+
+        for (let i = 0; i < ticks; i++) {
+            chunkOffset += fastHistory[i] ? fastSpeed : slowSpeed;
+        }
+
+        for (const chunk of this.chunks.values()) {
+            if (chunk.id === this.headChunkId) {
+                continue;
+            }
+
+            chunk.updateOffset(chunkOffset);
+        }
     }
 }

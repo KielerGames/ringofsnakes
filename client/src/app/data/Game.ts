@@ -115,6 +115,8 @@ export default class Game {
         for (const dto of changes.foodChunks) {
             this.foodChunks.set(dto.id, new FoodChunk(dto));
         }
+
+        this.removeJunk();
     }
 
     predict(): void {
@@ -137,6 +139,22 @@ export default class Game {
         }
 
         return this.snakes.get(this.targetSnakeId);
+    }
+
+    private removeJunk() {
+        // collect junk
+        const removeQueue = [];
+        for(const chunk of this.snakeChunks.values()) {
+            if(chunk.junk) {
+                removeQueue.push(chunk);
+            }
+        }
+
+        // remove
+        for(const chunk of removeQueue) {
+            this.snakeChunks.delete(chunk.id);
+            chunk.snake; // TODO remove chunk from snake
+        }
     }
 }
 

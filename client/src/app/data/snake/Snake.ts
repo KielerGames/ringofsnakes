@@ -3,7 +3,7 @@ import { GameConfig } from "../config/GameConfig";
 import { SnakeDTO } from "../dto/SnakeDTO";
 import SnakeChunk from "./SnakeChunk";
 import * as FrameTime from "../../util/FrameTime";
-import { getMinDelta, normalizeAngle } from "../../math/Angle";
+import { getMinDifference, normalizeAngle } from "../../math/Angle";
 import { clamp } from "../../math/CommonFunctions";
 
 /**
@@ -12,6 +12,7 @@ import { clamp } from "../../math/CommonFunctions";
 export default class Snake {
     readonly id: number;
     readonly skin: number;
+    target: boolean = false;
     private readonly chunks = new Map<number, SnakeChunk>();
     private lastUpdateTime: number;
     private lastPredictionTime: number;
@@ -87,7 +88,8 @@ export default class Snake {
     }
 
     toString(): string {
-        return `Snake ${this.id} with ${this.chunks.size} chunks`;
+        const speed = this.fast ? "f" : "s";
+        return `(${speed}) Snake ${this.id} with ${this.chunks.size} chunks`;
     }
 
     get headChunk(): SnakeChunk | undefined {
@@ -106,7 +108,11 @@ export default class Snake {
      * The current snake speed in units per seconds (not units per tick).
      */
     get speed(): number {
-        return this.computeSpeed(this.fast);
+        const config = this.gameConfig;
+        const tickSpeed = this.fast
+            ? config.snakes.fastSpeed
+            : config.snakes.speed;
+        return tickSpeed / config.tickDuration;
     }
 
     /**
@@ -155,8 +161,14 @@ export default class Snake {
         const maxChangePerSecond =
             this.gameConfig.snakes.maxTurnDelta / this.gameConfig.tickDuration;
 
-        const d1 = getMinDelta(this.predictedDirection, this.targetDirection);
-        const d2 = getMinDelta(this.lastKnownDirection, this.targetDirection);
+        const d1 = getMinDifference(
+            this.predictedDirection,
+            this.targetDirection
+        );
+        const d2 = getMinDifference(
+            this.lastKnownDirection,
+            this.targetDirection
+        );
 
         const max1 =
             (maxChangePerSecond * (now - this.lastPredictionTime)) / 1000;
@@ -169,15 +181,10 @@ export default class Snake {
             this.lastKnownDirection + clamp(-max2, d2, max2)
         );
 
+        // combine predictions
         this.predictedDirection = normalizeAngle(
-            p1 + 0.15 * getMinDelta(p1, p2)
+            p1 + 0.15 * getMinDifference(p1, p2)
         );
-    }
-
-    private computeSpeed(fast: boolean): number {
-        const config = this.gameConfig;
-        const tickSpeed = fast ? config.snakes.fastSpeed : config.snakes.speed;
-        return tickSpeed / config.tickDuration;
     }
 
     private updateChunkOffsets(ticks: number, fastHistory: boolean[]) {

@@ -3,7 +3,7 @@
     right: 10px;
     bottom: 10px;
     padding: 5px;
-    background-color: rgb(64,64,64);
+    background-color: rgb(64, 64, 64);
     color: white;
     font-size: 12px;
     min-width: 100px;
@@ -16,14 +16,15 @@
         border-radius: 6px;
         overflow: hidden;
         padding: 2px;
-        background-color: rgb(190, 190, 190);
+        background-color: rgb(180, 180, 180);
+        color: black;
 
         &:last-child {
             margin-bottom: 0;
         }
 
-        .snake-info {
-            color: black;
+        &.target {
+            background-color: rgb(230, 230, 230);
         }
     }
 }

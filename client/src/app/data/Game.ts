@@ -75,7 +75,11 @@ export default class Game {
             if (this.snakes.has(dto.id)) {
                 this.snakes.get(dto.id)!.update(dto, ticks);
             } else {
-                this.snakes.set(dto.id, new Snake(dto, this.config));
+                const snake = new Snake(dto, this.config);
+                this.snakes.set(dto.id, snake);
+                if (snake.id === this.targetSnakeId) {
+                    snake.target = true;
+                }
             }
         }
 
@@ -144,19 +148,19 @@ export default class Game {
     private removeJunk() {
         // collect junk
         const removeQueue = [];
-        for(const chunk of this.snakeChunks.values()) {
-            if(chunk.junk) {
+        for (const chunk of this.snakeChunks.values()) {
+            if (chunk.junk) {
                 removeQueue.push(chunk);
             }
         }
 
         // remove
-        for(const chunk of removeQueue) {
+        for (const chunk of removeQueue) {
             this.snakeChunks.delete(chunk.id);
             chunk.destroy();
         }
 
-        if(__DEBUG__) {
+        if (__DEBUG__) {
             console.info(`Removed ${removeQueue.length} chunks.`);
         }
     }

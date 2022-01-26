@@ -31,10 +31,10 @@ type SOProps = {
 
 function SnakeOverview(props: SOProps) {
     const snake = props.snake;
-    
+
     return (
-        <div class={`snake skin${snake.skin}`}>
-            <div class="snake-info">{snake.toString()}</div>
+        <div class={snake.target ? "snake target" : "snake"}>
+            {snake.toString()}
         </div>
     );
 }

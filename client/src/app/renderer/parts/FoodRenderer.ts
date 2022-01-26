@@ -40,6 +40,10 @@ export function render(game: Readonly<Game>, transform: Matrix) {
     shader.setUniform("uPlayerPosition", [attractor.x, attractor.y]);
 
     for (const chunk of game.foodChunks.values()) {
+        if (!chunk.isVisible(game.camera)) {
+            continue;
+        }
+
         chunk.useBuffer(gl);
 
         shader.run(chunk.numberOfVertices, {

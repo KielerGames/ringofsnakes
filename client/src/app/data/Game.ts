@@ -153,7 +153,11 @@ export default class Game {
         // remove
         for(const chunk of removeQueue) {
             this.snakeChunks.delete(chunk.id);
-            chunk.snake; // TODO remove chunk from snake
+            chunk.destroy();
+        }
+
+        if(__DEBUG__) {
+            console.info(`Removed ${removeQueue.length} chunks.`);
         }
     }
 }

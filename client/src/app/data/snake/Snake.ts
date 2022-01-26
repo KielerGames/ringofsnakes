@@ -114,6 +114,10 @@ export default class Snake {
         this.#chunks.set(chunk.id, chunk);
     }
 
+    unregisterSnakeChunk(chunk: SnakeChunk): void {
+        this.#chunks.delete(chunk.id);
+    }
+
     getSnakeChunksIterator(): IterableIterator<SnakeChunk> {
         return this.#chunks.values();
     }

@@ -1,4 +1,3 @@
-import SnakeChunk from "../../data/snake/SnakeChunk";
 import Matrix from "../../math/Matrix";
 import { mix } from "../../util/ColorUtils";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
@@ -6,6 +5,7 @@ import * as WebGLContextProvider from "../WebGLContextProvider";
 import * as BoxRenderer from "./BoxRenderer";
 import * as SkinLoader from "../SkinLoader";
 import assert from "../../util/assert";
+import Game from "../../data/Game";
 
 declare const __VERTEXSHADER_SNAKE__: string;
 declare const __FRAGMENTSHADER_SNAKE__: string;
@@ -27,8 +27,9 @@ let buffer: WebGLBuffer;
     assert(buffer !== null);
 })();
 
-export function render(chunks: Iterable<SnakeChunk>, transform: Matrix): void {
+export function render(game: Readonly<Game>, transform: Matrix): void {
     const gl = WebGLContextProvider.getContext();
+    const camera = game.camera;
 
     const shader = basicMaterialShader;
     shader.use();
@@ -37,12 +38,12 @@ export function render(chunks: Iterable<SnakeChunk>, transform: Matrix): void {
     shader.setUniform("uTransform", transform.data);
     shader.setUniform("uColorSampler", 0);
 
-    let n = 0;
-
-    for (const chunk of chunks) {
+    for (const chunk of game.snakeChunks.values()) {
+        if (!chunk.isVisible(camera)) {
+            continue;
+        }
         const snake = chunk.snake;
         const data = chunk.gpuData;
-        n++;
 
         SkinLoader.setColor(shader, "uSkin", snake.skin);
         shader.setUniform("uChunkPathOffset", chunk.offset);

@@ -3,6 +3,7 @@ import Snake from "./Snake";
 import * as FrameTime from "../../util/FrameTime";
 import assert from "../../util/assert";
 import Rectangle from "../../math/Rectangle";
+import Camera from "../camera/Camera";
 
 /**
  * Main thread representation of a SnakeChunk.
@@ -73,6 +74,18 @@ export default class SnakeChunk {
         // combine predictions
         this.predictedOffset = 0.85 * prediction1 + 0.15 * prediction2;
         this.lastPredictionTime = FrameTime.now();
+    }
+
+    isVisible(camera: Camera): boolean {
+        const d = Rectangle.distance2(camera.viewBox, this.bounds);
+        return d <= 0.5 * this.snake.width; // TODO consider prediction (?)
+    }
+
+    /**
+     * This is supposed to be called right before this chunk gets deleted.
+     */
+    destroy(): void {
+        this.snake.unregisterSnakeChunk(this);
     }
 
     /**

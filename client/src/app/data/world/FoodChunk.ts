@@ -2,6 +2,7 @@ import * as BufferManager from "../../renderer/webgl/BufferManager";
 import Rectangle from "../../math/Rectangle";
 import * as SkinLoader from "../../renderer/SkinLoader";
 import { FoodChunkDTO, FoodItemDTO } from "../dto/FoodChunkDTO";
+import Camera from "../camera/Camera";
 
 const boxCoords = [
     // triangle 1
@@ -16,17 +17,17 @@ const boxCoords = [
 
 // TODO: move webgl stuff out of here
 export default class FoodChunk {
-    public static readonly FOOD_VERTEX_SIZE = 2 + 2 + 1; // x,y, u,v, c
+    static readonly FOOD_VERTEX_SIZE = 2 + 2 + 1; // x,y, u,v, c
 
-    public id: number;
+    id: number;
     private gpuBuffer: WebGLBuffer;
     private gpuData: Float32Array | undefined = new Float32Array(
         32 * boxCoords.length
     );
     private numFoodItems: number;
-    public readonly box: Rectangle;
+    readonly box: Rectangle;
 
-    public constructor(dto: FoodChunkDTO) {
+    constructor(dto: FoodChunkDTO) {
         this.id = dto.id;
         this.numFoodItems = dto.items.length;
         this.box = Rectangle.fromTransferable(dto.bounds);
@@ -34,16 +35,16 @@ export default class FoodChunk {
         this.gpuData = createGPUData(dto.items, this.gpuData);
     }
 
-    public update(dto: FoodChunkDTO): void {
+    update(dto: FoodChunkDTO): void {
         this.numFoodItems = dto.items.length;
         this.gpuData = createGPUData(dto.items, this.gpuData);
     }
 
-    public destroy(): void {
+    destroy(): void {
         BufferManager.free(this.gpuBuffer);
     }
 
-    public useBuffer(gl: WebGLRenderingContext): void {
+    useBuffer(gl: WebGLRenderingContext): void {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.gpuBuffer);
 
         if (this.gpuData) {
@@ -52,11 +53,11 @@ export default class FoodChunk {
         }
     }
 
-    public isVisible(viewBox: Rectangle): boolean {
-        return Rectangle.distance2(this.box, viewBox) === 0.0;
+    isVisible(camera: Camera): boolean {
+        return Rectangle.distance2(this.box, camera.viewBox) === 0.0;
     }
 
-    public get numberOfVertices(): number {
+    get numberOfVertices(): number {
         return this.numFoodItems * boxCoords.length;
     }
 }

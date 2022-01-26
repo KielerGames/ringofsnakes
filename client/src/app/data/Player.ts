@@ -1,6 +1,8 @@
 import * as Comlink from "comlink";
+import { UserInputListener } from "../input/UserInput";
 import { WorkerAPI } from "../worker/worker";
 import Game from "./Game";
+import * as UserInput from "../input/UserInput";
 
 type Remote = Comlink.Remote<WorkerAPI>;
 
@@ -9,15 +11,22 @@ export default class Player {
     private game: Game;
     readonly snakeId: number;
     private snakeHasExisted: boolean = false;
+    private inputListener: UserInputListener;
 
     constructor(remote: Remote, snakeId: number, game: Game) {
         this.remote = remote;
         this.snakeId = snakeId;
         this.game = game;
-    }
 
-    sendUserInput(): void {
-        this.remote.sendUserInput(0, false, this.game.camera.viewBox);
+        this.inputListener = (wantsFast, direction) => {
+            if(this.alive) {
+                this.remote.sendUserInput(direction, wantsFast, this.game.camera.viewBox);
+            }
+        };
+
+        UserInput.addListener(this.inputListener);
+
+        // TODO: remove listener when dead
     }
 
     get alive(): boolean {

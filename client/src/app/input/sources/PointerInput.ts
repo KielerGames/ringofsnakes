@@ -1,24 +1,67 @@
 import assert from "../../util/assert";
+import InputSource from "./InputSource";
 
-let clickCatcher: HTMLElement = document.body;
+window.addEventListener("pointermove", (e) => {
+    const x = e.pageX - 0.5 * window.innerWidth;
+    const y = 0.5 * window.innerHeight - e.pageY;
+    if (x * x + y * y > 1) {
+        const alpha = Math.atan2(y, x);
+    }
+});
 
-export function setClickCatcher(element: HTMLElement): void {
-    assert(element != null);
-    // remove previous event listeners
-    clickCatcher.removeEventListener("pointerdown", pointerDownHandler);
-    clickCatcher.removeEventListener("pointerup", pointerUpHandler);
-    clickCatcher.removeEventListener("pointercancel", pointerUpHandler);
+export default class PointerInput extends InputSource {
+    private clickCatcher: HTMLElement | null = null;
 
-    clickCatcher = element;
+    public constructor() {
+        super();
 
-    // setup event listeners on new element
-    clickCatcher.addEventListener("pointerdown", pointerDownHandler);
-    clickCatcher.addEventListener("pointerup", pointerUpHandler);
-    clickCatcher.addEventListener("pointercancel", pointerUpHandler);
+        this.pointerDownHandler = this.pointerDownHandler.bind(this);
+        this.pointerUpHandler = this.pointerUpHandler.bind(this);
+
+        window.addEventListener("pointermove", (e) => {
+            const x = e.pageX - 0.5 * window.innerWidth;
+            const y = 0.5 * window.innerHeight - e.pageY;
+            if (x * x + y * y > 1) {
+                const alpha = Math.atan2(y, x);
+                this.setDirection(alpha);
+            }
+        });
+    }
+
+    private pointerDownHandler(e: PointerEvent) {
+        e.stopPropagation();
+        this.setWantsFast(true);
+    }
+
+    private pointerUpHandler(e: PointerEvent) {
+        e.stopPropagation();
+        this.setWantsFast(false);
+    }
+
+    public setClickCatcher(element: HTMLElement): void {
+        assert(element != null);
+
+        if (this.clickCatcher !== null) {
+            // remove previous event listeners
+            this.clickCatcher.removeEventListener(
+                "pointerdown",
+                this.pointerDownHandler
+            );
+            this.clickCatcher.removeEventListener(
+                "pointerup",
+                this.pointerUpHandler
+            );
+            this.clickCatcher.removeEventListener(
+                "pointercancel",
+                this.pointerUpHandler
+            );
+        }
+
+        // setup event listeners on new element
+        element.addEventListener("pointerdown", this.pointerDownHandler);
+        element.addEventListener("pointerup", this.pointerUpHandler);
+        element.addEventListener("pointercancel", this.pointerUpHandler);
+
+        this.clickCatcher = element;
+    }
 }
-
-function pointerDownHandler(e: PointerEvent) {}
-
-function pointerUpHandler(e: PointerEvent) {}
-
-window.addEventListener("pointermove", (e) => {});

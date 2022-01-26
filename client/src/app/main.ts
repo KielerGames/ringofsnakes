@@ -4,6 +4,7 @@ import GameOverlay from "./ui/GameOverlay";
 import * as FrameTime from "./util/FrameTime";
 import * as WebGLContextProvider from "./renderer/WebGLContextProvider";
 import * as GameRenderer from "./renderer/GameRenderer";
+import * as UserInput from "./input/UserInput";
 
 // create styles (in <head>)
 import "../styles/main.less";
@@ -18,6 +19,7 @@ WebGLContextProvider.init(canvas);
 const uiRoot = document.createElement("div");
 uiRoot.id = "root";
 document.body.appendChild(uiRoot);
+UserInput.init(uiRoot);
 
 (async () => {
     const [game, player] = await Game.joinAsPlayer("SnakeForceOne");
@@ -28,7 +30,6 @@ document.body.appendChild(uiRoot);
         GameRenderer.render(game);
 
         if (player.alive) {
-            setTimeout(() => player.sendUserInput());
             setTimeout(() => game.update());
             window.requestAnimationFrame(renderLoop);
         } else {

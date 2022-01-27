@@ -5,6 +5,8 @@ import SnakeChunk from "./SnakeChunk";
 import * as FrameTime from "../../util/FrameTime";
 import { getMinDifference, normalizeAngle } from "../../math/Angle";
 import { clamp } from "../../math/CommonFunctions";
+import Camera from "../camera/Camera";
+import Rectangle from "../../math/Rectangle";
 
 /**
  * Represents a snake on the main thread.
@@ -50,7 +52,7 @@ export default class Snake {
     update(dto: SnakeDTO, ticks: number): void {
         this.lastUpdateTime = FrameTime.now();
         this._length = dto.length;
-        if(dto.headChunkId !== this.headChunkId) {
+        if (dto.headChunkId !== this.headChunkId) {
             const mask = (1 << 16) - 1;
             const id = dto.headChunkId & mask;
             console.log(`Head chunk changed on snake ${this.id} to ${id}`);
@@ -95,6 +97,25 @@ export default class Snake {
     toString(): string {
         return `Snake ${this.id} with ${this.chunks.size} chunks`;
     }
+
+    isVisible(camera: Camera, epsilon: number = 0.0): boolean {
+        for (const chunk of this.chunks.values()) {
+            if (chunk.isVisible(camera, epsilon)) {
+                return true;
+            }
+        }
+
+        const size = 2 * 2.0 * 1.25 * this._width;
+        const headBox = Rectangle.createAt(
+            this.predictedHeadPosition,
+            size,
+            size
+        );
+
+        return Rectangle.distance2(headBox, camera.viewBox) < epsilon * epsilon;
+    }
+
+    destroy() {}
 
     get headChunk(): SnakeChunk | undefined {
         return this.chunks.get(this.headChunkId);

@@ -3,6 +3,7 @@ import Rectangle from "../../math/Rectangle";
 import * as SkinLoader from "../../renderer/SkinLoader";
 import { FoodChunkDTO, FoodItemDTO } from "../dto/FoodChunkDTO";
 import Camera from "../camera/Camera";
+import * as FrameTime from "../../util/FrameTime";
 
 const boxCoords = [
     // triangle 1
@@ -25,19 +26,20 @@ export default class FoodChunk {
         32 * boxCoords.length
     );
     private numFoodItems: number;
+    private lastUpdateTime: number;
     readonly box: Rectangle;
 
     constructor(dto: FoodChunkDTO) {
         this.id = dto.id;
-        this.numFoodItems = dto.items.length;
         this.box = Rectangle.fromTransferable(dto.bounds);
         this.gpuBuffer = BufferManager.create();
-        this.gpuData = createGPUData(dto.items, this.gpuData);
+        this.update(dto);
     }
 
     update(dto: FoodChunkDTO): void {
         this.numFoodItems = dto.items.length;
         this.gpuData = createGPUData(dto.items, this.gpuData);
+        this.lastUpdateTime = FrameTime.now();
     }
 
     destroy(): void {
@@ -53,12 +55,19 @@ export default class FoodChunk {
         }
     }
 
-    isVisible(camera: Camera): boolean {
-        return Rectangle.distance2(this.box, camera.viewBox) === 0.0;
+    isVisible(camera: Camera, eps: number = 0.0): boolean {
+        return Rectangle.distance2(this.box, camera.viewBox) <= eps * eps;
     }
 
     get numberOfVertices(): number {
         return this.numFoodItems * boxCoords.length;
+    }
+
+    /**
+     * Time since this chunk was created or last updated.
+     */
+    get age(): number {
+        return 0.001 * (FrameTime.now() - this.lastUpdateTime);
     }
 }
 

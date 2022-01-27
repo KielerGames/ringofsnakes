@@ -76,9 +76,10 @@ export default class SnakeChunk {
         this.lastPredictionTime = FrameTime.now();
     }
 
-    isVisible(camera: Camera): boolean {
+    isVisible(camera: Camera, epsilon: number = 0.0): boolean {
         const d = Rectangle.distance2(camera.viewBox, this.bounds);
-        return d <= 0.5 * this.snake.width;
+        const ub = 0.5 * this.snake.width + epsilon;
+        return d <= ub * ub;
     }
 
     /**

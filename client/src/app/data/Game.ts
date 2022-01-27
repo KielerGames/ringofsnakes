@@ -93,7 +93,7 @@ export default class Game {
                 this.snakeChunks.get(dto.id)!.update(dto);
             } else {
                 const snake = this.snakes.get(dto.snakeId)!;
-                assert(snake !== undefined, "Data for unknown snake.");
+                assert(snake !== undefined, "SnakeChunk for unknown snake.");
                 this.snakeChunks.set(dto.id, new SnakeChunk(snake, dto));
             }
         }
@@ -153,26 +153,55 @@ export default class Game {
     }
 
     private removeJunk() {
-        // collect junk
-        const removeQueue = [];
-        for (const chunk of this.snakeChunks.values()) {
-            if (chunk.junk) {
-                removeQueue.push(chunk);
-            }
-        }
+        const camera = this.camera;
+        const safeDist = 2 * this.config.snakes.fastSpeed;
 
-        // remove
-        for (const chunk of removeQueue) {
-            this.snakeChunks.delete(chunk.id);
-            chunk.destroy();
-        }
+        removeIf(
+            this.snakeChunks,
+            (chunk) => chunk.junk || !chunk.isVisible(camera, safeDist)
+        );
 
-        if (__DEBUG__ && removeQueue.length > 0) {
-            console.info(`Removed ${removeQueue.length} chunks.`);
-        }
+        removeIf(
+            this.foodChunks,
+            (chunk) => !chunk.isVisible(camera, safeDist) && chunk.age > 2.0
+        );
+
+        removeIf(
+            this.snakes,
+            (snake) =>
+                snake.id !== this.targetSnakeId &&
+                !snake.hasChunks() &&
+                !snake.isVisible(camera, safeDist)
+        );
     }
 }
 
 type SnakeId = number;
 type SnakeChunkId = number;
 type FoodChunkId = number;
+
+type JunkDetector<T> = (obj: T) => boolean;
+type Destroyable = { destroy: () => void };
+
+function removeIf<K, V extends Destroyable>(
+    map: Map<K, V>,
+    isJunk: JunkDetector<V>
+): number {
+    // collect junk
+    const removeList: K[] = [];
+    for (const [key, value] of map) {
+        if (isJunk(value)) {
+            removeList.push(key);
+            if (value.destroy) {
+                value.destroy();
+            }
+        }
+    }
+
+    // remove junk
+    for (const key of removeList) {
+        map.delete(key);
+    }
+
+    return removeList.length;
+}

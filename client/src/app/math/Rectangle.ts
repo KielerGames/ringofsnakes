@@ -27,6 +27,20 @@ export default class Rectangle {
     }
 
     /**
+     * Creates a Rectangle with center p and the given width and height.
+     * @param p center point
+     */
+    static createAt(
+        p: Readonly<Vector>,
+        width: number,
+        height: number
+    ): Rectangle {
+        const w = 0.5 * width;
+        const h = 0.5 * height;
+        return new Rectangle(p.x - w, p.x + w, p.y - h, p.y + h);
+    }
+
+    /**
      * Computes the squared distance between two `Rectangle` instances.
      * @param a A `Rectangle`
      * @param b Another `Rectangle`

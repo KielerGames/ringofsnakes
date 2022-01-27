@@ -163,7 +163,7 @@ export default class Game {
             chunk.destroy();
         }
 
-        if (__DEBUG__) {
+        if (__DEBUG__ && removeQueue.length > 0) {
             console.info(`Removed ${removeQueue.length} chunks.`);
         }
     }

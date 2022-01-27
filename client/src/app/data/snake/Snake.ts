@@ -50,6 +50,11 @@ export default class Snake {
     update(dto: SnakeDTO, ticks: number): void {
         this.lastUpdateTime = FrameTime.now();
         this._length = dto.length;
+        if(dto.headChunkId !== this.headChunkId) {
+            const mask = (1 << 16) - 1;
+            const id = dto.headChunkId & mask;
+            console.log(`Head chunk changed on snake ${this.id} to ${id}`);
+        }
         this.headChunkId = dto.headChunkId;
         this.lastKnownHeadPosition = Vector.fromObject(dto.headPosition);
         this.lastKnownDirection = dto.headDirection[0];

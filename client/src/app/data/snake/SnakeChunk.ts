@@ -50,7 +50,7 @@ export default class SnakeChunk {
 
     updateOffset(offsetChange: number): void {
         if (__DEBUG__ && !this.final) {
-            console.warn(`Offset change on non-final chunk.`);
+            console.warn(`Offset change on non-final ${this.toString()}.`);
         }
         this.lastKnownOffset += offsetChange;
         this.lastUpdateTime = FrameTime.now();
@@ -86,6 +86,12 @@ export default class SnakeChunk {
      */
     destroy(): void {
         this.snake.unregisterSnakeChunk(this);
+    }
+
+    toString(): string {
+        const mask = (1 << 16) - 1;
+        const id = this.id & mask;
+        return `SnakeChunk ${id} of snake ${this.snake.id}`;
     }
 
     /**

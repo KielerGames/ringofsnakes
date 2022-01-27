@@ -67,7 +67,7 @@ export default class SnakeChunk {
         const change1 = (speed * (now - this.lastPredictionTime)) / 1000;
         const change2 = (speed * (now - this.lastUpdateTime)) / 1000;
 
-        // predictions based on previous prediction & last known data
+        // predictions based on previous prediction (1) & last known data (2)
         const prediction1 = this.predictedOffset + change1;
         const prediction2 = this.lastKnownOffset + change2;
 
@@ -78,7 +78,7 @@ export default class SnakeChunk {
 
     isVisible(camera: Camera): boolean {
         const d = Rectangle.distance2(camera.viewBox, this.bounds);
-        return d <= 0.5 * this.snake.width; // TODO consider prediction (?)
+        return d <= 0.5 * this.snake.width;
     }
 
     /**

@@ -151,16 +151,16 @@ export default class Snake {
         const distance1 = (speed * (now - this.lastPredictionTime)) / 1000;
         const distance2 = (speed * (now - this.lastUpdateTime)) / 1000;
 
-        // predictions based on previous prediction & last known data
-        const prediction = this.lastKnownHeadPosition.clone();
-        prediction.addPolar(this.predictedDirection, distance1);
-        this.predictedHeadPosition.addPolar(this.predictedDirection, distance2);
+        // predictions based on previous prediction (1) & last known data (2)
+        this.predictedHeadPosition.addPolar(this.predictedDirection, distance1);
+        const prediction2 = this.lastKnownHeadPosition.clone();
+        prediction2.addPolar(this.predictedDirection, distance2);
 
         // combine predictions
         this.predictedHeadPosition = Vector.lerp(
-            prediction,
             this.predictedHeadPosition,
-            0.85
+            prediction2,
+            0.15
         );
     }
 

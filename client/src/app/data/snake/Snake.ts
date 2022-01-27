@@ -18,7 +18,7 @@ export default class Snake {
     private lastPredictionTime: number;
     private headChunkId: number;
     private _length: number;
-    private fast: boolean;
+    private _fast: boolean;
     private _width: number;
     private gameConfig: GameConfig;
 
@@ -54,7 +54,7 @@ export default class Snake {
         this.lastKnownHeadPosition = Vector.fromObject(dto.headPosition);
         this.lastKnownDirection = dto.headDirection[0];
         this.targetDirection = dto.headDirection[1];
-        this.fast = dto.fast;
+        this._fast = dto.fast;
         this._width = dto.width;
 
         this.updateChunkOffsets(ticks, dto.fastHistory);
@@ -88,8 +88,7 @@ export default class Snake {
     }
 
     toString(): string {
-        const speed = this.fast ? "f" : "s";
-        return `(${speed}) Snake ${this.id} with ${this.chunks.size} chunks`;
+        return `Snake ${this.id} with ${this.chunks.size} chunks`;
     }
 
     get headChunk(): SnakeChunk | undefined {
@@ -98,6 +97,10 @@ export default class Snake {
 
     get name(): string {
         return "A Snake With No Name"; // TODO
+    }
+
+    get fast(): boolean {
+        return this._fast;
     }
 
     get length(): number {
@@ -109,7 +112,7 @@ export default class Snake {
      */
     get speed(): number {
         const config = this.gameConfig;
-        const tickSpeed = this.fast
+        const tickSpeed = this._fast
             ? config.snakes.fastSpeed
             : config.snakes.speed;
         return tickSpeed / config.tickDuration;

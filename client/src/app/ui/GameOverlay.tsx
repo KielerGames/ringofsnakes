@@ -15,7 +15,7 @@ export default class GameOverlay extends Component<Props> {
     componentDidMount() {
         this.#timer = window.setInterval(() => {
             this.forceUpdate();
-        }, 500);
+        }, 100);
     }
 
     componentWillUnmount() {

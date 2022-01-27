@@ -32,8 +32,16 @@ type SOProps = {
 function SnakeOverview(props: SOProps) {
     const snake = props.snake;
 
+    const classes = ["snake"];
+    if (snake.target) {
+        classes.push("target");
+    }
+    if (snake.fast) {
+        classes.push("fast");
+    }
+
     return (
-        <div class={snake.target ? "snake target" : "snake"}>
+        <div class={classes.join(" ")}>
             {snake.toString()}
         </div>
     );

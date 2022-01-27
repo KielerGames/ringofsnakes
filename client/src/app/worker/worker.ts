@@ -10,7 +10,7 @@ import Rectangle, { TransferableBox } from "../math/Rectangle";
 import { DataUpdateDTO } from "../data/dto/DataUpdateDTO";
 import { GameInfoDTO } from "../data/dto/GameInfoDTO";
 
-type WorkerEvent = "server-update" | "error";
+type WorkerEvent = "server-update" | "error" | "disconnect";
 
 let socket: Socket | null = null;
 
@@ -76,6 +76,11 @@ export class WorkerAPI {
         socket.onBinaryMessage = (message) => {
             data.addBinaryUpdate(message);
             triggerEvent("server-update");
+        };
+
+        socket.onclose = () => {
+            triggerEvent("disconnect");
+            self.close();
         };
 
         socket.sendJSON({ tag: "UpdatePlayerName", name });

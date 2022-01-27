@@ -14,20 +14,20 @@ export interface Socket {
 }
 
 class SocketImpl implements Socket {
-    #websocket: WebSocket;
+    private websocket: WebSocket;
     onclose = () => {};
     onJSONMessage = (message: ServerToClientJSONMessage) => {};
     onBinaryMessage = (data: ArrayBuffer) => {};
 
     constructor(websocket: WebSocket) {
-        this.#websocket = websocket;
-        this.#websocket.onclose = (e: CloseEvent) => {
+        this.websocket = websocket;
+        this.websocket.onclose = (e: CloseEvent) => {
             const { code, reason, wasClean } = e;
             console.info("WebSocket closed", code, reason, wasClean);
             this.onclose();
         };
-        this.#websocket.onerror = () => console.error("WebSocket error");
-        this.#websocket.onmessage = (e: MessageEvent<string | ArrayBuffer>) => {
+        this.websocket.onerror = () => console.error("WebSocket error");
+        this.websocket.onmessage = (e: MessageEvent<string | ArrayBuffer>) => {
             const data = e.data;
 
             if (data instanceof ArrayBuffer) {
@@ -40,21 +40,21 @@ class SocketImpl implements Socket {
     }
 
     sendJSON(message: ClientToServerJSONMessage) {
-        this.#websocket.send(JSON.stringify(message));
+        this.websocket.send(JSON.stringify(message));
     }
 
     sendBinary(message: ArrayBuffer) {
-        this.#websocket.send(message);
+        this.websocket.send(message);
     }
 
     close() {
-        if (this.#websocket.readyState !== WebSocket.CLOSED) {
-            this.#websocket.close();
+        if (this.websocket.readyState !== WebSocket.CLOSED) {
+            this.websocket.close();
         }
     }
 
     isOpen() {
-        return this.#websocket.readyState === WebSocket.OPEN;
+        return this.websocket.readyState === WebSocket.OPEN;
     }
 }
 

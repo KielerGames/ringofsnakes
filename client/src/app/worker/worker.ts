@@ -15,7 +15,7 @@ type WorkerEvent = "server-update" | "error" | "disconnect";
 let socket: Socket | null = null;
 
 const userInputRateLimiter = new RateLimiter<ClientData>(1000 / 30, (data) => {
-    if (socket) {
+    if (socket && socket.isOpen()) {
         const buffer = new ArrayBuffer(9);
         const view = new DataView(buffer);
         const box = Rectangle.fromTransferable(data.viewBox);

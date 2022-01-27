@@ -124,6 +124,9 @@ export default class Game {
     }
 
     predict(): void {
+        if (this.stopped) {
+            return;
+        }
         for (const snake of this.snakes.values()) {
             snake.predict();
         }

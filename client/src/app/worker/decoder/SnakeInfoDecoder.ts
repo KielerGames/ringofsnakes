@@ -11,12 +11,6 @@ export function decode(
 ): DecodeResult<SnakeDTO> {
     const view = new DataView(buffer, offset, SNAKE_INFO_SIZE);
 
-    if (__DEBUG__) {
-        if (view.getUint8(5) > 1) {
-            throw new Error(`Invalid Snake info buffer (${view.getUint8(3)})`);
-        }
-    }
-
     const fastData = view.getUint8(5);
     const length = view.getFloat32(6, false);
     const currentDirection = view.getFloat32(10, false);

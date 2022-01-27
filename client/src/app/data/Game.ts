@@ -47,9 +47,12 @@ export default class Game {
             })
         );
 
-        remote.addEventListener("disconnect", () => {
-            Comlink.proxy(() => (game.stopped = true));
-        });
+        remote.addEventListener(
+            "disconnect",
+            Comlink.proxy(() => {
+                game.stopped = true;
+            })
+        );
 
         const player = new Player(remote, info.targetSnakeId, game);
 

@@ -1,9 +1,9 @@
 package util;
 
 public class BitWithShortHistory {
+    private static final byte MASK = (byte) 0b11111110;
     private boolean current;
     private byte history = 0;
-    private static final byte MASK = (byte) 0b11111110;
 
     public BitWithShortHistory(boolean initialValue) {
         set(initialValue);
@@ -30,6 +30,14 @@ public class BitWithShortHistory {
      */
     public boolean get() {
         return current;
+    }
+
+    /**
+     * Getter for previous values.
+     * {@code get(0)} returns the current value, {@code get(1)} the one before that.
+     */
+    public boolean get(int i) {
+        return (history & (1 << i)) != 0;
     }
 
     /**

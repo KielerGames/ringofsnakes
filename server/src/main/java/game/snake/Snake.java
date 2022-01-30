@@ -35,6 +35,7 @@ public class Snake {
     @Getter protected double length;
     @Getter Vector headPosition;
     double headDirection;
+    private char currentChunkId;
     @Setter private byte skin;
     @Getter private boolean alive = true;
     private char nextChunkId = 0;
@@ -75,20 +76,14 @@ public class Snake {
         }
     }
 
-    public boolean isFast() {
-        if (userWantsFast) {
-            return length > config.snakes.minLength;
-        }
-
-        return false;
-    }
-
     public void setUserFast(boolean wantsFast) {
         userWantsFast = wantsFast;
     }
 
     public void tick() {
-        final boolean fast = isFast();
+        assert currentChunk != null : "Snake not fully initialized";
+
+        final boolean fast = userWantsFast && length > config.snakes.minLength;
         fastHistory.set(fast);
 
         // update direction
@@ -114,6 +109,10 @@ public class Snake {
         if (currentChunk.isFull()) {
             beginChunk();
         }
+        if (currentChunkId != currentChunk.id && !currentChunk.isEmpty()) {
+            // the id of an empty chunk (non-existing to the client) would confuse the client
+            currentChunkId = currentChunk.id;
+        }
         double offset = currentChunk.getLength();
         for (FinalSnakeChunk chunk : chunks) {
             chunk.setOffset(offset);
@@ -127,7 +126,7 @@ public class Snake {
         }
     }
 
-    public void beginChunk() {
+    void beginChunk() {
         if (currentChunk != null) {
             assert currentChunk.isFull();
 
@@ -143,7 +142,7 @@ public class Snake {
     public ByteBuffer encodeInfo() {
         final var buffer = this.snakeInfoBuffer;
         buffer.putChar(0, id);
-        buffer.putChar(2, currentChunk.id);
+        buffer.putChar(2, currentChunkId);
         buffer.put(4, skin);
         buffer.put(5, fastHistory.getHistory());
         buffer.putFloat(6, (float) length);

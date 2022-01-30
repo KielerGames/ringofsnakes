@@ -9,7 +9,6 @@ import javax.websocket.Session;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class Client {
     public final Session session;
@@ -68,28 +67,24 @@ public abstract class Client {
         }
     }
 
-    public boolean sendSync(String textData) {
+    public void sendSync(String textData) {
         if (session.isOpen()) {
             try {
                 session.getBasicRemote().sendText(textData);
             } catch (IOException e) {
                 e.printStackTrace();
-                return false;
             }
         }
-
-        return true;
     }
 
     public abstract BoundingBox getKnowledgeBox();
 
     public void cleanupKnowledge() {
         final var knowledgeBox = getKnowledgeBox();
-        final var chunksToForget = knownFoodChunks.keySet().stream()
-                .filter(chunk -> !BoundingBox.intersect(knowledgeBox, chunk.box))
-                .collect(Collectors.toList());
 
-        chunksToForget.forEach(knownFoodChunks::remove);
+        // remove old or invisible chunks
+        knownFoodChunks.keySet().removeIf(chunk -> !BoundingBox.intersect(knowledgeBox, chunk.box));
+        knownSnakeChunks.removeIf(chunk -> chunk.isJunk() || !BoundingBox.intersect(knowledgeBox, chunk.getBoundingBox()));
     }
 
     public void setViewBoxRatio(float ratio) {

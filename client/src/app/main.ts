@@ -22,6 +22,7 @@ document.body.appendChild(uiRoot);
 UserInput.init(uiRoot);
 
 (async () => {
+    FrameTime.update(performance.now());
     const [game, player] = await Game.joinAsPlayer("SnakeForceOne");
 
     function renderLoop(time: number) {

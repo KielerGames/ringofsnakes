@@ -1,7 +1,0 @@
-{
-    "extension": ["ts"],
-    "spec": "src/tests/*.spec.ts",
-    "require": ["ts-node/register", "src/tests/setup.ts"],
-    "global": "global"
-}
-  

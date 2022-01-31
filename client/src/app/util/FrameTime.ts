@@ -1,4 +1,4 @@
-let currentTime = performance.now();
+let currentTime = 0.0;
 
 /**
  * @returns the time in ms for the current frame. 

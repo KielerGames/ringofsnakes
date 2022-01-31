@@ -10,16 +10,16 @@ type Props = {
 };
 
 export default class GameOverlay extends Component<Props> {
-    #timer: number;
+    private timer: number;
 
     componentDidMount() {
-        this.#timer = window.setInterval(() => {
+        this.timer = window.setInterval(() => {
             this.forceUpdate();
         }, 100);
     }
 
     componentWillUnmount() {
-        window.clearInterval(this.#timer);
+        window.clearInterval(this.timer);
     }
 
     render() {

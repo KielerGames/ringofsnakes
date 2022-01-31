@@ -4,11 +4,11 @@ import { Consumer } from "../../util/FunctionTypes";
 type TimeoutId = number;
 
 export default class RateLimiter<T> {
-    #minDelay: number;
-    #lastRealUpdate: number = performance.now();
-    #nextValue: T | null = null;
-    #timeout: TimeoutId | undefined = undefined;
-    #updateConsumer: Consumer<T>;
+    private minDelay: number;
+    private lastRealUpdate: number = performance.now();
+    private nextValue: T | null = null;
+    private timeout: TimeoutId | undefined = undefined;
+    private updateConsumer: Consumer<T>;
 
     /**
      * Limits the rate at which an update consumer is called.
@@ -17,41 +17,41 @@ export default class RateLimiter<T> {
      */
     constructor(minDelay: number, updateConsumer: Consumer<T>) {
         assert(minDelay > 0);
-        this.#minDelay = minDelay;
-        this.#updateConsumer = updateConsumer;
+        this.minDelay = minDelay;
+        this.updateConsumer = updateConsumer;
     }
 
     setValue(newValue: T): void {
-        if (this.#timeout !== undefined) {
-            this.#nextValue = newValue;
+        if (this.timeout !== undefined) {
+            this.nextValue = newValue;
             return;
         }
 
         const now = performance.now();
-        const delay = now - this.#lastRealUpdate;
+        const delay = now - this.lastRealUpdate;
 
-        if (delay >= this.#minDelay) {
-            this.#lastRealUpdate = now;
-            this.#updateConsumer(newValue);
+        if (delay >= this.minDelay) {
+            this.lastRealUpdate = now;
+            this.updateConsumer(newValue);
             return;
         }
 
-        const scheduleDelay = this.#minDelay - delay;
+        const scheduleDelay = this.minDelay - delay;
 
-        this.#timeout = setTimeout(() => {
-            this.#timeout = undefined;
+        this.timeout = setTimeout(() => {
+            this.timeout = undefined;
 
-            if (this.#nextValue !== null) {
-                this.#updateConsumer(this.#nextValue);
-                this.#nextValue = null;
+            if (this.nextValue !== null) {
+                this.updateConsumer(this.nextValue);
+                this.nextValue = null;
             }
         }, scheduleDelay) as any as TimeoutId;
     }
 
     abort(): void {
-        if (this.#timeout !== undefined) {
-            clearTimeout(this.#timeout);
-            this.#timeout = undefined;
+        if (this.timeout !== undefined) {
+            clearTimeout(this.timeout);
+            this.timeout = undefined;
         }
     }
 }

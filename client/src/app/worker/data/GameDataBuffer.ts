@@ -12,22 +12,22 @@ import { DataUpdateDTO } from "../../data/dto/DataUpdateDTO";
 export default class GameDataBuffer {
     config: GameConfig;
 
-    #leaderboard: LeaderboardDTO | undefined;
-    #updateQueue: DecodedGameUpdate[] = [];
-    #snakeDeaths: SnakeId[] = [];
+    private leaderboard: LeaderboardDTO | undefined;
+    private updateQueue: DecodedGameUpdate[] = [];
+    private snakeDeaths: SnakeId[] = [];
 
     init(spawnInfo: SpawnInfo): void {
         this.config = spawnInfo.gameConfig;
     }
 
     nextUpdate(): DataUpdateDTO {
-        const dataUpdate = this.#updateQueue.shift();
+        const dataUpdate = this.updateQueue.shift();
 
-        const leaderboard = this.#leaderboard;
-        this.#leaderboard = undefined;
+        const leaderboard = this.leaderboard;
+        this.leaderboard = undefined;
 
-        const snakeDeaths = this.#snakeDeaths;
-        this.#snakeDeaths = [];
+        const snakeDeaths = this.snakeDeaths;
+        this.snakeDeaths = [];
 
         return {
             ticksSinceLastUpdate: dataUpdate
@@ -43,18 +43,18 @@ export default class GameDataBuffer {
 
     addBinaryUpdate(buffer: ArrayBuffer): void {
         const update = GameUpdateDecoder.decode(this.config, buffer);
-        this.#updateQueue.push(update);
+        this.updateQueue.push(update);
     }
 
     addJSONUpdate(update: ServerToClientJSONMessage): void {
         switch (update.tag) {
             case "SnakeDeathInfo": {
                 console.info(`Snake ${update.snakeId} has died.`);
-                this.#snakeDeaths.push(update.snakeId);
+                this.snakeDeaths.push(update.snakeId);
                 break;
             }
             case "Leaderboard": {
-                this.#leaderboard = {
+                this.leaderboard = {
                     list: update.list
                 };
                 break;

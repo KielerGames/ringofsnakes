@@ -27,14 +27,22 @@ describe("SnakeChunk", () => {
     });
 
     describe("offset prediction", () => {
-        test("changes over time", () => {
-            const snake = new SnakeMock(snakeDTO, defaultConfig);
-            const chunk = createSnakeChunkForSnake(snake);
+        const snake = new SnakeMock(snakeDTO, defaultConfig);
 
-            // mock snake.speed
-            const speedMock = jest.fn();
-            Object.defineProperty(snake, "speed", { get: speedMock });
-            speedMock.mockReturnValue(1.0);
+        const snakeSpeedMock = jest.fn();
+        Object.defineProperty(snake, "speed", { get: snakeSpeedMock });
+
+        const snakeLengthMock = jest.fn();
+        Object.defineProperty(snake, "length", { get: snakeLengthMock });
+
+        beforeEach(() => {
+            snakeSpeedMock.mockClear();
+            snakeLengthMock.mockClear();
+        });
+
+        test("with constant speed", () => {
+            snakeSpeedMock.mockReturnValue(1.0);
+            const chunk = createSnakeChunkForSnake(snake);
 
             for (let d = 0; d < 42; d++) {
                 FrameTime.update(d * 1000);
@@ -42,7 +50,46 @@ describe("SnakeChunk", () => {
                 expect(chunk.offset).toBeCloseTo(d, 6);
             }
 
-            expect(speedMock).toBeCalled();
+            expect(snakeSpeedMock).toBeCalled();
+        });
+
+        test("approximates correct value over time", () => {
+            snakeSpeedMock.mockReturnValue(1.0);
+            const chunk = createSnakeChunkForSnake(snake);
+
+            FrameTime.update(1000);
+            chunk.predict();
+
+            const change = 42;
+
+            let correctOffset = chunk.offset + change;
+            FrameTime.update(2000);
+            chunk.updateOffset(change);
+            chunk.predict();
+            let lastError = Math.abs(correctOffset - chunk.offset);
+
+            for (let i = 1; i < 32; i++) {
+                correctOffset += 1.0;
+                FrameTime.update(3000 + i * 1000);
+                chunk.predict();
+                const error = Math.abs(correctOffset - chunk.offset);
+                expect(error).toBeLessThan(lastError);
+                lastError = error;
+            }
+        });
+
+        test("does not change chunk junk state", () => {
+            snakeSpeedMock.mockReturnValue(1.0);
+            snakeSpeedMock.mockReturnValue(4.2);
+            const chunk = createSnakeChunkForSnake(snake);
+            expect(chunk.junk).toBe(false);
+            for(let i=1; i<100; i++) {
+                FrameTime.update(i * 1000);
+                chunk.predict();
+                expect(chunk.junk).toBe(false);
+            }
+            chunk.updateOffset(13);
+            expect(chunk.junk).toBe(true);
         });
     });
 });

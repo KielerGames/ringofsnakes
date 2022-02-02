@@ -1,31 +1,52 @@
 jest.mock("../../../src/app/data/snake/Snake");
-import Snake from "../../../src/app/data/snake/Snake";
+import SnakeMock from "../../../src/app/data/snake/Snake";
 
 import SnakeChunk from "../../../src/app/data/snake/SnakeChunk";
-import Rectangle from "../../../src/app/math/Rectangle";
-import Vector from "../../../src/app/math/Vector";
 import defaultConfig from "../config/GameConfig.prefab";
 import snakeDTO from "../dto/SnakeDTO.prefab";
+import * as FrameTime from "../../../src/app/util/FrameTime";
+import { createSnakeChunkDTO } from "../dto/SnakeChunkDTO.prefab";
 
-beforeEach(() => {
-    //@ts-ignore
-    Snake.mockClear();
-});
-
-test("SnakeChunk registers itself", () => {
-    const snake = new Snake(snakeDTO, defaultConfig) as jest.Mocked<Snake>;
-
-    const chunk = new SnakeChunk(snake, {
-        id: 0,
-        snakeId: snake.id,
-
-        data: new Float32Array(0),
-        vertices: 0,
-        boundingBox: Rectangle.createAt(new Vector(0, 0), 4, 4), // ignores the snake width
-
-        length: 4,
-        offset: 0,
-        full: false
+describe("SnakeChunk", () => {
+    beforeEach(() => {
+        FrameTime.update(0);
+        jest.mocked(SnakeMock).mockClear();
     });
-    expect(snake.registerSnakeChunk).toHaveBeenCalledTimes(1);
+
+    test("registration", () => {
+        const snake = new SnakeMock(snakeDTO, defaultConfig);
+        const chunk = createSnakeChunkForSnake(snake);
+
+        expect(snake.registerSnakeChunk).toHaveBeenCalledTimes(1);
+        expect(snake.unregisterSnakeChunk).not.toHaveBeenCalled();
+
+        chunk.destroy();
+
+        expect(snake.registerSnakeChunk).toHaveBeenCalledTimes(1);
+        expect(snake.unregisterSnakeChunk).toHaveBeenCalledTimes(1);
+    });
+
+    describe("offset prediction", () => {
+        test("changes over time", () => {
+            const snake = new SnakeMock(snakeDTO, defaultConfig);
+            const chunk = createSnakeChunkForSnake(snake);
+
+            // mock snake.speed
+            const speedMock = jest.fn();
+            Object.defineProperty(snake, "speed", { get: speedMock });
+            speedMock.mockReturnValue(1.0);
+
+            for (let d = 0; d < 42; d++) {
+                FrameTime.update(d * 1000);
+                chunk.predict();
+                expect(chunk.offset).toBeCloseTo(d, 6);
+            }
+
+            expect(speedMock).toBeCalled();
+        });
+    });
 });
+
+function createSnakeChunkForSnake(snake: SnakeMock): SnakeChunk {
+    return new SnakeChunk(snake, createSnakeChunkDTO({ snakeId: snake.id }));
+}

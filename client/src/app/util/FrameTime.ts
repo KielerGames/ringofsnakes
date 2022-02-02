@@ -9,6 +9,7 @@ export function now(): number {
 
 /**
  * This should be called once per frame.
+ * @param time the time in milliseconds.
  */
 export function update(time: number = performance.now()): void {
     currentTime = time;

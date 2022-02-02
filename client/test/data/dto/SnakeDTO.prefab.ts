@@ -16,8 +16,8 @@ export default snakeDTO;
 
 export function createSnakeDTO(nonDefaults: Partial<SnakeDTO>): SnakeDTO {
     const dto = { ...snakeDTO, ...nonDefaults };
-     if(nonDefaults.fast !== undefined) {
-         dto.fastHistory[0] = nonDefaults.fast;
-     }
+    if (nonDefaults.fast !== undefined) {
+        dto.fastHistory[0] = nonDefaults.fast;
+    }
     return dto;
 }

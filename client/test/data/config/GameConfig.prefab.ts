@@ -3,12 +3,12 @@ import { GameConfig } from "../../../src/app/data/config/GameConfig";
 const defaultConfig: GameConfig = {
     chunks: {
         size: 32.0,
-        columns: 16,
-        rows: 16
+        columns: 8,
+        rows: 8
     },
     snakes: {
-        speed: 0.24,
-        fastSpeed: 2 * 0.24,
+        speed: 1,
+        fastSpeed: 2,
         maxTurnDelta: 0.05236,
         minLength: 6,
         startLength: 8,
@@ -18,7 +18,7 @@ const defaultConfig: GameConfig = {
         turnRateLimiting: 0.85
     },
 
-    tickDuration: 1.0 / 25.0,
+    tickDuration: 1.0,
     foodNutritionalValue: 1.0,
     foodConversionEfficiency: 0.5,
     selfCollision: false

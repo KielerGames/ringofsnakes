@@ -2,7 +2,6 @@ import { DecodeResult } from "./DecodeResult";
 import { normalizeAngle } from "../../math/Angle";
 import { GameConfig } from "../../data/config/GameConfig";
 import Rectangle from "../../math/Rectangle";
-import assert from "../../util/assert";
 import { SnakeChunkDTO } from "../../data/dto/SnakeChunkDTO";
 import SnakeChunkVertexBufferBuilder from "./helper/SnakeChunkVertexBufferBuilder";
 

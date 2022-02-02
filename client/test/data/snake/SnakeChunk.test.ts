@@ -55,7 +55,7 @@ describe("SnakeChunk", () => {
 
         test("approximates correct value over time", () => {
             snakeSpeedMock.mockReturnValue(1.0);
-            const chunk = createSnakeChunkForSnake(snake);
+            const chunk = createSnakeChunkForSnake(snake, true);
 
             FrameTime.update(1000);
             chunk.predict();
@@ -81,9 +81,9 @@ describe("SnakeChunk", () => {
         test("does not change chunk junk state", () => {
             snakeSpeedMock.mockReturnValue(1.0);
             snakeSpeedMock.mockReturnValue(4.2);
-            const chunk = createSnakeChunkForSnake(snake);
+            const chunk = createSnakeChunkForSnake(snake, true);
             expect(chunk.junk).toBe(false);
-            for(let i=1; i<100; i++) {
+            for (let i = 1; i < 100; i++) {
                 FrameTime.update(i * 1000);
                 chunk.predict();
                 expect(chunk.junk).toBe(false);
@@ -94,6 +94,12 @@ describe("SnakeChunk", () => {
     });
 });
 
-function createSnakeChunkForSnake(snake: SnakeMock): SnakeChunk {
-    return new SnakeChunk(snake, createSnakeChunkDTO({ snakeId: snake.id }));
+function createSnakeChunkForSnake(
+    snake: SnakeMock,
+    final: boolean = false
+): SnakeChunk {
+    return new SnakeChunk(
+        snake,
+        createSnakeChunkDTO({ snakeId: snake.id, full: final })
+    );
 }

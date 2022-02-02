@@ -1,6 +1,6 @@
 import { GameConfig } from "../../../src/app/data/config/GameConfig";
 
-export const defaultConfig: GameConfig = {
+const defaultConfig: GameConfig = {
     chunks: {
         size: 32.0,
         columns: 16,
@@ -23,3 +23,5 @@ export const defaultConfig: GameConfig = {
     foodConversionEfficiency: 0.5,
     selfCollision: false
 };
+
+export default defaultConfig;

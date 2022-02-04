@@ -86,6 +86,11 @@ export default class Snake {
     }
 
     registerSnakeChunk(chunk: SnakeChunk): void {
+        if (__DEBUG__ && this.chunks.has(chunk.id)) {
+            console.warn(
+                `Snake ${this.id} already has a registered chunk with id ${chunk.id}.`
+            );
+        }
         this.chunks.set(chunk.id, chunk);
     }
 
@@ -224,6 +229,10 @@ export default class Snake {
     }
 
     private updateChunkOffsets(ticks: number, fastHistory: boolean[]) {
+        if (ticks === 0.0) {
+            return;
+        }
+
         const fastSpeed = this.gameConfig.snakes.fastSpeed;
         const slowSpeed = this.gameConfig.snakes.speed;
 

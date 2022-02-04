@@ -1,8 +1,12 @@
-import SnakeChunkMock from "./snake/SnakeChunk.mock";
 import Game from "../../src/app/data/Game";
 import RemoteMock, { clearDefaultRemoteMock } from "../worker/worker.mock";
-import { emptyDataUpdate } from "./dto/DataUpdateDTO.prefab";
+import {
+    createSingleSnakeDataUpdate,
+    emptyDataUpdate
+} from "./dto/DataUpdateDTO.prefab";
 import * as UserInput from "../../src/app/input/UserInput";
+import { DataUpdateDTO } from "../../src/app/data/dto/DataUpdateDTO";
+import * as FrameTime from "../../src/app/util/FrameTime";
 
 jest.mock("../../src/app/worker/WorkerFactory", () => ({
     default: () => RemoteMock
@@ -16,10 +20,19 @@ jest.mock("comlink", () => ({
     proxy: (callback: Function) => callback
 }));
 
+async function updateGame(game: Game, dto: DataUpdateDTO): Promise<void> {
+    const mock = RemoteMock.addEventListener.mock;
+    expect(mock.calls[0][0]).toBe("server-update");
+    const serverUpdateNotifier = mock.calls[0][1];
+    serverUpdateNotifier();
+    RemoteMock.getDataChanges.mockReturnValueOnce(dto);
+    await game.update();
+}
+
 describe("Game", () => {
     beforeEach(() => {
         clearDefaultRemoteMock();
-        SnakeChunkMock.mockClear();
+        FrameTime.update(0.0);
     });
 
     afterEach(() => {
@@ -30,29 +43,49 @@ describe("Game", () => {
         await Game.joinAsPlayer("TestPlayer");
     });
 
-    describe("Updates", () => {
-        it("should only update after notification", async () => {
+    it("should only update after notification", async () => {
+        const [game] = await Game.joinAsPlayer("TestPlayer");
+
+        // without an update notification game.update should not do anything
+        await game.update();
+        expect(RemoteMock.getDataChanges).not.toHaveBeenCalled();
+
+        await updateGame(game, emptyDataUpdate);
+        expect(RemoteMock.getDataChanges).toHaveBeenCalledTimes(1);
+    });
+
+    describe("Prediction", () => {
+        const snakeId = 1;
+        test("SnakeChunks should be predicted once", async () => {
             const [game] = await Game.joinAsPlayer("TestPlayer");
+            await updateGame(game, createSingleSnakeDataUpdate(snakeId, 1, 0));
 
-            expect(RemoteMock.addEventListener.mock.calls[0][0]).toBe(
-                "server-update"
+            const spies = Array.from(game.snakeChunks.values()).map((chunk) =>
+                jest.spyOn(chunk, "predict")
             );
 
-            const serverUpdateNotifier =
-                RemoteMock.addEventListener.mock.calls[0][1];
+            FrameTime.update(1000);
+            game.predict();
 
-            // without an update notification game.update should not do anything
-            await game.update();
+            for(const spy of spies) {
+                expect(spy).toBeCalledTimes(1);
+            }
+        });
 
-            serverUpdateNotifier();
-            expect(RemoteMock.getDataChanges).not.toHaveBeenCalled();
+        test("Snakes should be predicted once", async () => {
+            const [game] = await Game.joinAsPlayer("TestPlayer");
+            await updateGame(game, createSingleSnakeDataUpdate(snakeId, 1, 0));
 
-            RemoteMock.getDataChanges.mockReturnValue(
-                Promise.resolve(emptyDataUpdate)
+            const spies = Array.from(game.snakes.values()).map((snake) =>
+                jest.spyOn(snake, "predict")
             );
 
-            await game.update();
-            expect(RemoteMock.getDataChanges).toHaveBeenCalledTimes(1);
+            FrameTime.update(1000);
+            game.predict();
+
+            for(const spy of spies) {
+                expect(spy).toBeCalledTimes(1);
+            }
         });
     });
 });

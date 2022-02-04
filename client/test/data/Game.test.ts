@@ -2,13 +2,10 @@ import SnakeChunkMock from "./snake/SnakeChunk.mock";
 import Game from "../../src/app/data/Game";
 import RemoteMock, { clearDefaultRemoteMock } from "../worker/worker.mock";
 import { emptyDataUpdate } from "./dto/DataUpdateDTO.prefab";
+import * as UserInput from "../../src/app/input/UserInput";
 
 jest.mock("../../src/app/worker/WorkerFactory", () => ({
     default: () => RemoteMock
-}));
-
-jest.mock("../../src/app/input/UserInput", () => ({
-    addListener: jest.fn()
 }));
 
 jest.mock("../../src/app/data/config/ClientConfig", () => ({
@@ -23,6 +20,10 @@ describe("Game", () => {
     beforeEach(() => {
         clearDefaultRemoteMock();
         SnakeChunkMock.mockClear();
+    });
+
+    afterEach(() => {
+        UserInput.removeAllListeners();
     });
 
     test("instantiation", async () => {

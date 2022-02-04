@@ -28,12 +28,12 @@ module.exports = {
     mode: "development",
     entry: {
         main: path.join(__dirname, "src", "app", "main.ts"),
-        worker: path.join(__dirname, "src", "app", "worker", "worker.ts"),
+        worker: path.join(__dirname, "src", "app", "worker", "worker.ts")
     },
     target: "web",
     devtool: "eval-cheap-module-source-map",
     resolve: {
-        extensions: [".ts", ".tsx", ".js"],
+        extensions: [".ts", ".tsx", ".js"]
     },
     module: {
         rules: [
@@ -41,18 +41,18 @@ module.exports = {
                 test: /\.tsx?$/,
                 loader: "ts-loader",
                 options: {
-                    onlyCompileBundledFiles: true,
-                },
+                    onlyCompileBundledFiles: true
+                }
             },
             {
                 test: /\.less$/i,
                 use: [
                     { loader: "style-loader" }, //  creates style nodes from JS strings
                     { loader: "css-loader" }, //    translates CSS into a JS module (CommonJS)
-                    { loader: "less-loader" }, //   compiles Less to CSS
-                ],
-            },
-        ],
+                    { loader: "less-loader" } //   compiles Less to CSS
+                ]
+            }
+        ]
     },
     plugins: [
         new webpack.DefinePlugin(
@@ -60,13 +60,14 @@ module.exports = {
                 {
                     __VERSION__: JSON.stringify(`${pkg.version}-dev`),
                     __DEBUG__: "true",
+                    __TEST__: "false"
                 },
                 shaders
             )
-        ),
+        )
     ],
     output: {
         filename: "[name].bundle.js",
-        path: path.resolve(__dirname, "public"),
-    },
+        path: path.resolve(__dirname, "public")
+    }
 };

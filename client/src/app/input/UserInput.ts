@@ -14,8 +14,13 @@ export function addListener(listener: UserInputListener) {
     }
 }
 
+// TODO this should be called
 export function removeListener(listener: UserInputListener) {
     listeners.delete(listener);
+}
+
+export function removeAllListeners():void {
+    listeners.clear();
 }
 
 export function init(clickCatcher: HTMLElement): void {

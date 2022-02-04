@@ -5,6 +5,8 @@ module.exports = {
     testMatch: ["**/test/**/*.test.ts"],
     testTimeout: 1000,
     globals: {
-        __DEBUG__: true
+        __DEBUG__: true,
+        __TEST__: true,
+        __VERSION__: "TEST VERSION"
     }
 };

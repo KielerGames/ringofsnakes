@@ -1,14 +1,6 @@
 import assert from "../../util/assert";
 import InputSource from "./InputSource";
 
-window.addEventListener("pointermove", (e) => {
-    const x = e.pageX - 0.5 * window.innerWidth;
-    const y = 0.5 * window.innerHeight - e.pageY;
-    if (x * x + y * y > 1) {
-        const alpha = Math.atan2(y, x);
-    }
-});
-
 export default class PointerInput extends InputSource {
     private clickCatcher: HTMLElement | null = null;
 

@@ -59,6 +59,7 @@ module.exports = {
                 {
                     __VERSION__: JSON.stringify(pkg.version),
                     __DEBUG__: "false",
+                    __TEST__: "false"
                 },
                 shaders
             )

@@ -1,20 +1,17 @@
-jest.mock("../../../src/app/data/snake/Snake");
-import SnakeMock from "../../../src/app/data/snake/Snake";
-
+import SnakeMock, { createSnakeMock } from "./Snake.mock";
 import SnakeChunk from "../../../src/app/data/snake/SnakeChunk";
-import defaultConfig from "../config/GameConfig.prefab";
-import snakeDTO from "../dto/SnakeDTO.prefab";
 import * as FrameTime from "../../../src/app/util/FrameTime";
 import { createSnakeChunkDTO } from "../dto/SnakeChunkDTO.prefab";
+import Snake from "../../../src/app/data/snake/Snake";
 
 describe("SnakeChunk", () => {
     beforeEach(() => {
         FrameTime.update(0);
-        jest.mocked(SnakeMock).mockClear();
+        SnakeMock.mockClear();
     });
 
     test("registration", () => {
-        const snake = new SnakeMock(snakeDTO, defaultConfig);
+        const snake = createSnakeMock();
         const chunk = createSnakeChunkForSnake(snake);
 
         expect(snake.registerSnakeChunk).toHaveBeenCalledTimes(1);
@@ -27,7 +24,7 @@ describe("SnakeChunk", () => {
     });
 
     describe("offset prediction", () => {
-        const snake = new SnakeMock(snakeDTO, defaultConfig);
+        const snake = createSnakeMock();
 
         const snakeSpeedMock = jest.fn();
         Object.defineProperty(snake, "speed", { get: snakeSpeedMock });
@@ -95,7 +92,7 @@ describe("SnakeChunk", () => {
 });
 
 function createSnakeChunkForSnake(
-    snake: SnakeMock,
+    snake: Snake,
     final: boolean = false
 ): SnakeChunk {
     return new SnakeChunk(

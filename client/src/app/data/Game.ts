@@ -10,6 +10,7 @@ import assert from "../util/assert";
 import Vector from "../math/Vector";
 import Player from "./Player";
 import FoodChunk from "./world/FoodChunk";
+import createRemote from "../worker/WorkerFactory";
 
 export default class Game {
     camera: Camera = new Camera();
@@ -25,9 +26,7 @@ export default class Game {
     private stopped: boolean = false;
 
     private constructor() {
-        this.remote = Comlink.wrap<WorkerAPI>(
-            new Worker("worker.bundle.js", { name: "SnakeWorker" })
-        );
+        this.remote = createRemote();
     }
 
     static async joinAsPlayer(name: string): Promise<[Game, Player]> {

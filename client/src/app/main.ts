@@ -21,6 +21,8 @@ uiRoot.id = "root";
 document.body.appendChild(uiRoot);
 UserInput.init(uiRoot);
 
+document.title = `Snake Royale ${__VERSION__}`;
+
 (async () => {
     FrameTime.update(performance.now());
     const [game, player] = await Game.joinAsPlayer("SnakeForceOne");

@@ -7,11 +7,12 @@ import { getMinDifference, normalizeAngle } from "../../math/Angle";
 import { clamp } from "../../math/CommonFunctions";
 import Camera from "../camera/Camera";
 import Rectangle from "../../math/Rectangle";
+import { ManagedObject } from "../../util/ManagedMap";
 
 /**
  * Represents a snake on the main thread.
  */
-export default class Snake {
+export default class Snake implements ManagedObject<number, SnakeDTO> {
     readonly id: number;
     readonly skin: number;
     target: boolean = false;
@@ -113,8 +114,6 @@ export default class Snake {
 
         return Rectangle.distance2(headBox, camera.viewBox) < epsilon * epsilon;
     }
-
-    destroy() {}
 
     get headChunk(): SnakeChunk | undefined {
         return this.chunks.get(this.headChunkId);

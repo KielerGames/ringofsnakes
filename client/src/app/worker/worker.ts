@@ -121,6 +121,7 @@ function triggerEvent(event: WorkerEvent): void {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 self.onerror = (event, source, lineno, colno, error) => {
     // TODO
     triggerEvent("error");

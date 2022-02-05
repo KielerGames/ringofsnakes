@@ -6,17 +6,20 @@ import Camera from "./camera/Camera";
 import Snake from "./snake/Snake";
 import SnakeChunk from "./snake/SnakeChunk";
 import { LeaderboardDTO } from "./dto/Leaderboard";
-import assert from "../util/assert";
 import Vector from "../math/Vector";
 import Player from "./Player";
 import FoodChunk from "./world/FoodChunk";
 import createRemote from "../worker/WorkerFactory";
+import { ManagedMap } from "../util/ManagedMap";
+import { SnakeDTO } from "./dto/SnakeDTO";
+import { SnakeChunkDTO } from "./dto/SnakeChunkDTO";
+import { FoodChunkDTO } from "./dto/FoodChunkDTO";
 
 export default class Game {
     camera: Camera = new Camera();
-    readonly snakes: Map<SnakeId, Snake> = new Map();
-    readonly snakeChunks: Map<SnakeChunkId, SnakeChunk> = new Map();
-    readonly foodChunks: Map<FoodChunkId, FoodChunk> = new Map();
+    readonly snakes: ManagedMap<SnakeDTO, SnakeId, Snake>;
+    readonly snakeChunks: ManagedMap<SnakeChunkDTO, SnakeChunkId, SnakeChunk>;
+    readonly foodChunks: ManagedMap<FoodChunkDTO, FoodChunkId, FoodChunk>;
     leaderboard: LeaderboardDTO = { list: [] };
 
     private remote: Comlink.Remote<WorkerAPI>;
@@ -27,6 +30,15 @@ export default class Game {
 
     private constructor() {
         this.remote = createRemote();
+        this.snakes = new ManagedMap((dto) => new Snake(dto, this.config));
+        this.snakeChunks = new ManagedMap((dto) => {
+            const snake = this.snakes.get(dto.snakeId);
+            if (snake === undefined) {
+                throw new Error(`SnakeChunk for unknown snake ${dto.snakeId}.`);
+            }
+            return new SnakeChunk(snake, dto);
+        });
+        this.foodChunks = new ManagedMap((dto) => new FoodChunk(dto));
     }
 
     static async joinAsPlayer(name: string): Promise<[Game, Player]> {
@@ -78,26 +90,16 @@ export default class Game {
 
         // update snakes
         for (const dto of changes.snakes) {
-            if (this.snakes.has(dto.id)) {
-                this.snakes.get(dto.id)!.update(dto, ticks);
-            } else {
-                const snake = new Snake(dto, this.config);
-                this.snakes.set(dto.id, snake);
-                if (snake.id === this.targetSnakeId) {
-                    snake.target = true;
-                }
-            }
+            this.snakes.addDTO(dto, ticks);
+            // TODO tim-we:
+            // if (snake.id === this.targetSnakeId) {
+            //     snake.target = true;
+            // }
         }
 
         // update snake chunks
         for (const dto of changes.snakeChunks) {
-            if (this.snakeChunks.has(dto.id)) {
-                this.snakeChunks.get(dto.id)!.update(dto);
-            } else {
-                const snake = this.snakes.get(dto.snakeId)!;
-                assert(snake !== undefined, "SnakeChunk for unknown snake.");
-                this.snakeChunks.set(dto.id, new SnakeChunk(snake, dto));
-            }
+            this.snakeChunks.addDTO(dto, ticks);
         }
 
         // remove dead snakes
@@ -109,10 +111,10 @@ export default class Game {
             }
 
             for (const snakeChunk of snake.getSnakeChunksIterator()) {
-                this.snakeChunks.delete(snakeChunk.id);
+                this.snakeChunks.remove(snakeChunk.id);
             }
 
-            this.snakes.delete(snakeId);
+            this.snakes.remove(snakeId);
 
             if (snakeId === this.targetSnakeId) {
                 this.targetSnakeId = undefined;
@@ -123,7 +125,7 @@ export default class Game {
 
         // update food chunks
         for (const dto of changes.foodChunks) {
-            this.foodChunks.set(dto.id, new FoodChunk(dto));
+            this.foodChunks.addDTO(dto, ticks);
         }
 
         this.removeJunk();
@@ -158,12 +160,11 @@ export default class Game {
         const camera = this.camera;
         const safeDist = 2 * this.config.snakes.fastSpeed;
 
-        removeIf(this.snakeChunks, (chunk) => chunk.junk || !chunk.isVisible(camera, safeDist));
+        this.snakeChunks.removeIf((chunk) => chunk.junk || !chunk.isVisible(camera, safeDist));
 
-        removeIf(this.foodChunks, (chunk) => !chunk.isVisible(camera, safeDist) && chunk.age > 2.0);
+        this.foodChunks.removeIf((chunk) => !chunk.isVisible(camera, safeDist) && chunk.age > 2.0);
 
-        removeIf(
-            this.snakes,
+        this.snakes.removeIf(
             (snake) =>
                 snake.id !== this.targetSnakeId &&
                 !snake.hasChunks() &&
@@ -175,26 +176,3 @@ export default class Game {
 type SnakeId = number;
 type SnakeChunkId = number;
 type FoodChunkId = number;
-
-type JunkDetector<T> = (obj: T) => boolean;
-type Destroyable = { destroy: () => void };
-
-function removeIf<K, V extends Destroyable>(map: Map<K, V>, isJunk: JunkDetector<V>): number {
-    // collect junk
-    const removeList: K[] = [];
-    for (const [key, value] of map) {
-        if (isJunk(value)) {
-            removeList.push(key);
-            if (value.destroy) {
-                value.destroy();
-            }
-        }
-    }
-
-    // remove junk
-    for (const key of removeList) {
-        map.delete(key);
-    }
-
-    return removeList.length;
-}

@@ -80,7 +80,7 @@ export default class Game {
         }
 
         const changes = await this.remote.getDataChanges();
-        this.updateAvailable = false;
+        this.updateAvailable = changes.moreUpdates;
         const ticks = changes.ticksSinceLastUpdate;
 
         // update leaderboard

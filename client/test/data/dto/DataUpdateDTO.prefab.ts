@@ -7,7 +7,8 @@ export const emptyDataUpdate: DataUpdateDTO = {
     snakes: [],
     snakeChunks: [],
     snakeDeaths: [],
-    foodChunks: []
+    foodChunks: [],
+    moreUpdates: false
 };
 
 export function createSingleSnakeDataUpdate(
@@ -29,6 +30,7 @@ export function createSingleSnakeDataUpdate(
               ]
             : [],
         snakeDeaths: [],
-        foodChunks: []
+        foodChunks: [],
+        moreUpdates: false
     };
 }

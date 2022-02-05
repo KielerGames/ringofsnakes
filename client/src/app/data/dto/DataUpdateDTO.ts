@@ -10,6 +10,7 @@ export type DataUpdateDTO = {
     leaderboard?: LeaderboardDTO;
     snakeDeaths: SnakeId[];
     foodChunks: FoodChunkDTO[];
+    moreUpdates: boolean;
 };
 
 type SnakeId = number;

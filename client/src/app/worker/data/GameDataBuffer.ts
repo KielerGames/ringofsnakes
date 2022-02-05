@@ -22,6 +22,7 @@ export default class GameDataBuffer {
 
     nextUpdate(): DataUpdateDTO {
         const dataUpdate = this.updateQueue.shift();
+        const moreUpdates = this.updateQueue.length > 0;
 
         const leaderboard = this.leaderboard;
         this.leaderboard = undefined;
@@ -35,7 +36,8 @@ export default class GameDataBuffer {
             snakeChunks: dataUpdate ? dataUpdate.snakeChunkData : [],
             foodChunks: dataUpdate ? dataUpdate.foodChunkData : [],
             snakeDeaths,
-            leaderboard
+            leaderboard,
+            moreUpdates
         };
     }
 

@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 type FloatData = null | number | number[] | Float32Array;
 
 export default class WebGLShaderProgram {

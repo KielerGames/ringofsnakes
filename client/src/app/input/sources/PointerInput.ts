@@ -31,7 +31,7 @@ export default class PointerInput extends InputSource {
     }
 
     public setClickCatcher(element: HTMLElement): void {
-        assert(element != null);
+        assert(element !== null);
 
         if (this.clickCatcher !== null) {
             // remove previous event listeners

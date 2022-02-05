@@ -9,7 +9,14 @@
         "@typescript-eslint/no-inferrable-types": "off",
         "no-empty-function": "off",
         "@typescript-eslint/no-empty-function": "warn",
-        "no-bitwise": "error"
+        "no-bitwise": "error",
+        "no-eval": "error",
+        "no-eq-null": "error",
+        "no-alert": "warn",
+        "max-classes-per-file": ["error", 1],
+        "no-implicit-coercion": "error",
+        "no-extend-native": "error",
+        "no-lonely-if": "error"
     },
     "env": {
         "browser": true

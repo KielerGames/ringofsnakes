@@ -10,7 +10,7 @@ const initialBuffers = 16;
 
     for (let i = 0; i < initialBuffers; i++) {
         const buffer = gl.createBuffer();
-        assert(buffer != null, "Buffer is null");
+        assert(buffer !== null, "Buffer is null");
         freeBuffers.push(buffer!);
     }
 })();
@@ -22,7 +22,7 @@ export function create(): WebGLBuffer {
         return freeBuffers.pop()!;
     } else {
         const buffer = gl.createBuffer();
-        assert(buffer != null, "Buffer is null");
+        assert(buffer !== null, "Buffer is null");
         return buffer!;
     }
 }

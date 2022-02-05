@@ -54,7 +54,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO> {
         this.lastUpdateTime = FrameTime.now();
         this._length = dto.length;
         if (__DEBUG__ && dto.headChunkId !== this.headChunkId && this.headChunkId !== undefined) {
-            console.log(
+            console.info(
                 `Head chunk changed on snake ${this.id} from ${this.headChunkId} to ${dto.headChunkId}`
             );
         }

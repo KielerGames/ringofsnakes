@@ -158,10 +158,10 @@ export default class Game {
             removedChunks
                 .filter((chunk) => chunk.snake.id === this.targetSnakeId)
                 .forEach((chunk) => {
-                    const reasons = [];
-                    if (chunk.junk) {
-                        reasons.push("junk");
+                    if (!chunk.junk) {
+                        return;
                     }
+                    const reasons = ["junk"];
                     if (!chunk.isVisible(camera, safeDist)) {
                         reasons.push("not visible");
                     }

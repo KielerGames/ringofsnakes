@@ -1,5 +1,5 @@
 import Game from "../../src/app/data/Game";
-import RemoteMock, { clearDefaultRemoteMock } from "../worker/worker.mock";
+import RemoteMock from "../worker/worker.mock";
 import {
     createSingleSnakeDataUpdate,
     emptyDataUpdate
@@ -31,7 +31,6 @@ async function updateGame(game: Game, dto: DataUpdateDTO): Promise<void> {
 
 describe("Game", () => {
     beforeEach(() => {
-        clearDefaultRemoteMock();
         FrameTime.update(0.0);
     });
 

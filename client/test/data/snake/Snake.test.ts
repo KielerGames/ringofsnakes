@@ -7,7 +7,6 @@ import * as FrameTime from "../../../src/app/util/FrameTime";
 describe("Snake", () => {
     beforeEach(() => {
         FrameTime.update(0);
-        SnakeChunkMock.mockClear();
     });
 
     test("snake updates snake chunks", () => {

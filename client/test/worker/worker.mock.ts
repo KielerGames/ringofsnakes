@@ -7,8 +7,3 @@ const defaultRemoteMock = {
 };
 
 export default defaultRemoteMock;
-
-export function clearDefaultRemoteMock(): void {
-    defaultRemoteMock.addEventListener.mockClear();
-    defaultRemoteMock.getDataChanges.mockClear();
-}

@@ -1,4 +1,4 @@
-import SnakeMock, { createSnakeMock } from "./Snake.mock";
+import { createSnakeMock } from "./Snake.mock";
 import SnakeChunk from "../../../src/app/data/snake/SnakeChunk";
 import * as FrameTime from "../../../src/app/util/FrameTime";
 import { createSnakeChunkDTO } from "../dto/SnakeChunkDTO.prefab";
@@ -7,7 +7,6 @@ import Snake from "../../../src/app/data/snake/Snake";
 describe("SnakeChunk", () => {
     beforeEach(() => {
         FrameTime.update(0);
-        SnakeMock.mockClear();
     });
 
     test("registration", () => {
@@ -31,11 +30,6 @@ describe("SnakeChunk", () => {
 
         const snakeLengthMock = jest.fn();
         Object.defineProperty(snake, "length", { get: snakeLengthMock });
-
-        beforeEach(() => {
-            snakeSpeedMock.mockClear();
-            snakeLengthMock.mockClear();
-        });
 
         test("with constant speed", () => {
             snakeSpeedMock.mockReturnValue(1.0);

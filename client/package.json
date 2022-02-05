@@ -15,7 +15,8 @@
         "build:production": "webpack --config webpack.config.production.js",
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\"",
         "lint": "tslint -p tsconfig.json",
-        "check:format": "prettier --check --no-color \"src/**/*.ts\" \"src/**/*.tsx\""
+        "check:format": "prettier --check --no-color \"src/**/*.ts\" \"src/**/*.tsx\"",
+        "coverage": "jest --maxWorkers=1 --coverage"
     },
     "author": "Tim Weißenfels",
     "devDependencies": {

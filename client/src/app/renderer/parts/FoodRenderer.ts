@@ -37,7 +37,7 @@ export function render(game: Readonly<Game>, transform: Matrix) {
     shader.setUniform("uTransform", transform.data);
 
     const attractor = targetSnake ? targetSnake.position : FAR_AWAY;
-    shader.setUniform("uPlayerPosition", [attractor.x, attractor.y]);
+    shader.setUniform("uAttractorPosition", [attractor.x, attractor.y]);
 
     for (const chunk of game.foodChunks.values()) {
         if (!chunk.isVisible(game.camera)) {

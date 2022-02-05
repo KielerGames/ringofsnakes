@@ -9,10 +9,7 @@ import { SnakeChunkDTO } from "../../data/dto/SnakeChunkDTO";
 
 const UPDATE_HEADER_SIZE = 4;
 
-export function decode(
-    config: GameConfig,
-    buffer: ArrayBuffer
-): DecodedGameUpdate {
+export function decode(config: GameConfig, buffer: ArrayBuffer): DecodedGameUpdate {
     const view = new DataView(buffer);
 
     // read update header
@@ -22,14 +19,13 @@ export function decode(
     const numFoodChunks = view.getUint8(3);
 
     // read snake infos
-    const { data: snakeInfos, nextByteOffset: chunkOffset } =
-        ArrayDecoder.decode(
-            SID.decode,
-            config,
-            numSnakeInfos,
-            buffer,
-            UPDATE_HEADER_SIZE
-        );
+    const { data: snakeInfos, nextByteOffset: chunkOffset } = ArrayDecoder.decode(
+        SID.decode,
+        config,
+        numSnakeInfos,
+        buffer,
+        UPDATE_HEADER_SIZE
+    );
 
     // read chunks
     const { data: chunks, nextByteOffset: foodOffset } = ArrayDecoder.decode(
@@ -41,14 +37,13 @@ export function decode(
     );
 
     // read food
-    const { data: foodChunks, nextByteOffset: endPosition } =
-        ArrayDecoder.decode(
-            FCD.decode,
-            config,
-            numFoodChunks,
-            buffer,
-            foodOffset
-        );
+    const { data: foodChunks, nextByteOffset: endPosition } = ArrayDecoder.decode(
+        FCD.decode,
+        config,
+        numFoodChunks,
+        buffer,
+        foodOffset
+    );
 
     if (endPosition !== buffer.byteLength) {
         console.error(

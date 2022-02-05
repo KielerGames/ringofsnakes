@@ -15,11 +15,7 @@ export default class Leaderboard extends Component<LeaderboardProps> {
         return (
             <div id="leaderboard">
                 {leaderboardData.list.map((entry, index) => (
-                    <LeaderboardView
-                        key={entry.name}
-                        data={entry}
-                        index={index}
-                    />
+                    <LeaderboardView key={entry.name} data={entry} index={index} />
                 ))}
             </div>
         );

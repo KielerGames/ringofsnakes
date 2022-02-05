@@ -2,11 +2,7 @@ import { GameConfig } from "../../data/config/GameConfig";
 import assert from "../../util/assert";
 import { DecodeResult } from "./DecodeResult";
 
-type ItemDecoder<T> = (
-    buffer: ArrayBuffer,
-    offset: number,
-    config: GameConfig
-) => DecodeResult<T>;
+type ItemDecoder<T> = (buffer: ArrayBuffer, offset: number, config: GameConfig) => DecodeResult<T>;
 
 export function decode<T>(
     itemDecoder: ItemDecoder<T>,

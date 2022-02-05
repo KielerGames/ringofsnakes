@@ -27,19 +27,14 @@ export default class WebGLShaderProgram {
 
         // check for errors
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            throw new Error(
-                "Shader linking failed: " + gl.getProgramInfoLog(program)
-            );
+            throw new Error("Shader linking failed: " + gl.getProgramInfoLog(program));
         }
 
         if (__DEBUG__) {
             gl.validateProgram(program);
 
             if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-                console.error(
-                    "WebGL program info log",
-                    gl.getProgramInfoLog(program)
-                );
+                console.error("WebGL program info log", gl.getProgramInfoLog(program));
                 throw new Error("Shader program validation failed.");
             }
         }
@@ -48,10 +43,7 @@ export default class WebGLShaderProgram {
 
         // get shader attributes & uniforms
         // attributes & uniforms are "active" after linking
-        const numberOfAttributes = gl.getProgramParameter(
-            program,
-            gl.ACTIVE_ATTRIBUTES
-        );
+        const numberOfAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
 
         const attribOrder = [];
 
@@ -88,10 +80,7 @@ export default class WebGLShaderProgram {
 
         // uniforms
 
-        const numberOfUniforms = gl.getProgramParameter(
-            program,
-            gl.ACTIVE_UNIFORMS
-        );
+        const numberOfUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
 
         for (let i = 0; i < numberOfUniforms; i++) {
             const info = gl.getActiveUniform(program, i)!;
@@ -147,9 +136,7 @@ export default class WebGLShaderProgram {
             } else {
                 // TODO
                 // gl.vertexAttrib[1234]f[v]()
-                throw new Error(
-                    "Constant values for attributes not yet implemented!"
-                );
+                throw new Error("Constant values for attributes not yet implemented!");
             }
         }
 
@@ -166,21 +153,11 @@ export default class WebGLShaderProgram {
                 } else if (uniform.type === gl.FLOAT_VEC4) {
                     gl.uniform4fv(uniform.location, uniform.value as number[]);
                 } else if (uniform.type === gl.FLOAT_MAT3) {
-                    gl.uniformMatrix3fv(
-                        uniform.location,
-                        false,
-                        uniform.value as number[]
-                    );
+                    gl.uniformMatrix3fv(uniform.location, false, uniform.value as number[]);
                 } else if (uniform.type === gl.FLOAT_MAT4) {
-                    gl.uniformMatrix4fv(
-                        uniform.location,
-                        false,
-                        uniform.value as number[]
-                    );
+                    gl.uniformMatrix4fv(uniform.location, false, uniform.value as number[]);
                 } else {
-                    throw new Error(
-                        `Uniform type ${uniform.type} not implemented.`
-                    );
+                    throw new Error(`Uniform type ${uniform.type} not implemented.`);
                 }
             }
         });
@@ -231,11 +208,7 @@ class ShaderVar<L> {
     }
 }
 
-function compileShader(
-    gl: WebGLRenderingContext,
-    type: number,
-    source: string
-): WebGLShader {
+function compileShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {
     const shader: WebGLShader = gl.createShader(type)!;
 
     // set the source code

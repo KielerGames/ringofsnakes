@@ -8,7 +8,7 @@ import * as FoodRenderer from "./parts/FoodRenderer";
 
 export function render(game: Readonly<Game>): void {
     const gl = WebGLContextProvider.getContext();
-    
+
     updateSize(gl);
     const canvas = gl.canvas as HTMLCanvasElement;
     game.camera.setRatio(canvas.clientWidth, canvas.clientHeight);

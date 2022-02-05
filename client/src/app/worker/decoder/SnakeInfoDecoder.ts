@@ -16,10 +16,7 @@ export function decode(
     const currentDirection = view.getFloat32(10, false);
     const targetDirection = view.getFloat32(14, false);
 
-    const fastHistory: boolean[] = Array.from(
-        { length: 8 },
-        (_, i) => (fastData & (1 << i)) !== 0
-    );
+    const fastHistory: boolean[] = Array.from({ length: 8 }, (_, i) => (fastData & (1 << i)) !== 0);
 
     const data: SnakeDTO = {
         id: view.getUint16(0, false),

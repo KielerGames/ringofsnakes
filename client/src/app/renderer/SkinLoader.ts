@@ -62,11 +62,7 @@ export function setSkinTexture(): void {
     gl.bindTexture(gl.TEXTURE_2D, texture);
 }
 
-export function setColor(
-    shader: WebGLShaderProgram,
-    uniform: string,
-    skinId: number
-): void {
+export function setColor(shader: WebGLShaderProgram, uniform: string, skinId: number): void {
     shader.setUniform(uniform, getColorPosition(skinId));
 }
 

@@ -16,9 +16,7 @@ export default class SnakeList extends Component<SLProps> {
                     ? snakes
                           .filter((snake) => snake.hasChunks())
                           .slice(0, 7)
-                          .map((snake) => (
-                              <SnakeOverview key={snake.id} snake={snake} />
-                          ))
+                          .map((snake) => <SnakeOverview key={snake.id} snake={snake} />)
                     : "No snake data."}
             </div>
         );
@@ -40,9 +38,5 @@ function SnakeOverview(props: SOProps) {
         classes.push("fast");
     }
 
-    return (
-        <div class={classes.join(" ")}>
-            {snake.toString()}
-        </div>
-    );
+    return <div class={classes.join(" ")}>{snake.toString()}</div>;
 }

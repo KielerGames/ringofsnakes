@@ -16,12 +16,9 @@ const defaultConfig: ClientConfig = {
     }
 };
 
-const configPromise: Promise<ClientConfig> = loadJSON<ClientConfig>(
-    "client-config.json",
-    {
-        guard: isValidClientConfig
-    }
-).catch((error) => {
+const configPromise: Promise<ClientConfig> = loadJSON<ClientConfig>("client-config.json", {
+    guard: isValidClientConfig
+}).catch((error) => {
     console.warn("Loading client config failed: " + error);
     return defaultConfig;
 });

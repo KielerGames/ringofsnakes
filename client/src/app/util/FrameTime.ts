@@ -15,10 +15,7 @@ export function now(): number {
  */
 export function update(time: number = performance.now()): void {
     if (time !== 0.0) {
-        assert(
-            time >= currentTime,
-            `Time cannot go backwards (${time} < ${currentTime})`
-        );
+        assert(time >= currentTime, `Time cannot go backwards (${time} < ${currentTime})`);
     }
     currentTime = time;
 }

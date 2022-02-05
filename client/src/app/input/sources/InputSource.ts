@@ -28,8 +28,6 @@ export default abstract class InputSource {
     }
 
     private notifyListeners() {
-        this.listeners.forEach((listener) =>
-            listener(this.wantsFast, this.direction)
-        );
+        this.listeners.forEach((listener) => listener(this.wantsFast, this.direction));
     }
 }

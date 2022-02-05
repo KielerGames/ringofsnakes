@@ -35,18 +35,9 @@ export default class PointerInput extends InputSource {
 
         if (this.clickCatcher !== null) {
             // remove previous event listeners
-            this.clickCatcher.removeEventListener(
-                "pointerdown",
-                this.pointerDownHandler
-            );
-            this.clickCatcher.removeEventListener(
-                "pointerup",
-                this.pointerUpHandler
-            );
-            this.clickCatcher.removeEventListener(
-                "pointercancel",
-                this.pointerUpHandler
-            );
+            this.clickCatcher.removeEventListener("pointerdown", this.pointerDownHandler);
+            this.clickCatcher.removeEventListener("pointerup", this.pointerUpHandler);
+            this.clickCatcher.removeEventListener("pointercancel", this.pointerUpHandler);
         }
 
         // setup event listeners on new element

@@ -36,10 +36,7 @@ export default class Camera {
         this._translation.setEntry(0, 2, -pos.x);
         this._translation.setEntry(1, 2, -pos.y);
 
-        return Matrix.compose(
-            Matrix.compose(this._unstretch, SCALE_MATRIX),
-            this._translation
-        );
+        return Matrix.compose(Matrix.compose(this._unstretch, SCALE_MATRIX), this._translation);
     }
 
     get viewBox(): Rectangle {

@@ -38,9 +38,7 @@ export default class FPSStats extends Component<Props, State> {
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
         // start frame counting
-        this.rafHandle = window.requestAnimationFrame(
-            this.beforeFrame.bind(this)
-        );
+        this.rafHandle = window.requestAnimationFrame(this.beforeFrame.bind(this));
     }
 
     private beforeFrame() {
@@ -65,9 +63,7 @@ export default class FPSStats extends Component<Props, State> {
         this.frameCountCanvas++;
         this.frameCountText++;
 
-        this.rafHandle = window.requestAnimationFrame(
-            this.beforeFrame.bind(this)
-        );
+        this.rafHandle = window.requestAnimationFrame(this.beforeFrame.bind(this));
     }
 
     private updateCanvas() {
@@ -79,13 +75,7 @@ export default class FPSStats extends Component<Props, State> {
         if (fps > this.maxFPS) {
             // update scale
             const height = Math.round((canvas.height * this.maxFPS) / fps);
-            ctx.drawImage(
-                canvas,
-                0,
-                canvas.height - height,
-                canvas.width,
-                height
-            );
+            ctx.drawImage(canvas, 0, canvas.height - height, canvas.width, height);
 
             // draw background
             ctx.fillStyle = "black";
@@ -114,12 +104,7 @@ export default class FPSStats extends Component<Props, State> {
 
         // add new bar
         ctx.fillStyle = "black";
-        ctx.fillRect(
-            canvas.width - barWidth,
-            canvas.height,
-            barWidth,
-            canvas.height
-        );
+        ctx.fillRect(canvas.width - barWidth, canvas.height, barWidth, canvas.height);
         const h = Math.floor((canvas.height * fps) / this.maxFPS);
         ctx.fillStyle = "white";
         ctx.fillRect(canvas.width - barWidth, canvas.height - h, barWidth, h);

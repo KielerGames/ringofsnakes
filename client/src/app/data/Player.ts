@@ -19,7 +19,7 @@ export default class Player {
         this.game = game;
 
         this.inputListener = (wantsFast, direction) => {
-            if(this.alive) {
+            if (this.alive) {
                 this.remote.sendUserInput(direction, wantsFast, this.game.camera.viewBox);
             }
         };

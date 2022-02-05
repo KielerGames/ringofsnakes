@@ -1,7 +1,4 @@
-import {
-    ClientToServerJSONMessage,
-    ServerToClientJSONMessage
-} from "./data/JSONMessages";
+import { ClientToServerJSONMessage, ServerToClientJSONMessage } from "./data/JSONMessages";
 
 export interface Socket {
     onclose: () => void;

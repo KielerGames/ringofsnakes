@@ -17,12 +17,11 @@ const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
 
-    shader = new WebGLShaderProgram(
-        gl,
-        __VERTEXSHADER_FOOD__,
-        __FRAGMENTSHADER_FOOD__,
-        ["aPosition", "aLocalPos", "aColorIndex"]
-    );
+    shader = new WebGLShaderProgram(gl, __VERTEXSHADER_FOOD__, __FRAGMENTSHADER_FOOD__, [
+        "aPosition",
+        "aLocalPos",
+        "aColorIndex"
+    ]);
 })();
 
 export function render(game: Readonly<Game>, transform: Matrix) {

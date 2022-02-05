@@ -10,10 +10,7 @@ type LoadOptions<T> = {
     guard?: TypeGuard<T>;
 };
 
-export async function loadJSON<T>(
-    path: string,
-    options: LoadOptions<T> = {}
-): Promise<T> {
+export async function loadJSON<T>(path: string, options: LoadOptions<T> = {}): Promise<T> {
     // initialize options
     const allowCache = options.allowCache ?? false;
     const guard = options.guard ?? defaultGuard;

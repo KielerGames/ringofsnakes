@@ -158,15 +158,9 @@ export default class Game {
         const camera = this.camera;
         const safeDist = 2 * this.config.snakes.fastSpeed;
 
-        removeIf(
-            this.snakeChunks,
-            (chunk) => chunk.junk || !chunk.isVisible(camera, safeDist)
-        );
+        removeIf(this.snakeChunks, (chunk) => chunk.junk || !chunk.isVisible(camera, safeDist));
 
-        removeIf(
-            this.foodChunks,
-            (chunk) => !chunk.isVisible(camera, safeDist) && chunk.age > 2.0
-        );
+        removeIf(this.foodChunks, (chunk) => !chunk.isVisible(camera, safeDist) && chunk.age > 2.0);
 
         removeIf(
             this.snakes,
@@ -185,10 +179,7 @@ type FoodChunkId = number;
 type JunkDetector<T> = (obj: T) => boolean;
 type Destroyable = { destroy: () => void };
 
-function removeIf<K, V extends Destroyable>(
-    map: Map<K, V>,
-    isJunk: JunkDetector<V>
-): number {
+function removeIf<K, V extends Destroyable>(map: Map<K, V>, isJunk: JunkDetector<V>): number {
     // collect junk
     const removeList: K[] = [];
     for (const [key, value] of map) {

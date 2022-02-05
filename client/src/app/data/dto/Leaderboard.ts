@@ -5,4 +5,4 @@ export type LeaderboardDTO = {
 export type LeaderboardEntry = {
     name: string;
     score: number;
-}
+};

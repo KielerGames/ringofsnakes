@@ -22,9 +22,7 @@ export default class FoodChunk {
 
     id: number;
     private gpuBuffer: WebGLBuffer;
-    private gpuData: Float32Array | undefined = new Float32Array(
-        32 * boxCoords.length
-    );
+    private gpuData: Float32Array | undefined = new Float32Array(32 * boxCoords.length);
     private numFoodItems: number;
     private lastUpdateTime: number;
     readonly box: Rectangle;
@@ -71,10 +69,7 @@ export default class FoodChunk {
     }
 }
 
-function createGPUData(
-    items: FoodItemDTO[],
-    gpuData: Float32Array | undefined
-): Float32Array {
+function createGPUData(items: FoodItemDTO[], gpuData: Float32Array | undefined): Float32Array {
     const floatsPerFood = FoodChunk.FOOD_VERTEX_SIZE * boxCoords.length;
     const n = items.length * floatsPerFood;
     const fvs = FoodChunk.FOOD_VERTEX_SIZE;

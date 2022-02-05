@@ -7,8 +7,7 @@ import SnakeChunkVertexBufferBuilder from "./helper/SnakeChunkVertexBufferBuilde
 
 const SNAKE_CHUNK_MAX_BYTES = 96;
 export const SNAKE_CHUNK_HEADER_SIZE = 21;
-export const FULL_CHUNK_NUM_POINTS =
-    SNAKE_CHUNK_MAX_BYTES - SNAKE_CHUNK_HEADER_SIZE + 1;
+export const FULL_CHUNK_NUM_POINTS = SNAKE_CHUNK_MAX_BYTES - SNAKE_CHUNK_HEADER_SIZE + 1;
 const PATH_VERTEX_SIZE = 4;
 
 // chaincode
@@ -90,8 +89,7 @@ export function decode(
         alpha = normalizeAngle(alpha + dirDelta);
 
         // compute next position
-        const s =
-            steps * (fast ? config.snakes.fastSpeed : config.snakes.speed);
+        const s = steps * (fast ? config.snakes.fastSpeed : config.snakes.speed);
         x += s * Math.cos(alpha);
         y += s * Math.sin(alpha);
         length += s;

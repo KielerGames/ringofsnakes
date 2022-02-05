@@ -34,9 +34,7 @@ export default class AsyncEvent {
         }
 
         if (this.promise === undefined) {
-            this.promise = new Promise(
-                (resolve) => (this.resolver = resolve)
-            );
+            this.promise = new Promise((resolve) => (this.resolver = resolve));
         }
 
         if (timeout > 0) {

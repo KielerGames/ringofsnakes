@@ -6,5 +6,5 @@ export type GameInfoDTO = {
     readonly startPosition: {
         x: number;
         y: number;
-    }
+    };
 };

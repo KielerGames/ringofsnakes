@@ -61,11 +61,7 @@ export function render(game: Readonly<Game>, transform: Matrix): void {
             const age = chunk.age;
             BoxRenderer.addBox(
                 chunk.boundingBox.createTransferable(0.5 * snake.width),
-                mix(
-                    [0.1, 1, 1, 0.64],
-                    [0.5, 1.0, 0, 0.025 + 0.3 / Math.max(1.0, age)],
-                    2.0 * age
-                )
+                mix([0.1, 1, 1, 0.64], [0.5, 1.0, 0, 0.025 + 0.3 / Math.max(1.0, age)], 2.0 * age)
             );
         }
     }

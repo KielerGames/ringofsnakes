@@ -1,9 +1,6 @@
 import { GameConfig } from "../../data/config/GameConfig";
 export type ClientToServerJSONMessage = UpdatePlayerName;
-export type ServerToClientJSONMessage =
-    | SpawnInfo
-    | SnakeDeathInfo
-    | LeaderboardData;
+export type ServerToClientJSONMessage = SpawnInfo | SnakeDeathInfo | LeaderboardData;
 
 export type UpdatePlayerName = {
     tag: "UpdatePlayerName";

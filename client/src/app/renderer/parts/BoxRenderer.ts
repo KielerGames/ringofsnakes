@@ -15,11 +15,7 @@ const boxesToDraw: { box: TransferableBox; color: RGBAColor }[] = [];
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
 
-    shader = new WebGLShaderProgram(
-        gl,
-        __VERTEXSHADER_SOLIDCOLOR__,
-        __FRAGMENTSHADER_SOLIDCOLOR__
-    );
+    shader = new WebGLShaderProgram(gl, __VERTEXSHADER_SOLIDCOLOR__, __FRAGMENTSHADER_SOLIDCOLOR__);
 
     buffer = gl.createBuffer()!;
     assert(buffer !== null);

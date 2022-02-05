@@ -19,7 +19,7 @@ export function removeListener(listener: UserInputListener) {
     listeners.delete(listener);
 }
 
-export function removeAllListeners():void {
+export function removeAllListeners(): void {
     listeners.clear();
 }
 

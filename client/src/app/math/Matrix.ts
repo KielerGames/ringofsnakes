@@ -50,11 +50,7 @@ export default class Matrix {
      * @param res the result matrix (a new matrix if omitted)
      * @returns the matrix product
      */
-    public static compose(
-        a: Matrix,
-        b: Matrix,
-        res: Matrix = new Matrix()
-    ): Matrix {
+    public static compose(a: Matrix, b: Matrix, res: Matrix = new Matrix()): Matrix {
         // result row i
         for (let i = 0; i < n; i++) {
             // result column j

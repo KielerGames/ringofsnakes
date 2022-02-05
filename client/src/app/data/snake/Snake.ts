@@ -52,17 +52,11 @@ export default class Snake {
     update(dto: SnakeDTO, ticks: number): void {
         this.lastUpdateTime = FrameTime.now();
         this._length = dto.length;
-        if (
-            __DEBUG__ &&
-            dto.headChunkId !== this.headChunkId &&
-            this.headChunkId !== undefined
-        ) {
+        if (__DEBUG__ && dto.headChunkId !== this.headChunkId && this.headChunkId !== undefined) {
             const mask = (1 << 16) - 1;
             const id1 = this.headChunkId & mask;
             const id2 = dto.headChunkId & mask;
-            console.log(
-                `Head chunk changed on snake ${this.id} from ${id1} to ${id2}`
-            );
+            console.log(`Head chunk changed on snake ${this.id} from ${id1} to ${id2}`);
         }
         this.headChunkId = dto.headChunkId;
         this.lastKnownHeadPosition = Vector.fromObject(dto.headPosition);
@@ -87,9 +81,7 @@ export default class Snake {
 
     registerSnakeChunk(chunk: SnakeChunk): void {
         if (__DEBUG__ && this.chunks.has(chunk.id)) {
-            console.warn(
-                `Snake ${this.id} already has a registered chunk with id ${chunk.id}.`
-            );
+            console.warn(`Snake ${this.id} already has a registered chunk with id ${chunk.id}.`);
         }
         this.chunks.set(chunk.id, chunk);
     }
@@ -118,11 +110,7 @@ export default class Snake {
         }
 
         const size = 2 * 2.0 * 1.25 * this._width;
-        const headBox = Rectangle.createAt(
-            this.predictedHeadPosition,
-            size,
-            size
-        );
+        const headBox = Rectangle.createAt(this.predictedHeadPosition, size, size);
 
         return Rectangle.distance2(headBox, camera.viewBox) < epsilon * epsilon;
     }
@@ -150,9 +138,7 @@ export default class Snake {
      */
     get speed(): number {
         const config = this.gameConfig;
-        const tickSpeed = this._fast
-            ? config.snakes.fastSpeed
-            : config.snakes.speed;
+        const tickSpeed = this._fast ? config.snakes.fastSpeed : config.snakes.speed;
         return tickSpeed / config.tickDuration;
     }
 
@@ -190,11 +176,7 @@ export default class Snake {
         prediction2.addPolar(this.predictedDirection, distance2);
 
         // combine predictions
-        this.predictedHeadPosition = Vector.lerp(
-            this.predictedHeadPosition,
-            prediction2,
-            0.15
-        );
+        this.predictedHeadPosition = Vector.lerp(this.predictedHeadPosition, prediction2, 0.15);
     }
 
     private predictDirection() {
@@ -202,30 +184,17 @@ export default class Snake {
         const maxChangePerSecond =
             this.gameConfig.snakes.maxTurnDelta / this.gameConfig.tickDuration;
 
-        const d1 = getMinDifference(
-            this.predictedDirection,
-            this.targetDirection
-        );
-        const d2 = getMinDifference(
-            this.lastKnownDirection,
-            this.targetDirection
-        );
+        const d1 = getMinDifference(this.predictedDirection, this.targetDirection);
+        const d2 = getMinDifference(this.lastKnownDirection, this.targetDirection);
 
-        const max1 =
-            (maxChangePerSecond * (now - this.lastPredictionTime)) / 1000;
+        const max1 = (maxChangePerSecond * (now - this.lastPredictionTime)) / 1000;
         const max2 = (maxChangePerSecond * (now - this.lastUpdateTime)) / 1000;
 
-        const p1 = normalizeAngle(
-            this.predictedDirection + clamp(-max1, d1, max1)
-        );
-        const p2 = normalizeAngle(
-            this.lastKnownDirection + clamp(-max2, d2, max2)
-        );
+        const p1 = normalizeAngle(this.predictedDirection + clamp(-max1, d1, max1));
+        const p2 = normalizeAngle(this.lastKnownDirection + clamp(-max2, d2, max2));
 
         // combine predictions
-        this.predictedDirection = normalizeAngle(
-            p1 + 0.15 * getMinDifference(p1, p2)
-        );
+        this.predictedDirection = normalizeAngle(p1 + 0.15 * getMinDifference(p1, p2));
     }
 
     private updateChunkOffsets(ticks: number, fastHistory: boolean[]) {

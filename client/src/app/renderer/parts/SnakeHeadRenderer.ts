@@ -25,11 +25,7 @@ const rotOffset = -0.5 * Math.PI;
     buffer = gl.createBuffer()!;
     assert(buffer !== null);
 
-    shader = new WebGLShaderProgram(
-        gl,
-        __VERTEXSHADER_HEAD__,
-        __FRAGMENTSHADER_HEAD__
-    );
+    shader = new WebGLShaderProgram(gl, __VERTEXSHADER_HEAD__, __FRAGMENTSHADER_HEAD__);
 
     // send data to GPU (once)
     shader.use();

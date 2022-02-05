@@ -31,10 +31,7 @@ const data = new GameDataBuffer();
 const eventListeners = new Map<WorkerEvent, Callback>();
 
 export class WorkerAPI {
-    async init(
-        name: string,
-        cfg: Readonly<ClientConfig>
-    ): Promise<GameInfoDTO> {
+    async init(name: string, cfg: Readonly<ClientConfig>): Promise<GameInfoDTO> {
         if (socket !== null) {
             throw new Error("Worker is already initialized.");
         }
@@ -44,20 +41,14 @@ export class WorkerAPI {
         socket = await connect(url);
 
         const spawnInfo: SpawnInfo = await new Promise((resolve, reject) => {
-            const timeoutId = setTimeout(
-                () => reject("SpawnInfo timeout."),
-                2000
-            );
+            const timeoutId = setTimeout(() => reject("SpawnInfo timeout."), 2000);
 
             socket!.onJSONMessage = (message) => {
                 if (message.tag === "SpawnInfo") {
                     clearTimeout(timeoutId);
                     resolve(message);
                 } else {
-                    console.warn(
-                        `Game init: Unexpected message from server.`,
-                        message
-                    );
+                    console.warn(`Game init: Unexpected message from server.`, message);
                 }
             };
         });
@@ -92,11 +83,7 @@ export class WorkerAPI {
         };
     }
 
-    async sendUserInput(
-        alpha: number,
-        wantsFast: boolean,
-        viewBox: TransferableBox
-    ) {
+    async sendUserInput(alpha: number, wantsFast: boolean, viewBox: TransferableBox) {
         userInputRateLimiter.setValue({
             targetAlpha: alpha,
             wantsToBeFast: wantsFast,
@@ -109,9 +96,7 @@ export class WorkerAPI {
 
         // avoid copying of ArrayBuffers
         // instead move/transfer them to the main thread
-        const transferables: ArrayBuffer[] = update.snakeChunks.map(
-            (chunk) => chunk.data.buffer
-        );
+        const transferables: ArrayBuffer[] = update.snakeChunks.map((chunk) => chunk.data.buffer);
 
         return Comlink.transfer(update, transferables);
     }
@@ -131,7 +116,7 @@ export class WorkerAPI {
 function triggerEvent(event: WorkerEvent): void {
     const listener = eventListeners.get(event);
 
-    if(listener) {
+    if (listener) {
         listener();
     }
 }

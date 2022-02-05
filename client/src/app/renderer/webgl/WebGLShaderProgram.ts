@@ -140,7 +140,7 @@ export default class WebGLShaderProgram {
             }
         }
 
-        this.uniforms.forEach((uniform, name) => {
+        this.uniforms.forEach((uniform) => {
             if (uniform.value !== null) {
                 if (uniform.type === gl.FLOAT) {
                     gl.uniform1f(uniform.location, uniform.value as number);

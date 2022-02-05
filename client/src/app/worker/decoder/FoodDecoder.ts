@@ -1,3 +1,5 @@
+/*eslint no-bitwise: "off"*/
+
 import { GameConfig } from "../../data/config/GameConfig";
 import { FoodChunkDTO, FoodItemDTO } from "../../data/dto/FoodChunkDTO";
 import { DecodeResult } from "./DecodeResult";

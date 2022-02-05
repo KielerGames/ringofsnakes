@@ -1,7 +1,6 @@
 import { SnakeChunkDTO } from "../dto/SnakeChunkDTO";
 import Snake from "./Snake";
 import * as FrameTime from "../../util/FrameTime";
-import assert from "../../util/assert";
 import Rectangle from "../../math/Rectangle";
 import Camera from "../camera/Camera";
 
@@ -94,9 +93,7 @@ export default class SnakeChunk {
     }
 
     toString(): string {
-        const mask = (1 << 16) - 1;
-        const id = this.id & mask;
-        return `SnakeChunk ${id} of snake ${this.snake.id}`;
+        return `SnakeChunk ${this.id} of snake ${this.snake.id}`;
     }
 
     /**

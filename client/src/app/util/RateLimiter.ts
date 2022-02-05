@@ -1,5 +1,5 @@
-import assert from "../../util/assert";
-import { Consumer } from "../../util/FunctionTypes";
+import assert from "./assert";
+import { Consumer } from "./FunctionTypes";
 
 type TimeoutId = number;
 
@@ -45,7 +45,7 @@ export default class RateLimiter<T> {
                 this.updateConsumer(this.nextValue);
                 this.nextValue = null;
             }
-        }, scheduleDelay) as any as TimeoutId;
+        }, scheduleDelay) as unknown as TimeoutId;
     }
 
     abort(): void {

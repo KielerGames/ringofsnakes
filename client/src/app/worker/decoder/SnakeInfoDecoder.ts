@@ -1,3 +1,5 @@
+/*eslint no-bitwise: "off"*/
+
 import { GameConfig } from "../../data/config/GameConfig";
 import { SnakeDTO } from "../../data/dto/SnakeDTO";
 import { DecodeResult } from "./DecodeResult";

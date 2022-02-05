@@ -27,6 +27,7 @@ export function get(): Promise<Readonly<ClientConfig>> {
     return configPromise;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isValidClientConfig(data: any): data is ClientConfig {
     if (!data || !data.server) {
         return false;

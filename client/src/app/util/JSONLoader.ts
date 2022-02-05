@@ -1,6 +1,6 @@
-type TypeGuard<T> = (data: any) => data is T;
+type TypeGuard<T> = (data: unknown) => data is T;
 
-const defaultGuard = function <T>(data: any): data is T {
+const defaultGuard = function <T>(data: unknown): data is T {
     // the default guard accepts any data
     return true;
 };

@@ -1,3 +1,4 @@
+import { Consumer } from "../util/FunctionTypes";
 import { ClientToServerJSONMessage, ServerToClientJSONMessage } from "./data/JSONMessages";
 
 export interface Socket {
@@ -10,12 +11,14 @@ export interface Socket {
     readonly isOpen: () => boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop = () => {};
+
 class SocketImpl implements Socket {
     private websocket: WebSocket;
-    onclose = () => {};
-    onJSONMessage = (message: ServerToClientJSONMessage) => {};
-    onBinaryMessage = (data: ArrayBuffer) => {};
-
+    onclose = noop;
+    onJSONMessage: Consumer<ServerToClientJSONMessage> = noop;
+    onBinaryMessage: Consumer<ArrayBuffer> = noop;
     constructor(websocket: WebSocket) {
         this.websocket = websocket;
         this.websocket.onclose = (e: CloseEvent) => {

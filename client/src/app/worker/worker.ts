@@ -1,7 +1,7 @@
 import * as Comlink from "comlink";
 import { ClientConfig } from "../data/config/ClientConfig";
 import { connect, Socket } from "./socket";
-import RateLimiter from "./util/RateLimiter";
+import RateLimiter from "../util/RateLimiter";
 import GameDataBuffer from "./data/GameDataBuffer";
 import { ClientData } from "./data/ClientData";
 import { Callback } from "../util/FunctionTypes";

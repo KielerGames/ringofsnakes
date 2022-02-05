@@ -8,8 +8,8 @@ const options: WebGLContextAttributes = {
     premultipliedAlpha: false
 };
 
+const loaded = new AsyncEvent();
 let gl: WebGLRenderingContext | null = null;
-let loaded = new AsyncEvent();
 
 export function init(canvas: HTMLCanvasElement): void {
     const ctx = canvas.getContext("webgl", options);

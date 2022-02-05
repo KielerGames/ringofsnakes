@@ -1,9 +1,11 @@
+/*eslint no-bitwise: "off"*/
+
 import { DecodeResult } from "./DecodeResult";
 import { normalizeAngle } from "../../math/Angle";
 import { GameConfig } from "../../data/config/GameConfig";
 import Rectangle from "../../math/Rectangle";
 import { SnakeChunkDTO } from "../../data/dto/SnakeChunkDTO";
-import SnakeChunkVertexBufferBuilder from "./helper/SnakeChunkVertexBufferBuilder";
+import SnakeChunkVertexBufferBuilder from "./encoder/SnakeChunkVertexBufferBuilder";
 
 const SNAKE_CHUNK_MAX_BYTES = 96;
 export const SNAKE_CHUNK_HEADER_SIZE = 21;
@@ -62,8 +64,8 @@ export function decode(
     const points = n + 1;
 
     // initialize variables
+    const pathData = new Float32Array(4 * points);
     let length = 0.0;
-    let pathData = new Float32Array(4 * points);
     let minX, maxX, minY, maxY;
     minX = maxX = x;
     minY = maxY = y;

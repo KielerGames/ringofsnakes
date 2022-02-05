@@ -36,7 +36,11 @@ export default class SnakeChunk {
     }
 
     update(dto: SnakeChunkDTO): void {
-        assert(!this.final);
+        if (__DEBUG__ && this.final) {
+            // can happen when the server thinks the client
+            // does not know this chunk anymore
+            console.info(`Update for final snake chunk ${this.id}.`);
+        }
         this.final = dto.full;
         this.lastUpdateTime = FrameTime.now();
         this.lastKnownOffset = dto.offset;

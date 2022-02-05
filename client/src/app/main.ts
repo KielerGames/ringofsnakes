@@ -46,4 +46,9 @@ document.title = `Snake Royale ${__VERSION__}`;
 
     // create user interface
     Preact.render(Preact.createElement(GameOverlay, { game }), uiRoot);
+
+    // stop game on error
+    window.addEventListener("error", (e) => {
+        console.error("Stopped due to unhandled error.", e);
+    });
 })();

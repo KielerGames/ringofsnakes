@@ -31,8 +31,21 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
         }
     }
 
+    addMultiple(dtos: Iterable<DTO>, ticks: number = 0): void {
+        for (const dto of dtos) {
+            this.addDTO(dto, ticks);
+        }
+    }
+
     get(id: K): V | undefined {
         return this.data.get(id);
+    }
+
+    runIfPresent(id: K, consumer: Consumer<V>): void {
+        const value = this.data.get(id);
+        if (value) {
+            consumer(value);
+        }
     }
 
     remove(id: K): V | undefined {
@@ -77,7 +90,7 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
         return this.data.values();
     }
 
-    entries(): IterableIterator<[K,V]> {
+    entries(): IterableIterator<[K, V]> {
         return this.data.entries();
     }
 

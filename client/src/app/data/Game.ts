@@ -88,19 +88,15 @@ export default class Game {
             this.leaderboard = changes.leaderboard;
         }
 
-        // update snakes
-        for (const dto of changes.snakes) {
-            this.snakes.addDTO(dto, ticks);
-            // TODO tim-we:
-            // if (snake.id === this.targetSnakeId) {
-            //     snake.target = true;
-            // }
+        this.foodChunks.addMultiple(changes.foodChunks, ticks);
+
+        this.snakes.addMultiple(changes.snakes);
+        if (this.targetSnakeId !== undefined) {
+            this.snakes.runIfPresent(this.targetSnakeId, (snake) => (snake.target = true));
         }
 
-        // update snake chunks
-        for (const dto of changes.snakeChunks) {
-            this.snakeChunks.addDTO(dto, ticks);
-        }
+        // update snake chunks AFTER snakes
+        this.snakeChunks.addMultiple(changes.snakeChunks, ticks);
 
         // remove dead snakes
         for (const snakeId of changes.snakeDeaths) {
@@ -121,11 +117,6 @@ export default class Game {
                 // TODO
                 this.stopped = true;
             }
-        }
-
-        // update food chunks
-        for (const dto of changes.foodChunks) {
-            this.foodChunks.addDTO(dto, ticks);
         }
 
         this.removeJunk();

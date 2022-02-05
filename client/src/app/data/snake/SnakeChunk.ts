@@ -12,7 +12,7 @@ export default class SnakeChunk {
     readonly id: number;
 
     private readonly creationTime: number;
-    private final: boolean = false;
+    private _final: boolean = false;
     private bounds: Rectangle;
     private length: number;
 
@@ -35,12 +35,12 @@ export default class SnakeChunk {
     }
 
     update(dto: SnakeChunkDTO): void {
-        if (__DEBUG__ && this.final) {
+        if (__DEBUG__ && this._final) {
             // can happen when the server thinks the client
             // does not know this chunk anymore
             console.info(`Update for final snake chunk ${this.id}.`);
         }
-        this.final = dto.full;
+        this._final = dto.full;
         this.lastUpdateTime = FrameTime.now();
         this.lastKnownOffset = dto.offset;
         this.bounds = Rectangle.fromTransferable(dto.boundingBox);
@@ -52,7 +52,7 @@ export default class SnakeChunk {
     }
 
     updateOffset(offsetChange: number): void {
-        if (__DEBUG__ && !this.final) {
+        if (__DEBUG__ && !this._final) {
             console.warn(`Offset change on non-final ${this.toString()}.`);
         }
         this.lastKnownOffset += offsetChange;
@@ -115,7 +115,14 @@ export default class SnakeChunk {
     }
 
     get junk(): boolean {
-        return this.lastKnownOffset > this.length;
+        return this.lastKnownOffset >= this.snake.length;
+    }
+
+    /**
+     * Is true if the path data is final (only the offset can change).
+     */
+    get final(): boolean {
+        return this._final;
     }
 }
 

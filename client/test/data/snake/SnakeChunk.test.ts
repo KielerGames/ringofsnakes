@@ -1,8 +1,9 @@
-import { createSnakeMock } from "./Snake.mock";
 import SnakeChunk from "../../../src/app/data/snake/SnakeChunk";
 import * as FrameTime from "../../../src/app/util/FrameTime";
 import { createSnakeChunkDTO } from "../dto/SnakeChunkDTO.prefab";
 import Snake from "../../../src/app/data/snake/Snake";
+import { createSnakeDTO } from "../dto/SnakeDTO.prefab";
+import defaultConfig from "../config/GameConfig.prefab";
 
 describe("SnakeChunk", () => {
     beforeEach(() => {
@@ -10,26 +11,31 @@ describe("SnakeChunk", () => {
     });
 
     test("registration", () => {
-        const snake = createSnakeMock();
+        const snake = new Snake(createSnakeDTO({}), defaultConfig);
+        const registerSpy = jest.spyOn(snake, "registerSnakeChunk");
+        const unregisterSpy = jest.spyOn(snake, "unregisterSnakeChunk");
+
         const chunk = createSnakeChunkForSnake(snake);
 
-        expect(snake.registerSnakeChunk).toHaveBeenCalledTimes(1);
-        expect(snake.unregisterSnakeChunk).not.toHaveBeenCalled();
+        expect(registerSpy).toHaveBeenCalledTimes(1);
+        expect(unregisterSpy).not.toHaveBeenCalled();
 
         chunk.destroy();
 
-        expect(snake.registerSnakeChunk).toHaveBeenCalledTimes(1);
-        expect(snake.unregisterSnakeChunk).toHaveBeenCalledTimes(1);
+        expect(registerSpy).toHaveBeenCalledTimes(1);
+        expect(unregisterSpy).toHaveBeenCalledTimes(1);
     });
 
     describe("offset prediction", () => {
-        const snake = createSnakeMock();
-
+        let snake: Snake;
         const snakeSpeedMock = jest.fn();
-        Object.defineProperty(snake, "speed", { get: snakeSpeedMock });
-
         const snakeLengthMock = jest.fn();
-        Object.defineProperty(snake, "length", { get: snakeLengthMock });
+
+        beforeEach(() => {
+            snake = new Snake(createSnakeDTO({}), defaultConfig);
+            Object.defineProperty(snake, "speed", { get: snakeSpeedMock });
+            Object.defineProperty(snake, "length", { get: snakeLengthMock });
+        });
 
         test("with constant speed", () => {
             snakeSpeedMock.mockReturnValue(1.0);
@@ -71,7 +77,7 @@ describe("SnakeChunk", () => {
 
         test("does not change chunk junk state", () => {
             snakeSpeedMock.mockReturnValue(1.0);
-            snakeSpeedMock.mockReturnValue(4.2);
+            snakeLengthMock.mockReturnValue(4.2);
             const chunk = createSnakeChunkForSnake(snake, true);
             expect(chunk.junk).toBe(false);
             for (let i = 1; i < 100; i++) {
@@ -83,14 +89,21 @@ describe("SnakeChunk", () => {
             expect(chunk.junk).toBe(true);
         });
     });
+
+    describe("lifecycle", () => {
+        it("should become junk eventually", () => {
+            const snake = new Snake(createSnakeDTO({}), defaultConfig);
+            expect(snake.length).not.toBe(undefined);
+            const chunk = createSnakeChunkForSnake(snake, true);
+            expect(chunk.junk).toBe(false);
+            for (let i = 0; i < 100 && !chunk.junk; i++) {
+                chunk.updateOffset(1);
+            }
+            expect(chunk.junk).toBe(true);
+        });
+    });
 });
 
-function createSnakeChunkForSnake(
-    snake: Snake,
-    final: boolean = false
-): SnakeChunk {
-    return new SnakeChunk(
-        snake,
-        createSnakeChunkDTO({ snakeId: snake.id, full: final })
-    );
+function createSnakeChunkForSnake(snake: Snake, final: boolean = false): SnakeChunk {
+    return new SnakeChunk(snake, createSnakeChunkDTO({ snakeId: snake.id, full: final }));
 }

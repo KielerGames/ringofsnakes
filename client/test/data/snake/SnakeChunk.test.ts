@@ -120,6 +120,24 @@ describe("SnakeChunk", () => {
                 expect(chunks.filter((chunk) => chunk.junk).length).toBe(i);
             }
         });
+
+        test("junk state should depend on offset", () => {
+            const n = 10;
+            const length = defaultConfig.snakes.speed * n;
+            const snake = new Snake(createSnakeDTO({ length }), defaultConfig);
+            const chunks = generateArray(
+                n,
+                (i) =>
+                    new SnakeChunk(snake, createSnakeChunkDTO({ id: i + 1, offset: i, full: true }))
+            );
+            chunks.forEach((chunk) => expect(chunk.junk).toBe(false));
+
+            for(let i=1; i<=n; i++) {
+                snake.update(createSnakeDTO({length}), 1);
+                expect(snake.length).toBe(length);
+                expect(chunks.filter(chunk => chunk.junk).length).toBe(i);
+            }
+        });
     });
 });
 

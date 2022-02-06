@@ -81,6 +81,7 @@ export default class Game {
 
         const changes = await this.remote.getDataChanges();
         this.updateAvailable = changes.moreUpdates;
+        // TODO: handle congestion (?)
         const ticks = changes.ticksSinceLastUpdate;
 
         // update leaderboard

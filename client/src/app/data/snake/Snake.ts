@@ -205,7 +205,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO> {
     }
 
     private updateChunkOffsets(ticks: number, fastHistory: boolean[]) {
-        if (ticks === 0.0) {
+        if (ticks === 0) {
             return;
         }
 

@@ -87,6 +87,9 @@ export default class Snake implements ManagedObject<number, SnakeDTO> {
     }
 
     unregisterSnakeChunk(chunk: SnakeChunk): void {
+        if (__DEBUG__ && !this.chunks.has(chunk.id)) {
+            console.warn(`Snake ${this.id} has no chunk with id ${chunk.id}.`);
+        }
         this.chunks.delete(chunk.id);
     }
 
@@ -113,6 +116,12 @@ export default class Snake implements ManagedObject<number, SnakeDTO> {
         const headBox = Rectangle.createAt(this.predictedHeadPosition, size, size);
 
         return Rectangle.distance2(headBox, camera.viewBox) < epsilon * epsilon;
+    }
+
+    destroy() {
+        if (__DEBUG__ && this.hasChunks()) {
+            console.warn(`Snake ${this.id} still had chunks when it was destroyed.`);
+        }
     }
 
     get headChunk(): SnakeChunk | undefined {

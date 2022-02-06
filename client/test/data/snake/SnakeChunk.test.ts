@@ -3,7 +3,8 @@ import * as FrameTime from "../../../src/app/util/FrameTime";
 import { createSnakeChunkDTO } from "../dto/SnakeChunkDTO.prefab";
 import Snake from "../../../src/app/data/snake/Snake";
 import { createSnakeDTO } from "../dto/SnakeDTO.prefab";
-import defaultConfig from "../config/GameConfig.prefab";
+import defaultConfig, { zeroSpeedConfig } from "../config/GameConfig.prefab";
+import { generateArray } from "../../../src/app/util/ArrayHelper";
 
 describe("SnakeChunk", () => {
     beforeEach(() => {
@@ -100,6 +101,24 @@ describe("SnakeChunk", () => {
                 chunk.updateOffset(1);
             }
             expect(chunk.junk).toBe(true);
+        });
+
+        test("junk state should depend on snake length", () => {
+            const length = 10;
+            const snake = new Snake(createSnakeDTO({ length }), zeroSpeedConfig);
+            const chunks = generateArray(
+                length,
+                (i) =>
+                    new SnakeChunk(snake, createSnakeChunkDTO({ id: i + 1, offset: i, full: true }))
+            );
+            expect(snake.hasChunks()).toBe(true);
+            chunks.forEach((chunk) => expect(chunk.junk).toBe(false));
+
+            for (let i = 1; i <= length; i++) {
+                snake.update(createSnakeDTO({ length: length - i }), 1);
+                expect(snake.length).toBe(length - i);
+                expect(chunks.filter((chunk) => chunk.junk).length).toBe(i);
+            }
         });
     });
 });

@@ -14,7 +14,6 @@ export default class SnakeChunk {
     private readonly creationTime: number;
     private _final: boolean = false;
     private bounds: Rectangle;
-    private length: number;
 
     gpuData: GPUData;
 
@@ -48,7 +47,6 @@ export default class SnakeChunk {
             buffer: dto.data,
             vertices: dto.vertices
         };
-        this.length = dto.length;
     }
 
     updateOffset(offsetChange: number): void {

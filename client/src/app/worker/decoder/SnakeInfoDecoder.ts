@@ -2,6 +2,7 @@
 
 import { GameConfig } from "../../data/config/GameConfig";
 import { SnakeDTO } from "../../data/dto/SnakeDTO";
+import { generateArray } from "../../util/ArrayHelper";
 import { DecodeResult } from "./DecodeResult";
 
 export const SNAKE_INFO_SIZE = 26;
@@ -14,11 +15,11 @@ export function decode(
     const view = new DataView(buffer, offset, SNAKE_INFO_SIZE);
 
     const fastData = view.getUint8(5);
+    const fastHistory = generateArray(8, (i) => (fastData & (1 << i)) !== 0);
+
     const length = view.getFloat32(6, false);
     const currentDirection = view.getFloat32(10, false);
     const targetDirection = view.getFloat32(14, false);
-
-    const fastHistory: boolean[] = Array.from({ length: 8 }, (_, i) => (fastData & (1 << i)) !== 0);
 
     const data: SnakeDTO = {
         id: view.getUint16(0, false),

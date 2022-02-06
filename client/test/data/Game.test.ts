@@ -17,7 +17,7 @@ jest.mock("../../src/app/data/config/ClientConfig", () => ({
 }));
 
 jest.mock("comlink", () => ({
-    proxy: (callback: Function) => callback
+    proxy: (callback: () => void) => callback
 }));
 
 async function updateGame(game: Game, dto: DataUpdateDTO): Promise<void> {

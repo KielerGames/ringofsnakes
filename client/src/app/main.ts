@@ -2,7 +2,7 @@ import * as Preact from "preact";
 import Game from "./data/Game";
 import GameOverlay from "./ui/GameOverlay";
 import * as FrameTime from "./util/FrameTime";
-import * as WebGLContextProvider from "./renderer/WebGLContextProvider";
+import * as WebGLContextProvider from "./renderer/webgl/WebGLContextProvider";
 import * as GameRenderer from "./renderer/GameRenderer";
 import * as UserInput from "./input/UserInput";
 

@@ -1,5 +1,5 @@
 import Game from "../data/Game";
-import * as WebGLContextProvider from "./WebGLContextProvider";
+import * as WebGLContextProvider from "./webgl/WebGLContextProvider";
 import * as SkinLoader from "./SkinLoader";
 import * as SnakeHeadRenderer from "./parts/SnakeHeadRenderer";
 import * as SnakeChunkRenderer from "./parts/SnakeChunkRenderer";

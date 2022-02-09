@@ -4,7 +4,7 @@ import Matrix from "../../math/Matrix";
 import Vector from "../../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as BoxRenderer from "./BoxRenderer";
-import * as WebGLContextProvider from "../WebGLContextProvider";
+import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 
 declare const __VERTEXSHADER_FOOD__: string;
 declare const __FRAGMENTSHADER_FOOD__: string;

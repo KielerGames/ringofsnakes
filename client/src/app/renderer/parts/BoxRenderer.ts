@@ -2,7 +2,7 @@ import Matrix from "../../math/Matrix";
 import { TransferableBox } from "../../math/Rectangle";
 import assert from "../../util/assert";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
-import * as WebGLContextProvider from "../WebGLContextProvider";
+import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 
 declare const __VERTEXSHADER_SOLIDCOLOR__: string;
 declare const __FRAGMENTSHADER_SOLIDCOLOR__: string;

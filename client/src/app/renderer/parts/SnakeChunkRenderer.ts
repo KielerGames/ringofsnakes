@@ -1,6 +1,6 @@
 import Matrix from "../../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
-import * as WebGLContextProvider from "../WebGLContextProvider";
+import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import * as BoxRenderer from "./BoxRenderer";
 import * as SkinLoader from "../SkinLoader";
 import assert from "../../util/assert";

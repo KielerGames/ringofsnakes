@@ -2,7 +2,7 @@ import Snake from "../../data/snake/Snake";
 import Matrix from "../../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as SkinManager from "../SkinLoader";
-import * as WebGLContextProvider from "../WebGLContextProvider";
+import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import assert from "../../util/assert";
 
 declare const __VERTEXSHADER_HEAD__: string;

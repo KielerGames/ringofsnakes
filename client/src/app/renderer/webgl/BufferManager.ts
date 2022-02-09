@@ -1,8 +1,9 @@
 import assert from "../../util/assert";
-import * as WebGLContextProvider from "../WebGLContextProvider";
+import * as WebGLContextProvider from "./WebGLContextProvider";
 
 const freeBuffers: WebGLBuffer[] = [];
 const initialBuffers = 16;
+const upperLimit = 128;
 
 (async () => {
     assert(initialBuffers >= 0);
@@ -28,5 +29,7 @@ export function create(): WebGLBuffer {
 }
 
 export function free(buffer: WebGLBuffer): void {
-    freeBuffers.push(buffer);
+    if (freeBuffers.length < upperLimit) {
+        freeBuffers.push(buffer);
+    }
 }

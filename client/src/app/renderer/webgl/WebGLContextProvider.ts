@@ -1,7 +1,7 @@
-import AsyncEvent from "../util/AsyncEvent";
+import AsyncEvent from "../../util/AsyncEvent";
 
 const options: WebGLContextAttributes = {
-    alpha: false,
+    alpha: true, // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices#avoid_alphafalse_which_can_be_expensive
     depth: false,
     antialias: true,
     preserveDrawingBuffer: false,

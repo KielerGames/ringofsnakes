@@ -1,6 +1,6 @@
 import WebGLShaderProgram from "./webgl/WebGLShaderProgram";
 import * as Skins from "../data/misc/Skins";
-import * as WebGLContextProvider from "./WebGLContextProvider";
+import * as WebGLContextProvider from "./webgl/WebGLContextProvider";
 import assert from "../util/assert";
 
 const skinTextureData: Uint8Array = (() => {

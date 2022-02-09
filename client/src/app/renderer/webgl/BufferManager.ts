@@ -1,4 +1,3 @@
-import assert from "../../util/assert";
 import * as WebGLContextProvider from "./WebGLContextProvider";
 
 const freeBuffers: WebGLBuffer[] = [];
@@ -6,25 +5,20 @@ const initialBuffers = 16;
 const upperLimit = 128;
 
 (async () => {
-    assert(initialBuffers >= 0);
-    const gl = await WebGLContextProvider.waitForContext();
+    if (initialBuffers > 0) {
+        const gl = await WebGLContextProvider.waitForContext();
 
-    for (let i = 0; i < initialBuffers; i++) {
-        const buffer = gl.createBuffer();
-        assert(buffer !== null, "Buffer is null");
-        freeBuffers.push(buffer!);
+        for (let i = 0; i < initialBuffers; i++) {
+            freeBuffers.push(createBuffer(gl));
+        }
     }
 })();
 
 export function create(): WebGLBuffer {
-    const gl = WebGLContextProvider.getContext();
-
     if (freeBuffers.length > 0) {
         return freeBuffers.pop()!;
     } else {
-        const buffer = gl.createBuffer();
-        assert(buffer !== null, "Buffer is null");
-        return buffer!;
+        return createBuffer(WebGLContextProvider.getContext());
     }
 }
 
@@ -32,4 +26,17 @@ export function free(buffer: WebGLBuffer): void {
     if (freeBuffers.length < upperLimit) {
         freeBuffers.push(buffer);
     }
+    if (__DEBUG__ && freeBuffers.length === upperLimit) {
+        console.warn(`Free buffer cache limit (${upperLimit}) reached.`);
+    }
+}
+
+function createBuffer(gl: WebGLRenderingContext): WebGLBuffer {
+    const buffer = gl.createBuffer();
+
+    if (buffer === null) {
+        throw new Error("Failed to create buffer.");
+    }
+
+    return buffer;
 }

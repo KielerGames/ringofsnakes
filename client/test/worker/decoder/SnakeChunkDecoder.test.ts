@@ -1,5 +1,5 @@
 import Rand from "rand-seed";
-import { VERTEX_SIZE } from "../../../src/app/worker/decoder/encoder/SnakeChunkVertexBufferBuilder";
+import { VERTEX_SIZE } from "../../../src/app/worker/encoder/SnakeChunkVertexBufferBuilder";
 import * as SCD from "../../../src/app/worker/decoder/SnakeChunkDecoder";
 import defaultConfig from "../../data/config/GameConfig.prefab";
 import { createSnakeChunkBuffer } from "./SnakeChunkBuffer.testFactory";

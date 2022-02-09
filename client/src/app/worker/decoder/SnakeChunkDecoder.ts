@@ -5,7 +5,7 @@ import { normalizeAngle } from "../../math/Angle";
 import { GameConfig } from "../../data/config/GameConfig";
 import Rectangle from "../../math/Rectangle";
 import { SnakeChunkDTO } from "../../data/dto/SnakeChunkDTO";
-import SnakeChunkVertexBufferBuilder from "./encoder/SnakeChunkVertexBufferBuilder";
+import SnakeChunkVertexBufferBuilder from "../encoder/SnakeChunkVertexBufferBuilder";
 
 const SNAKE_CHUNK_MAX_BYTES = 96;
 export const SNAKE_CHUNK_HEADER_SIZE = 21;

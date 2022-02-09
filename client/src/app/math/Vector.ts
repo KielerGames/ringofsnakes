@@ -11,7 +11,7 @@ export default class Vector {
         this.y = y;
     }
 
-    static fromObject(p: PointLike): Vector {
+    static fromObject(p: VectorLike): Vector {
         return new Vector(p.x, p.y);
     }
 
@@ -21,9 +21,27 @@ export default class Vector {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    /**
+     * Linear interpolation between two Vectors.
+     * @param a the t=0 Vector
+     * @param b the t=1 Vector
+     * @param t should be between 0 and 1
+     * @returns interpolated Vector
+     */
     static lerp(a: Vector, b: Vector, t: number): Vector {
         const s = 1.0 - t;
         return new Vector(s * a.x + t * b.x, s * a.y + t * b.y);
+    }
+
+    /**
+     * Returns true if both Vectors are equal or sufficiently close.
+     * @param epsilon should be small and >= 0
+     */
+    static equals(a: Vector, b: Vector, epsilon: number): boolean {
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const d2 = dx * dx + dy * dy;
+        return d2 < epsilon * epsilon;
     }
 
     addPolar(alpha: number, distance: number): void {
@@ -31,11 +49,11 @@ export default class Vector {
         this.y += distance * Math.sin(alpha);
     }
 
-    createTransferable(): PointLike {
-        return { x: this.x, y: this.y };
+    createTransferable(): VectorLike {
+        return this;
     }
 
-    set(data: PointLike): void {
+    set(data: VectorLike): void {
         this.x = data.x;
         this.y = data.y;
     }
@@ -50,7 +68,7 @@ export default class Vector {
     }
 }
 
-type PointLike = {
+export type VectorLike = {
     x: number;
     y: number;
 };

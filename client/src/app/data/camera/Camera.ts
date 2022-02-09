@@ -4,15 +4,15 @@ import Snake from "../snake/Snake";
 import Rectangle from "../../math/Rectangle";
 
 const WORLD_SCALE = 0.042;
-const SCALE_MATRIX = new Matrix();
+const SCALE_MATRIX = new Matrix(true);
 SCALE_MATRIX.setEntry(0, 0, WORLD_SCALE);
 SCALE_MATRIX.setEntry(1, 1, WORLD_SCALE);
 
 export default class Camera {
     private _position: Vector = new Vector(0, 0);
 
-    private _unstretch: Matrix = new Matrix();
-    private _translation: Matrix = new Matrix();
+    private _unstretch: Matrix = new Matrix(true);
+    private _translation: Matrix = new Matrix(true);
 
     setRatio(width: number, height: number): void {
         this._unstretch.setEntry(0, 0, height / width);

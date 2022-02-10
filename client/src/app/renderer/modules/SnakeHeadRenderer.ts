@@ -1,5 +1,5 @@
 import Snake from "../../data/snake/Snake";
-import Matrix from "../../math/Matrix";
+import { ReadonlyMatrix } from "../../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as SkinManager from "../SkinLoader";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
@@ -33,7 +33,7 @@ const rotOffset = -0.5 * Math.PI;
     gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
 })();
 
-export function render(snakes: Iterable<Snake>, transform: Matrix) {
+export function render(snakes: Iterable<Snake>, transform: ReadonlyMatrix) {
     const gl = WebGLContextProvider.getContext();
 
     shader.use();

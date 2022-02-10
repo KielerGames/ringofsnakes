@@ -1,4 +1,4 @@
-import Matrix from "../../math/Matrix";
+import { ReadonlyMatrix } from "../../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import * as BoxRenderer from "./BoxRenderer";
@@ -26,7 +26,7 @@ let buffer: WebGLBuffer;
     assert(buffer !== null);
 })();
 
-export function render(game: Readonly<Game>, transform: Matrix): void {
+export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
     const gl = WebGLContextProvider.getContext();
     const camera = game.camera;
 

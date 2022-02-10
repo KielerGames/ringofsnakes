@@ -209,6 +209,10 @@ export default class Snake implements ManagedObject<number, SnakeDTO> {
             return;
         }
 
+        if (__DEBUG__ && fastHistory.length !== 8) {
+            console.warn("unexpected fast history array", fastHistory);
+        }
+
         const fastSpeed = this.gameConfig.snakes.fastSpeed;
         const slowSpeed = this.gameConfig.snakes.speed;
 

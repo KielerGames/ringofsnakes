@@ -1,6 +1,6 @@
 import FoodChunk from "../../data/world/FoodChunk";
 import Game from "../../data/Game";
-import Matrix from "../../math/Matrix";
+import { ReadonlyMatrix } from "../../math/Matrix";
 import Vector from "../../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as BoxRenderer from "./BoxRenderer";
@@ -24,7 +24,7 @@ const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
     ]);
 })();
 
-export function render(game: Readonly<Game>, transform: Matrix) {
+export function render(game: Readonly<Game>, transform: ReadonlyMatrix) {
     const gl = WebGLContextProvider.getContext();
 
     const targetSnake = game.targetSnake;

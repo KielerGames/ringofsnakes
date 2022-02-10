@@ -12,13 +12,40 @@ html, body {
     right: 0;
 }
 
-#main-canvas {
+#mainCanvas {
     position: absolute;
     display: block;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+#textLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    .text {
+        position: absolute;
+        user-select: none;
+        text-align: center;
+        animation: fade-in 0.5s ease-in;
+        text-shadow: 1px 1px black;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @import "user-input.less";

@@ -1,5 +1,5 @@
 import Vector from "../../math/Vector";
-import Matrix from "../../math/Matrix";
+import Matrix, { ReadonlyMatrix } from "../../math/Matrix";
 import Snake from "../snake/Snake";
 import Rectangle from "../../math/Rectangle";
 
@@ -14,6 +14,8 @@ export default class Camera {
     private _unstretch: Matrix = new Matrix(true);
     private _translation: Matrix = new Matrix(true);
 
+    private _lastTransformMatrix: ReadonlyMatrix | null = null;
+
     setRatio(width: number, height: number): void {
         this._unstretch.setEntry(0, 0, height / width);
     }
@@ -24,19 +26,48 @@ export default class Camera {
 
     moveTo(position: Vector): void {
         this._position.set(position);
+        this._lastTransformMatrix = null;
         // TODO
+    }
+
+    computeScreenCoordinates(
+        worldPosition: Readonly<Vector>,
+        width: number,
+        height: number
+    ): Vector {
+        const glPosition = this.transformMatrix.multiply(worldPosition);
+
+        // flip y
+        glPosition.y *= -1;
+
+        // transform to [0, width]
+        glPosition.x += 1;
+        glPosition.x = width * 0.5 * glPosition.x;
+
+        // transform to [0, height]
+        glPosition.y += 1;
+        glPosition.y = height * 0.5 * glPosition.y;
+
+        return glPosition;
     }
 
     get position(): Vector {
         return this._position;
     }
 
-    get transformMatrix(): Matrix {
-        const pos = this._position;
-        this._translation.setEntry(0, 2, -pos.x);
-        this._translation.setEntry(1, 2, -pos.y);
+    get transformMatrix(): ReadonlyMatrix {
+        if (this._lastTransformMatrix === null) {
+            const pos = this._position;
+            this._translation.setEntry(0, 2, -pos.x);
+            this._translation.setEntry(1, 2, -pos.y);
 
-        return Matrix.compose(Matrix.compose(this._unstretch, SCALE_MATRIX), this._translation);
+            this._lastTransformMatrix = Matrix.compose(
+                Matrix.compose(this._unstretch, SCALE_MATRIX),
+                this._translation
+            );
+        }
+
+        return this._lastTransformMatrix;
     }
 
     get viewBox(): Rectangle {

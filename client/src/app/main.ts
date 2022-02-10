@@ -3,6 +3,7 @@ import Game from "./data/Game";
 import GameOverlay from "./ui/GameOverlay";
 import * as FrameTime from "./util/FrameTime";
 import * as WebGLContextProvider from "./renderer/webgl/WebGLContextProvider";
+import * as TextRenderer from "./renderer/modules/TextRenderer";
 import * as GameRenderer from "./renderer/GameRenderer";
 import * as UserInput from "./input/UserInput";
 
@@ -11,9 +12,15 @@ import "../styles/main.less";
 
 // initialize main canvas
 const canvas = document.createElement("canvas");
-canvas.id = "main-canvas";
+canvas.id = "mainCanvas";
 document.body.appendChild(canvas);
 WebGLContextProvider.init(canvas);
+
+// text layer
+const textLayer = document.createElement("div");
+textLayer.id = "textLayer";
+document.body.appendChild(textLayer);
+TextRenderer.init(textLayer);
 
 // initialize UI container
 const uiRoot = document.createElement("div");

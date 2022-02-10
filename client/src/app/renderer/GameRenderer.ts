@@ -1,10 +1,12 @@
 import Game from "../data/Game";
 import * as WebGLContextProvider from "./webgl/WebGLContextProvider";
 import * as SkinLoader from "./SkinLoader";
-import * as SnakeHeadRenderer from "./parts/SnakeHeadRenderer";
-import * as SnakeChunkRenderer from "./parts/SnakeChunkRenderer";
-import * as BoxRenderer from "./parts/BoxRenderer";
-import * as FoodRenderer from "./parts/FoodRenderer";
+import * as SnakeHeadRenderer from "./modules/SnakeHeadRenderer";
+import * as SnakeChunkRenderer from "./modules/SnakeChunkRenderer";
+import * as BoxRenderer from "./modules/BoxRenderer";
+import * as FoodRenderer from "./modules/FoodRenderer";
+import * as TextRenderer from "./modules/TextRenderer";
+import * as SnakeNameRenderer from "./modules/SnakeNameRenderer";
 
 export function render(game: Readonly<Game>): void {
     const gl = WebGLContextProvider.getContext();
@@ -26,10 +28,12 @@ export function render(game: Readonly<Game>): void {
     FoodRenderer.render(game, transform);
     SnakeChunkRenderer.render(game, transform);
     SnakeHeadRenderer.render(game.snakes.values(), transform);
+    SnakeNameRenderer.render(game, canvas.clientWidth, canvas.clientHeight);
 
     if (__DEBUG__) {
         BoxRenderer.renderAll(transform);
     }
+    TextRenderer.renderAll();
 }
 
 function updateSize(gl: WebGLRenderingContext) {

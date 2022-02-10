@@ -50,7 +50,7 @@ export default class Matrix {
      * @param result the result matrix (a new matrix if omitted)
      * @returns the matrix product
      */
-    public static compose(a: Readonly<Matrix>, b: Readonly<Matrix>, result?: Matrix): Matrix {
+    public static compose(a: ReadonlyMatrix, b: ReadonlyMatrix, result?: Matrix): Matrix {
         if (result === undefined) {
             result = new Matrix(false);
         }
@@ -72,3 +72,5 @@ export default class Matrix {
         return result;
     }
 }
+
+export type ReadonlyMatrix = Omit<Readonly<Matrix>, "setEntry">;

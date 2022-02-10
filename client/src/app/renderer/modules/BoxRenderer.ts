@@ -1,4 +1,4 @@
-import Matrix from "../../math/Matrix";
+import { ReadonlyMatrix } from "../../math/Matrix";
 import { TransferableBox } from "../../math/Rectangle";
 import assert from "../../util/assert";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
@@ -25,7 +25,7 @@ export function addBox(box: TransferableBox, color: RGBAColor): void {
     boxesToDraw.push({ box, color });
 }
 
-export function renderAll(transform: Matrix): void {
+export function renderAll(transform: ReadonlyMatrix): void {
     const gl = WebGLContextProvider.getContext();
 
     shader.use();

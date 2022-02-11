@@ -17,7 +17,7 @@ import { FoodChunkDTO } from "./dto/FoodChunkDTO";
 
 export default class Game {
     camera: Camera = new Camera();
-    readonly snakes: ManagedMap<SnakeDTO, SnakeId, Snake>;
+    readonly snakes: ManagedMap<SnakeDTO, SnakeId, Snake, number>;
     readonly snakeChunks: ManagedMap<SnakeChunkDTO, SnakeChunkId, SnakeChunk>;
     readonly foodChunks: ManagedMap<FoodChunkDTO, FoodChunkId, FoodChunk>;
     leaderboard: LeaderboardDTO = { list: [] };
@@ -89,7 +89,7 @@ export default class Game {
             this.leaderboard = changes.leaderboard;
         }
 
-        this.foodChunks.addMultiple(changes.foodChunks, ticks);
+        this.foodChunks.addMultiple(changes.foodChunks);
 
         this.snakes.addMultiple(changes.snakes, ticks);
         if (this.targetSnakeId !== undefined) {
@@ -97,7 +97,7 @@ export default class Game {
         }
 
         // update snake chunks AFTER snakes
-        this.snakeChunks.addMultiple(changes.snakeChunks, ticks);
+        this.snakeChunks.addMultiple(changes.snakeChunks);
 
         // remove dead snakes
         for (const snakeId of changes.snakeDeaths) {

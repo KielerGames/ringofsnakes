@@ -4,6 +4,7 @@ import * as SkinLoader from "../../renderer/SkinLoader";
 import { FoodChunkDTO, FoodItemDTO } from "../dto/FoodChunkDTO";
 import Camera from "../camera/Camera";
 import * as FrameTime from "../../util/FrameTime";
+import { ManagedObject } from "../../util/ManagedMap";
 
 const boxCoords = [
     // triangle 1
@@ -17,7 +18,7 @@ const boxCoords = [
 ];
 
 // TODO: move webgl stuff out of here
-export default class FoodChunk {
+export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
     static readonly FOOD_VERTEX_SIZE = 2 + 2 + 1; // x,y, u,v, c
 
     id: number;

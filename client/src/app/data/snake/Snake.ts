@@ -12,7 +12,7 @@ import { ManagedObject } from "../../util/ManagedMap";
 /**
  * Represents a snake on the main thread.
  */
-export default class Snake implements ManagedObject<number, SnakeDTO> {
+export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     readonly id: number;
     readonly skin: number;
     target: boolean = false;

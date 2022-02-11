@@ -1,16 +1,16 @@
 import assert from "./assert";
 import { BiConsumer, Consumer, Predicate } from "./FunctionTypes";
 
-export interface ManagedObject<ID, DTO> {
+export interface ManagedObject<ID, DTO, COMMON_INFO = void> {
     id: ID;
-    update: BiConsumer<DTO, number>;
+    update: BiConsumer<DTO, COMMON_INFO>;
     destroy?: () => void;
 }
 
 type WithId<T> = { id: T };
 type Factory<T, DTO> = (dto: DTO) => T;
 
-export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO>> {
+export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO, CI>, CI = void> {
     private readonly data: Map<K, V> = new Map();
     private readonly factory: Factory<V, DTO>;
 
@@ -21,11 +21,11 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
         this.factory = factory;
     }
 
-    add(dto: DTO, ticks: number): void {
+    add(dto: DTO, info: CI): void {
         const storedValue = this.data.get(dto.id);
 
         if (storedValue) {
-            storedValue.update(dto, ticks);
+            storedValue.update(dto, info);
         } else {
             const value = this.factory(dto);
             assert(dto.id === value.id);
@@ -33,9 +33,9 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
         }
     }
 
-    addMultiple(dtos: Iterable<DTO>, ticks: number): void {
+    addMultiple(dtos: Iterable<DTO>, info: CI): void {
         for (const dto of dtos) {
-            this.add(dto, ticks);
+            this.add(dto, info);
         }
     }
 

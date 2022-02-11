@@ -4,11 +4,12 @@ import * as FrameTime from "../../util/FrameTime";
 import Rectangle from "../../math/Rectangle";
 import Camera from "../camera/Camera";
 import Vector from "../../math/Vector";
+import { ManagedObject } from "../../util/ManagedMap";
 
 /**
  * Main thread representation of a SnakeChunk.
  */
-export default class SnakeChunk {
+export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> {
     readonly snake: Snake;
     readonly id: number;
     readonly end: Vector;

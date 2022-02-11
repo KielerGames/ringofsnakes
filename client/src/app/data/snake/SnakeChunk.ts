@@ -14,13 +14,14 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
 
     private _final: boolean = false;
     private bounds: Rectangle;
+    private creationTime: number = FrameTime.now();
+    private lastUpdateTime: number;
 
     gpuData: GPUData;
 
     // offset prediction
-    private lastUpdateTime: number;
     private lastOffsetUpdateTime: number;
-    private lastPredictionTime: number;
+    private lastPredictionTime: number = FrameTime.now();
     private lastKnownOffset: number;
     private predictedOffset: number;
 
@@ -29,7 +30,6 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
         this.id = dto.id;
         snake.registerSnakeChunk(this);
         this.predictedOffset = dto.offset;
-        this.lastPredictionTime = FrameTime.now();
         this.update(dto);
     }
 
@@ -123,6 +123,13 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
     get shortId(): number {
         // eslint-disable-next-line no-bitwise
         return this.id & 0b1111111111111111;
+    }
+
+    /**
+     * Time in seconds since this SnakeChunk instance has been created.
+     */
+    get clientAge(): number {
+        return 0.001 * (FrameTime.now() - this.creationTime);
     }
 
     get debugInfo(): string {

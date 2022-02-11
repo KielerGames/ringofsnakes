@@ -152,25 +152,9 @@ export default class Game {
         const camera = this.camera;
         const safeDist = 2 * this.config.snakes.fastSpeed;
 
-        const removedChunks = this.snakeChunks.removeIf(
-            (chunk) => chunk.junk || !chunk.isVisible(camera, safeDist)
+        this.snakeChunks.removeIf(
+            (chunk) => chunk.junk || (!chunk.isVisible(camera, safeDist) && chunk.clientAge > 1.0)
         );
-        if (__DEBUG__) {
-            removedChunks
-                .filter((chunk) => chunk.snake.id === this.targetSnakeId)
-                .forEach((chunk) => {
-                    if (!chunk.junk) {
-                        return;
-                    }
-                    const reasons = ["junk"];
-                    if (!chunk.isVisible(camera, safeDist)) {
-                        reasons.push("not visible");
-                    }
-                    console.log(
-                        `SnakeChunk ${chunk.id} removed because its ${reasons.join(" & ")}.`
-                    );
-                });
-        }
 
         this.foodChunks.removeIf((chunk) => !chunk.isVisible(camera, safeDist) && chunk.age > 1.0);
 

@@ -2,17 +2,20 @@ import Camera from "../../data/camera/Camera";
 import Game from "../../data/Game";
 import Vector from "../../math/Vector";
 import * as TextRenderer from "./TextRenderer";
+import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 
 const ctx = document.createElement("canvas").getContext("2d")!;
 const snakeNameSize = 12;
 
-export function render(game: Readonly<Game>, width: number, height: number): void {
+export function render(game: Readonly<Game>): void {
+    const canvas = WebGLContextProvider.getContext().canvas;
+
     for (const snake of game.snakes.values()) {
         if (snake.target || !snake.hasChunks() || !isVisible(game.camera, snake.position)) {
             continue;
         }
 
-        const p = game.camera.computeScreenCoordinates(snake.position, width, height);
+        const p = game.camera.computeScreenCoordinates(snake.position, canvas);
         const offset = 10 + 0.5 * snake.width;
         const text = `Snake ${snake.id}`;
         TextRenderer.addText(text, `snake${snake.id}`, {

@@ -2,6 +2,7 @@ import { ReadonlyMatrix } from "../../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import * as BoxRenderer from "./BoxRenderer";
+import * as TextRenderer from "./TextRenderer";
 import * as SkinLoader from "../SkinLoader";
 import assert from "../../util/assert";
 import Game from "../../data/Game";
@@ -60,8 +61,17 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
         if (__DEBUG__) {
             BoxRenderer.addBox(
                 chunk.boundingBox.createTransferable(0.5 * snake.width),
-                chunk.final ? [0.1, 1, 1, 0.64] : [0.5, 1.0, 0, 0.3]
+                SkinLoader.getFloatColor(snake.skin, chunk.final ? 0.64 : 0.3)
             );
+
+            if (chunk !== snake.headChunk) {
+                const p = game.camera.computeScreenCoordinates(chunk.end, gl.canvas);
+                TextRenderer.addText(chunk.debugInfo, `sc${chunk.id}`, {
+                    x: p.x,
+                    y: p.y,
+                    debug: true
+                });
+            }
         }
     }
 }

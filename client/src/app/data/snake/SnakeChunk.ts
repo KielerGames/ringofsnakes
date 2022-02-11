@@ -3,6 +3,7 @@ import Snake from "./Snake";
 import * as FrameTime from "../../util/FrameTime";
 import Rectangle from "../../math/Rectangle";
 import Camera from "../camera/Camera";
+import Vector from "../../math/Vector";
 
 /**
  * Main thread representation of a SnakeChunk.
@@ -10,6 +11,7 @@ import Camera from "../camera/Camera";
 export default class SnakeChunk {
     readonly snake: Snake;
     readonly id: number;
+    readonly end: Vector;
 
     private readonly creationTime: number;
     private _final: boolean = false;
@@ -26,6 +28,7 @@ export default class SnakeChunk {
     constructor(snake: Snake, dto: SnakeChunkDTO) {
         this.snake = snake;
         this.id = dto.id;
+        this.end = Vector.fromObject(dto.end);
         this.creationTime = FrameTime.now();
         snake.registerSnakeChunk(this);
         this.predictedOffset = dto.offset;
@@ -121,6 +124,26 @@ export default class SnakeChunk {
      */
     get final(): boolean {
         return this._final;
+    }
+
+    /**
+     * The 16bit snake chunk id unique to the snake.
+     */
+    get shortId(): number {
+        // eslint-disable-next-line no-bitwise
+        return this.id & 0b1111111111111111;
+    }
+
+    get debugInfo(): string {
+        if (__DEBUG__) {
+            return [
+                `SnakeChunk ${this.snake.id}-${this.shortId}`,
+                `offset: ${Math.round(this.lastKnownOffset)} ~ ${Math.round(this.offset)}`
+            ].join("\n");
+        } else {
+            // only allowed in debug mode
+            throw new Error();
+        }
     }
 }
 

@@ -30,11 +30,9 @@ export default class Camera {
         // TODO
     }
 
-    computeScreenCoordinates(
-        worldPosition: Readonly<Vector>,
-        width: number,
-        height: number
-    ): Vector {
+    computeScreenCoordinates(worldPosition: Readonly<Vector>, canvas: HTMLCanvasElement): Vector {
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
         const glPosition = this.transformMatrix.multiply(worldPosition);
 
         // flip y

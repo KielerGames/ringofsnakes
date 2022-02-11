@@ -1,5 +1,5 @@
 import * as Preact from "preact";
-import { TextDescriptor, TextLayer } from "../../ui/components/TextLayer";
+import { TextDescriptor, TextLayer } from "../../ui/TextLayer";
 
 let container: HTMLElement | null = null;
 const textToRender: TextDescriptor[] = [];

@@ -2,6 +2,7 @@ import WebGLShaderProgram from "./webgl/WebGLShaderProgram";
 import * as Skins from "../data/misc/Skins";
 import * as WebGLContextProvider from "./webgl/WebGLContextProvider";
 import assert from "../util/assert";
+import { rgb2rgbaf } from "../util/ColorUtils";
 
 const skinTextureData: Uint8Array = (() => {
     const skins = Skins.getAllSkins();
@@ -69,4 +70,8 @@ export function setColor(shader: WebGLShaderProgram, uniform: string, skinId: nu
 export function getColorPosition(skinId: number): number {
     const skins = Skins.getAllSkins();
     return ((skinId % skins.length) + 0.5) / skins.length;
+}
+
+export function getFloatColor(skinId: number, alpha: number): [number, number, number, number] {
+    return rgb2rgbaf(Skins.getSkin(skinId).snakeBody, alpha);
 }

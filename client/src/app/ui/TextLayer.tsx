@@ -12,6 +12,7 @@ export type TextDescriptor = {
     size: number;
     minWidth?: number;
     color?: string;
+    debug?: boolean;
 };
 
 export function TextLayer(props: Readonly<Props>): JSXInternal.Element {
@@ -26,7 +27,7 @@ export function TextLayer(props: Readonly<Props>): JSXInternal.Element {
                     styles += `color:${td.color};`;
                 }
                 return (
-                    <div key={td.key} class="text" style={styles}>
+                    <div key={td.key} class={td.debug ? "text debug" : "text"} style={styles}>
                         {td.text}
                     </div>
                 );

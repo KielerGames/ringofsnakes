@@ -28,7 +28,7 @@ export function render(game: Readonly<Game>): void {
     FoodRenderer.render(game, transform);
     SnakeChunkRenderer.render(game, transform);
     SnakeHeadRenderer.render(game.snakes.values(), transform);
-    SnakeNameRenderer.render(game, canvas.clientWidth, canvas.clientHeight);
+    SnakeNameRenderer.render(game);
 
     if (__DEBUG__) {
         BoxRenderer.renderAll(transform);

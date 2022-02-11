@@ -9,14 +9,13 @@ const chunkDTO: SnakeChunkDTO = {
     data: new Float32Array(0),
     vertices: 0,
     boundingBox: Rectangle.createAt(new Vector(0, 0), 4, 4),
+    end: { x: 0, y: 0 },
 
     length: 4,
     offset: 0,
     full: false
 };
 
-export function createSnakeChunkDTO(
-    nonDefaults: Partial<SnakeChunkDTO>
-): SnakeChunkDTO {
+export function createSnakeChunkDTO(nonDefaults: Partial<SnakeChunkDTO>): SnakeChunkDTO {
     return { ...chunkDTO, ...nonDefaults };
 }

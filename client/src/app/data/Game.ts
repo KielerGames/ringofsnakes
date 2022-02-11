@@ -91,7 +91,7 @@ export default class Game {
 
         this.foodChunks.addMultiple(changes.foodChunks, ticks);
 
-        this.snakes.addMultiple(changes.snakes);
+        this.snakes.addMultiple(changes.snakes, ticks);
         if (this.targetSnakeId !== undefined) {
             this.snakes.runIfPresent(this.targetSnakeId, (snake) => (snake.target = true));
         }

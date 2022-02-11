@@ -13,7 +13,6 @@ export default class SnakeChunk {
     readonly id: number;
     readonly end: Vector;
 
-    private readonly creationTime: number;
     private _final: boolean = false;
     private bounds: Rectangle;
 
@@ -29,7 +28,6 @@ export default class SnakeChunk {
         this.snake = snake;
         this.id = dto.id;
         this.end = Vector.fromObject(dto.end);
-        this.creationTime = FrameTime.now();
         snake.registerSnakeChunk(this);
         this.predictedOffset = dto.offset;
         this.lastPredictionTime = FrameTime.now();
@@ -104,13 +102,6 @@ export default class SnakeChunk {
         return this.predictedOffset;
     }
 
-    /**
-     * Age of this chunk in seconds.
-     */
-    get age(): number {
-        return 0.001 * (FrameTime.now() - this.creationTime);
-    }
-
     get boundingBox(): Readonly<Rectangle> {
         return this.bounds;
     }
@@ -136,9 +127,11 @@ export default class SnakeChunk {
 
     get debugInfo(): string {
         if (__DEBUG__) {
+            const time = Math.round(0.001 * (FrameTime.now() - this.lastUpdateTime));
             return [
                 `SnakeChunk ${this.snake.id}-${this.shortId}`,
-                `offset: ${Math.round(this.lastKnownOffset)} ~ ${Math.round(this.offset)}`
+                `offset: ${Math.round(this.lastKnownOffset)} ~ ${Math.round(this.offset)}`,
+                `updated ${time}s ago`
             ].join("\n");
         } else {
             // only allowed in debug mode

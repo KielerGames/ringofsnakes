@@ -27,10 +27,10 @@ describe("ManagedMap", () => {
 
     it("should create only 1 instance", () => {
         const id = 1;
-        managedMap.add({ id });
+        managedMap.add({ id }, 0);
         expect(TestObject.instanceCount).toBe(1);
         expect(managedMap.size).toBe(1);
-        managedMap.add({ id });
+        managedMap.add({ id }, 0);
         expect(TestObject.instanceCount).toBe(1);
         expect(managedMap.get(id)!.updateCount).toBe(1);
         expect(managedMap.size).toBe(1);
@@ -38,7 +38,7 @@ describe("ManagedMap", () => {
 
     test("remove by id", () => {
         const id = 1;
-        managedMap.add({ id });
+        managedMap.add({ id }, 0);
         managedMap.remove(id);
         expect(managedMap.size).toBe(0);
     });

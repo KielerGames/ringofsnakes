@@ -21,7 +21,7 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
         this.factory = factory;
     }
 
-    add(dto: DTO, ticks: number = 0): void {
+    add(dto: DTO, ticks: number): void {
         const storedValue = this.data.get(dto.id);
 
         if (storedValue) {
@@ -33,7 +33,7 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
         }
     }
 
-    addMultiple(dtos: Iterable<DTO>, ticks: number = 0): void {
+    addMultiple(dtos: Iterable<DTO>, ticks: number): void {
         for (const dto of dtos) {
             this.add(dto, ticks);
         }

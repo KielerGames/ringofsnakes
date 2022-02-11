@@ -6,6 +6,7 @@ import * as TextRenderer from "./TextRenderer";
 import * as SkinLoader from "../SkinLoader";
 import assert from "../../util/assert";
 import Game from "../../data/Game";
+import Vector from "../../math/Vector";
 
 declare const __VERTEXSHADER_SNAKE__: string;
 declare const __FRAGMENTSHADER_SNAKE__: string;
@@ -65,10 +66,14 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
             );
 
             if (chunk !== snake.headChunk) {
-                const p = game.camera.computeScreenCoordinates(chunk.end, gl.canvas);
+                const worldPosition = new Vector(chunk.boundingBox.minX, chunk.boundingBox.maxY);
+                const canvasPosition = game.camera.computeScreenCoordinates(
+                    worldPosition,
+                    gl.canvas
+                );
                 TextRenderer.addText(chunk.debugInfo, `sc${chunk.id}`, {
-                    x: p.x,
-                    y: p.y,
+                    x: canvasPosition.x,
+                    y: canvasPosition.y,
                     debug: true
                 });
             }

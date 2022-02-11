@@ -3,7 +3,6 @@ import Snake from "./Snake";
 import * as FrameTime from "../../util/FrameTime";
 import Rectangle from "../../math/Rectangle";
 import Camera from "../camera/Camera";
-import Vector from "../../math/Vector";
 import { ManagedObject } from "../../util/ManagedMap";
 
 /**
@@ -12,7 +11,6 @@ import { ManagedObject } from "../../util/ManagedMap";
 export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> {
     readonly snake: Snake;
     readonly id: number;
-    readonly end: Vector;
 
     private _final: boolean = false;
     private bounds: Rectangle;
@@ -21,6 +19,7 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
 
     // offset prediction
     private lastUpdateTime: number;
+    private lastOffsetUpdateTime: number;
     private lastPredictionTime: number;
     private lastKnownOffset: number;
     private predictedOffset: number;
@@ -28,7 +27,6 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
     constructor(snake: Snake, dto: SnakeChunkDTO) {
         this.snake = snake;
         this.id = dto.id;
-        this.end = Vector.fromObject(dto.end);
         snake.registerSnakeChunk(this);
         this.predictedOffset = dto.offset;
         this.lastPredictionTime = FrameTime.now();
@@ -42,13 +40,14 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
             console.info(`Update for final snake chunk ${this.id}.`);
         }
         this._final = dto.full;
-        this.lastUpdateTime = FrameTime.now();
+        this.lastOffsetUpdateTime = FrameTime.now();
         this.lastKnownOffset = dto.offset;
         this.bounds = Rectangle.fromTransferable(dto.boundingBox);
         this.gpuData = {
             buffer: dto.data,
             vertices: dto.vertices
         };
+        this.lastUpdateTime = FrameTime.now();
     }
 
     updateOffset(offsetChange: number): void {
@@ -56,7 +55,7 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
             console.warn(`Offset change on non-final ${this.toString()}.`);
         }
         this.lastKnownOffset += offsetChange;
-        this.lastUpdateTime = FrameTime.now();
+        this.lastOffsetUpdateTime = FrameTime.now();
     }
 
     /**
@@ -68,7 +67,7 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
 
         // offset change assuming constant speed
         const change1 = (speed * (now - this.lastPredictionTime)) / 1000;
-        const change2 = (speed * (now - this.lastUpdateTime)) / 1000;
+        const change2 = (speed * (now - this.lastOffsetUpdateTime)) / 1000;
 
         // predictions based on previous prediction (1) & last known data (2)
         const prediction1 = this.predictedOffset + change1;

@@ -52,7 +52,6 @@ export function decode(
         y = view.getFloat32(13, false);
     const chunkOffset = view.getFloat32(17, false);
     const full = SNAKE_CHUNK_HEADER_SIZE + n === SNAKE_CHUNK_MAX_BYTES;
-    const end = { x, y };
 
     // verify
     if (!full && chunkOffset !== 0.0) {
@@ -141,8 +140,7 @@ export function decode(
             full,
             vertices: 2 * points,
             data: builder.buffer,
-            boundingBox: box.createTransferable(),
-            end
+            boundingBox: box.createTransferable()
         },
         nextByteOffset: byteOffset + SNAKE_CHUNK_HEADER_SIZE + n
     };

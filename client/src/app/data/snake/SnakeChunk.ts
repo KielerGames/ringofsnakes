@@ -16,6 +16,7 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
     private bounds: Rectangle;
     private creationTime: number = FrameTime.now();
     private lastUpdateTime: number;
+    private length: number;
 
     gpuData: GPUData;
 
@@ -29,8 +30,8 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
         this.snake = snake;
         this.id = dto.id;
         snake.registerSnakeChunk(this);
-        this.predictedOffset = dto.offset;
         this.update(dto);
+        this.predictedOffset = dto.offset;
     }
 
     update(dto: SnakeChunkDTO): void {
@@ -40,16 +41,29 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
             console.info(`Update for final snake chunk ${this.id}.`);
         }
         this._final = dto.full;
-        this.lastOffsetUpdateTime = FrameTime.now();
-        this.lastKnownOffset = dto.offset;
+
         this.bounds = Rectangle.fromTransferable(dto.boundingBox);
         this.gpuData = {
             buffer: dto.data,
             vertices: dto.vertices
         };
+
+        this.lastKnownOffset = dto.offset;
+
+        if (this.lastKnownOffset === 0.0) {
+            const lengthChange = dto.length - this.length;
+            this.predictedOffset -= lengthChange;
+        }
+        this.length = dto.length;
+
+        this.lastOffsetUpdateTime = FrameTime.now();
         this.lastUpdateTime = FrameTime.now();
     }
 
+    /**
+     * Increase the chunks offset by the given amount.
+     * @param offsetChange should be non-negative
+     */
     updateOffset(offsetChange: number): void {
         if (__DEBUG__ && !this._final) {
             console.warn(`Offset change on non-final ${this.toString()}.`);

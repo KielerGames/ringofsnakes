@@ -6,6 +6,7 @@ import game.world.World;
 import lombok.Getter;
 import lombok.Setter;
 import math.Vector;
+import util.BitWithShortHistory;
 import util.Direction;
 
 import java.nio.ByteBuffer;
@@ -29,15 +30,17 @@ public class Snake {
     private final ChainCodeCoder coder;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
+    private final BitWithShortHistory fastHistory = new BitWithShortHistory(false);
     public GrowingSnakeChunk currentChunk;
     @Getter protected double length;
     @Getter Vector headPosition;
     double headDirection;
+    private char currentChunkId;
     @Setter private byte skin;
     @Getter private boolean alive = true;
     private char nextChunkId = 0;
     private double targetDirection;
-    private boolean fast = false;
+    private boolean userWantsFast = false;
     private double lengthBuffer = 0;
     @Getter private double width;
     private double foodTrailBuffer = 0f;
@@ -73,15 +76,16 @@ public class Snake {
         }
     }
 
-    public void setFast(boolean wantsFast) {
-        if (length > config.snakes.minLength) {
-            this.fast = wantsFast;
-        } else {
-            this.fast = false;
-        }
+    public void setUserFast(boolean wantsFast) {
+        userWantsFast = wantsFast;
     }
 
     public void tick() {
+        assert currentChunk != null : "Snake not fully initialized";
+
+        final boolean fast = userWantsFast && length > config.snakes.minLength;
+        fastHistory.set(fast);
+
         // update direction
         int encDirDelta = coder.sampleDirectionChange(targetDirection, headDirection);
         double dirDelta = coder.decodeDirectionChange(encDirDelta);
@@ -105,6 +109,10 @@ public class Snake {
         if (currentChunk.isFull()) {
             beginChunk();
         }
+        if (currentChunkId != currentChunk.id && !currentChunk.isEmpty()) {
+            // the id of an empty chunk (non-existing to the client) would confuse the client
+            currentChunkId = currentChunk.id;
+        }
         double offset = currentChunk.getLength();
         for (FinalSnakeChunk chunk : chunks) {
             chunk.setOffset(offset);
@@ -118,7 +126,7 @@ public class Snake {
         }
     }
 
-    public void beginChunk() {
+    void beginChunk() {
         if (currentChunk != null) {
             assert currentChunk.isFull();
 
@@ -134,9 +142,9 @@ public class Snake {
     public ByteBuffer encodeInfo() {
         final var buffer = this.snakeInfoBuffer;
         buffer.putChar(0, id);
-        buffer.putChar(2, currentChunk.id);
+        buffer.putChar(2, currentChunkId);
         buffer.put(4, skin);
-        buffer.put(5, (byte) (fast ? 1 : 0));
+        buffer.put(5, fastHistory.getHistory());
         buffer.putFloat(6, (float) length);
         buffer.putFloat(10, (float) headDirection);
         buffer.putFloat(14, (float) targetDirection);

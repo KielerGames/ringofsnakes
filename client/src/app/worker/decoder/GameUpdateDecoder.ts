@@ -1,60 +1,67 @@
 import * as SID from "./SnakeInfoDecoder";
 import * as SCD from "./SnakeChunkDecoder";
 import * as FCD from "./FoodDecoder";
-import { GameConfig } from "../../types/GameConfig";
+import * as ArrayDecoder from "./ArrayDecoder";
+import { GameConfig } from "../../data/config/GameConfig";
+import { FoodChunkDTO } from "../../data/dto/FoodChunkDTO";
+import { SnakeDTO } from "../../data/dto/SnakeDTO";
+import { SnakeChunkDTO } from "../../data/dto/SnakeChunkDTO";
 
-const UPDATE_HEADER_SIZE = 3;
+const UPDATE_HEADER_SIZE = 4;
 
-export function decode(
-    config: GameConfig,
-    buffer: ArrayBuffer
-): GameUpdateData {
+export function decode(config: GameConfig, buffer: ArrayBuffer): DecodedGameUpdate {
     const view = new DataView(buffer);
 
     // read update header
-    const numSnakeInfos = view.getUint8(0);
-    const numSnakeChunks = view.getUint8(1);
-    const numFoodChunks = view.getUint8(2);
+    const ticksSinceLastUpdate = view.getUint8(0);
+    const numSnakeInfos = view.getUint8(1);
+    const numSnakeChunks = view.getUint8(2);
+    const numFoodChunks = view.getUint8(3);
 
     // read snake infos
-    let byteOffset = UPDATE_HEADER_SIZE;
-    const snakeInfos = new Array(numSnakeInfos);
-    for (let i = 0; i < numSnakeInfos; i++) {
-        const result = SID.decode(buffer, byteOffset);
-        snakeInfos[i] = result.data;
-        byteOffset = result.nextByteOffset;
-    }
+    const { data: snakeInfos, nextByteOffset: chunkOffset } = ArrayDecoder.decode(
+        SID.decode,
+        config,
+        numSnakeInfos,
+        buffer,
+        UPDATE_HEADER_SIZE
+    );
 
     // read chunks
-    const chunks: SCD.DecodedSnakeChunk[] = new Array(numSnakeChunks);
-    for (let i = 0; i < numSnakeChunks; i++) {
-        const result = SCD.decode(buffer, byteOffset, config);
-        chunks[i] = result.data;
-        byteOffset = result.nextByteOffset;
-    }
+    const { data: chunks, nextByteOffset: foodOffset } = ArrayDecoder.decode(
+        SCD.decode,
+        config,
+        numSnakeChunks,
+        buffer,
+        chunkOffset
+    );
 
-    const foodChunks: FCD.FoodChunkDTO[] = new Array(numFoodChunks);
-    for (let i = 0; i < numFoodChunks; i++) {
-        const result = FCD.decode(buffer, byteOffset, config);
-        foodChunks[i] = result.data;
-        byteOffset = result.nextByteOffset;
-    }
+    // read food
+    const { data: foodChunks, nextByteOffset: endPosition } = ArrayDecoder.decode(
+        FCD.decode,
+        config,
+        numFoodChunks,
+        buffer,
+        foodOffset
+    );
 
-    if (byteOffset !== buffer.byteLength) {
-        console.warn(
-            `Unexpected update buffer size (expected ${byteOffset}, was ${buffer.byteLength})`
+    if (endPosition !== buffer.byteLength) {
+        console.error(
+            `Unexpected update buffer size (expected ${endPosition}, was ${buffer.byteLength})`
         );
     }
 
     return {
+        ticksSinceLastUpdate,
         snakeInfos,
         snakeChunkData: chunks,
         foodChunkData: foodChunks
     };
 }
 
-export type GameUpdateData = {
-    snakeInfos: SID.SnakeInfo[];
-    snakeChunkData: SCD.DecodedSnakeChunk[];
-    foodChunkData: FCD.FoodChunkDTO[];
+export type DecodedGameUpdate = {
+    ticksSinceLastUpdate: number;
+    snakeInfos: SnakeDTO[];
+    snakeChunkData: SnakeChunkDTO[];
+    foodChunkData: FoodChunkDTO[];
 };

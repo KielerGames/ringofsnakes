@@ -1,4 +1,7 @@
-import { GameConfig } from "../../types/GameConfig";
+/*eslint no-bitwise: "off"*/
+
+import { GameConfig } from "../../data/config/GameConfig";
+import { FoodChunkDTO, FoodItemDTO } from "../../data/dto/FoodChunkDTO";
 import { DecodeResult } from "./DecodeResult";
 
 const FOOD_SIZE = 3;
@@ -54,23 +57,3 @@ export function decode(
         nextByteOffset: offset + FOOD_CHUNK_HEADER_SIZE + n * FOOD_SIZE
     };
 }
-
-export type FoodItemDTO = {
-    x: number;
-    y: number;
-    size: number;
-    color: number;
-};
-
-export type FoodChunkId = number;
-
-export type FoodChunkDTO = {
-    id: FoodChunkId;
-    items: FoodItemDTO[];
-    bounds: {
-        minX: number;
-        maxX: number;
-        minY: number;
-        maxY: number;
-    };
-};

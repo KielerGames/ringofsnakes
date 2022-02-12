@@ -1,0 +1,25 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+    "rules": {
+        "no-console": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
+        "no-empty-function": "off",
+        "@typescript-eslint/no-empty-function": "warn",
+        "no-bitwise": "error",
+        "no-eval": "error",
+        "no-eq-null": "error",
+        "no-alert": "warn",
+        "max-classes-per-file": ["error", 1],
+        "no-implicit-coercion": "error",
+        "no-extend-native": "error",
+        "no-lonely-if": "error",
+        "@typescript-eslint/no-unused-vars": "error"
+    },
+    "env": {
+        "browser": true
+    }
+}

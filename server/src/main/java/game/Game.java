@@ -41,6 +41,7 @@ public class Game {
     protected final ExceptionalExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
     private final List<Bot> bots = new LinkedList<>();
+    private byte ticksSinceLastUpdate = 0;
 
     public Game() {
         this(new GameConfig());
@@ -128,13 +129,13 @@ public class Game {
 
     public void start() {
         final long tickDuration = (long) (1000 * config.tickDuration);
+        final long updateInterval = 2 * tickDuration;
 
-        executor.scheduleAtFixedRate(measure("tick-and-update", () -> {
-            tick();
-            updateClients();
-        }), 0, tickDuration, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(measure("game-tick", this::tick), 0, tickDuration, TimeUnit.MILLISECONDS);
 
-        executor.scheduleAtFixedRate(world::spawnFood, 100, (long) (25 * 1000 * config.tickDuration), TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(measure("client-update", this::updateClients), 10, updateInterval, TimeUnit.MILLISECONDS);
+
+        executor.scheduleAtFixedRate(world::spawnFood, 100, 1000, TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
             // garbage-collection
@@ -144,8 +145,8 @@ public class Game {
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
         executor.scheduleAtFixedRate(() -> {
-            final var topTen = gson.toJson(new Leaderboard(this, 10));
-            clients.forEach((sId, client) -> client.send(topTen));
+            final var topTenJson = gson.toJson(new Leaderboard(this, 10));
+            clients.forEach((__, client) -> client.send(topTenJson));
         }, 1, 1, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(() -> {
@@ -176,6 +177,7 @@ public class Game {
         bots.stream().filter(Bot::isAlive).forEach(Bot::act);
         eatFood();
         collisionManager.detectCollisions();
+        ticksSinceLastUpdate++;
     }
 
     private void updateClients() {
@@ -184,10 +186,11 @@ public class Game {
                 final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
                 worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
                 worldChunks.forEach(client::updateClientFoodChunk);
-                client.sendUpdate();
+                client.sendUpdate(ticksSinceLastUpdate);
                 client.cleanupKnowledge();
             });
         }
+        ticksSinceLastUpdate = 0;
     }
 
     private void eatFood() {
@@ -218,7 +221,6 @@ public class Game {
             s.kill();
         }
     }
-
 
     public void stop() {
         this.executor.shutdown();

@@ -1,6 +1,5 @@
 package server;
 
-import game.snake.FinalSnakeChunk;
 import game.snake.SnakeChunk;
 import game.world.WorldChunk;
 import math.BoundingBox;
@@ -10,27 +9,23 @@ import javax.websocket.Session;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class Client {
     public final Session session;
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private final Map<WorldChunk, Integer> knownFoodChunks = new HashMap<>();
     protected float viewBoxRatio = 1f;
-    private GameUpdate nextUpdate;
+    private GameUpdate nextUpdate = new GameUpdate();
 
     public Client(Session session) {
         this.session = session;
-        nextUpdate = new GameUpdate();
     }
 
     public void updateClientSnakeChunk(SnakeChunk chunk) {
-        // TODO Kilian: remove instanceof check
-        if (chunk instanceof FinalSnakeChunk) {
-            if (((FinalSnakeChunk) chunk).isJunk()) {
-                return;
-            }
+        if (chunk.isJunk()) {
+            return;
         }
+
         if (knownSnakeChunks.contains(chunk)) {
             nextUpdate.addSnake(chunk.getSnake());
         } else {
@@ -52,8 +47,9 @@ public abstract class Client {
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
     }
 
-    public void sendUpdate() {
-        var update = this.nextUpdate;
+    public void sendUpdate(byte ticksSinceLastUpdate) {
+        final var update = this.nextUpdate;
+        update.setTicksSinceLastUpdate(ticksSinceLastUpdate);
         this.nextUpdate = new GameUpdate();
         onBeforeUpdateBufferIsCreated(update);
         send(update.createUpdateBuffer());
@@ -71,32 +67,28 @@ public abstract class Client {
         }
     }
 
-    public boolean sendSync(String textData) {
+    public void sendSync(String textData) {
         if (session.isOpen()) {
             try {
                 session.getBasicRemote().sendText(textData);
             } catch (IOException e) {
                 e.printStackTrace();
-                return false;
             }
         }
-
-        return true;
     }
 
     public abstract BoundingBox getKnowledgeBox();
 
     public void cleanupKnowledge() {
         final var knowledgeBox = getKnowledgeBox();
-        final var chunksToForget = knownFoodChunks.keySet().stream()
-                .filter(chunk -> !BoundingBox.intersect(knowledgeBox, chunk.box))
-                .collect(Collectors.toList());
 
-        chunksToForget.forEach(chunk -> knownFoodChunks.remove(chunk));
+        // remove old or invisible chunks
+        knownFoodChunks.keySet().removeIf(chunk -> !BoundingBox.intersect(knowledgeBox, chunk.box));
+        knownSnakeChunks.removeIf(chunk -> chunk.isJunk() || !BoundingBox.intersect(knowledgeBox, chunk.getBoundingBox()));
     }
 
     public void setViewBoxRatio(float ratio) {
-        assert(ratio > 0f && ratio < 3f);
+        assert (ratio > 0f && ratio < 3f);
         viewBoxRatio = ratio;
     }
 }

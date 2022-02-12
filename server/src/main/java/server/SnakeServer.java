@@ -86,7 +86,7 @@ public class SnakeServer {
 
         if (player != null) {
             player.snake.setTargetDirection(alpha);
-            player.snake.setFast(fast);
+            player.snake.setUserFast(fast);
             player.setViewBoxRatio(ratio);
         } else {
             System.err.println("Illegal request from client.");

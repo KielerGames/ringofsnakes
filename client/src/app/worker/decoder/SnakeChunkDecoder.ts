@@ -1,34 +1,21 @@
+/*eslint no-bitwise: "off"*/
+
 import { DecodeResult } from "./DecodeResult";
-import { normalizeAngle } from "../../math/utils";
-import { GameConfig } from "../../types/GameConfig";
+import { normalizeAngle } from "../../math/Angle";
+import { GameConfig } from "../../data/config/GameConfig";
+import Rectangle from "../../math/Rectangle";
+import { SnakeChunkDTO } from "../../data/dto/SnakeChunkDTO";
+import SnakeChunkVertexBufferBuilder from "../encoder/SnakeChunkVertexBufferBuilder";
 
 const SNAKE_CHUNK_MAX_BYTES = 96;
 export const SNAKE_CHUNK_HEADER_SIZE = 21;
-export const FULL_CHUNK_NUM_POINTS =
-    SNAKE_CHUNK_MAX_BYTES - SNAKE_CHUNK_HEADER_SIZE + 1;
+export const FULL_CHUNK_NUM_POINTS = SNAKE_CHUNK_MAX_BYTES - SNAKE_CHUNK_HEADER_SIZE + 1;
+const PATH_VERTEX_SIZE = 4;
 
 // chaincode
 const FAST_BIT = 1 << 7;
 const STEPS_MASK = 7 << 4;
 const DIRECTION_MASK = 15;
-
-type OrientedPoint = {
-    x: number;
-    y: number;
-    alpha: number;
-};
-
-export type DecodedSnakeChunk = {
-    snakeId: number;
-    chunkId: number;
-    pathLength: number;
-    pathOffset: number;
-    full: boolean;
-    points: number;
-    start: OrientedPoint;
-    end: OrientedPoint;
-    pathData: Float32Array;
-};
 
 /*
  * Byte(s) | Description
@@ -48,7 +35,7 @@ export function decode(
     buffer: ArrayBuffer,
     byteOffset: number,
     config: GameConfig
-): DecodeResult<DecodedSnakeChunk> {
+): DecodeResult<SnakeChunkDTO> {
     const view = new DataView(buffer, byteOffset);
 
     if (view.byteLength < SNAKE_CHUNK_HEADER_SIZE) {
@@ -74,9 +61,15 @@ export function decode(
         throw new RangeError("Invalid buffer (too small)");
     }
 
+    const points = n + 1;
+
     // initialize variables
+    const pathData = new Float32Array(4 * points);
     let length = 0.0;
-    let pathData = new Float32Array(4 * (n + 1));
+    let minX, maxX, minY, maxY;
+    minX = maxX = x;
+    minY = maxY = y;
+
     // start vertex
     pathData[0] = x;
     pathData[1] = y;
@@ -103,11 +96,18 @@ export function decode(
         y += s * Math.sin(alpha);
         length += s;
 
+        // store data
         const idx = 4 * (i + 1);
         pathData[idx + 0] = x;
         pathData[idx + 1] = y;
         pathData[idx + 2] = length;
         pathData[idx + 3] = midAlpha;
+
+        // update bounds
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
     }
 
     pathData[pathData.length - 1] = alpha;
@@ -116,27 +116,31 @@ export function decode(
     // this way pathData[idx + 2] is always less or equal to length
     length = Math.max(length, pathData[pathData.length - 2]);
 
+    const builder = new SnakeChunkVertexBufferBuilder(points, length);
+
+    for (let i = 0; i < points; i++) {
+        const pdo = PATH_VERTEX_SIZE * i;
+
+        builder.addPoint(
+            pathData[pdo + 0], // x
+            pathData[pdo + 1], // y
+            pathData[pdo + 3], // alpha
+            pathData[pdo + 2] //  path offset
+        );
+    }
+
+    const box = new Rectangle(minX, maxX, minY, maxY);
+
     return {
         data: {
+            id: chunkId,
             snakeId,
-            chunkId,
-            pathLength: length,
-            pathOffset: chunkOffset,
+            length,
+            offset: chunkOffset,
             full,
-            points: n + 1,
-            // the end point where pathData starts (further away from snake head)
-            start: {
-                x: pathData[0],
-                y: pathData[1],
-                alpha: pathData[3]
-            },
-            // the end point closest to the snake head
-            end: {
-                x,
-                y,
-                alpha
-            },
-            pathData
+            vertices: 2 * points,
+            data: builder.buffer,
+            boundingBox: box.createTransferable()
         },
         nextByteOffset: byteOffset + SNAKE_CHUNK_HEADER_SIZE + n
     };

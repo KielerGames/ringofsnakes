@@ -1,94 +1,57 @@
-import { Camera } from "../data/Camera";
-import GameData from "../data/GameData";
-import * as SnakeChunkRenderer from "./SnakeChunkRenderer";
-import * as SnakeHeadRenderer from "./SnakeHeadRenderer";
-import * as FoodRenderer from "./FoodRenderer";
-import * as BoxRenderer from "./BoxRenderer";
-import * as BufferManager from "../webgl/BufferManager";
-import * as SkinManager from "./SkinManager";
+import Game from "../data/Game";
+import * as WebGLContextProvider from "./webgl/WebGLContextProvider";
+import * as SkinLoader from "./SkinLoader";
+import * as SnakeHeadRenderer from "./modules/SnakeHeadRenderer";
+import * as SnakeChunkRenderer from "./modules/SnakeChunkRenderer";
+import * as BoxRenderer from "./modules/BoxRenderer";
+import * as FoodRenderer from "./modules/FoodRenderer";
+import * as TextRenderer from "./modules/TextRenderer";
+import * as SnakeNameRenderer from "./modules/SnakeNameRenderer";
 
-let gl: WebGLRenderingContext;
+export function render(game: Readonly<Game>): void {
+    const gl = WebGLContextProvider.getContext();
 
-export function init(parentNode: HTMLElement = document.body): void {
-    // create canvas element
-    const canvas = document.createElement("canvas");
-    canvas.id = "main-canvas";
-    parentNode.appendChild(canvas);
-
-    // init gl context
-    gl = canvas.getContext("webgl", {
-        alpha: false,
-        depth: false,
-        antialias: true,
-        preserveDrawingBuffer: false,
-        premultipliedAlpha: false
-    })!;
-    gl.disable(gl.DEPTH_TEST);
-    gl.enable(gl.BLEND);
-
-    resize(true);
-
-    // init other render modules
-    BufferManager.init(gl, 16);
-    SnakeChunkRenderer.init(gl);
-    SnakeHeadRenderer.init(gl);
-    FoodRenderer.init(gl);
-    SkinManager.init(gl);
-
-    if (__DEBUG__) {
-        BoxRenderer.init(gl);
-    }
-}
-
-export function render(
-    data: Readonly<GameData>,
-    camera: Camera,
-    time: number
-): void {
-    // resize canvas (only if needed)
-    resize();
+    updateSize(gl);
+    const canvas = gl.canvas as HTMLCanvasElement;
+    game.camera.setRatio(canvas.clientWidth, canvas.clientHeight);
 
     // background color
     gl.clearColor(0.1, 0.1, 0.1, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    const canvas = gl.canvas;
-    const transform = camera.getTransformMatrix(canvas.width, canvas.height);
+    // compute transform matrix once
+    const transform = game.camera.transformMatrix;
 
-    const pTime = data.timeSinceLastUpdate(time);
+    SkinLoader.setSkinTexture();
 
-    SkinManager.setSkinTexture(gl.TEXTURE0);
-
-    FoodRenderer.render(data.getFoodChunks(), data.targetSnake, transform);
-
-    // render snake bodies
-    SnakeChunkRenderer.render(data.getSnakeChunks(), transform, pTime);
-
-    // render snake heads
-    SnakeHeadRenderer.render(data.getSnakes(), transform, pTime);
+    // render parts
+    FoodRenderer.render(game, transform);
+    SnakeChunkRenderer.render(game, transform);
+    SnakeHeadRenderer.render(game.snakes.values(), transform);
+    SnakeNameRenderer.render(game);
 
     if (__DEBUG__) {
         BoxRenderer.renderAll(transform);
     }
+    TextRenderer.renderAll();
 }
 
-function resize(force: boolean = false) {
+function updateSize(gl: WebGLRenderingContext) {
     const canvas = gl.canvas as HTMLCanvasElement;
 
     // get current canvas size in CSS pixels
     const displayWidth = canvas.clientWidth;
     const displayHeight = canvas.clientHeight;
 
-    const needResize =
-        canvas.width !== displayWidth || canvas.height !== displayHeight;
-
-    if (force || needResize) {
+    if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
         if (__DEBUG__) {
             console.info("Resizing canvas...");
         }
+
         // resize canvas
         canvas.width = displayWidth;
         canvas.height = displayHeight;
+
         // update clip space to screen pixel transformation
         gl.viewport(0, 0, displayWidth, displayHeight);
     }

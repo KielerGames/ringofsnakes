@@ -1,116 +1,130 @@
 import * as Comlink from "comlink";
-import { ClientConfig } from "../data/ClientConfig";
+import { ClientConfig } from "../data/config/ClientConfig";
+import { connect, Socket } from "./socket";
+import RateLimiter from "../util/RateLimiter";
+import GameDataBuffer from "./data/GameDataBuffer";
+import { ClientData } from "./data/ClientData";
+import { Callback } from "../util/FunctionTypes";
+import { SpawnInfo } from "./data/JSONMessages";
 import Rectangle, { TransferableBox } from "../math/Rectangle";
-import { ClientToServerMessage, ServerToClientJSONMessage } from "../protocol";
-import { GameConfig } from "../types/GameConfig";
-import { MainThreadGameDataUpdate } from "./MainThreadGameDataUpdate";
-import WorkerGame from "./WorkerGame";
+import { DataUpdateDTO } from "../data/dto/DataUpdateDTO";
+import { GameInfoDTO } from "../data/dto/GameInfoDTO";
 
-let game: WorkerGame | null = null;
+type WorkerEvent = "server-update" | "error" | "disconnect";
+
+let socket: Socket | null = null;
+
+const userInputRateLimiter = new RateLimiter<ClientData>(1000 / 30, (data) => {
+    if (socket && socket.isOpen()) {
+        const buffer = new ArrayBuffer(9);
+        const view = new DataView(buffer);
+        const box = Rectangle.fromTransferable(data.viewBox);
+        view.setFloat32(0, box.width / box.height, false);
+        view.setFloat32(4, data.targetAlpha, false);
+        view.setUint8(8, data.wantsToBeFast ? 1 : 0);
+        socket.sendBinary(buffer);
+    }
+});
+
+const data = new GameDataBuffer();
+
+const eventListeners = new Map<WorkerEvent, Callback>();
 
 export class WorkerAPI {
-    public async init(
-        name: string,
-        cfg: Readonly<ClientConfig>
-    ): Promise<void> {
+    async init(name: string, cfg: Readonly<ClientConfig>): Promise<GameInfoDTO> {
+        if (socket !== null) {
+            throw new Error("Worker is already initialized.");
+        }
+
         const protocol = cfg.server.wss ? "wss" : "ws";
-        const websocket = new WebSocket(
-            `${protocol}://${cfg.server.host}:${cfg.server.port}/game`
-        );
-        websocket.binaryType = "arraybuffer";
+        const url = `${protocol}://${cfg.server.host}:${cfg.server.port}/game`;
+        socket = await connect(url);
 
-        await new Promise<void>((resolve) => {
-            websocket.onopen = () => {
-                websocket.onopen = null;
-                resolve();
-            };
-        });
+        const spawnInfo: SpawnInfo = await new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => reject("SpawnInfo timeout."), 2000);
 
-        console.info("Connection open.");
-
-        game = await new Promise((resolve) => {
-            websocket.onmessage = (event: MessageEvent) => {
-                if (typeof event.data === "string") {
-                    const json = JSON.parse(
-                        event.data
-                    ) as ServerToClientJSONMessage;
-                    if (json.tag === "SpawnInfo") {
-                        websocket.onmessage = null;
-                        resolve(
-                            new WorkerGame(
-                                websocket,
-                                json.snakeId,
-                                json.gameConfig
-                            )
-                        );
-                        // this was the expected message
-                        return;
-                    }
+            socket!.onJSONMessage = (message) => {
+                if (message.tag === "SpawnInfo") {
+                    clearTimeout(timeoutId);
+                    resolve(message);
+                } else {
+                    console.warn(`Game init: Unexpected message from server.`, message);
                 }
-
-                console.warn(
-                    `Game init: Unexpected websocket message from server. (${typeof event.data})`
-                );
             };
-
-            websocket.send(
-                JSON.stringify({
-                    tag: "UpdatePlayerName",
-                    name
-                } as ClientToServerMessage)
-            );
         });
 
-        console.info(`WorkerGame init complete.`);
+        data.init(spawnInfo);
+
+        socket.onJSONMessage = (message) => {
+            switch (message.tag) {
+                default: {
+                    data.addJSONUpdate(message);
+                }
+            }
+            triggerEvent("server-update");
+        };
+
+        socket.onBinaryMessage = (message) => {
+            data.addBinaryUpdate(message);
+            triggerEvent("server-update");
+        };
+
+        socket.onclose = () => {
+            triggerEvent("disconnect");
+            self.close();
+        };
+
+        socket.sendJSON({ tag: "UpdatePlayerName", name });
+
+        return {
+            config: data.config,
+            targetSnakeId: spawnInfo.snakeId,
+            startPosition: { x: 0, y: 0 } // TODO
+        };
     }
 
-    public updateUserData(
-        alpha: number,
-        wantsFast: boolean,
-        viewBox: TransferableBox
-    ): void {
-        if (game) {
-            game.updateUserData(
-                alpha,
-                wantsFast,
-                Rectangle.fromTransferable(viewBox)
-            );
-        }
+    async sendUserInput(alpha: number, wantsFast: boolean, viewBox: TransferableBox) {
+        userInputRateLimiter.setValue({
+            targetAlpha: alpha,
+            wantsToBeFast: wantsFast,
+            viewBox
+        });
     }
 
-    public getGameDataUpdate(): MainThreadGameDataUpdate {
-        if (game === null) {
-            throw new Error("Not initialized.");
-        }
+    getDataChanges(): DataUpdateDTO {
+        const update = data.nextUpdate();
 
-        const update = game.getDataChanges();
-        const transferables = update.newSnakeChunks.map(
-            (chunk) => chunk.data.buffer
-        );
+        // avoid copying of ArrayBuffers
+        // instead move/transfer them to the main thread
+        const transferables: ArrayBuffer[] = update.snakeChunks.map((chunk) => chunk.data.buffer);
 
         return Comlink.transfer(update, transferables);
     }
 
-    public getConfig(): GameConfig {
-        if (!game) {
-            throw new Error("No game config. (Game not fully initialized)");
+    quit(): void {
+        if (socket) {
+            socket.close();
         }
-        return game.config;
+        self.close();
     }
 
-    public onEnd(callback: () => void): void {
-        if (game === null) {
-            throw new Error("No game.");
-        }
-
-        game.socket.addEventListener("close", callback);
-    }
-
-    public quitCurrentGame(): void {
-        if (game) {
-            game.socket.close();
-        }
+    addEventListener(eventId: WorkerEvent, callback: Callback): void {
+        eventListeners.set(eventId, callback);
     }
 }
+
+function triggerEvent(event: WorkerEvent): void {
+    const listener = eventListeners.get(event);
+
+    if (listener) {
+        listener();
+    }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+self.onerror = (event, source, lineno, colno, error) => {
+    // TODO
+    triggerEvent("error");
+};
 
 Comlink.expose(new WorkerAPI());

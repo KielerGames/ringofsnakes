@@ -27,7 +27,7 @@ console.log("Done.");
 module.exports = {
     mode: "production",
     entry: {
-        main: path.join(__dirname, "src", "app", "main.tsx"),
+        main: path.join(__dirname, "src", "app", "main.ts"),
         worker: path.join(__dirname, "src", "app", "worker", "worker.ts"),
     },
     target: "web",
@@ -59,6 +59,7 @@ module.exports = {
                 {
                     __VERSION__: JSON.stringify(pkg.version),
                     __DEBUG__: "false",
+                    __TEST__: "false"
                 },
                 shaders
             )

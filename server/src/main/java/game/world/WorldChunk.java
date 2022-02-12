@@ -18,8 +18,8 @@ public class WorldChunk {
     private final List<SnakeChunk> snakeChunks = new LinkedList<>();
     private final byte x, y;
     private final World world;
+    private final List<Food> foodList = new LinkedList<>();
     private int foodVersion = 0;
-    final private List<Food> foodList = new LinkedList<>();
 
     public WorldChunk(World world, double left, double bottom, double width, double height, int x, int y) {
         assert (width > 0.0);
@@ -73,14 +73,15 @@ public class WorldChunk {
     }
 
     public ByteBuffer encodeFood() {
-        ByteBuffer buffer = ByteBuffer.allocate(FOOD_HEADER_SIZE + foodList.size() * Food.BYTE_SIZE);
+        final int numFood = Math.min(foodList.size(), Character.MAX_VALUE);
+        ByteBuffer buffer = ByteBuffer.allocate(FOOD_HEADER_SIZE + numFood * Food.BYTE_SIZE);
 
         buffer.put(this.x);
         buffer.put(this.y);
         buffer.putChar((char) foodList.size());
 
         assert (foodList.isEmpty() || buffer.hasRemaining());
-        foodList.forEach(food -> food.addToByteBuffer(buffer));
+        foodList.stream().limit(Character.MAX_VALUE).forEach(food -> food.addToByteBuffer(buffer));
         assert (!buffer.hasRemaining());
 
         return buffer.asReadOnlyBuffer().flip();

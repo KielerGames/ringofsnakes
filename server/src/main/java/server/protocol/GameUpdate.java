@@ -11,28 +11,38 @@ import java.util.List;
 import java.util.Set;
 
 public class GameUpdate {
-    public static final int HEADER_SIZE = 3;
+    public static final int HEADER_SIZE = 4;
+    private static final int ITEM_LIMIT = 255;
     private final List<ByteBuffer> snakeChunkBuffers = new LinkedList<>();
     private final List<ByteBuffer> foodChunkBuffers = new LinkedList<>();
     private final Set<Snake> snakes = new HashSet<>();
     private int snakeChunkBufferSize = 0;
     private int foodChunkBufferSize = 0;
+    private byte ticksSinceLastUpdate = 0;
 
     public void addSnakeChunk(SnakeChunk chunk) {
         if (!chunk.isEmpty()) {
-            snakeChunkBuffers.add(chunk.getBuffer());
-            snakeChunkBufferSize += chunk.getByteSize();
+            if (snakeChunkBuffers.size() < ITEM_LIMIT) {
+                snakeChunkBuffers.add(chunk.getBuffer());
+                snakeChunkBufferSize += chunk.getByteSize();
+            }
         }
         addSnake(chunk.getSnake());
     }
 
     public void addFoodChunk(WorldChunk chunk) {
-        final var encodedFood = chunk.encodeFood();
-        foodChunkBuffers.add(encodedFood);
-        foodChunkBufferSize += encodedFood.capacity();
+        if (foodChunkBuffers.size() >= ITEM_LIMIT) {
+            return;
+        }
+        final var encodedFoodChunk = chunk.encodeFood();
+        foodChunkBuffers.add(encodedFoodChunk);
+        foodChunkBufferSize += encodedFoodChunk.capacity();
     }
 
     public void addSnake(Snake snake) {
+        if (snakes.size() >= ITEM_LIMIT) {
+            return;
+        }
         snakes.add(snake);
     }
 
@@ -41,11 +51,13 @@ public class GameUpdate {
         final int bufferSize = HEADER_SIZE + snakeInfoSize + snakeChunkBufferSize + foodChunkBufferSize;
         ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
 
-        assert snakes.size() < 256; // TODO
-        assert snakeChunkBuffers.size() < 256; // TODO
-        assert foodChunkBuffers.size() < 256; // TODO
+        assert ticksSinceLastUpdate >= 0; // TODO: should be > 0
+        assert snakes.size() < 256;
+        assert snakeChunkBuffers.size() < 256;
+        assert foodChunkBuffers.size() < 256;
 
         // update header
+        buffer.put(ticksSinceLastUpdate);
         buffer.put((byte) snakes.size());
         buffer.put((byte) snakeChunkBuffers.size());
         buffer.put((byte) foodChunkBuffers.size());
@@ -61,6 +73,11 @@ public class GameUpdate {
 
     public boolean isEmpty() {
         return snakes.isEmpty() && foodChunkBuffers.isEmpty();
+    }
+
+    public void setTicksSinceLastUpdate(byte ticks) {
+        assert ticks >= 0;
+        this.ticksSinceLastUpdate = ticks;
     }
 
     @Override

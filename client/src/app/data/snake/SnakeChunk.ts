@@ -151,7 +151,6 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
             const time = Math.round(0.001 * (FrameTime.now() - this.lastUpdateTime));
             return [
                 `SnakeChunk ${this.snake.id}-${this.shortId}`,
-                `offset: ${Math.round(this.lastKnownOffset)} ~ ${Math.round(this.offset)}`,
                 `updated ${time}s ago`
             ].join("\n");
         } else {

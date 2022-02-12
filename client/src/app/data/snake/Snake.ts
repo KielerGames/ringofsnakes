@@ -112,10 +112,14 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             }
         }
 
+        return this.isHeadVisible(camera, epsilon);
+    }
+
+    isHeadVisible(camera: Camera, epsilon: number = 0.0): boolean {
         const size = 2 * 2.0 * 1.25 * this._width;
         const headBox = Rectangle.createAt(this.predictedHeadPosition, size, size);
 
-        return Rectangle.distance2(headBox, camera.viewBox) < epsilon * epsilon;
+        return Rectangle.distance2(headBox, camera.viewBox) <= epsilon * epsilon;
     }
 
     destroy() {

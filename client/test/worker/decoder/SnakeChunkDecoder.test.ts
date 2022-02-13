@@ -64,11 +64,14 @@ describe("SnakeChunkDecoder", () => {
 
         // data length should be a multiple of VERTEX_SIZE
         expect(vertexData.length % (2 * VERTEX_SIZE)).toBe(0);
+        // ignore last point
+        const n = (vertexData.length / (2 * VERTEX_SIZE)) - 1;
 
         let last = Number.POSITIVE_INFINITY;
-        for (let i = 0; i < vertexData.length; i += 2 * VERTEX_SIZE) {
-            const oc1 = vertexData[i + 5];
-            const oc2 = vertexData[i + 5 + VERTEX_SIZE];
+        for (let i = 0; i < n; i++) {
+            const o = i * 2 * VERTEX_SIZE;
+            const oc1 = vertexData[o + 5];
+            const oc2 = vertexData[o + 5 + VERTEX_SIZE];
             expect(oc1).toBeLessThan(last);
             expect(oc1).toBe(oc2);
             last = oc1;
@@ -104,11 +107,14 @@ describe("SnakeChunkDecoder", () => {
         const vertexData = SCD.decode(buffer, 0, defaultConfig).data.data;
         // data length should be a multiple of VERTEX_SIZE
         expect(vertexData.length % (2 * VERTEX_SIZE)).toBe(0);
+        // ignore last point
+        const n = (vertexData.length / (2 * VERTEX_SIZE)) - 1;
 
         let lastX = -1;
-        for (let i = 0; i < vertexData.length; i += 2 * VERTEX_SIZE) {
-            const x = vertexData[i];
-            const y = vertexData[i + 1];
+        for (let i = 0; i < n; i++) {
+            const o = i * 2 * VERTEX_SIZE;
+            const x = vertexData[o];
+            const y = vertexData[o + 1];
             expect(x).toBeGreaterThan(lastX);
             lastX = x;
             expect(y).toBeCloseTo(0.0, 8);

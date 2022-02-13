@@ -21,10 +21,8 @@ export default class SnakeChunkVertexBufferBuilder {
     }
 
     addPoint(x: number, y: number, alpha: number, pathOffset: number): void {
+        this.checkCanAdd();
         const vb = this.buffer;
-        if (this.position >= vb.length) {
-            throw new RangeError("Cannot add another point to vertex buffer!");
-        }
 
         // current position in vertex buffer
         let pos = this.position;
@@ -55,5 +53,30 @@ export default class SnakeChunkVertexBufferBuilder {
         vb[pos + 3] = ny;
         vb[pos + 4] = -1.0;
         vb[pos + 5] = pathDist;
+    }
+
+    duplicateLastPoint(): void {
+        this.checkCanAdd();
+
+        // current position in vertex buffer
+        const pos = this.position;
+        const vbo = pos - 2 * VERTEX_SIZE;
+        if (vbo < 0) {
+            throw new Error("No point to duplicate.");
+        }
+        this.position += 2 * VERTEX_SIZE;
+
+        const vb = this.buffer;
+
+        // copy data
+        for (let i = 0; i < 2 * VERTEX_SIZE; i++) {
+            vb[pos + i] = vb[vbo + i];
+        }
+    }
+
+    private checkCanAdd() {
+        if (this.position >= this.buffer.length) {
+            throw new RangeError("Cannot add another point to vertex buffer.");
+        }
     }
 }

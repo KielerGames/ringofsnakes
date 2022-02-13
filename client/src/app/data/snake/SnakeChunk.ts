@@ -4,6 +4,7 @@ import * as FrameTime from "../../util/FrameTime";
 import Rectangle from "../../math/Rectangle";
 import Camera from "../camera/Camera";
 import { ManagedObject } from "../../util/ManagedMap";
+import { VERTEX_SIZE } from "../../worker/encoder/SnakeChunkVertexBufferBuilder";
 
 /**
  * Main thread representation of a SnakeChunk.
@@ -92,6 +93,40 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
         this.lastPredictionTime = FrameTime.now();
     }
 
+    /**
+     * Should only be called on the head chunk.
+     */
+    connectMeshToHead(): void {
+        const hp = this.snake.position;
+        const vb = this.gpuData.buffer;
+
+        let vbo = (this.gpuData.vertices - 2) * VERTEX_SIZE;
+        vb[vbo + 0] = hp.x;
+        vb[vbo + 1] = hp.y;
+        vb[vbo + 5] = -this.predictedOffset;
+
+        vbo += VERTEX_SIZE;
+        vb[vbo + 0] = hp.x;
+        vb[vbo + 1] = hp.y;
+        vb[vbo + 5] = -this.predictedOffset;
+    }
+
+    resetMesh(): void {
+        const vb = this.gpuData.buffer;
+
+        let vbo1 = (this.gpuData.vertices - 2) * VERTEX_SIZE;
+        let vbo2 = vbo1 - 2 * VERTEX_SIZE;
+        vb[vbo1 + 0] = vb[vbo2 + 0];
+        vb[vbo1 + 1] = vb[vbo2 + 1];
+        vb[vbo1 + 5] = vb[vbo2 + 5];
+
+        vbo1 += VERTEX_SIZE;
+        vbo2 += VERTEX_SIZE;
+        vb[vbo1 + 0] = vb[vbo2 + 0];
+        vb[vbo1 + 1] = vb[vbo2 + 1];
+        vb[vbo1 + 5] = vb[vbo2 + 5];
+    }
+
     isVisible(camera: Camera, epsilon: number = 0.0): boolean {
         const d = Rectangle.distance2(camera.viewBox, this.bounds);
         const ub = 0.5 * this.snake.width + epsilon;
@@ -149,10 +184,9 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
     get debugInfo(): string {
         if (__DEBUG__) {
             const time = Math.round(0.001 * (FrameTime.now() - this.lastUpdateTime));
-            return [
-                `SnakeChunk ${this.snake.id}-${this.shortId}`,
-                `updated ${time}s ago`
-            ].join("\n");
+            return [`SnakeChunk ${this.snake.id}-${this.shortId}`, `updated ${time}s ago`].join(
+                "\n"
+            );
         } else {
             // only allowed in debug mode
             throw new Error();

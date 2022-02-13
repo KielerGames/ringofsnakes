@@ -116,7 +116,7 @@ export function decode(
     // this way pathData[idx + 2] is always less or equal to length
     length = Math.max(length, pathData[pathData.length - 2]);
 
-    const builder = new SnakeChunkVertexBufferBuilder(points, length);
+    const builder = new SnakeChunkVertexBufferBuilder(points + 1, length);
 
     for (let i = 0; i < points; i++) {
         const pdo = PATH_VERTEX_SIZE * i;
@@ -128,6 +128,9 @@ export function decode(
             pathData[pdo + 2] //  path offset
         );
     }
+
+    // for mesh prediction we store the last point twice
+    builder.duplicateLastPoint();
 
     const box = new Rectangle(minX, maxX, minY, maxY);
 

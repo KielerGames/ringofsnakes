@@ -16,7 +16,8 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     readonly id: number;
     readonly skin: number;
     target: boolean = false;
-    
+    headChunk: SnakeChunk | null = null;
+
     private readonly chunks = new Map<number, SnakeChunk>();
     private lastUpdateTime: number;
     private lastPredictionTime: number;
@@ -70,11 +71,19 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     }
 
     predict(): void {
+        // predict snake head
         this.predictPosition();
         this.predictDirection();
 
+        // predict body
         for (const snakeChunk of this.chunks.values()) {
             snakeChunk.predict();
+        }
+
+        // fix head chunk mesh
+        const headChunk = this.headChunk;
+        if (headChunk) {
+            headChunk.connectMeshToHead();
         }
 
         this.lastPredictionTime = FrameTime.now();
@@ -85,6 +94,12 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             console.warn(`Snake ${this.id} already has a registered chunk with id ${chunk.id}.`);
         }
         this.chunks.set(chunk.id, chunk);
+        if (chunk.id === this.headChunkId) {
+            if (this.headChunk !== null) {
+                this.headChunk.resetMesh();
+            }
+            this.headChunk = chunk;
+        }
     }
 
     unregisterSnakeChunk(chunk: SnakeChunk): void {
@@ -134,10 +149,6 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         if (__DEBUG__ && this.hasChunks()) {
             console.warn(`Snake ${this.id} still had chunks when it was destroyed.`);
         }
-    }
-
-    get headChunk(): SnakeChunk | undefined {
-        return this.chunks.get(this.headChunkId);
     }
 
     get name(): string {

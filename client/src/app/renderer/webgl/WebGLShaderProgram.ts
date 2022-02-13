@@ -186,7 +186,7 @@ export default class WebGLShaderProgram {
     public setAttribute(name: string, value: ShaderVarValue | null): void {
         const attrib = this.attribs.get(name);
 
-        if(attrib === undefined) {
+        if (attrib === undefined) {
             throw new Error(`Attribute ${name} does not exist.`);
         }
 
@@ -200,7 +200,7 @@ export default class WebGLShaderProgram {
     public setUniform(name: string, value: ShaderVarValue): void {
         const uniform = this.uniforms.get(name);
 
-        if(uniform === undefined) {
+        if (uniform === undefined) {
             throw new Error(`Uniform ${name} does not exist.`);
         }
 

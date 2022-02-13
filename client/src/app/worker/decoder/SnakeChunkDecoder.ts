@@ -138,7 +138,7 @@ export function decode(
             length,
             offset: chunkOffset,
             full,
-            vertices: 2 * points,
+            vertices: builder.vertices,
             data: builder.buffer,
             boundingBox: box.createTransferable()
         },

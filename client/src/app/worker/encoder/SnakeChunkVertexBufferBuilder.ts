@@ -3,20 +3,21 @@ import assert from "../../util/assert";
 export const VERTEX_SIZE = 6;
 
 export default class SnakeChunkVertexBufferBuilder {
-    private vertices: number;
+    readonly vertices: number;
     readonly buffer: Float32Array;
+    private readonly pathPoints: number;
+    private readonly chunkPathLength: number;
     private position: number = 0;
-    private chunkPathLength: number;
 
     constructor(numPoints: number, chunkLength: number) {
         assert(numPoints > 0);
         assert(chunkLength > 0.0);
 
-        this.vertices = numPoints;
+        this.pathPoints = numPoints;
+        this.vertices = 2 * this.pathPoints; // triangle strip format
         this.chunkPathLength = chunkLength;
 
-        // triangle strip format
-        this.buffer = new Float32Array(2 * VERTEX_SIZE * this.vertices);
+        this.buffer = new Float32Array(this.vertices * VERTEX_SIZE);
     }
 
     addPoint(x: number, y: number, alpha: number, pathOffset: number): void {
@@ -26,9 +27,8 @@ export default class SnakeChunkVertexBufferBuilder {
         }
 
         // current position in vertex buffer
-        const pos = this.position;
-        assert(pos < this.vertices);
-        this.position++;
+        let pos = this.position;
+        this.position += 2 * VERTEX_SIZE;
 
         // compute normal vector
         const normalAlpha = alpha - 0.5 * Math.PI;
@@ -39,25 +39,21 @@ export default class SnakeChunkVertexBufferBuilder {
         const pathDist = this.chunkPathLength - pathOffset;
 
         // right vertex
-        {
-            const vbo = 2 * VERTEX_SIZE * pos;
-            vb[vbo + 0] = x;
-            vb[vbo + 1] = y;
-            vb[vbo + 2] = nx;
-            vb[vbo + 3] = ny;
-            vb[vbo + 4] = 1.0;
-            vb[vbo + 5] = pathDist;
-        }
+        vb[pos + 0] = x;
+        vb[pos + 1] = y;
+        vb[pos + 2] = nx;
+        vb[pos + 3] = ny;
+        vb[pos + 4] = 1.0;
+        vb[pos + 5] = pathDist;
+
+        pos += VERTEX_SIZE;
 
         // left vertex
-        {
-            const vbo = 2 * VERTEX_SIZE * pos + VERTEX_SIZE;
-            vb[vbo + 0] = x;
-            vb[vbo + 1] = y;
-            vb[vbo + 2] = nx;
-            vb[vbo + 3] = ny;
-            vb[vbo + 4] = -1.0;
-            vb[vbo + 5] = pathDist;
-        }
+        vb[pos + 0] = x;
+        vb[pos + 1] = y;
+        vb[pos + 2] = nx;
+        vb[pos + 3] = ny;
+        vb[pos + 4] = -1.0;
+        vb[pos + 5] = pathDist;
     }
 }

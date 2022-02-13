@@ -107,8 +107,8 @@ describe("SnakeChunkDecoder", () => {
 
         let lastX = -1;
         for (let i = 0; i < vertexData.length; i += 2 * VERTEX_SIZE) {
-            let x = vertexData[i];
-            let y = vertexData[i + 1];
+            const x = vertexData[i];
+            const y = vertexData[i + 1];
             expect(x).toBeGreaterThan(lastX);
             lastX = x;
             expect(y).toBeCloseTo(0.0, 8);

@@ -21,7 +21,7 @@ let buffer: WebGLBuffer;
         gl,
         __VERTEXSHADER_SNAKE__,
         __FRAGMENTSHADER_SNAKE__,
-        ["vPosition", "vNormal", "vNormalOffset", "vRelativePathOffset"]
+        ["aPosition", "aNormal", "aNormalOffset", "aRelativePathOffset"]
     );
 
     buffer = gl.createBuffer()!;

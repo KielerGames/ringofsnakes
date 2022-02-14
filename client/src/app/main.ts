@@ -38,6 +38,7 @@ document.title = `Snake Royale ${__VERSION__}`;
         FrameTime.update(time);
         game.predict();
         GameRenderer.render(game);
+        UserInput.tick();
 
         if (player.alive) {
             setTimeout(() => game.update());
@@ -56,6 +57,7 @@ document.title = `Snake Royale ${__VERSION__}`;
 
     // stop game on error
     window.addEventListener("error", (e) => {
+        game.quit();
         console.error("Stopped due to unhandled error.", e);
     });
 })();

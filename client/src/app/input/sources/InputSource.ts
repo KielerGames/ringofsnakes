@@ -27,6 +27,22 @@ export default abstract class InputSource {
         this.notifyListeners();
     }
 
+    protected set(wantsFast: boolean, direction: number): void {
+        const changed = wantsFast !== this.wantsFast || direction !== this.direction;
+
+        if (!changed) {
+            return;
+        }
+
+        this.wantsFast = wantsFast;
+        this.direction = direction;
+        this.notifyListeners();
+    }
+
+    protected getCurrentDirection(): number {
+        return this.direction;
+    }
+
     private notifyListeners() {
         this.listeners.forEach((listener) => listener(this.wantsFast, this.direction));
     }

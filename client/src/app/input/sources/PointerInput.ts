@@ -4,7 +4,7 @@ import InputSource from "./InputSource";
 export default class PointerInput extends InputSource {
     private clickCatcher: HTMLElement | null = null;
 
-    public constructor() {
+    constructor() {
         super();
 
         this.pointerDownHandler = this.pointerDownHandler.bind(this);
@@ -30,7 +30,7 @@ export default class PointerInput extends InputSource {
         this.setWantsFast(false);
     }
 
-    public setClickCatcher(element: HTMLElement): void {
+    setClickCatcher(element: HTMLElement): void {
         assert(element !== null);
 
         if (this.clickCatcher !== null) {

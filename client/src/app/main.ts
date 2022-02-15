@@ -6,6 +6,7 @@ import * as WebGLContextProvider from "./renderer/webgl/WebGLContextProvider";
 import * as TextRenderer from "./renderer/modules/TextRenderer";
 import * as GameRenderer from "./renderer/GameRenderer";
 import * as UserInput from "./input/UserInput";
+import * as InputDirectionDisplay from "./ui/InputDirectionDisplay";
 
 // create styles (in <head>)
 import "../styles/main.less";
@@ -21,6 +22,8 @@ const textLayer = document.createElement("div");
 textLayer.id = "textLayer";
 document.body.appendChild(textLayer);
 TextRenderer.init(textLayer);
+
+InputDirectionDisplay.appendTo(document.body);
 
 // initialize UI container
 const uiRoot = document.createElement("div");

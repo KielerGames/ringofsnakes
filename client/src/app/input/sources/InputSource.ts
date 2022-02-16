@@ -1,3 +1,5 @@
+import { normalizeAngle } from "../../math/Angle";
+
 type InputChangeListener = (wantsFast: boolean, direction: number) => void;
 
 export default abstract class InputSource {
@@ -19,7 +21,9 @@ export default abstract class InputSource {
     }
 
     protected setDirection(value: number): void {
-        if (value === this.direction) {
+        const newDirection = normalizeAngle(value);
+
+        if (newDirection === this.direction) {
             return;
         }
 
@@ -28,14 +32,15 @@ export default abstract class InputSource {
     }
 
     protected set(wantsFast: boolean, direction: number): void {
-        const changed = wantsFast !== this.wantsFast || direction !== this.direction;
+        const nd = normalizeAngle(direction);
+        const changed = wantsFast !== this.wantsFast || nd !== this.direction;
 
         if (!changed) {
             return;
         }
 
         this.wantsFast = wantsFast;
-        this.direction = direction;
+        this.direction = nd;
         this.notifyListeners();
     }
 

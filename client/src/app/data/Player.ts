@@ -10,7 +10,7 @@ export default class Player {
     private remote: Remote;
     private game: Game;
     readonly snakeId: number;
-    private snakeHasExisted: boolean = false;
+    private _alive: boolean = true;
     private inputListener: UserInputListener;
 
     constructor(remote: Remote, snakeId: number, game: Game) {
@@ -26,20 +26,17 @@ export default class Player {
 
         UserInput.addListener(this.inputListener);
 
-        // TODO: remove listener when dead
+        game.addEventListener("snakeDeath", (snake) => {
+            if (snake.id !== this.snakeId) {
+                return;
+            }
+
+            this._alive = false;
+            UserInput.removeListener(this.inputListener);
+        });
     }
 
     get alive(): boolean {
-        const snake = this.game.targetSnake;
-
-        if (snake === undefined && !this.snakeHasExisted) {
-            return true;
-        }
-
-        if (snake !== undefined) {
-            this.snakeHasExisted = true;
-        }
-
-        return snake !== undefined && snake.id === this.snakeId;
+        return this._alive;
     }
 }

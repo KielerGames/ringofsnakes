@@ -13,37 +13,52 @@ const deviceChangeListeners = new Set<DeviceChangeListener>();
 const pointerInput = new PointerInput();
 const keyboardInput = new KeyboardInput(() => ({ wantsFast: lastFast, direction: lastDirection }));
 
+// input state
 let lastFast: boolean = false;
 let lastDirection: number = 0.0;
-let lastSource: DeviceName | "no-device" = "no-device";
+let lastSource: DeviceName | undefined = undefined;
 
+/**
+ * Listen for user input changes (fast & direction).
+ */
 export function addListener(listener: UserInputListener): void {
     inputListeners.add(listener);
 }
 
+/**
+ * Listen for user input device changes.
+ */
 export function addDeviceChangeListener(listener: DeviceChangeListener): void {
     deviceChangeListeners.add(listener);
 }
 
-// TODO this should be called
 export function removeListener(listener: UserInputListener) {
     inputListeners.delete(listener);
 }
 
 export function removeAllListeners(): void {
     inputListeners.clear();
+    deviceChangeListeners.clear();
 }
 
+/**
+ * Initialize user input module.
+ * @param clickCatcher A HTMLElement that catches click/touch events.
+ */
 export function init(clickCatcher: HTMLElement): void {
     pointerInput.setClickCatcher(clickCatcher);
 }
 
+/**
+ * Should be called once per frame.
+ */
 export function tick(): void {
     keyboardInput.tick();
 }
 
 function createInputChangeHandler(device: InputSource) {
     return (state: Partial<InputState>) => {
+        // unpack partial new input state
         const direction =
             state.direction !== undefined ? normalizeAngle(state.direction) : lastDirection;
         const wantsFast = state.wantsFast ?? lastFast;
@@ -52,13 +67,15 @@ function createInputChangeHandler(device: InputSource) {
             return;
         }
 
+        // update input state
         lastDirection = direction;
         lastFast = wantsFast;
 
+        // notify listeners
         inputListeners.forEach((listener) => listener(wantsFast, direction));
 
+        // did the device change?
         const source = device.getDeviceName();
-
         if (lastSource !== source) {
             lastSource = source;
             deviceChangeListeners.forEach((listener) => listener(source));

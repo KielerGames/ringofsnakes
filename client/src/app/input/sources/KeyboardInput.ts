@@ -1,14 +1,20 @@
-import InputSource from "./InputSource";
+import { Provider } from "../../util/FunctionTypes";
+import InputSource, { InputState } from "./InputSource";
 
 type Action = "left" | "right" | "fast";
 type Key = string;
 
 export default class KeyboardInput extends InputSource {
-    private pressed: Set<Key> = new Set();
-    private keyMappings: Map<Action, Set<Key>> = new Map();
+    private readonly pressed: Set<Key> = new Set();
+    private readonly keyMappings: Map<Action, Set<Key>> = new Map();
+    private readonly trackedKeys: Set<Key> = new Set();
+    private readonly stateProvider: Provider<InputState>;
+    private previousTickAnyPressed: boolean = false;
 
-    constructor() {
+    constructor(provider: Provider<InputState>) {
         super();
+
+        this.stateProvider = provider;
 
         this.addMappings("left", ["a", "ArrowLeft"]);
         this.addMappings("right", ["d", "ArrowRight"]);
@@ -30,22 +36,34 @@ export default class KeyboardInput extends InputSource {
 
     addMappings(action: Action, keys: Key[]): void {
         const keySet = this.keyMappings.get(action) ?? new Set();
-        keys.forEach((key) => keySet.add(key.toLowerCase()));
+        keys.forEach((key) => {
+            const keyId = key.toLowerCase();
+            keySet.add(keyId);
+            this.trackedKeys.add(keyId);
+        });
         this.keyMappings.set(action, keySet);
     }
 
     tick(): void {
+        const anyPressed = this.anyPressed();
+
+        if (!anyPressed && !this.previousTickAnyPressed) {
+            return;
+        }
+
+        this.previousTickAnyPressed = anyPressed;
+
         const wantsFast = this.isPressed("fast");
-        const direction = this.getCurrentDirection();
+        const direction = this.stateProvider().direction;
         let change = 0.0;
 
         if (this.isPressed("left")) {
-            change += 0.1;
+            change += 0.05;
         } else if (this.isPressed("right")) {
-            change -= 0.1;
+            change -= 0.05;
         }
 
-        this.set(wantsFast, direction + change);
+        this.set({ wantsFast, direction: direction + change });
     }
 
     private isPressed(action: Action): boolean {
@@ -57,6 +75,16 @@ export default class KeyboardInput extends InputSource {
 
         for (const key of keys) {
             if (this.pressed.has(key.toLowerCase())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private anyPressed(): boolean {
+        for (const key of this.pressed) {
+            if (this.trackedKeys.has(key)) {
                 return true;
             }
         }

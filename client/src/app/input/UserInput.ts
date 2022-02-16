@@ -1,12 +1,17 @@
 import PointerInput from "./sources/PointerInput";
 import KeyboardInput from "./sources/KeyboardInput";
+import { normalizeAngle } from "../math/Angle";
+import { InputState } from "./sources/InputSource";
 
 export type UserInputListener = (wantsFast: boolean, direction: number) => void;
 
 const listeners = new Set<UserInputListener>();
 
 const pointerInput = new PointerInput();
-const keyboardInput = new KeyboardInput();
+const keyboardInput = new KeyboardInput(() => ({ wantsFast: lastFast, direction: lastDirection }));
+
+let lastFast: boolean = false;
+let lastDirection: number = 0.0;
 
 export function addListener(listener: UserInputListener) {
     listeners.add(listener);
@@ -33,7 +38,18 @@ export function tick(): void {
     keyboardInput.tick();
 }
 
-function inputChangeHandler(wantsFast: boolean, direction: number): void {
+function inputChangeHandler(state: Partial<InputState>): void {
+    const direction =
+        state.direction !== undefined ? normalizeAngle(state.direction) : lastDirection;
+    const wantsFast = state.wantsFast ?? lastFast;
+
+    if (lastFast === wantsFast && lastDirection === direction) {
+        return;
+    }
+
+    lastDirection = direction;
+    lastFast = wantsFast;
+
     listeners.forEach((listener) => listener(wantsFast, direction));
 }
 

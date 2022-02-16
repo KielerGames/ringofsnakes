@@ -15,19 +15,19 @@ export default class PointerInput extends InputSource {
             const y = 0.5 * window.innerHeight - e.pageY;
             if (x * x + y * y > 1) {
                 const alpha = Math.atan2(y, x);
-                this.setDirection(alpha);
+                this.set({ direction: alpha });
             }
         });
     }
 
     private pointerDownHandler(e: PointerEvent) {
         e.stopPropagation();
-        this.setWantsFast(true);
+        this.set({ wantsFast: true });
     }
 
     private pointerUpHandler(e: PointerEvent) {
         e.stopPropagation();
-        this.setWantsFast(false);
+        this.set({ wantsFast: false });
     }
 
     setClickCatcher(element: HTMLElement): void {

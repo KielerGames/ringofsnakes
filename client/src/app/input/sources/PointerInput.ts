@@ -5,7 +5,7 @@ export default class PointerInput extends InputSource {
     private clickCatcher: HTMLElement | null = null;
 
     constructor() {
-        super();
+        super("pointer");
 
         this.pointerDownHandler = this.pointerDownHandler.bind(this);
         this.pointerUpHandler = this.pointerUpHandler.bind(this);

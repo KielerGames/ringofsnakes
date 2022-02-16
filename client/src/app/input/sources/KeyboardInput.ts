@@ -12,7 +12,7 @@ export default class KeyboardInput extends InputSource {
     private previousTickAnyPressed: boolean = false;
 
     constructor(provider: Provider<InputState>) {
-        super();
+        super("keyboard");
 
         this.stateProvider = provider;
 

@@ -43,8 +43,6 @@ describe("UserInput", () => {
         UserInput.addListener(listener);
         expect(listener).not.toBeCalled();
 
-        console.log(windowEvents.mock.calls);
-
         pressKey("ArrowLeft");
         tick();
         expect(listener).toBeCalledTimes(1);

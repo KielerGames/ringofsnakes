@@ -1,11 +1,13 @@
 /* eslint-disable max-classes-per-file */
-type FloatData = null | number | number[] | Float32Array;
+
+type ShaderVarValue = number | number[] | Float32Array;
+type WebGLAttributeLocation = number;
 
 export default class WebGLShaderProgram {
     private gl: WebGLRenderingContext;
     private program: WebGLProgram;
     private uniforms: Map<string, ShaderVar<WebGLUniformLocation>> = new Map();
-    private attribs: Map<string, ShaderVar<number>> = new Map();
+    private attribs: Map<string, ShaderVar<WebGLAttributeLocation>> = new Map();
     private attribOrder: string[];
     private autoStride: number = 0;
 
@@ -135,9 +137,15 @@ export default class WebGLShaderProgram {
                 );
                 offset += attrib.size;
             } else {
-                // TODO
-                // gl.vertexAttrib[1234]f[v]()
-                throw new Error("Constant values for attributes not yet implemented!");
+                // eslint-disable-next-line no-lonely-if
+                if (attrib.type === gl.FLOAT) {
+                    gl.vertexAttrib1f(attrib.location, attrib.value as number);
+                } else {
+                    // TODO
+                    // gl.vertexAttrib[1234]f[v]()
+                    // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttrib
+                    throw new Error("Constant values for attributes not yet implemented!");
+                }
             }
         }
 
@@ -170,28 +178,33 @@ export default class WebGLShaderProgram {
         return this.gl;
     }
 
-    public setAttribute(name: string, value: FloatData): void {
+    /**
+     * Set the attribute to a constant value or enable VertexAttribArray.
+     * @param name attribute name
+     * @param value use null to enable VertexAttribArray
+     */
+    public setAttribute(name: string, value: ShaderVarValue | null): void {
         const attrib = this.attribs.get(name);
 
-        if (attrib) {
-            const stateChanged = (attrib.value === null) !== (value === null);
-            attrib.value = value;
-            if (stateChanged) {
-                this.computeStride();
-            }
-        } else {
+        if (attrib === undefined) {
             throw new Error(`Attribute ${name} does not exist.`);
+        }
+
+        const stateChanged = (attrib.value === null) !== (value === null);
+        attrib.value = value;
+        if (stateChanged) {
+            this.computeStride();
         }
     }
 
-    public setUniform(name: string, value: FloatData): void {
+    public setUniform(name: string, value: ShaderVarValue): void {
         const uniform = this.uniforms.get(name);
 
-        if (uniform) {
-            uniform.value = value;
-        } else {
+        if (uniform === undefined) {
             throw new Error(`Uniform ${name} does not exist.`);
         }
+
+        uniform.value = value;
     }
 }
 
@@ -200,7 +213,7 @@ class ShaderVar<L> {
     public readonly type: number;
     public readonly location: L;
     public readonly size: number;
-    public value: FloatData = null;
+    public value: ShaderVarValue | null = null;
     public constructor(info: WebGLActiveInfo, location: L) {
         this.name = info.name;
         this.type = info.type;

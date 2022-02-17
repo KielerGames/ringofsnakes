@@ -4,6 +4,7 @@ import * as FrameTime from "../../util/FrameTime";
 import Rectangle from "../../math/Rectangle";
 import Camera from "../camera/Camera";
 import { ManagedObject } from "../../util/ManagedMap";
+import { VERTEX_SIZE } from "../../worker/encoder/SnakeChunkVertexBufferBuilder";
 
 /**
  * Main thread representation of a SnakeChunk.
@@ -16,6 +17,7 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
     private bounds: Rectangle;
     private creationTime: number = FrameTime.now();
     private lastUpdateTime: number;
+    private length: number;
 
     gpuData: GPUData;
 
@@ -29,8 +31,8 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
         this.snake = snake;
         this.id = dto.id;
         snake.registerSnakeChunk(this);
-        this.predictedOffset = dto.offset;
         this.update(dto);
+        this.predictedOffset = dto.offset;
     }
 
     update(dto: SnakeChunkDTO): void {
@@ -40,16 +42,29 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
             console.info(`Update for final snake chunk ${this.id}.`);
         }
         this._final = dto.full;
-        this.lastOffsetUpdateTime = FrameTime.now();
-        this.lastKnownOffset = dto.offset;
+
         this.bounds = Rectangle.fromTransferable(dto.boundingBox);
         this.gpuData = {
             buffer: dto.data,
             vertices: dto.vertices
         };
+
+        this.lastKnownOffset = dto.offset;
+
+        if (this.lastKnownOffset === 0.0) {
+            const lengthChange = dto.length - this.length;
+            this.predictedOffset -= lengthChange;
+        }
+        this.length = dto.length;
+
+        this.lastOffsetUpdateTime = FrameTime.now();
         this.lastUpdateTime = FrameTime.now();
     }
 
+    /**
+     * Increase the chunks offset by the given amount.
+     * @param offsetChange should be non-negative
+     */
     updateOffset(offsetChange: number): void {
         if (__DEBUG__ && !this._final) {
             console.warn(`Offset change on non-final ${this.toString()}.`);
@@ -76,6 +91,40 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
         // combine predictions
         this.predictedOffset = 0.85 * prediction1 + 0.15 * prediction2;
         this.lastPredictionTime = FrameTime.now();
+    }
+
+    /**
+     * Should only be called on the head chunk.
+     */
+    connectMeshToHead(): void {
+        const hp = this.snake.position;
+        const vb = this.gpuData.buffer;
+
+        let vbo = (this.gpuData.vertices - 2) * VERTEX_SIZE;
+        vb[vbo + 0] = hp.x;
+        vb[vbo + 1] = hp.y;
+        vb[vbo + 5] = -this.predictedOffset;
+
+        vbo += VERTEX_SIZE;
+        vb[vbo + 0] = hp.x;
+        vb[vbo + 1] = hp.y;
+        vb[vbo + 5] = -this.predictedOffset;
+    }
+
+    resetMesh(): void {
+        const vb = this.gpuData.buffer;
+
+        let vbo1 = (this.gpuData.vertices - 2) * VERTEX_SIZE;
+        let vbo2 = vbo1 - 2 * VERTEX_SIZE;
+        vb[vbo1 + 0] = vb[vbo2 + 0];
+        vb[vbo1 + 1] = vb[vbo2 + 1];
+        vb[vbo1 + 5] = vb[vbo2 + 5];
+
+        vbo1 += VERTEX_SIZE;
+        vbo2 += VERTEX_SIZE;
+        vb[vbo1 + 0] = vb[vbo2 + 0];
+        vb[vbo1 + 1] = vb[vbo2 + 1];
+        vb[vbo1 + 5] = vb[vbo2 + 5];
     }
 
     isVisible(camera: Camera, epsilon: number = 0.0): boolean {
@@ -135,11 +184,9 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
     get debugInfo(): string {
         if (__DEBUG__) {
             const time = Math.round(0.001 * (FrameTime.now() - this.lastUpdateTime));
-            return [
-                `SnakeChunk ${this.snake.id}-${this.shortId}`,
-                `offset: ${Math.round(this.lastKnownOffset)} ~ ${Math.round(this.offset)}`,
-                `updated ${time}s ago`
-            ].join("\n");
+            return [`SnakeChunk ${this.snake.id}-${this.shortId}`, `updated ${time}s ago`].join(
+                "\n"
+            );
         } else {
             // only allowed in debug mode
             throw new Error();

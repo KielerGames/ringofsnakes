@@ -16,6 +16,8 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     readonly id: number;
     readonly skin: number;
     target: boolean = false;
+    headChunk: SnakeChunk | null = null;
+
     private readonly chunks = new Map<number, SnakeChunk>();
     private lastUpdateTime: number;
     private lastPredictionTime: number;
@@ -69,11 +71,19 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     }
 
     predict(): void {
+        // predict snake head
         this.predictPosition();
         this.predictDirection();
 
+        // predict body
         for (const snakeChunk of this.chunks.values()) {
             snakeChunk.predict();
+        }
+
+        // fix head chunk mesh
+        const headChunk = this.headChunk;
+        if (headChunk) {
+            headChunk.connectMeshToHead();
         }
 
         this.lastPredictionTime = FrameTime.now();
@@ -84,6 +94,12 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             console.warn(`Snake ${this.id} already has a registered chunk with id ${chunk.id}.`);
         }
         this.chunks.set(chunk.id, chunk);
+        if (chunk.id === this.headChunkId) {
+            if (this.headChunk !== null) {
+                this.headChunk.resetMesh();
+            }
+            this.headChunk = chunk;
+        }
     }
 
     unregisterSnakeChunk(chunk: SnakeChunk): void {
@@ -105,6 +121,9 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         return `Snake ${this.id} with ${this.chunks.size} chunks`;
     }
 
+    /**
+     * True if the snake or some of its body is visible.
+     */
     isVisible(camera: Camera, epsilon: number = 0.0): boolean {
         for (const chunk of this.chunks.values()) {
             if (chunk.isVisible(camera, epsilon)) {
@@ -112,20 +131,24 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             }
         }
 
+        return this.isHeadVisible(camera, epsilon);
+    }
+
+    /**
+     * True if the head of the snake could be visible.
+     * Checks if the bounding box of the snakes head is visible.
+     */
+    isHeadVisible(camera: Camera, epsilon: number = 0.0): boolean {
         const size = 2 * 2.0 * 1.25 * this._width;
         const headBox = Rectangle.createAt(this.predictedHeadPosition, size, size);
 
-        return Rectangle.distance2(headBox, camera.viewBox) < epsilon * epsilon;
+        return Rectangle.distance2(headBox, camera.viewBox) <= epsilon * epsilon;
     }
 
     destroy() {
         if (__DEBUG__ && this.hasChunks()) {
             console.warn(`Snake ${this.id} still had chunks when it was destroyed.`);
         }
-    }
-
-    get headChunk(): SnakeChunk | undefined {
-        return this.chunks.get(this.headChunkId);
     }
 
     get name(): string {

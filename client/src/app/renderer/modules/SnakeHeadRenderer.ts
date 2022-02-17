@@ -1,9 +1,9 @@
-import Snake from "../../data/snake/Snake";
 import { ReadonlyMatrix } from "../../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as SkinManager from "../SkinLoader";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import assert from "../../util/assert";
+import Game from "../../data/Game";
 
 declare const __VERTEXSHADER_HEAD__: string;
 declare const __FRAGMENTSHADER_HEAD__: string;
@@ -33,7 +33,7 @@ const rotOffset = -0.5 * Math.PI;
     gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
 })();
 
-export function render(snakes: Iterable<Snake>, transform: ReadonlyMatrix) {
+export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
     const gl = WebGLContextProvider.getContext();
 
     shader.use();
@@ -41,8 +41,8 @@ export function render(snakes: Iterable<Snake>, transform: ReadonlyMatrix) {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
 
-    for (const snake of snakes) {
-        if (!snake.hasChunks()) {
+    for (const snake of game.snakes.values()) {
+        if (!snake.hasChunks() || !snake.isHeadVisible(game.camera)) {
             continue;
         }
 

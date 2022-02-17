@@ -30,12 +30,6 @@ jobs:
           java-version: 17
           distribution: temurin
           cache: maven
-          
-      - name: Workflow debug maven version
-        run: mvn --version
-        
-      - name: Workflow debug java version
-        run: java --version
 
       - name: Build & run tests with Maven
         run: mvn --batch-mode test --file pom.xml

@@ -6,12 +6,11 @@ import { Consumer } from "../util/FunctionTypes";
 
 export type UserInputListener = (wantsFast: boolean, direction: number) => void;
 export type DeviceChangeListener = Consumer<DeviceName>;
+type TickedInputSource = KeyboardInput;
 
 const inputListeners = new Set<UserInputListener>();
 const deviceChangeListeners = new Set<DeviceChangeListener>();
-
-const pointerInput = new PointerInput();
-const keyboardInput = new KeyboardInput(() => ({ wantsFast: lastFast, direction: lastDirection }));
+const tickedInputSources: TickedInputSource[] = [];
 
 // input state
 let lastFast: boolean = false;
@@ -46,14 +45,20 @@ export function removeAllListeners(): void {
  * @param clickCatcher A HTMLElement that catches click/touch events.
  */
 export function init(clickCatcher: HTMLElement): void {
+    tickedInputSources.length = 0;
+
+    const pointerInput: PointerInput = new PointerInput();
     pointerInput.setClickCatcher(clickCatcher);
+
+    addInputSource(pointerInput);
+    addInputSource(new KeyboardInput(() => ({ wantsFast: lastFast, direction: lastDirection })));
 }
 
 /**
  * Should be called once per frame.
  */
 export function tick(): void {
-    keyboardInput.tick();
+    tickedInputSources.forEach((source) => source.tick());
 }
 
 function createInputChangeHandler(device: InputSource) {
@@ -83,5 +88,9 @@ function createInputChangeHandler(device: InputSource) {
     };
 }
 
-pointerInput.addListener(createInputChangeHandler(pointerInput));
-keyboardInput.addListener(createInputChangeHandler(keyboardInput));
+function addInputSource(source: InputSource): void {
+    if (source instanceof KeyboardInput) {
+        tickedInputSources.push(source);
+    }
+    source.addListener(createInputChangeHandler(source));
+}

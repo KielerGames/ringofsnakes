@@ -48,7 +48,7 @@ export default class KeyboardInput extends InputSource {
 
     tick(): void {
         // speed in rad/second
-        const speed = 2.5 * (FrameTime.now() - this.lastTick) / 1000;
+        const speed = (2.5 * (FrameTime.now() - this.lastTick)) / 1000;
         this.lastTick = FrameTime.now();
 
         const anyPressed = this.anyPressed();

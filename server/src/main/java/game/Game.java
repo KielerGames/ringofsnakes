@@ -129,7 +129,7 @@ public class Game {
 
     public void start() {
         final long tickDuration = (long) (1000 * config.tickDuration);
-        final long updateInterval = 2 * tickDuration;
+        final long updateInterval = tickDuration;
 
         executor.scheduleAtFixedRate(measure("game-tick", this::tick), 0, tickDuration, TimeUnit.MILLISECONDS);
 

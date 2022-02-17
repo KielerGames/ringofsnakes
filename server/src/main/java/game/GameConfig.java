@@ -16,7 +16,7 @@ public final class GameConfig {
 
     public GameConfig(ChunkInfo chunkInfo) {
         this.chunks = chunkInfo;
-        this.snakes = new SnakeInfo(0.24);
+        this.snakes = new SnakeInfo(0.3);
     }
 
     public static class ChunkInfo {

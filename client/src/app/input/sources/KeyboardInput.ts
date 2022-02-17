@@ -1,5 +1,6 @@
 import { Provider } from "../../util/FunctionTypes";
 import InputSource, { InputState } from "./InputSource";
+import * as FrameTime from "../../util/FrameTime";
 
 type Action = "left" | "right" | "fast";
 type Key = string;
@@ -10,6 +11,7 @@ export default class KeyboardInput extends InputSource {
     private readonly trackedKeys: Set<Key> = new Set();
     private readonly stateProvider: Provider<InputState>;
     private previousTickAnyPressed: boolean = false;
+    private lastTick: number = FrameTime.now();
 
     constructor(provider: Provider<InputState>) {
         super("keyboard");
@@ -34,7 +36,7 @@ export default class KeyboardInput extends InputSource {
         });
     }
 
-    addMappings(action: Action, keys: Key[]): void {
+    private addMappings(action: Action, keys: Key[]): void {
         const keySet = this.keyMappings.get(action) ?? new Set();
         keys.forEach((key) => {
             const keyId = key.toLowerCase();
@@ -45,22 +47,27 @@ export default class KeyboardInput extends InputSource {
     }
 
     tick(): void {
-        const anyPressed = this.anyPressed();
+        // speed in rad/second
+        const speed = 2.5 * (FrameTime.now() - this.lastTick) / 1000;
+        this.lastTick = FrameTime.now();
 
+        const anyPressed = this.anyPressed();
         if (!anyPressed && !this.previousTickAnyPressed) {
             return;
         }
-
         this.previousTickAnyPressed = anyPressed;
 
+        // compute new input state
         const wantsFast = this.isPressed("fast");
         const direction = this.stateProvider().direction;
-        let change = 0.0;
 
+        // pressing both left & right should not do anything
+        let change = 0.0;
         if (this.isPressed("left")) {
-            change += 0.05;
-        } else if (this.isPressed("right")) {
-            change -= 0.05;
+            change += speed;
+        }
+        if (this.isPressed("right")) {
+            change -= speed;
         }
 
         this.set({ wantsFast, direction: direction + change });

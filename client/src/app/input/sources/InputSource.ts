@@ -1,33 +1,33 @@
-type InputChangeListener = (wantsFast: boolean, direction: number) => void;
+type InputChangeListener = (change: Partial<InputState>) => void;
+
+export type InputState = {
+    wantsFast: boolean;
+    direction: number;
+};
+
+export type DeviceName = "keyboard" | "pointer";
 
 export default abstract class InputSource {
-    private listeners: Set<InputChangeListener> = new Set();
-    private wantsFast: boolean = false;
-    private direction: number = 0.0;
+    private readonly listeners: Set<InputChangeListener> = new Set();
+    private readonly _deviceName: DeviceName;
 
-    public addListener(listener: InputChangeListener): void {
+    protected constructor(deviceName: DeviceName) {
+        this._deviceName = deviceName;
+    }
+
+    addListener(listener: InputChangeListener): void {
         this.listeners.add(listener);
     }
 
-    protected setWantsFast(value: boolean): void {
-        if (value === this.wantsFast) {
-            return;
-        }
-
-        this.wantsFast = value;
-        this.notifyListeners();
+    protected set(newState: Partial<InputState>): void {
+        this.notifyListeners(newState);
     }
 
-    protected setDirection(value: number): void {
-        if (value === this.direction) {
-            return;
-        }
-
-        this.direction = value;
-        this.notifyListeners();
+    private notifyListeners(change: Partial<InputState>) {
+        this.listeners.forEach((listener) => listener(change));
     }
 
-    private notifyListeners() {
-        this.listeners.forEach((listener) => listener(this.wantsFast, this.direction));
+    public getDeviceName(): DeviceName {
+        return this._deviceName;
     }
 }

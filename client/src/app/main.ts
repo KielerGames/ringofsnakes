@@ -6,6 +6,7 @@ import * as WebGLContextProvider from "./renderer/webgl/WebGLContextProvider";
 import * as TextRenderer from "./renderer/modules/TextRenderer";
 import * as GameRenderer from "./renderer/GameRenderer";
 import * as UserInput from "./input/UserInput";
+import * as InputDirectionDisplay from "./ui/InputDirectionDisplay";
 
 // create styles (in <head>)
 import "../styles/main.less";
@@ -21,6 +22,8 @@ const textLayer = document.createElement("div");
 textLayer.id = "textLayer";
 document.body.appendChild(textLayer);
 TextRenderer.init(textLayer);
+
+InputDirectionDisplay.appendTo(document.body);
 
 // initialize UI container
 const uiRoot = document.createElement("div");
@@ -38,6 +41,7 @@ document.title = `Snake Royale ${__VERSION__}`;
         FrameTime.update(time);
         game.predict();
         GameRenderer.render(game);
+        UserInput.tick();
 
         if (player.alive) {
             setTimeout(() => game.update());
@@ -56,6 +60,7 @@ document.title = `Snake Royale ${__VERSION__}`;
 
     // stop game on error
     window.addEventListener("error", (e) => {
+        game.quit();
         console.error("Stopped due to unhandled error.", e);
     });
 })();

@@ -14,6 +14,8 @@ import { ManagedMap } from "../util/ManagedMap";
 import { SnakeDTO } from "./dto/SnakeDTO";
 import { SnakeChunkDTO } from "./dto/SnakeChunkDTO";
 import { FoodChunkDTO } from "./dto/FoodChunkDTO";
+import { AppEvent } from "../util/AppEvent";
+import { Consumer } from "../util/FunctionTypes";
 
 export default class Game {
     camera: Camera = new Camera();
@@ -27,6 +29,10 @@ export default class Game {
     private updateAvailable: boolean = false;
     private targetSnakeId: number | undefined;
     private stopped: boolean = false;
+
+    private readonly events = {
+        snakeDeath: new AppEvent<Snake>()
+    };
 
     private constructor() {
         this.remote = createRemote();
@@ -107,6 +113,8 @@ export default class Game {
                 continue;
             }
 
+            this.events.snakeDeath.trigger(snake);
+
             for (const snakeChunk of snake.getSnakeChunksIterator()) {
                 this.snakeChunks.remove(snakeChunk.id);
             }
@@ -115,8 +123,6 @@ export default class Game {
 
             if (snakeId === this.targetSnakeId) {
                 this.targetSnakeId = undefined;
-                // TODO
-                this.stopped = true;
             }
         }
 
@@ -138,6 +144,10 @@ export default class Game {
     quit(): void {
         this.remote.quit();
         this.stopped = true;
+    }
+
+    addEventListener(event: EventName, listener: Consumer<Snake>): void {
+        this.events[event].addListener(listener);
     }
 
     get targetSnake(): Snake | undefined {
@@ -170,3 +180,5 @@ export default class Game {
 type SnakeId = number;
 type SnakeChunkId = number;
 type FoodChunkId = number;
+
+type EventName = "snakeDeath";

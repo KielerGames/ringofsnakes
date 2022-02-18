@@ -39,3 +39,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./client/public
           keep_files: true
+          cname: ringofsnakes.io

@@ -1,10 +1,10 @@
 {
-    "name": "snake-royale-client",
+    "name": "ringofsnakes-client",
     "version": "0.2.2",
     "description": "",
     "repository": {
         "type": "git",
-        "url": "https://github.com/KielerGames/snake-royale.git"
+        "url": "https://github.com/KielerGames/ringofsnakes.git"
     },
     "private": true,
     "scripts": {

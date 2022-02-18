@@ -31,7 +31,7 @@ uiRoot.id = "root";
 document.body.appendChild(uiRoot);
 UserInput.init(uiRoot);
 
-document.title = `Snake Royale ${__VERSION__}`;
+document.title = `Ring of Snakes ${__VERSION__}`;
 
 (async () => {
     FrameTime.update(performance.now());

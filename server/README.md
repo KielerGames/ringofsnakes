@@ -1,3 +1,5 @@
+[![Java CI with Maven](https://github.com/KielerGames/ringofsnakes/actions/workflows/server.yml/badge.svg)](https://github.com/KielerGames/ringofsnakes/actions/workflows/server.yml)
+
 Requires Java 15 or newer.
 
 ## Run

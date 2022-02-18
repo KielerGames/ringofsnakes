@@ -1,0 +1,40 @@
+name: GitHub Pages Deployment
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "client/**"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build+Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2.4.0
+      
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.5.1
+        with:
+          node-version: 14.x
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      
+      - name: NPM install
+        run: npm ci
+        working-directory: client
+        
+      - name: Build client
+        run: npm run build:production
+        working-directory: client
+      
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3.7.3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./client/public

@@ -1,3 +1,5 @@
+[![Web-Client CI](https://github.com/KielerGames/ringofsnakes/actions/workflows/client.yml/badge.svg)](https://github.com/KielerGames/ringofsnakes/actions/workflows/client.yml)
+
 ## Install dependencies
 
 Requires node.js (tested with version 14). Run `npm install`.

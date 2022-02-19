@@ -64,3 +64,7 @@ document.title = `Ring of Snakes ${__VERSION__}`;
         console.error("Stopped due to unhandled error.", e);
     });
 })();
+
+if (window.location.protocol === "https:") {
+    document.body.innerHTML = `<b>HTTPS</b> is not yet supported.`;
+}

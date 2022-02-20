@@ -1,0 +1,80 @@
+#dialogLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    overflow: hidden;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(32, 32, 32, 0.75);
+    animation: dialog-background-in 0.5s;
+
+    &.show {
+        display: flex;
+    }
+
+    @keyframes dialog-background-in {
+        from {
+            background-color: transparent;
+        }
+        to {
+            background-color: rgba(32, 32, 32, 0.75);
+        }
+    }
+}
+
+.dialog-modal {
+    position: relative;
+    border: 2px solid white;
+    padding: 10px;
+    border-radius: 1px;
+    background-color: rgb(64, 64, 64);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 550px;
+    min-height: 250px;
+    gap: 0.5em;
+    animation: dialog-modal-in 0.3s;
+
+    .dialog-title {
+        font-size: 1.25em;
+        font-weight: bold;
+        flex-grow: 0;
+    }
+
+    .dialog-content {
+        flex-grow: 1;
+    }
+
+    .dialog-buttons {
+        flex-grow: 0;
+        text-align: right;
+    }
+
+    &::before {
+        content: " ";
+        display: block;
+        position: absolute;
+        inset: 0;
+        background-color: black;
+        z-index: -1;
+        transform: rotate(-3deg) scale(1.05, 1.03);
+        animation: dialog-shadow-in 0.5s;
+
+        @keyframes dialog-shadow-in {
+            0% {
+                transform: none;
+            }
+
+            60% {
+                transform: rotate(-4deg) scale(1.06, 1.04);
+            }
+
+            100% {
+                transform: rotate(-3deg) scale(1.05, 1.03);
+            }
+        }
+    }
+}

@@ -7,6 +7,7 @@ import * as TextRenderer from "./renderer/modules/TextRenderer";
 import * as GameRenderer from "./renderer/GameRenderer";
 import * as UserInput from "./input/UserInput";
 import * as InputDirectionDisplay from "./ui/InputDirectionDisplay";
+import { dialog, init as initDialogs } from "./ui/Dialogs";
 
 // create styles (in <head>)
 import "../styles/main.less";
@@ -31,7 +32,19 @@ uiRoot.id = "root";
 document.body.appendChild(uiRoot);
 UserInput.init(uiRoot);
 
+initDialogs();
+
 document.title = `Ring of Snakes ${__VERSION__}`;
+
+dialog({
+    title: "Hello World",
+    content: "This is a very important message."
+});
+
+dialog({
+    title: "Hello World 2",
+    content: "Another very important message."
+});
 
 (async () => {
     FrameTime.update(performance.now());

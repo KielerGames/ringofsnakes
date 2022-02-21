@@ -11,6 +11,7 @@
 
     &.show {
         display: flex;
+        backdrop-filter: blur(2px);
     }
 
     @keyframes dialog-background-in {
@@ -23,58 +24,118 @@
     }
 }
 
-.dialog-modal {
+.dialog-container {
     position: relative;
-    border: 2px solid white;
-    padding: 10px;
-    border-radius: 1px;
-    background-color: rgb(64, 64, 64);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    min-width: 550px;
-    min-height: 250px;
-    gap: 0.5em;
-    animation: dialog-modal-in 0.3s;
 
-    .dialog-title {
-        font-size: 1.25em;
-        font-weight: bold;
-        flex-grow: 0;
+    .dialog-modal {
+        padding: 15px;
+        background-color: rgb(64, 64, 64);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        min-width: 550px;
+        min-height: 250px;
+        gap: 1em;
+        transform: scale(1,1); /* create new stacking context */
+        animation: dialog-modal-fly-in 0.3s;
+    
+        .dialog-title {
+            font-size: 1.25em;
+            font-weight: bold;
+            flex-grow: 0;
+        }
+    
+        .dialog-content {
+            flex-grow: 1;
+        }
+    
+        .dialog-buttons {
+            flex-grow: 0;
+            text-align: right;
+
+            button {
+                position: relative;
+                min-width: 80px;
+                min-height: 35px;
+                font-weight: bold;
+                background-color: white;
+                color: black;
+                font-size: 1.15em;
+                border-radius: 2px;
+                border: none;
+
+                &::before {
+                    content: " ";
+                    position: absolute;
+                    inset: 0;
+                    box-shadow: 0 0 0 2px rgb(0,0,0);
+                    transform: rotate(3deg);
+                    pointer-events: none;
+                }
+            }
+        }
+
+        /* modal border */
+        &::after {
+            content: " ";
+            position: absolute;
+            inset: 0;
+            border: 2px solid white;
+            border-radius: 2px;
+            transform: scale(1.02, 1) rotate(1deg);
+            animation: dialog-border-in 0.5s;
+            pointer-events: none;
+    
+            @keyframes dialog-border-in {
+                0% {
+                    transform: scale(1, 0.98) rotate(0deg);
+                    opacity: 0;
+                }
+                50% {
+                    transform: translateY(-10px) rotate(0deg);
+                }
+                100% {
+                    transform: scale(1.02, 1) rotate(1deg);
+                    opacity: 1;
+                }
+            }
+        }
+    
+        @keyframes dialog-modal-fly-in {
+            from {
+                transform: scale(0.5, 0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1, 1);
+                opacity: 1;
+            }
+        }
     }
 
-    .dialog-content {
-        flex-grow: 1;
-    }
-
-    .dialog-buttons {
-        flex-grow: 0;
-        text-align: right;
-    }
-
-    &::before {
-        content: " ";
-        display: block;
+    .dialog-shadow {
         position: absolute;
         inset: 0;
         background-color: black;
-        z-index: -1;
         transform: rotate(-3deg) scale(1.05, 1.03);
         animation: dialog-shadow-in 0.5s;
 
         @keyframes dialog-shadow-in {
             0% {
-                transform: none;
+                transform: scale(0.9, 0.9);
+                opacity: 0;
             }
 
             60% {
-                transform: rotate(-4deg) scale(1.06, 1.04);
+                transform: rotate(-4deg) scale(1.1, 1.06);
             }
 
             100% {
                 transform: rotate(-3deg) scale(1.05, 1.03);
+                opacity: 1;
             }
         }
     }
+
 }

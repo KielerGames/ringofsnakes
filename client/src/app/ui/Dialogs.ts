@@ -31,7 +31,7 @@ function showNextDialog() {
         return;
     }
     const queuedDialog = dialogQueue.shift();
-    dialogLayer.innerHTML = "";
+    Preact.render(null, dialogLayer);
     if (!queuedDialog) {
         dialogLayer.classList.remove("show");
         return;

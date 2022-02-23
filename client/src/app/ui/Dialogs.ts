@@ -1,6 +1,6 @@
 import * as Preact from "preact";
 import { ComponentChild } from "preact";
-import { Consumer, Producer } from "../util/FunctionTypes";
+import { Callback, Consumer, Producer } from "../util/FunctionTypes";
 import DialogModal from "./components/DialogModal";
 
 const dialogQueue: QueuedDialog[] = [];
@@ -9,7 +9,7 @@ let current: QueuedDialog | null = null;
 
 /**
  * Display a dialog to the user.
- * @param options 
+ * @param options
  * @returns A promise that resolves when the dialog is closed.
  */
 export function dialog(options: DialogOptions): Promise<string> {
@@ -65,4 +65,4 @@ type QueuedDialog = {
  * If the callback returns a string the dialog will close with that value.
  * If the callback returns undefined the dialog will not close.
  */
-type ButtonAction = Producer<string | undefined>;
+type ButtonAction = Producer<string | undefined> | Callback;

@@ -36,27 +36,28 @@ initDialogs();
 
 document.title = `Ring of Snakes ${__VERSION__}`;
 
-dialog({
-    title: "Hello World",
-    content: "This is a very important message."
-});
-
-dialog({
-    title: "Hello World 2",
-    content: "Another very important message.",
-    buttons: [
-        {
-            label: "Button1",
-            action: () => undefined
-        },
-        {
-            label: "Button2",
-            value: "button2"
-        }
-    ]
-});
-
 (async () => {
+    if (window.location.protocol === "https:") {
+        const { host, pathname } = window.location;
+        const httpUrl = `http://${host}${pathname}`;
+        await dialog({
+            title: "Error",
+            content: (
+                <>
+                    Unfortunately <b>HTTPS</b> is not yet supported.{"\n"}Please use HTTP instead:{" "}
+                    <pre>{httpUrl}</pre>
+                </>
+            ),
+            buttons: [
+                {
+                    label: "Switch to HTTP",
+                    action: () => window.location.replace(httpUrl)
+                }
+            ]
+        });
+        return;
+    }
+
     FrameTime.update(performance.now());
     const [game, player] = await Game.joinAsPlayer("SnakeForceOne");
 
@@ -87,7 +88,3 @@ dialog({
         console.error("Stopped due to unhandled error.", e);
     });
 })();
-
-if (window.location.protocol === "https:") {
-    document.body.innerHTML = `<b>HTTPS</b> is not yet supported.`;
-}

@@ -54,7 +54,7 @@ export default class Game {
         const remote = game.remote;
 
         const info = await remote.init(name, clientConfig).catch(async (e) => {
-            await dialog({ title: "Error", content: `Failed to connect.` });
+            await dialog({ title: "Error", content: `Failed to connect to the game server.` });
             return Promise.reject(e);
         });
         game.config = info.config;

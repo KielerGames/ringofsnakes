@@ -8,9 +8,10 @@ const dialogLayer: HTMLElement = document.createElement("div");
 let current: QueuedDialog | null = null;
 
 /**
- * Display a dialog to the user.
- * @param options
+ * Display a dialog to the user. If another dialog is open it will be queued.
+ * @param options Define title, content and buttons.
  * @returns A promise that resolves when the dialog is closed.
+ *  The promise value is the value of the button that closed the dialog.
  */
 export function dialog(options: DialogOptions): Promise<string> {
     return new Promise<string>((resolve) => {

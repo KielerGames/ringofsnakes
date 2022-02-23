@@ -7,6 +7,11 @@ const dialogQueue: QueuedDialog[] = [];
 const dialogLayer: HTMLElement = document.createElement("div");
 let current: QueuedDialog | null = null;
 
+/**
+ * Display a dialog to the user.
+ * @param options 
+ * @returns A promise that resolves when the dialog is closed.
+ */
 export function dialog(options: DialogOptions): Promise<string> {
     return new Promise<string>((resolve) => {
         dialogQueue.push({
@@ -49,10 +54,15 @@ export type DialogOptions = {
 
 type DialogButton = {
     label: string;
-    shouldClose?: Producer<boolean>;
-} & ({ value: string; action?: never } | { action: Producer<string>; value?: never });
+} & ({ value: string; action?: never } | { action: ButtonAction; value?: never });
 
 type QueuedDialog = {
     options: DialogOptions;
     onExit: Consumer<string>;
 };
+
+/**
+ * If the callback returns a string the dialog will close with that value.
+ * If the callback returns undefined the dialog will not close.
+ */
+type ButtonAction = Producer<string | undefined>;

@@ -43,7 +43,17 @@ dialog({
 
 dialog({
     title: "Hello World 2",
-    content: "Another very important message."
+    content: "Another very important message.",
+    buttons: [
+        {
+            label: "Button1",
+            action: () => undefined
+        },
+        {
+            label: "Button2",
+            value: "button2"
+        }
+    ]
 });
 
 (async () => {

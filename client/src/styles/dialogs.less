@@ -29,6 +29,7 @@
 
     .dialog-modal {
         padding: 15px;
+        padding-top: 1.25em;
         background-color: rgb(64, 64, 64);
         color: white;
         display: flex;
@@ -37,41 +38,71 @@
         min-width: 550px;
         min-height: 250px;
         gap: 1em;
-        transform: scale(1,1); /* create new stacking context */
+        transform: scale(1, 1); /* create new stacking context */
         animation: dialog-modal-fly-in 0.3s;
-    
+
         .dialog-title {
             font-size: 1.25em;
             font-weight: bold;
             flex-grow: 0;
         }
-    
+
         .dialog-content {
             flex-grow: 1;
         }
-    
+
         .dialog-buttons {
             flex-grow: 0;
-            text-align: right;
+            display: flex;
+            flex-direction: row;
+            justify-content: end;
+            gap: 10px;
 
             button {
                 position: relative;
                 min-width: 80px;
                 min-height: 35px;
+                padding: 5px 8px;
                 font-weight: bold;
-                background-color: white;
-                color: black;
+                background-color: rgb(141, 142, 143);
+                color: white;
+                text-shadow: 1px 1px 0px black;
                 font-size: 1.15em;
                 border-radius: 2px;
-                border: none;
+                border: 2px solid rgb(32,32,32);
+                border-bottom-left-radius: 20px 240px;
+                border-bottom-right-radius: 300px 20px;
+                border-top-left-radius: 300px 20px;
+                border-top-right-radius: 20px 220px;
+                transition: 0.25s;
+                transform-origin: center;
+                animation: dialog-button-in 0.4s;
+                animation-delay: 0.3s;
+                animation-fill-mode: backwards;
 
-                &::before {
-                    content: " ";
-                    position: absolute;
-                    inset: 0;
-                    box-shadow: 0 0 0 2px rgb(0,0,0);
-                    transform: rotate(3deg);
-                    pointer-events: none;
+                &:hover:not(:active) {
+                    transform: scale(1.1, 1.1);
+                }
+
+                &:last-child {
+                    background-color: #0c81ee;
+                    border: 2px solid black;
+
+                    &:hover {
+                        background-color: #148dff;
+                    }
+                }
+
+                @keyframes dialog-button-in {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px) scale(0.9, 0.9);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: scale(1, 1);
+                    }
                 }
             }
         }
@@ -86,7 +117,7 @@
             transform: scale(1.02, 1) rotate(1deg);
             animation: dialog-border-in 0.5s;
             pointer-events: none;
-    
+
             @keyframes dialog-border-in {
                 0% {
                     transform: scale(1, 0.98) rotate(0deg);
@@ -101,7 +132,7 @@
                 }
             }
         }
-    
+
         @keyframes dialog-modal-fly-in {
             from {
                 transform: scale(0.5, 0.5);
@@ -137,5 +168,4 @@
             }
         }
     }
-
 }

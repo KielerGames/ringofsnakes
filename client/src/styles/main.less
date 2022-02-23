@@ -52,6 +52,15 @@ body {
     }
 }
 
+button {
+    text-transform: uppercase;
+    white-space: nowrap;
+    
+    &:not(:disabled) {
+        cursor: pointer;
+    }
+}
+
 @keyframes fade-in {
     from {
         opacity: 0;

@@ -22,16 +22,10 @@ export default class DialogModal extends Component<Props> {
                             <button
                                 key={button.label}
                                 onClick={() => {
-                                    let value = button.value;
-                                    if (button.action) {
-                                        value = button.action();
-                                    }
-                                    let shouldClose = true;
-                                    if (button.shouldClose) {
-                                        shouldClose = button.shouldClose();
-                                    }
-                                    if (shouldClose) {
-                                        this.props.onExit(value!);
+                                    const value = button.action ? button.action() : button.value;
+
+                                    if (value !== undefined) {
+                                        this.props.onExit(value);
                                     }
                                 }}
                             >

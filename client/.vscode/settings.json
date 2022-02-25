@@ -1,0 +1,10 @@
+{
+    "liveServer.settings.root": "/public/",
+    "liveServer.settings.ignoreFiles": [
+        ".vscode/**",
+        "node_modules/**",
+        "src/**",
+        "test/**"
+    ],
+    "liveServer.settings.port": 5501
+}

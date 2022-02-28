@@ -16,6 +16,7 @@ import { SnakeChunkDTO } from "./dto/SnakeChunkDTO";
 import { FoodChunkDTO } from "./dto/FoodChunkDTO";
 import { AppEvent } from "../util/AppEvent";
 import { Consumer } from "../util/FunctionTypes";
+import { dialog } from "../ui/Dialogs";
 
 export default class Game {
     camera: Camera = new Camera();
@@ -52,7 +53,10 @@ export default class Game {
         const game = new Game();
         const remote = game.remote;
 
-        const info = await remote.init(name, clientConfig);
+        const info = await remote.init(name, clientConfig).catch(async (e) => {
+            await dialog({ title: "Error", content: `Failed to connect to the game server.` });
+            return Promise.reject(e);
+        });
         game.config = info.config;
         game.camera.moveTo(Vector.fromObject(info.startPosition));
         game.targetSnakeId = info.targetSnakeId;
@@ -68,6 +72,10 @@ export default class Game {
             "disconnect",
             Comlink.proxy(() => {
                 game.stopped = true;
+                dialog({
+                    title: "Disconnected",
+                    content: `You have been disconnected from the server.`
+                });
             })
         );
 

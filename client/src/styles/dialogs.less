@@ -1,0 +1,174 @@
+#dialogLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    overflow: hidden;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(32, 32, 32, 0.75);
+    animation: dialog-background-in 0.5s;
+
+    &.show {
+        display: flex;
+        backdrop-filter: blur(2px);
+    }
+
+    @keyframes dialog-background-in {
+        from {
+            background-color: transparent;
+        }
+        to {
+            background-color: rgba(32, 32, 32, 0.75);
+        }
+    }
+}
+
+.dialog-container {
+    position: relative;
+
+    .dialog-modal {
+        padding: 15px;
+        padding-top: 1.25em;
+        background-color: rgb(64, 64, 64);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        min-width: 550px;
+        max-width: 80vw;
+        min-height: 250px;
+        max-height: 80vh;
+        gap: 1em;
+        transform: scale(1, 1); /* create new stacking context */
+        animation: dialog-modal-fly-in 0.3s;
+
+        .dialog-title {
+            font-size: 1.25em;
+            font-weight: bold;
+            flex-grow: 0;
+        }
+
+        .dialog-content {
+            flex-grow: 1;
+            white-space: pre-line;
+        }
+
+        .dialog-buttons {
+            flex-grow: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: end;
+            gap: 10px;
+
+            button {
+                position: relative;
+                min-width: 80px;
+                min-height: 35px;
+                padding: 5px 8px;
+                font-weight: bold;
+                background-color: rgb(141, 142, 143);
+                color: white;
+                text-shadow: 1px 1px 0px black;
+                font-size: 1.15em;
+                border-radius: 2px;
+                border: 2px solid rgb(32,32,32);
+                border-bottom-left-radius: 20px 240px;
+                border-bottom-right-radius: 300px 20px;
+                border-top-left-radius: 300px 20px;
+                border-top-right-radius: 20px 220px;
+                transition: 0.25s;
+                transform-origin: center;
+                animation: dialog-button-in 0.4s;
+                animation-delay: 0.3s;
+                animation-fill-mode: backwards;
+
+                &:hover:not(:active) {
+                    transform: scale(1.05, 1.05);
+                }
+
+                &:last-child {
+                    background-color: #0c81ee;
+                    border: 2px solid black;
+
+                    &:hover {
+                        background-color: #148dff;
+                    }
+                }
+
+                @keyframes dialog-button-in {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px) scale(0.9, 0.9);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: scale(1, 1);
+                    }
+                }
+            }
+        }
+
+        /* modal border */
+        &::after {
+            content: " ";
+            position: absolute;
+            inset: 0;
+            border: 2px solid white;
+            border-radius: 2px;
+            transform: scale(1.02, 1) rotate(1deg);
+            animation: dialog-border-in 0.5s;
+            pointer-events: none;
+
+            @keyframes dialog-border-in {
+                0% {
+                    transform: scale(1, 0.98) rotate(0deg);
+                    opacity: 0;
+                }
+                50% {
+                    transform: translateY(-10px) rotate(0deg);
+                }
+                100% {
+                    transform: scale(1.02, 1) rotate(1deg);
+                    opacity: 1;
+                }
+            }
+        }
+
+        @keyframes dialog-modal-fly-in {
+            from {
+                transform: scale(0.5, 0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1, 1);
+                opacity: 1;
+            }
+        }
+    }
+
+    .dialog-shadow {
+        position: absolute;
+        inset: 0;
+        background-color: black;
+        transform: rotate(-3deg) scale(1.05, 1.03);
+        animation: dialog-shadow-in 0.5s;
+
+        @keyframes dialog-shadow-in {
+            0% {
+                transform: scale(0.9, 0.9);
+                opacity: 0;
+            }
+
+            60% {
+                transform: rotate(-4deg) scale(1.1, 1.06);
+            }
+
+            100% {
+                transform: rotate(-3deg) scale(1.05, 1.03);
+                opacity: 1;
+            }
+        }
+    }
+}

@@ -7,6 +7,7 @@ import * as TextRenderer from "./renderer/modules/TextRenderer";
 import * as GameRenderer from "./renderer/GameRenderer";
 import * as UserInput from "./input/UserInput";
 import * as InputDirectionDisplay from "./ui/InputDirectionDisplay";
+import { dialog, init as initDialogs } from "./ui/Dialogs";
 
 // create styles (in <head>)
 import "../styles/main.less";
@@ -31,9 +32,32 @@ uiRoot.id = "root";
 document.body.appendChild(uiRoot);
 UserInput.init(uiRoot);
 
+initDialogs();
+
 document.title = `Ring of Snakes ${__VERSION__}`;
 
 (async () => {
+    if (window.location.protocol === "https:") {
+        const { host, pathname } = window.location;
+        const httpUrl = `http://${host}${pathname}`;
+        await dialog({
+            title: "Error",
+            content: (
+                <>
+                    Unfortunately <b>HTTPS</b> is not yet supported.{"\n"}Please use HTTP instead:{" "}
+                    <pre>{httpUrl}</pre>
+                </>
+            ),
+            buttons: [
+                {
+                    label: "Switch to HTTP",
+                    action: () => window.location.replace(httpUrl)
+                }
+            ]
+        });
+        return;
+    }
+
     FrameTime.update(performance.now());
     const [game, player] = await Game.joinAsPlayer("SnakeForceOne");
 
@@ -64,7 +88,3 @@ document.title = `Ring of Snakes ${__VERSION__}`;
         console.error("Stopped due to unhandled error.", e);
     });
 })();
-
-if (window.location.protocol === "https:") {
-    document.body.innerHTML = `<b>HTTPS</b> is not yet supported.`;
-}

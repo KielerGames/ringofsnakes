@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-undef */
+
 const webpack = require("webpack");
 const path = require("path");
 const pkg = require("./package.json");
@@ -22,12 +25,12 @@ shaderFiles.forEach((filename) => {
         shaders["__" + stn + "_" + id + "__"] = content;
     }
 });
-console.log("Done.");
+console.log("Done. Running webpack...");
 
 module.exports = {
     mode: "development",
     entry: {
-        main: path.join(__dirname, "src", "app", "main.ts"),
+        main: path.join(__dirname, "src", "app", "main.tsx"),
         worker: path.join(__dirname, "src", "app", "worker", "worker.ts")
     },
     target: "web",

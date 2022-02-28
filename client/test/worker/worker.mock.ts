@@ -1,7 +1,7 @@
 import defaultGameInfo from "../data/dto/GameInfo.prefab";
 
 const defaultRemoteMock = {
-    init: () => defaultGameInfo,
+    init: () => Promise.resolve(defaultGameInfo),
     addEventListener: jest.fn(),
     getDataChanges: jest.fn()
 };

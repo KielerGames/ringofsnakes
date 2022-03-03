@@ -1,8 +1,10 @@
 import assert from "../../util/assert";
 import InputSource from "./InputSource";
+import * as Settings from "../../settings/SettingsManager";
 
 export default class PointerInput extends InputSource {
     private clickCatcher: HTMLElement | null = null;
+    private lockPointer: boolean = false;
 
     constructor() {
         super("pointer");
@@ -18,10 +20,15 @@ export default class PointerInput extends InputSource {
                 this.set({ direction: alpha });
             }
         });
+
+        Settings.subscribe("input.pointerLock", (value: boolean) => (this.lockPointer = value));
     }
 
     private pointerDownHandler(e: PointerEvent) {
         e.stopPropagation();
+        if(this.lockPointer) {
+            // TODO
+        }
         this.set({ wantsFast: true });
     }
 

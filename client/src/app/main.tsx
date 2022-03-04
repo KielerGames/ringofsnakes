@@ -73,6 +73,7 @@ document.title = `Ring of Snakes ${__VERSION__}`;
         } else {
             game.quit();
             console.log("Game stopped.");
+            document.exitPointerLock();
         }
     }
 

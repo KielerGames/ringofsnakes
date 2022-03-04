@@ -1,8 +1,3 @@
-import { defineSetting } from "./SettingsManager";
+import Setting from "./Setting";
 
-defineSetting({
-    id: "input.pointerLock",
-    type: "boolean",
-    default: false,
-    label: "Lock pointer"
-});
+export const pointerLockSetting = new Setting("input.pointerLock", false, "Lock pointer");

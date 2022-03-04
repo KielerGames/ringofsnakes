@@ -1,6 +1,6 @@
 import assert from "../../util/assert";
 import InputSource from "./InputSource";
-import * as Settings from "../../settings/SettingsManager";
+import { pointerLockSetting } from "../../settings/SettingsDefinitions";
 
 export default class PointerInput extends InputSource {
     private clickCatcher: HTMLElement | null = null;
@@ -21,13 +21,13 @@ export default class PointerInput extends InputSource {
             }
         });
 
-        Settings.subscribe("input.pointerLock", (value: boolean) => (this.lockPointer = value));
+        pointerLockSetting.subscribe((value: boolean) => (this.lockPointer = value));
     }
 
     private pointerDownHandler(e: PointerEvent) {
         e.stopPropagation();
-        if(this.lockPointer) {
-            // TODO
+        if (this.lockPointer && document.pointerLockElement !== this.clickCatcher) {
+            this.clickCatcher?.requestPointerLock();
         }
         this.set({ wantsFast: true });
     }

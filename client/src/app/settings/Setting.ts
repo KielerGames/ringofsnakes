@@ -36,6 +36,8 @@ export default class Setting<T> {
                 if (__DEBUG__) {
                     console.info(`User setting loaded: ${id}:`, this.userValue);
                 }
+            } else {
+                console.log("result is null");
             }
         } catch (e) {
             console.warn(`Failed to load value from local storage.`);

@@ -1,22 +1,6 @@
 import Setting from "../../src/app/settings/Setting";
 
 describe("Settings", () => {
-    const storageMock = {
-        setItem: jest.fn(),
-        getItem: jest.fn(),
-        removeItem: jest.fn(),
-        clear: jest.fn(),
-        length: 0,
-        key: jest.fn()
-    };
-
-    beforeEach(() => {
-        window.localStorage = storageMock;
-        storageMock.setItem.mockClear();
-        storageMock.getItem.mockClear();
-        storageMock.removeItem.mockClear();
-    });
-
     afterEach(() => {
         Setting.resetForTests();
     });
@@ -45,5 +29,25 @@ describe("Settings", () => {
         testSetting.resetValue();
         expect(valueListener).toBeCalledTimes(4);
         expect(valueListener.mock.calls[3][0]).toBe(testSetting.defaultValue);
+    });
+
+    test("persistence", () => {
+        // test restore
+        const setItemSpy = jest.spyOn(localStorage.__proto__, "setItem");
+        const getItemSpy = jest.spyOn(localStorage.__proto__, "getItem");
+
+        getItemSpy.mockReturnValueOnce("42");
+
+        const testSetting = new Setting("test.setting", 13, "Test Setting");
+        const valueListener = jest.fn();
+        testSetting.subscribe(valueListener);
+        expect(valueListener).toBeCalledTimes(1);
+        expect(valueListener.mock.calls[0][0]).toBe(42);
+
+        // test save
+        expect(setItemSpy).not.toBeCalled();
+        testSetting.setValue(7);
+        expect(setItemSpy).toBeCalledTimes(1);
+        expect(setItemSpy.mock.calls[0][1]).toBe("7");
     });
 });

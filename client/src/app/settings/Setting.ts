@@ -67,9 +67,14 @@ export default class Setting<T> {
             return;
         }
 
+        const oldValue = this.userValue;
         this.userValue = null;
         this.hasUserValue = false;
         this.persist();
+
+        if (oldValue !== this.defaultValue) {
+            this.notifyListeners(this.defaultValue);
+        }
     }
 
     /**
@@ -103,5 +108,9 @@ export default class Setting<T> {
         } else {
             window.localStorage.removeItem(key);
         }
+    }
+
+    static resetForTests(): void {
+        usedIds.clear();
     }
 }

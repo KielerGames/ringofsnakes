@@ -29,3 +29,11 @@ UserInput.addDeviceChangeListener((device) => {
         ring.classList.add("hide");
     }
 });
+
+document.addEventListener("pointerlockchange", () => {
+    if (document.pointerLockElement !== null) {
+        ring.classList.remove("hide");
+    } else {
+        ring.classList.add("hide");
+    }
+});

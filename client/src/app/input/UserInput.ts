@@ -47,7 +47,10 @@ export function removeAllListeners(): void {
 export function init(clickCatcher: HTMLElement): void {
     tickedInputSources.length = 0;
 
-    const pointerInput: PointerInput = new PointerInput();
+    const pointerInput: PointerInput = new PointerInput(() => ({
+        wantsFast: lastFast,
+        direction: lastDirection
+    }));
     pointerInput.setClickCatcher(clickCatcher);
 
     addInputSource(pointerInput);

@@ -33,7 +33,7 @@ export default class Setting<T> {
             if (result !== null) {
                 this.userValue = JSON.parse(result);
                 this.hasUserValue = true;
-                if (__DEBUG__) {
+                if (__DEBUG__ && !__TEST__) {
                     console.info(`User setting loaded: ${id}:`, this.userValue);
                 }
             }

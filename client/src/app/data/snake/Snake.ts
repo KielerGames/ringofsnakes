@@ -152,7 +152,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     }
 
     get name(): string {
-        return "A Snake With No Name"; // TODO
+        return `Snake ${this.id}`; // TODO
     }
 
     get fast(): boolean {

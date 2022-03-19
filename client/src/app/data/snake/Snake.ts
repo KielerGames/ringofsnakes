@@ -152,9 +152,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     }
 
     get name(): string {
-        // eslint-disable-next-line no-bitwise
-        const shortId = this.id & 0b1111111111111111;
-        return `Snake ${shortId}`; // TODO
+        return `Snake ${this.id}`; // TODO
     }
 
     get fast(): boolean {

@@ -192,6 +192,7 @@ public class Game {
                 final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
                 worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
                 worldChunks.forEach(client::updateClientFoodChunk);
+                client.updateHeatMap(world.getHeatMap());
                 client.sendUpdate(ticksSinceLastUpdate);
                 client.cleanupKnowledge();
             });

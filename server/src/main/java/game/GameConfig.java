@@ -19,7 +19,7 @@ public final class GameConfig {
         this.snakes = new SnakeInfo(0.3);
     }
 
-    public static class ChunkInfo {
+    public static final class ChunkInfo {
         public final double size;
         public final int columns;
         public final int rows;
@@ -35,7 +35,7 @@ public final class GameConfig {
         }
     }
 
-    public static class SnakeInfo {
+    public static final class SnakeInfo {
         public final double speed;
         public final double fastSpeed;
         public final double maxTurnDelta = Math.toRadians(6);

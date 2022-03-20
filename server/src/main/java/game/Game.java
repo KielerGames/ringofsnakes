@@ -131,24 +131,29 @@ public class Game {
         final long tickDuration = (long) (1000 * config.tickDuration);
         final long updateInterval = tickDuration;
 
+        // run game ticks
         executor.scheduleAtFixedRate(measure("game-tick", this::tick), 0, tickDuration, TimeUnit.MILLISECONDS);
 
+        // update clients
         executor.scheduleAtFixedRate(measure("client-update", this::updateClients), 10, updateInterval, TimeUnit.MILLISECONDS);
 
+        // spawn food every second
         executor.scheduleAtFixedRate(world::spawnFood, 100, 1000, TimeUnit.MILLISECONDS);
 
+        // garbage-collection every second
         executor.scheduleAtFixedRate(() -> {
-            // garbage-collection
             snakes.removeIf(Predicate.not(Snake::isAlive));
             world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
             bots.removeIf(Predicate.not(Bot::isAlive));
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
+        // update leaderboard every second
         executor.scheduleAtFixedRate(() -> {
             final var topTenJson = gson.toJson(new Leaderboard(this, 10));
             clients.forEach((__, client) -> client.send(topTenJson));
         }, 1, 1, TimeUnit.SECONDS);
 
+        // spawn bots every 20 seconds
         executor.scheduleAtFixedRate(() -> {
             final var n = snakes.stream().filter(Snake::isAlive).count();
 

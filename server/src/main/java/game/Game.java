@@ -181,6 +181,7 @@ public class Game {
         });
         bots.stream().filter(Bot::isAlive).forEach(Bot::act);
         eatFood();
+        world.getHeatMap().update();
         collisionManager.detectCollisions();
         ticksSinceLastUpdate++;
     }

@@ -2,6 +2,7 @@ package game.world;
 
 import game.GameConfig;
 import game.snake.SnakeChunk;
+import lombok.Getter;
 import math.BoundingBox;
 import math.Vector;
 
@@ -16,7 +17,7 @@ public class WorldChunk {
     public final BoundingBox box;
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
     private final List<SnakeChunk> snakeChunks = new LinkedList<>();
-    private final byte x, y;
+    private @Getter final byte x, y;
     private final World world;
     private final List<Food> foodList = new LinkedList<>();
     private int foodVersion = 0;

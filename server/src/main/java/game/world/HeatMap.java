@@ -41,6 +41,7 @@ public class HeatMap {
     }
 
     public ByteBuffer getBuffer() {
-        return buffer.asReadOnlyBuffer().flip();
+        // the buffers position is still 0 so .flip() must not be called here
+        return buffer.asReadOnlyBuffer();
     }
 }

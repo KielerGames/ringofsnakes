@@ -7,7 +7,7 @@ import { FoodChunkDTO } from "../../data/dto/FoodChunkDTO";
 import { SnakeDTO } from "../../data/dto/SnakeDTO";
 import { SnakeChunkDTO } from "../../data/dto/SnakeChunkDTO";
 
-const UPDATE_HEADER_SIZE = 4;
+const UPDATE_HEADER_SIZE = 5;
 
 export function decode(config: GameConfig, buffer: ArrayBuffer): DecodedGameUpdate {
     const view = new DataView(buffer);
@@ -17,6 +17,7 @@ export function decode(config: GameConfig, buffer: ArrayBuffer): DecodedGameUpda
     const numSnakeInfos = view.getUint8(1);
     const numSnakeChunks = view.getUint8(2);
     const numFoodChunks = view.getUint8(3);
+    const hasHeatMap = view.getUint8(4) !== 0;
 
     // read snake infos
     const { data: snakeInfos, nextByteOffset: chunkOffset } = ArrayDecoder.decode(
@@ -37,13 +38,21 @@ export function decode(config: GameConfig, buffer: ArrayBuffer): DecodedGameUpda
     );
 
     // read food
-    const { data: foodChunks, nextByteOffset: endPosition } = ArrayDecoder.decode(
+    const { data: foodChunks, nextByteOffset: heatMapOffset } = ArrayDecoder.decode(
         FCD.decode,
         config,
         numFoodChunks,
         buffer,
         foodOffset
     );
+
+    let heatMap = undefined;
+    let endPosition = heatMapOffset;
+    if (hasHeatMap) {
+        heatMap = new Uint8Array(config.chunks.rows * config.chunks.columns);
+        endPosition += heatMap.length;
+        // TODO copy values from update buffer to heatMap array
+    }
 
     if (endPosition !== buffer.byteLength) {
         console.error(
@@ -55,7 +64,8 @@ export function decode(config: GameConfig, buffer: ArrayBuffer): DecodedGameUpda
         ticksSinceLastUpdate,
         snakeInfos,
         snakeChunkData: chunks,
-        foodChunkData: foodChunks
+        foodChunkData: foodChunks,
+        heatMap
     };
 }
 
@@ -64,4 +74,5 @@ export type DecodedGameUpdate = {
     snakeInfos: SnakeDTO[];
     snakeChunkData: SnakeChunkDTO[];
     foodChunkData: FoodChunkDTO[];
+    heatMap?: Uint8Array;
 };

@@ -49,9 +49,11 @@ export function decode(config: GameConfig, buffer: ArrayBuffer): DecodedGameUpda
     let heatMap = undefined;
     let endPosition = heatMapOffset;
     if (hasHeatMap) {
-        heatMap = new Uint8Array(config.chunks.rows * config.chunks.columns);
-        endPosition += heatMap.length;
-        // TODO copy values from update buffer to heatMap array
+        const heatMapLength = config.chunks.rows * config.chunks.columns;
+        endPosition += heatMapLength;
+        const heatMapBufferView = new Uint8Array(buffer, heatMapOffset, heatMapLength);
+        // copy data into new array
+        heatMap = new Uint8Array(heatMapBufferView);
     }
 
     if (endPosition !== buffer.byteLength) {

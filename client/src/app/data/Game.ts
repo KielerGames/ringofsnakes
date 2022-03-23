@@ -24,6 +24,7 @@ export default class Game {
     readonly snakeChunks: ManagedMap<SnakeChunkDTO, SnakeChunkId, SnakeChunk>;
     readonly foodChunks: ManagedMap<FoodChunkDTO, FoodChunkId, FoodChunk>;
     leaderboard: LeaderboardDTO = { list: [] };
+    heatMap: Uint8Array;
 
     private remote: Comlink.Remote<WorkerAPI>;
     private config: GameConfig;
@@ -60,6 +61,7 @@ export default class Game {
         game.config = info.config;
         game.camera.moveTo(Vector.fromObject(info.startPosition));
         game.targetSnakeId = info.targetSnakeId;
+        game.heatMap = new Uint8Array(info.config.chunks.rows * info.config.chunks.columns);
 
         remote.addEventListener(
             "server-update",

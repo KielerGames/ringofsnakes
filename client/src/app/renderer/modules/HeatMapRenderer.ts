@@ -15,7 +15,8 @@ let buffer: WebGLBuffer;
     shaderProgram = new WebGLShaderProgram(
         gl,
         __VERTEXSHADER_HEATMAP__,
-        __FRAGMENTSHADER_HEATMAP__
+        __FRAGMENTSHADER_HEATMAP__,
+        ["aAbsPosition"]
     );
 
     buffer = gl.createBuffer()!;
@@ -28,6 +29,8 @@ export function render(game: Readonly<Game>): void {
 
     shaderProgram.use();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+    shaderProgram.setUniform("uCameraPosition", [0, 0]); // TODO
 
     position;
     // TODO

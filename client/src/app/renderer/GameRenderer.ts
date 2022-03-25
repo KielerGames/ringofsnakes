@@ -8,11 +8,12 @@ import * as FoodRenderer from "./modules/FoodRenderer";
 import * as TextRenderer from "./modules/TextRenderer";
 import * as SnakeNameRenderer from "./modules/SnakeNameRenderer";
 import * as HeatMapRenderer from "./modules/HeatMapRenderer";
+import { updateCanvasSize } from "./webgl/WebGLUtils";
 
 export function render(game: Readonly<Game>): void {
     const gl = WebGLContextProvider.getContext();
 
-    updateSize(gl);
+    updateCanvasSize(gl);
     const canvas = gl.canvas as HTMLCanvasElement;
     game.camera.setRatio(canvas.clientWidth, canvas.clientHeight);
 
@@ -36,26 +37,4 @@ export function render(game: Readonly<Game>): void {
     }
     TextRenderer.renderAll();
     HeatMapRenderer.render(game);
-
-}
-
-function updateSize(gl: WebGLRenderingContext) {
-    const canvas = gl.canvas as HTMLCanvasElement;
-
-    // get current canvas size in CSS pixels
-    const displayWidth = canvas.clientWidth;
-    const displayHeight = canvas.clientHeight;
-
-    if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
-        if (__DEBUG__) {
-            console.info("Resizing canvas...");
-        }
-
-        // resize canvas
-        canvas.width = displayWidth;
-        canvas.height = displayHeight;
-
-        // update clip space to screen pixel transformation
-        gl.viewport(0, 0, displayWidth, displayHeight);
-    }
 }

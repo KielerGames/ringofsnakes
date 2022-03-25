@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     font-family: sans-serif;
@@ -6,7 +7,7 @@ html, body {
 }
 
 body {
-    background-color: rgb(42,42,42);
+    background-color: rgb(42, 42, 42);
 }
 
 #root {
@@ -41,12 +42,12 @@ body {
         animation: fade-in 0.5s ease-in;
         text-shadow: 1px 1px black;
         white-space: pre-line;
-        
-        &.debug{
+
+        &.debug {
             text-shadow: 1px 0px black;
             font-size: 11px;
             text-align: left;
-            color: rgb(221,222,223);
+            color: rgb(221, 222, 223);
             line-height: 11px;
         }
     }
@@ -55,7 +56,7 @@ body {
 button {
     text-transform: uppercase;
     white-space: nowrap;
-    
+
     &:not(:disabled) {
         cursor: pointer;
     }
@@ -76,3 +77,4 @@ button {
 @import "snake-info.less";
 @import "fps-stats.less";
 @import "leaderboard.less";
+@import "heatmap.less";

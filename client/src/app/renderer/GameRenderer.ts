@@ -7,6 +7,7 @@ import * as BoxRenderer from "./modules/BoxRenderer";
 import * as FoodRenderer from "./modules/FoodRenderer";
 import * as TextRenderer from "./modules/TextRenderer";
 import * as SnakeNameRenderer from "./modules/SnakeNameRenderer";
+import * as HeatMapRenderer from "./modules/HeatMapRenderer";
 
 export function render(game: Readonly<Game>): void {
     const gl = WebGLContextProvider.getContext();
@@ -34,6 +35,8 @@ export function render(game: Readonly<Game>): void {
         BoxRenderer.renderAll(transform);
     }
     TextRenderer.renderAll();
+    HeatMapRenderer.render(game);
+
 }
 
 function updateSize(gl: WebGLRenderingContext) {

@@ -27,7 +27,7 @@ export default class Game {
     heatMap: Uint8Array;
 
     private remote: Comlink.Remote<WorkerAPI>;
-    private config: GameConfig;
+    private _config: GameConfig;
     private updateAvailable: boolean = false;
     private targetSnakeId: number | undefined;
     private stopped: boolean = false;
@@ -38,7 +38,7 @@ export default class Game {
 
     private constructor() {
         this.remote = createRemote();
-        this.snakes = new ManagedMap((dto) => new Snake(dto, this.config));
+        this.snakes = new ManagedMap((dto) => new Snake(dto, this._config));
         this.snakeChunks = new ManagedMap((dto) => {
             const snake = this.snakes.get(dto.snakeId);
             if (snake === undefined) {
@@ -58,7 +58,7 @@ export default class Game {
             await dialog({ title: "Error", content: `Failed to connect to the game server.` });
             return Promise.reject(e);
         });
-        game.config = info.config;
+        game._config = info.config;
         game.camera.moveTo(Vector.fromObject(info.startPosition));
         game.targetSnakeId = info.targetSnakeId;
         game.heatMap = new Uint8Array(info.config.chunks.rows * info.config.chunks.columns);
@@ -160,6 +160,10 @@ export default class Game {
         this.events[event].addListener(listener);
     }
 
+    get config(): GameConfig {
+        return this._config;
+    }
+
     get targetSnake(): Snake | undefined {
         if (this.targetSnakeId === undefined) {
             return undefined;
@@ -170,7 +174,7 @@ export default class Game {
 
     private removeJunk() {
         const camera = this.camera;
-        const safeDist = 2 * this.config.snakes.fastSpeed;
+        const safeDist = 2 * this._config.snakes.fastSpeed;
 
         this.snakeChunks.removeIf(
             (chunk) => chunk.junk || (!chunk.isVisible(camera, safeDist) && chunk.clientAge > 1.0)

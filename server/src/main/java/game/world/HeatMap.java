@@ -34,7 +34,7 @@ public class HeatMap {
         // TODO consider using area of snake chunk bounding box intersection as a factor
         double h2 = chunk.streamSnakeChunks()
                 .mapToDouble(sc -> sc.getSnake().getWidth() / config.snakes.maxWidth)
-                .map(x -> 0.75 * x * x)
+                .map(x -> 0.5 * x * x)
                 .sum();
 
         return (byte) (Math.min(1.0, Math.sqrt(h2)) * 255.0);

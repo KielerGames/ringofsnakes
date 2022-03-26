@@ -32,6 +32,8 @@ export function setCanvas(canvas: HTMLCanvasElement): void {
 
     gl.disable(WebGLRenderingContext.DEPTH_TEST);
 
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+
     shaderProgram = new WebGLShaderProgram(
         gl,
         __VERTEXSHADER_HEATMAP__,
@@ -95,7 +97,10 @@ export function render(game: Readonly<Game>): void {
 
 function worldToMapCoordinates(game: Readonly<Game>, worldPosition: Vector): [number, number] {
     const cc = game.config.chunks;
-    const halfWidth = cc.columns * cc.size,
-        halfHeight = cc.rows * cc.size;
-    return [worldPosition.x / halfWidth, worldPosition.y / halfHeight];
+    const width = cc.columns * cc.size;
+    const height = cc.rows * cc.size;
+    return [
+        (0.5 * width + worldPosition.x) / width,
+        (0.5 * height + worldPosition.y) / height
+    ];
 }

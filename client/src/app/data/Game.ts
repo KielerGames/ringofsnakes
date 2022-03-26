@@ -105,6 +105,11 @@ export default class Game {
             this.leaderboard = changes.leaderboard;
         }
 
+        // update heat map
+        if(changes.heatMap) {
+            this.heatMap = changes.heatMap;
+        }
+
         this.foodChunks.addMultiple(changes.foodChunks);
 
         this.snakes.addMultiple(changes.snakes, ticks);

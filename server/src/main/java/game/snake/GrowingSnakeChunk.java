@@ -24,6 +24,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
     private int lastSteps = 0;
     private boolean lastFast = false;
     private int lastDirDelta = 0;
+    private boolean markedAsFull = false;
 
     public GrowingSnakeChunk(ChainCodeCoder coder, Snake snake, char chunkId) {
         super(snake);
@@ -135,7 +136,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
     }
 
     public boolean isFull() {
-        return this.chunkByteBuffer.position() == FinalSnakeChunk.BYTE_SIZE;
+        return this.chunkByteBuffer.position() == FinalSnakeChunk.BYTE_SIZE || markedAsFull;
     }
 
     public ByteBuffer getBuffer() {
@@ -152,6 +153,10 @@ public class GrowingSnakeChunk extends SnakeChunk {
 
     public int getUniqueId() {
         return this.chunkByteBuffer.getInt(0);
+    }
+
+    public void markAsFull(){
+        this.markedAsFull = true;
     }
 
     @Override

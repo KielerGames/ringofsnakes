@@ -3,6 +3,7 @@ package game.snake;
 import game.GameConfig;
 import game.world.Food;
 import game.world.World;
+import game.world.WorldChunk;
 import lombok.Getter;
 import lombok.Setter;
 import math.Vector;
@@ -86,6 +87,10 @@ public class Snake {
         final boolean fast = userWantsFast && length > config.snakes.minLength;
         fastHistory.set(fast);
 
+
+        var lastWorldChunk = world.chunks.findChunk(headPosition);
+
+
         // update direction
         int encDirDelta = coder.sampleDirectionChange(targetDirection, headDirection);
         double dirDelta = coder.decodeDirectionChange(encDirDelta);
@@ -102,6 +107,12 @@ public class Snake {
         }
 
         updateWidth();
+        var currentWorldChunk = world.chunks.findChunk(headPosition);
+        boolean worldChunkChanged = lastWorldChunk != currentWorldChunk;
+
+        if(worldChunkChanged){
+            currentWorldChunk.addSnakeChunk(currentChunk);
+        }
 
         // update chunks
         currentChunk.append(encDirDelta, fast);
@@ -124,6 +135,7 @@ public class Snake {
                 chunks.remove(chunks.size() - 1);
             }
         }
+
     }
 
     void beginChunk() {

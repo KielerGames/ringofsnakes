@@ -155,7 +155,7 @@ public class Game {
             if (n < config.targetSnakePopulation) {
                 addBotsRandomly((int) Math.min(4, config.targetSnakePopulation - n));
             }
-        }, 1, 20, TimeUnit.SECONDS);
+        }, 1, 2, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + gson.toJson(config));
     }

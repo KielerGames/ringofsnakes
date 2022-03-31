@@ -1,44 +1,35 @@
 import Game from "../../data/Game";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
+import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import assert from "../../util/assert";
 import Vector from "../../math/Vector";
-import { updateCanvasSize } from "../webgl/WebGLUtils";
+import Matrix from "../../math/Matrix";
 
 declare const __VERTEXSHADER_HEATMAP__: string;
 declare const __FRAGMENTSHADER_HEATMAP__: string;
 
-let gl: WebGLRenderingContext | null = null;
+const transform = new Matrix(true);
 let shaderProgram: WebGLShaderProgram;
 let buffer: WebGLBuffer;
 let texture: WebGLTexture;
 
+// prettier-ignore
 const boxCoords = new Float32Array([
-    -1.0,
-    1.0, // top-left
-    1.0,
-    1.0, // top-right
-    -1.0,
-    -1.0, // bottom-left
-    1.0,
-    -1.0 // bottom-right
+    0.0, 1.0, // top-left
+    1.0, 1.0, // top-right
+    0.0, 0.0, // bottom-left
+    1.0, 0.0  // bottom-right
 ]);
 
-export function setCanvas(canvas: HTMLCanvasElement): void {
-    gl = canvas.getContext("webgl", { alpha: true })!;
+const heatMapSize = 128;
 
-    if (gl === null) {
-        throw new Error();
-    }
-
-    gl.disable(WebGLRenderingContext.DEPTH_TEST);
-
-    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+(async () => {
+    const gl = await WebGLContextProvider.waitForContext();
 
     shaderProgram = new WebGLShaderProgram(
         gl,
         __VERTEXSHADER_HEATMAP__,
-        __FRAGMENTSHADER_HEATMAP__,
-        ["aAbsPosition"]
+        __FRAGMENTSHADER_HEATMAP__
     );
 
     buffer = gl.createBuffer()!;
@@ -56,20 +47,19 @@ export function setCanvas(canvas: HTMLCanvasElement): void {
     if (__DEBUG__) {
         console.info(`HeatMapRenderer initialized.`);
     }
-}
+})();
 
-export function render(game: Readonly<Game>): void {
-    if (gl === null || gl.isContextLost()) {
-        return;
-    }
+export async function render(game: Readonly<Game>): Promise<void> {
+    const gl = await WebGLContextProvider.waitForContext();
 
-    updateCanvasSize(gl);
     shaderProgram.use();
-
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    updateTransformMatrix(gl);
+
+    gl.activeTexture(WebGLRenderingContext.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
 
     const format = gl.LUMINANCE;
-
     gl.texImage2D(
         gl.TEXTURE_2D,
         0,
@@ -82,25 +72,34 @@ export function render(game: Readonly<Game>): void {
         game.heatMap
     );
 
-    gl.activeTexture(WebGLRenderingContext.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
     shaderProgram.setUniform("uHeatMapTexture", 2);
 
     const position = game.camera.position;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, boxCoords.buffer, gl.STATIC_DRAW);
 
     shaderProgram.setUniform("uCameraPosition", worldToMapCoordinates(game, position));
+    shaderProgram.setUniform("uTransform", transform.data);
 
     shaderProgram.run(4, { mode: gl.TRIANGLE_STRIP });
+}
+
+function updateTransformMatrix(gl: WebGLRenderingContext): void {
+    const { width: cw, height: ch } = gl.canvas;
+    const sx = 2.0 / cw;
+    const sy = 2.0 / ch;
+    const offset = 10;
+
+    transform.setEntry(0, 0, sx * heatMapSize);
+    transform.setEntry(1, 1, sy * heatMapSize);
+    transform.setEntry(0, 2, 1.0 - sx * (heatMapSize + offset));
+    transform.setEntry(1, 2, -1.0 + sy * offset);
 }
 
 function worldToMapCoordinates(game: Readonly<Game>, worldPosition: Vector): [number, number] {
     const cc = game.config.chunks;
     const width = cc.columns * cc.size;
     const height = cc.rows * cc.size;
-    return [
-        (0.5 * width + worldPosition.x) / width,
-        (0.5 * height + worldPosition.y) / height
-    ];
+    return [(0.5 * width + worldPosition.x) / width, (0.5 * height + worldPosition.y) / height];
 }

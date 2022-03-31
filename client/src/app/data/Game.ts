@@ -106,7 +106,7 @@ export default class Game {
         }
 
         // update heat map
-        if(changes.heatMap) {
+        if (changes.heatMap) {
             this.heatMap = changes.heatMap;
         }
 

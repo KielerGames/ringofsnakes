@@ -1,3 +1,4 @@
+import { dialog } from "../../ui/Dialogs";
 import AsyncEvent from "../../util/AsyncEvent";
 
 const options: WebGLContextAttributes = {
@@ -20,6 +21,23 @@ export function init(canvas: HTMLCanvasElement): void {
 
     ctx.disable(WebGLRenderingContext.DEPTH_TEST);
     ctx.enable(WebGLRenderingContext.BLEND);
+
+    // https://webglfundamentals.org/webgl/lessons/webgl-data-textures.html
+    ctx.pixelStorei(WebGLRenderingContext.UNPACK_ALIGNMENT, 1);
+
+    canvas.addEventListener("webglcontextlost", (e) => {
+        console.error("WebGL context lost.", e);
+        dialog({
+            title: "Error",
+            content: "The WebGL context has been lost. Reload the page should fix the issue.",
+            buttons: [
+                {
+                    label: "Reload",
+                    action: () => window.location.reload()
+                }
+            ]
+        });
+    });
 
     if (__DEBUG__) {
         console.info("Canvas initialized.");

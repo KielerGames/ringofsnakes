@@ -52,7 +52,7 @@ export function decode(config: GameConfig, buffer: ArrayBuffer): DecodedGameUpda
         const heatMapLength = config.chunks.rows * config.chunks.columns;
         endPosition += heatMapLength;
         const heatMapBufferView = new Uint8Array(buffer, heatMapOffset, heatMapLength);
-        // copy data into new array
+        // copy data into new array with the copy constructor
         heatMap = new Uint8Array(heatMapBufferView);
     }
 

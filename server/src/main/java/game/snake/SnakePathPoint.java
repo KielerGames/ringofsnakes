@@ -16,7 +16,7 @@ public class SnakePathPoint {
     }
 
     public double getOffsetInChunk() {
-        final var offset = snakeChunk.getLength() - localPathLength;
+        final var offset = snakeChunk.getDataLength() - localPathLength;
         assert offset >= 0.0;
         return Math.max(0.0, offset);
     }

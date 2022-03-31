@@ -1,6 +1,7 @@
 package game;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import game.ai.Bot;
 import game.ai.StupidBot;
 import game.snake.Snake;
@@ -33,6 +34,7 @@ import static util.TaskMeasurer.measure;
 
 public class Game {
     private static final Gson gson = new Gson();
+    private static final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     public final int id = 1; //TODO
     public final GameConfig config;
     public final World world;
@@ -162,7 +164,7 @@ public class Game {
             }
         }, 1, 20, TimeUnit.SECONDS);
 
-        System.out.println("Game started. Config:\n" + gson.toJson(config));
+        System.out.println("Game started. Config:\n" + prettyGson.toJson(config));
     }
 
     /**

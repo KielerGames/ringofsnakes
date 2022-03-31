@@ -150,7 +150,7 @@ public class SnakeChunkTest {
         for (SnakePathPoint pd : pathData) {
             final var localOffset = pd.getOffsetInChunk();
             assertTrue(0 <= localOffset);
-            assertTrue(localOffset <= lastSnakeChunk.getLength());
+            assertTrue(localOffset <= lastSnakeChunk.getDataLength());
         }
 
         assertUniqueOffsets(lastSnakeChunk);
@@ -192,7 +192,7 @@ public class SnakeChunkTest {
         assertFalse(snakeChunk.isEmpty());
 
         final var startOffset = snakeChunk.getOffset();
-        final var endOffset = startOffset + snakeChunk.getLength();
+        final var endOffset = startOffset + snakeChunk.getDataLength();
 
         for (var offset = startOffset; offset <= endOffset; offset += 0.05) {
             final var point = snake.getPositionAt(offset);

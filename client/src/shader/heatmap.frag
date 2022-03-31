@@ -15,7 +15,7 @@ void main(void) {
 	float med = min(ed.x, ed.y);
 	float alpha = min(8.0 * med, 1.0);
 
-	// heta map color
+	// heat map color
 	float heat = texture2D(uHeatMapTexture, vPosition).r;
 	vec4 hotColor = vec4(1.0, 0.4 * heat, max(0.0, 0.5 * heat - 0.4), alpha);
 	vec4 color = mix(COOL_COLOR, hotColor, 1.3 * heat);

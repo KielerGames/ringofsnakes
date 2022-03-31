@@ -13,6 +13,10 @@ public class SnakeFactory {
     private SnakeFactory() {
     }
 
+    public static Snake createSnake(World world) {
+        return createSnake(world.findSpawnPosition(), world);
+    }
+
     public static Snake createSnake(Vector position, World world) {
         final double direction = Direction.getRandom(random);
         return createSnake(position, direction, world);

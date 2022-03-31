@@ -1,6 +1,5 @@
 package game.snake;
 
-import game.world.WorldChunk;
 import lombok.Getter;
 import math.BoundingBox;
 import math.Vector;
@@ -20,7 +19,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
     private double x, y;
     private float direction;
     private double minX, maxX, minY, maxY;
-    @Getter private double length = 0.0;
+    @Getter private double dataLength = 0.0;
     private int lastSteps = 0;
     private boolean lastFast = false;
     private int lastDirDelta = 0;
@@ -84,8 +83,8 @@ public class GrowingSnakeChunk extends SnakeChunk {
         final double stepSize = fast ? snake.config.snakes.fastSpeed : snake.config.snakes.speed;
         x += Math.cos(direction) * stepSize;
         y += Math.sin(direction) * stepSize;
-        length += stepSize;
-        pathData.add(0, new SnakePathPoint(this, new Vector(x, y), length));
+        dataLength += stepSize;
+        pathData.add(0, new SnakePathPoint(this, new Vector(x, y), dataLength));
 
         // update chaincode
         if (canUpdatePreviousChainCode(dirDelta, fast)) {
@@ -121,7 +120,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
         BoundingBox box = new BoundingBox(minX, maxX, minY, maxY);
         markAsJunk();
         final var finalPathData = this.pathData.toArray(new SnakePathPoint[0]);
-        final var fsc = new FinalSnakeChunk(snake, chunkByteBuffer, box, length, List.of(finalPathData));
+        final var fsc = new FinalSnakeChunk(snake, chunkByteBuffer, box, dataLength, List.of(finalPathData));
         this.pathData.forEach(pd -> pd.setFinalSnakeChunk(fsc));
         return fsc;
     }

@@ -160,9 +160,9 @@ public class Game {
             final var n = snakes.stream().filter(Snake::isAlive).count();
 
             if (n < config.targetSnakePopulation) {
-                addBotsRandomly((int) Math.min(4, config.targetSnakePopulation - n));
+                addBotsRandomly((int) Math.min(5, config.targetSnakePopulation - n));
             }
-        }, 1, 20, TimeUnit.SECONDS);
+        }, 1, 16, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + prettyGson.toJson(config));
     }

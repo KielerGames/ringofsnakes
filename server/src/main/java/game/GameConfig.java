@@ -4,7 +4,7 @@ public final class GameConfig {
     public final double tickDuration = 1.0 / 25.0; // in seconds
     public final double foodNutritionalValue = 1.0;
     public final double foodConversionEfficiency = 0.5;
-    public final int targetSnakePopulation = 42;
+    public final int targetSnakePopulation = 60;
     public final boolean selfCollision = false;
 
     public final ChunkInfo chunks;

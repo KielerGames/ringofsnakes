@@ -11,7 +11,11 @@ declare const __FRAGMENTSHADER_HEATMAP__: string;
 const transform = new Matrix(true);
 let shaderProgram: WebGLShaderProgram;
 let buffer: WebGLBuffer;
-let texture: WebGLTexture;
+let texture1: WebGLTexture;
+let texture2: WebGLTexture;
+let textureMix = 0.0;
+let texture1IsCurrent: boolean = true;
+let lastTextureData: Uint8Array | null = null;
 
 // prettier-ignore
 const boxCoords = new Float32Array([
@@ -37,12 +41,8 @@ const heatMapSize = 128;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, boxCoords.buffer, gl.STATIC_DRAW);
 
-    texture = gl.createTexture()!;
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    texture1 = createTexture(gl);
+    texture2 = createTexture(gl);
 
     if (__DEBUG__) {
         console.info(`HeatMapRenderer initialized.`);
@@ -51,34 +51,17 @@ const heatMapSize = 128;
 
 export async function render(game: Readonly<Game>): Promise<void> {
     const gl = await WebGLContextProvider.waitForContext();
-
     shaderProgram.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    updateTransformMatrix(gl);
-
-    gl.activeTexture(WebGLRenderingContext.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    const format = gl.LUMINANCE;
-    gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        format,
-        game.config.chunks.columns,
-        game.config.chunks.rows,
-        0,
-        format,
-        gl.UNSIGNED_BYTE,
-        game.heatMap
-    );
-
-    shaderProgram.setUniform("uHeatMapTexture", 2);
-
-    const position = game.camera.position;
-
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, boxCoords.buffer, gl.STATIC_DRAW);
 
+    updateTransformMatrix(gl);
+    const position = game.camera.position;
+    manageData(gl, game);
+
+    shaderProgram.setUniform("uHeatMapTexture1", 2);
+    shaderProgram.setUniform("uHeatMapTexture2", 3);
+    shaderProgram.setUniform("uTextureMix", textureMix);
     shaderProgram.setUniform("uCameraPosition", worldToMapCoordinates(game, position));
     shaderProgram.setUniform("uTransform", transform.data);
 
@@ -102,4 +85,59 @@ function worldToMapCoordinates(game: Readonly<Game>, worldPosition: Vector): [nu
     const width = cc.columns * cc.size;
     const height = cc.rows * cc.size;
     return [(0.5 * width + worldPosition.x) / width, (0.5 * height + worldPosition.y) / height];
+}
+
+function createTexture(gl: WebGLRenderingContext): WebGLTexture {
+    const texture = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    return texture;
+}
+
+function manageData(gl: WebGLRenderingContext, game: Readonly<Game>): void {
+    const { columns: width, rows: height } = game.config.chunks;
+
+    const targetMix = texture1IsCurrent ? 0.0 : 1.0;
+    textureMix = 0.8 * textureMix + 0.2 * targetMix;
+
+    if (lastTextureData === game.heatMap) {
+        return;
+    }
+
+    if (!texture1IsCurrent || lastTextureData === null) {
+        gl.activeTexture(WebGLRenderingContext.TEXTURE2);
+    } else {
+        gl.activeTexture(WebGLRenderingContext.TEXTURE3);
+    }
+
+    if (texture1IsCurrent) {
+        gl.bindTexture(gl.TEXTURE_2D, texture2);
+    } else {
+        gl.bindTexture(gl.TEXTURE_2D, texture1);
+    }
+
+    // send texture data to gpu
+    const format = gl.LUMINANCE;
+    gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        format,
+        width,
+        height,
+        0,
+        format,
+        gl.UNSIGNED_BYTE,
+        game.heatMap
+    );
+
+    if (lastTextureData !== null) {
+        texture1IsCurrent = !texture1IsCurrent;
+        textureMix = texture1IsCurrent ? 1.0 : 0.0;
+    }
+
+    lastTextureData = game.heatMap;
 }

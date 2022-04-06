@@ -90,6 +90,9 @@ export default class Game {
         throw new Error("not implemented");
     }
 
+    /**
+     *
+     */
     async update(): Promise<void> {
         if (!this.updateAvailable) {
             return;
@@ -140,6 +143,14 @@ export default class Game {
                 this.targetSnakeId = undefined;
             }
         }
+
+        // pause snakes that did not receive any updates
+        const updatedSnakeIds = new Set<SnakeId>(changes.snakes.map((snake) => snake.id));
+        this.snakes.forEach((snake) => {
+            if (!updatedSnakeIds.has(snake.id)) {
+                snake.pause();
+            }
+        });
 
         this.removeJunk();
     }

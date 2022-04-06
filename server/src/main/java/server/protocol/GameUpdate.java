@@ -49,6 +49,10 @@ public class GameUpdate {
         snakes.add(snake);
     }
 
+    public boolean hasSnake(Snake snake) {
+        return snakes.contains(snake);
+    }
+
     public void addHeatMap(HeatMap heatMap) {
         assert this.heatMap == null;
         this.heatMap = heatMap.getBuffer();

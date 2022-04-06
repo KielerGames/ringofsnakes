@@ -1,5 +1,6 @@
 package server;
 
+import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.world.HeatMap;
 import game.world.WorldChunk;
@@ -11,10 +12,14 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
+/**
+ * Player/Spectator abstraction.
+ */
 public abstract class Client {
     public final Session session;
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private final Map<WorldChunk, Integer> knownFoodChunks = new HashMap<>();
+    private final Map<Snake, Integer> knownSnakes = new HashMap<>();
     protected float viewBoxRatio = 1f;
     private GameUpdate nextUpdate = new GameUpdate();
     private long lastHeatMapUpdate = System.currentTimeMillis();
@@ -29,7 +34,7 @@ public abstract class Client {
         }
 
         if (knownSnakeChunks.contains(chunk)) {
-            nextUpdate.addSnake(chunk.getSnake());
+            updateClientSnake(chunk.getSnake());
         } else {
             nextUpdate.addSnakeChunk(chunk);
             if (chunk.isFull()) {
@@ -46,6 +51,11 @@ public abstract class Client {
         knownFoodChunks.put(chunk, chunk.getFoodVersion());
     }
 
+    private void updateClientSnake(Snake snake) {
+        knownSnakes.put(snake, 0);
+        nextUpdate.addSnake(snake);
+    }
+
     public void updateHeatMap(HeatMap heatMap) {
         final long now = System.currentTimeMillis();
         final long elapsed = now - lastHeatMapUpdate;
@@ -56,6 +66,26 @@ public abstract class Client {
     }
 
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
+        // removeIf is used to efficiently iterate over, modify and remove entries from knownSnakes
+        knownSnakes.entrySet().removeIf(entry -> {
+            final var updateContainsSnake = update.hasSnake(entry.getKey());
+            final int decay = updateContainsSnake ? 0 : entry.getValue() + 1;
+
+            if (decay > 5) {
+                /*
+                The client would not have received any updates about this snake within the last 5 updates.
+                Thus, we can "safely" exclude it from further updates.
+                */
+                return true;
+            }
+
+            // keep snake with updated knowledge-decay value
+            entry.setValue(decay);
+            if (!updateContainsSnake) {
+                update.addSnake(entry.getKey());
+            }
+            return false;
+        });
     }
 
     public void sendUpdate(byte ticksSinceLastUpdate) {

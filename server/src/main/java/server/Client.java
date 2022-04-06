@@ -63,7 +63,7 @@ public abstract class Client {
             if (decay > 5) {
                 /*
                 The client would not have received any updates about this snake within the last 5 updates.
-                Thus, we can "safely" stop sending updates about it.
+                Thus, we can "safely" exclude it from further updates.
                 */
                 return true;
             }

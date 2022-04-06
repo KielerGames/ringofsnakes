@@ -67,7 +67,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             this.predictedHeadPosition = Vector.fromObject(dto.headPosition);
             this.predictedDirection = dto.headDirection[0];
             this.lastPredictionTime = FrameTime.now();
-            this._paused = true;
+            this._paused = false;
         }
 
         this.updateChunkOffsets(ticks, dto.fastHistory);

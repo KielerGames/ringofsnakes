@@ -5,12 +5,15 @@ import { SnakeDTO } from "./SnakeDTO";
 
 export type DataUpdateDTO = {
     ticksSinceLastUpdate: number;
+    moreUpdates: boolean;
+
     snakes: SnakeDTO[];
     snakeChunks: SnakeChunkDTO[];
-    leaderboard?: LeaderboardDTO;
     snakeDeaths: SnakeId[];
     foodChunks: FoodChunkDTO[];
-    moreUpdates: boolean;
+
+    leaderboard?: LeaderboardDTO;
+    heatMap?: Uint8Array;
 };
 
 type SnakeId = number;

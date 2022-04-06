@@ -98,6 +98,10 @@ export class WorkerAPI {
         // instead move/transfer them to the main thread
         const transferables: ArrayBuffer[] = update.snakeChunks.map((chunk) => chunk.data.buffer);
 
+        if (update.heatMap) {
+            transferables.push(update.heatMap.buffer);
+        }
+
         return Comlink.transfer(update, transferables);
     }
 

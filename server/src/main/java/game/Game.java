@@ -1,6 +1,7 @@
 package game;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import game.ai.Bot;
 import game.ai.StupidBot;
 import game.snake.Snake;
@@ -33,6 +34,7 @@ import static util.TaskMeasurer.measure;
 
 public class Game {
     private static final Gson gson = new Gson();
+    private static final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     public final int id = 1; //TODO
     public final GameConfig config;
     public final World world;
@@ -131,33 +133,38 @@ public class Game {
         final long tickDuration = (long) (1000 * config.tickDuration);
         final long updateInterval = tickDuration;
 
+        // run game ticks
         executor.scheduleAtFixedRate(measure("game-tick", this::tick), 0, tickDuration, TimeUnit.MILLISECONDS);
 
+        // update clients
         executor.scheduleAtFixedRate(measure("client-update", this::updateClients), 10, updateInterval, TimeUnit.MILLISECONDS);
 
+        // spawn food every second
         executor.scheduleAtFixedRate(world::spawnFood, 100, 1000, TimeUnit.MILLISECONDS);
 
+        // garbage-collection every second
         executor.scheduleAtFixedRate(() -> {
-            // garbage-collection
             snakes.removeIf(Predicate.not(Snake::isAlive));
             world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
             bots.removeIf(Predicate.not(Bot::isAlive));
         }, 250, 1000, TimeUnit.MILLISECONDS);
 
+        // update leaderboard every second
         executor.scheduleAtFixedRate(() -> {
             final var topTenJson = gson.toJson(new Leaderboard(this, 10));
             clients.forEach((__, client) -> client.send(topTenJson));
         }, 1, 1, TimeUnit.SECONDS);
 
+        // spawn bots every 20 seconds
         executor.scheduleAtFixedRate(() -> {
             final var n = snakes.stream().filter(Snake::isAlive).count();
 
             if (n < config.targetSnakePopulation) {
-                addBotsRandomly((int) Math.min(4, config.targetSnakePopulation - n));
+                addBotsRandomly((int) Math.min(5, config.targetSnakePopulation - n));
             }
-        }, 1, 20, TimeUnit.SECONDS);
+        }, 1, 16, TimeUnit.SECONDS);
 
-        System.out.println("Game started. Config:\n" + gson.toJson(config));
+        System.out.println("Game started. Config:\n" + prettyGson.toJson(config));
     }
 
     /**
@@ -176,6 +183,7 @@ public class Game {
         });
         bots.stream().filter(Bot::isAlive).forEach(Bot::act);
         eatFood();
+        world.getHeatMap().update();
         collisionManager.detectCollisions();
         ticksSinceLastUpdate++;
     }
@@ -186,6 +194,7 @@ public class Game {
                 final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
                 worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
                 worldChunks.forEach(client::updateClientFoodChunk);
+                client.updateHeatMap(world.getHeatMap());
                 client.sendUpdate(ticksSinceLastUpdate);
                 client.cleanupKnowledge();
             });

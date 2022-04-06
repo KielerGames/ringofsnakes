@@ -1,5 +1,6 @@
 package util;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
@@ -27,22 +28,22 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
     }
 
     @Override
-    public ScheduledFuture<?> schedule(Runnable runnable, long l, TimeUnit timeUnit) {
+    public ScheduledFuture<?> schedule(@Nonnull Runnable runnable, long l, @Nonnull TimeUnit timeUnit) {
         return executor.schedule(runnable, l, timeUnit);
     }
 
     @Override
-    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long l, TimeUnit timeUnit) {
+    public <V> ScheduledFuture<V> schedule(@Nonnull Callable<V> callable, long l, @Nonnull TimeUnit timeUnit) {
         throw new UnsupportedOperationException("Method not implemented.");
     }
 
     @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long l, long l1, TimeUnit timeUnit) {
+    public ScheduledFuture<?> scheduleAtFixedRate(@Nonnull Runnable runnable, long l, long l1, @Nonnull TimeUnit timeUnit) {
         return executor.scheduleAtFixedRate(createExceptionalRunnable(runnable), l, l1, timeUnit);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long l, long l1, TimeUnit timeUnit) {
+    public ScheduledFuture<?> scheduleWithFixedDelay(@Nonnull Runnable runnable, long l, long l1, @Nonnull TimeUnit timeUnit) {
         throw new UnsupportedOperationException("Method not implemented.");
     }
 
@@ -67,47 +68,47 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
     }
 
     @Override
-    public boolean awaitTermination(long l, TimeUnit timeUnit) throws InterruptedException {
+    public boolean awaitTermination(long l, @Nonnull TimeUnit timeUnit) throws InterruptedException {
         return executor.awaitTermination(l, timeUnit);
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> callable) {
+    public <T> Future<T> submit(@Nonnull Callable<T> callable) {
         return executor.submit(callable);
     }
 
     @Override
-    public <T> Future<T> submit(Runnable runnable, T t) {
+    public <T> Future<T> submit(@Nonnull Runnable runnable, T t) {
         return executor.submit(runnable, t);
     }
 
     @Override
-    public Future<?> submit(Runnable runnable) {
+    public Future<?> submit(@Nonnull Runnable runnable) {
         return executor.submit(runnable);
     }
 
     @Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> collection) {
+    public <T> List<Future<T>> invokeAll(@Nonnull Collection<? extends Callable<T>> collection) {
         throw new UnsupportedOperationException("Method not implemented.");
     }
 
     @Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> collection, long l, TimeUnit timeUnit) {
+    public <T> List<Future<T>> invokeAll(@Nonnull Collection<? extends Callable<T>> collection, long l, @Nonnull TimeUnit timeUnit) {
         throw new UnsupportedOperationException("Method not implemented.");
     }
 
     @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> collection) {
+    public <T> T invokeAny(@Nonnull Collection<? extends Callable<T>> collection) {
         throw new UnsupportedOperationException("Method not implemented.");
     }
 
     @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> collection, long l, TimeUnit timeUnit) {
+    public <T> T invokeAny(@Nonnull Collection<? extends Callable<T>> collection, long l, @Nonnull TimeUnit timeUnit) {
         throw new UnsupportedOperationException("Method not implemented.");
     }
 
     @Override
-    public void execute(Runnable runnable) {
+    public void execute(@Nonnull Runnable runnable) {
         executor.execute(createExceptionalRunnable(runnable));
     }
 }

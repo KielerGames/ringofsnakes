@@ -80,10 +80,14 @@ public class Snake {
         userWantsFast = wantsFast;
     }
 
+    public boolean isFast() {
+        return userWantsFast && length > config.snakes.minLength;
+    }
+
     public void tick() {
         assert currentChunk != null : "Snake not fully initialized";
 
-        final boolean fast = userWantsFast && length > config.snakes.minLength;
+        final boolean fast = isFast();
         fastHistory.set(fast);
 
         // update direction
@@ -113,10 +117,10 @@ public class Snake {
             // the id of an empty chunk (non-existing to the client) would confuse the client
             currentChunkId = currentChunk.id;
         }
-        double offset = currentChunk.getLength();
+        double offset = currentChunk.getDataLength();
         for (FinalSnakeChunk chunk : chunks) {
             chunk.setOffset(offset);
-            offset += chunk.getLength();
+            offset += chunk.getDataLength();
         }
         if (chunks.size() > 0) {
             FinalSnakeChunk lastChunk = chunks.get(chunks.size() - 1);
@@ -243,7 +247,7 @@ public class Snake {
         final var chunk = streamSnakeChunks()
                 .filter(snakeChunk -> {
                     final var sco = snakeChunk.getOffset();
-                    return sco <= offset && offset <= sco + snakeChunk.getLength();
+                    return sco <= offset && offset <= sco + snakeChunk.getDataLength();
                 })
                 .findFirst();
 

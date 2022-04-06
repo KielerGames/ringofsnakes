@@ -46,6 +46,10 @@ public class GameUpdate {
         snakes.add(snake);
     }
 
+    public boolean hasSnake(Snake snake) {
+        return snakes.contains(snake);
+    }
+
     public ByteBuffer createUpdateBuffer() {
         final int snakeInfoSize = snakes.size() * Snake.INFO_BYTE_SIZE;
         final int bufferSize = HEADER_SIZE + snakeInfoSize + snakeChunkBufferSize + foodChunkBufferSize;

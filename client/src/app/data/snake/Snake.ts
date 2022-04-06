@@ -25,6 +25,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     private _length: number;
     private _fast: boolean;
     private _width: number;
+    private _paused: boolean = false;
     private gameConfig: GameConfig;
 
     // head position & interpolation
@@ -55,17 +56,19 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     update(dto: SnakeDTO, ticks: number): void {
         this.lastUpdateTime = FrameTime.now();
         this._length = dto.length;
-        if (__DEBUG__ && dto.headChunkId !== this.headChunkId && this.headChunkId !== undefined) {
-            console.info(
-                `Head chunk changed on snake ${this.id} from ${this.headChunkId} to ${dto.headChunkId}`
-            );
-        }
         this.headChunkId = dto.headChunkId;
         this.lastKnownHeadPosition = Vector.fromObject(dto.headPosition);
         this.lastKnownDirection = dto.headDirection[0];
         this.targetDirection = dto.headDirection[1];
         this._fast = dto.fast;
         this._width = dto.width;
+
+        if (this._paused) {
+            this.predictedHeadPosition = Vector.fromObject(dto.headPosition);
+            this.predictedDirection = dto.headDirection[0];
+            this.lastPredictionTime = FrameTime.now();
+            this._paused = true;
+        }
 
         this.updateChunkOffsets(ticks, dto.fastHistory);
     }
@@ -151,6 +154,16 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         }
     }
 
+    /**
+     * Pause snake movement until the next server update.
+     */
+    pause() {
+        if (__DEBUG__ && !this._paused) {
+            console.info(`Snake ${this.id} has been paused.`);
+        }
+        this._paused = true;
+    }
+
     get name(): string {
         return `Snake ${this.id}`; // TODO
     }
@@ -167,6 +180,9 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
      * The current snake speed in units per seconds (not units per tick).
      */
     get speed(): number {
+        if (this._paused) {
+            return 0.0;
+        }
         const config = this.gameConfig;
         const tickSpeed = this._fast ? config.snakes.fastSpeed : config.snakes.speed;
         return tickSpeed / config.tickDuration;

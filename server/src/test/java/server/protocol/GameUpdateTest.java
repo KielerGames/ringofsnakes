@@ -1,8 +1,10 @@
 package server.protocol;
 
+import game.snake.SnakeFactory;
 import game.world.World;
 import game.world.WorldChunk;
 import math.BoundingBox;
+import math.Vector;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -37,23 +39,6 @@ public class GameUpdateTest {
         var update = new GameUpdate();
         update.addFoodChunk(chunk);
         assertFalse(update.isEmpty());
-    }
-
-    private ByteBuffer captureUpdateData(Client client) {
-        var remoteEndpoint = Mockito.mock(RemoteEndpoint.Async.class);
-
-        assertNotNull(session);
-        assertNotNull(remoteEndpoint);
-
-        when(session.isOpen()).thenReturn(true);
-        when(session.getAsyncRemote()).thenReturn(remoteEndpoint);
-
-        client.sendUpdate((byte) 0);
-
-        var captor = ArgumentCaptor.forClass(ByteBuffer.class);
-        verify(remoteEndpoint).sendBinary(captor.capture());
-
-        return captor.getValue();
     }
 
     @Test
@@ -102,8 +87,54 @@ public class GameUpdateTest {
         assertEquals(1, update2.get(3));
     }
 
+    @Test
+    void testKnowledgeDecay() {
+        var client = new TestClient(session);
+        var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+
+        for (int i = 0; i < 10; i++) {
+            snake.tick();
+        }
+
+        client.updateClientSnakeChunk(snake.getSnakeChunks().get(0));
+        sendUpdate(client);
+        var update1 = client.lastSentUpdate;
+        assertTrue(update1.hasSnake(snake));
+
+        for (int i = 0; i < 42; i++) {
+            sendUpdate(client);
+            if (!client.lastSentUpdate.hasSnake(snake)) {
+                break;
+            }
+        }
+
+        assertFalse(client.lastSentUpdate.hasSnake(snake), "Knowledge about that snake should have decayed.");
+    }
+
+    private ByteBuffer captureUpdateData(Client client) {
+        var remoteEndpoint = Mockito.mock(RemoteEndpoint.Async.class);
+
+        assertNotNull(session);
+        assertNotNull(remoteEndpoint);
+
+        when(session.isOpen()).thenReturn(true);
+        when(session.getAsyncRemote()).thenReturn(remoteEndpoint);
+
+        client.sendUpdate((byte) 0);
+
+        var captor = ArgumentCaptor.forClass(ByteBuffer.class);
+        verify(remoteEndpoint).sendBinary(captor.capture());
+
+        return captor.getValue();
+    }
+
+    private void sendUpdate(Client client) {
+        captureUpdateData(client);
+    }
+
     private static class TestClient extends Client {
         public BoundingBox knowledgeBox = new BoundingBox(0, 0, 100, 100);
+        public GameUpdate lastSentUpdate;
 
         TestClient(Session session) {
             super(session);
@@ -112,6 +143,11 @@ public class GameUpdateTest {
         @Override
         public BoundingBox getKnowledgeBox() {
             return knowledgeBox;
+        }
+
+        @Override
+        protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
+            lastSentUpdate = update;
         }
     }
 }

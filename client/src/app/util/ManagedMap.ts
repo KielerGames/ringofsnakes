@@ -99,6 +99,10 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
         return removeList;
     }
 
+    forEach(consumer: BiConsumer<V, K>): void {
+        this.data.forEach(consumer);
+    }
+
     values(): IterableIterator<V> {
         return this.data.values();
     }

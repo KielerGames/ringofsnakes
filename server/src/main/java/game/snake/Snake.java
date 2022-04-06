@@ -33,17 +33,22 @@ public class Snake {
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private final BitWithShortHistory fastHistory = new BitWithShortHistory(false);
     public GrowingSnakeChunk currentChunk;
-    @Getter protected double length;
-    @Getter Vector headPosition;
+    @Getter
+    protected double length;
+    @Getter
+    Vector headPosition;
     double headDirection;
     private char currentChunkId;
-    @Setter private byte skin;
-    @Getter private boolean alive = true;
+    @Setter
+    private byte skin;
+    @Getter
+    private boolean alive = true;
     private char nextChunkId = 0;
     private double targetDirection;
     private boolean userWantsFast = false;
     private double lengthBuffer = 0;
-    @Getter private double width;
+    @Getter
+    private double width;
     private double foodTrailBuffer = 0f;
 
     Snake(char id, World world) {
@@ -87,9 +92,7 @@ public class Snake {
         final boolean fast = userWantsFast && length > config.snakes.minLength;
         fastHistory.set(fast);
 
-
         var lastWorldChunk = world.chunks.findChunk(headPosition);
-
 
         // update direction
         int encDirDelta = coder.sampleDirectionChange(targetDirection, headDirection);
@@ -107,15 +110,17 @@ public class Snake {
         }
 
         updateWidth();
-        var currentWorldChunk = world.chunks.findChunk(headPosition);
-        boolean worldChunkChanged = lastWorldChunk != currentWorldChunk;
-
-        if(worldChunkChanged){
-            currentWorldChunk.addSnakeChunk(currentChunk);
-        }
 
         // update chunks
         currentChunk.append(encDirDelta, fast);
+
+        //TODO:consider the snake head size when checking the snake head position
+        //add currentChunk to currentWorldChunk if the worldChunk is changed
+        var currentWorldChunk = world.chunks.findChunk(headPosition);
+        if (!lastWorldChunk.equals(world.chunks.findChunk(headPosition))) {
+            currentWorldChunk.addSnakeChunk(currentChunk);
+        }
+
         // after an update a chunk might be full
         if (currentChunk.isFull()) {
             beginChunk();
@@ -135,7 +140,6 @@ public class Snake {
                 chunks.remove(chunks.size() - 1);
             }
         }
-
     }
 
     void beginChunk() {

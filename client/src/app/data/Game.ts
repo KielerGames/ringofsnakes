@@ -144,13 +144,15 @@ export default class Game {
             }
         }
 
-        // pause snakes that did not receive any updates
         const updatedSnakeIds = new Set<SnakeId>(changes.snakes.map((snake) => snake.id));
-        this.snakes.forEach((snake) => {
-            if (!updatedSnakeIds.has(snake.id)) {
-                snake.pause();
-            }
-        });
+        if (updatedSnakeIds.size > 0) {
+            // pause snakes that did not receive any updates
+            this.snakes.forEach((snake) => {
+                if (!updatedSnakeIds.has(snake.id)) {
+                    snake.pause();
+                }
+            });
+        }
 
         this.removeJunk();
     }

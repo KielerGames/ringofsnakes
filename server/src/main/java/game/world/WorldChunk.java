@@ -16,7 +16,7 @@ public class WorldChunk {
     private static final int FOOD_HEADER_SIZE = 4;
     public final BoundingBox box;
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
-    private final List<SnakeChunk> snakeChunks = new LinkedList<>();
+    private final Set<SnakeChunk> snakeChunks = new HashSet<>();
     private @Getter final byte x, y;
     private final World world;
     private final List<Food> foodList = new LinkedList<>();

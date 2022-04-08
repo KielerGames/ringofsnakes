@@ -2,7 +2,7 @@ package math;
 
 import java.util.Random;
 
-public class Vector implements Cloneable {
+public final class Vector implements Cloneable {
     public final static Vector ORIGIN = new Vector(0.0, 0.0);
 
     public double x;

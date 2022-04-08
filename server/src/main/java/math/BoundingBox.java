@@ -5,8 +5,9 @@ import java.util.Random;
 /**
  * Axis-aligned bounding box.
  */
-public class BoundingBox {
+public final class BoundingBox {
     public final double minX, maxX, minY, maxY;
+    private final double centerX, centerY;
 
     public BoundingBox(double minX, double maxX, double minY, double maxY) {
         assert minX <= maxX;
@@ -17,6 +18,9 @@ public class BoundingBox {
 
         this.minY = minY;
         this.maxY = maxY;
+
+        centerX = minX + 0.5 * (maxX - minX);
+        centerY = minY + 0.5 * (maxY - minY);
     }
 
     public BoundingBox(Random rand) {
@@ -24,6 +28,8 @@ public class BoundingBox {
         minY = rand.nextDouble();
         maxX = minX + rand.nextDouble();
         maxY = minY + rand.nextDouble();
+        centerX = minX + 0.5 * (maxX - minX);
+        centerY = minY + 0.5 * (maxY - minY);
     }
 
     public BoundingBox(Vector center, double width, double height) {
@@ -33,6 +39,8 @@ public class BoundingBox {
         maxX = center.x + 0.5 * width;
         minY = center.y - 0.5 * height;
         maxY = center.y + 0.5 * height;
+        centerX = minX + 0.5 * (maxX - minX);
+        centerY = minY + 0.5 * (maxY - minY);
     }
 
     /**
@@ -105,6 +113,26 @@ public class BoundingBox {
     }
 
     /**
+     * Compute the squared distance between two bounding boxes.
+     */
+    public static double distance2(BoundingBox a, BoundingBox b) {
+        // center distance
+        final var cdX = Math.abs(a.centerX - b.centerX);
+        final var cdY = Math.abs(a.centerY - b.centerY);
+
+        // summed extends
+        final var extX = 0.5 * (a.getWidth() + b.getWidth());
+        final var extY = 0.5 * (a.getHeight() + b.getHeight());
+
+        // axis distances
+        final var dX = Math.max(0.0, cdX - extX);
+        final var dY = Math.max(0.0, cdY - extY);
+
+        // = length(max(0, abs(a.center - b.center) - (a.extend + b.extend)))²
+        return dX * dX + dY * dY;
+    }
+
+    /**
      * Computes the minimum distance between a point and this rectangle.
      * In performance critical section use the distance2 method instead.
      *
@@ -139,10 +167,7 @@ public class BoundingBox {
     }
 
     public Vector getCenter() {
-        return new Vector(
-                minX + 0.5 * (maxX - minX),
-                minY + 0.5 * (maxY - minY)
-        );
+        return new Vector(centerX, centerY);
     }
 
     @Override

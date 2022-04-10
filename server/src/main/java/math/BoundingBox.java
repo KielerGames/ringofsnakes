@@ -24,12 +24,7 @@ public final class BoundingBox {
     }
 
     public BoundingBox(Random rand) {
-        minX = rand.nextDouble();
-        minY = rand.nextDouble();
-        maxX = minX + rand.nextDouble();
-        maxY = minY + rand.nextDouble();
-        centerX = minX + 0.5 * (maxX - minX);
-        centerY = minY + 0.5 * (maxY - minY);
+        this(new Vector(rand.nextDouble(), rand.nextDouble()), rand.nextDouble(), rand.nextDouble());
     }
 
     public BoundingBox(Vector center, double width, double height) {
@@ -92,26 +87,6 @@ public final class BoundingBox {
         return 0.0;
     }
 
-    public double getWidth() {
-        return maxX - minX;
-    }
-
-    public double getHeight() {
-        return maxY - minY;
-    }
-
-    /**
-     * Computes the squared distance between this rectangle and a given point p.
-     * The distance is 0 if the point is within the rectangle.
-     *
-     * @param p A point
-     * @return Returns the squared distance
-     */
-    public double distance2(Vector p) {
-        final double dx = axisDist(minX, maxX, p.x), dy = axisDist(minY, maxY, p.y);
-        return dx * dx + dy * dy;
-    }
-
     /**
      * Compute the squared distance between two bounding boxes.
      */
@@ -130,6 +105,26 @@ public final class BoundingBox {
 
         // = length(max(0, abs(a.center - b.center) - (a.extend + b.extend)))²
         return dX * dX + dY * dY;
+    }
+
+    public double getWidth() {
+        return maxX - minX;
+    }
+
+    public double getHeight() {
+        return maxY - minY;
+    }
+
+    /**
+     * Computes the squared distance between this rectangle and a given point p.
+     * The distance is 0 if the point is within the rectangle.
+     *
+     * @param p A point
+     * @return Returns the squared distance
+     */
+    public double distance2(Vector p) {
+        final double dx = axisDist(minX, maxX, p.x), dy = axisDist(minY, maxY, p.y);
+        return dx * dx + dy * dy;
     }
 
     /**

@@ -35,5 +35,6 @@ describe("Snake", () => {
         const snake = new Snake(snakeDTO, defaultConfig);
         snake.pause();
         snake.update(createSnakeDTO({ id: snake.id }), 1);
+        expect(snake.speed).toBeGreaterThan(0.0);
     });
 });

@@ -1,13 +1,15 @@
 package game.snake;
 
+import game.GameConfig;
 import game.world.Collidable;
-import game.world.WorldChunk;
 import lombok.Getter;
 import math.BoundingBox;
 import math.Vector;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+
+import static util.MathFunctions.clamp;
 
 public abstract class SnakeChunk implements Collidable {
 
@@ -19,6 +21,13 @@ public abstract class SnakeChunk implements Collidable {
 
     protected SnakeChunk(Snake snake) {
         this.snake = snake;
+    }
+
+    /**
+     * Compute the maximum possible snake chunk length for a given GameConfig.
+     */
+    public static double getMaximumLength(GameConfig config) {
+        return (ChainCodeCoder.MAX_STEPS * FinalSnakeChunk.BYTE_SIZE) * config.snakes.fastSpeed;
     }
 
     public abstract ByteBuffer getBuffer();
@@ -36,7 +45,15 @@ public abstract class SnakeChunk implements Collidable {
      */
     public abstract int getUniqueId();
 
-    public abstract double getLength();
+    public abstract double getDataLength();
+
+    /**
+     * The last snake chunk is often only partially used due to the snake length constraint.
+     * {@code #getCurrentLength() <= getDataLength()}
+     */
+    public double getCurrentLength() {
+        return clamp(snake.getLength() - getOffset(), 0.0, getDataLength());
+    }
 
     public abstract List<SnakePathPoint> getPathData();
 
@@ -60,13 +77,16 @@ public abstract class SnakeChunk implements Collidable {
         forceJunk = true;
     }
 
+    /**
+     * Return the minimal bounding box assuming snake width 0.
+     */
     public abstract BoundingBox getBoundingBox();
 
     public abstract double getOffset();
 
     public Vector getPositionAt(double inSnakeOffset) {
         final var inChunkOffset = inSnakeOffset - getOffset();
-        assert 0.0 <= inChunkOffset && inChunkOffset <= getLength();
+        assert 0.0 <= inChunkOffset && inChunkOffset <= getDataLength();
 
         // TODO: use binary search instead
 
@@ -90,5 +110,10 @@ public abstract class SnakeChunk implements Collidable {
 
         assert minPoint != null;
         return minPoint;
+    }
+
+    @Override
+    public int hashCode() {
+        return getUniqueId();
     }
 }

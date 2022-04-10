@@ -2,6 +2,7 @@ package server;
 
 import game.snake.Snake;
 import game.snake.SnakeChunk;
+import game.world.HeatMap;
 import game.world.WorldChunk;
 import math.BoundingBox;
 import server.protocol.GameUpdate;
@@ -21,6 +22,7 @@ public abstract class Client {
     private final Map<Snake, Integer> knownSnakes = new HashMap<>();
     protected float viewBoxRatio = 1f;
     private GameUpdate nextUpdate = new GameUpdate();
+    private long lastHeatMapUpdate = System.currentTimeMillis();
 
     public Client(Session session) {
         this.session = session;
@@ -52,6 +54,15 @@ public abstract class Client {
     private void updateClientSnake(Snake snake) {
         knownSnakes.put(snake, 0);
         nextUpdate.addSnake(snake);
+    }
+
+    public void updateHeatMap(HeatMap heatMap) {
+        final long now = System.currentTimeMillis();
+        final long elapsed = now - lastHeatMapUpdate;
+        if (elapsed >= 1000) {
+            nextUpdate.addHeatMap(heatMap);
+            lastHeatMapUpdate = now;
+        }
     }
 
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {

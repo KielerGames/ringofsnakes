@@ -1,18 +1,16 @@
 package game.snake;
 
-import game.world.WorldChunk;
 import lombok.Getter;
 import math.BoundingBox;
 
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
 import java.util.List;
 
 public class FinalSnakeChunk extends SnakeChunk {
     public final static int BYTE_SIZE = 96;
 
     private final ByteBuffer chunkByteBuffer;
-    @Getter private final double length;
+    @Getter private final double dataLength;
     @Getter private final int uniqueId;
     private final BoundingBox boundingBox;
     final private List<SnakePathPoint> pathData;
@@ -22,18 +20,18 @@ public class FinalSnakeChunk extends SnakeChunk {
             Snake snake,
             ByteBuffer buffer,
             BoundingBox box,
-            double length,
+            double dataLength,
             List<SnakePathPoint> pathData
     ) {
         super(snake);
 
         assert buffer.position() == BYTE_SIZE;
-        assert length > 0;
+        assert dataLength > 0;
 
         this.pathData = pathData;
         chunkByteBuffer = buffer;
         boundingBox = box;
-        this.length = length;
+        this.dataLength = dataLength;
         this.uniqueId = buffer.getInt(0); // bytes 0-3
     }
 

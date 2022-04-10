@@ -4,10 +4,10 @@ import game.GameConfig;
 
 import static util.MathFunctions.clamp;
 
-public class ChainCodeCoder {
-    public static final int STEPS_MASK = 7 << 4;
-    public static final int DIRECTION_MASK = 15;
-    public static final int MAX_STEPS = 8;
+class ChainCodeCoder {
+    static final int DIRECTION_MASK = 15;
+    static final int MAX_STEPS = 8;
+    private static final int STEPS_MASK = 7 << 4;
     private static final int FAST_BIT = 1 << 7;
     private static final double SCALE_RANGE = 6.0 / 7.0 - Double.MIN_NORMAL;
 
@@ -16,7 +16,7 @@ public class ChainCodeCoder {
     private final double DIR_STEP;
     private final double INV_MAX_DELTA;
 
-    public ChainCodeCoder(Snake snake) {
+    ChainCodeCoder(Snake snake) {
         this.snake = snake;
         this.config = snake.config;
         DIR_STEP = config.snakes.maxTurnDelta / 7.0;
@@ -41,7 +41,7 @@ public class ChainCodeCoder {
      *
      * @return data encoded in 8 bits
      */
-    public byte encode(int direction, boolean fast, int steps) {
+    byte encode(int direction, boolean fast, int steps) {
         assert 0 < steps && steps <= MAX_STEPS;
 
         // encode steps
@@ -56,7 +56,7 @@ public class ChainCodeCoder {
         return (byte) data;
     }
 
-    public int sampleDirectionChange(double newAngle, double oldAngle) {
+    int sampleDirectionChange(double newAngle, double oldAngle) {
         // compute change
         double delta = newAngle - oldAngle;
 
@@ -74,20 +74,20 @@ public class ChainCodeCoder {
         return 2 * Math.abs(k) + (k < 0 ? 1 : 0);
     }
 
-    public double decodeDirectionChange(int direction) {
+    double decodeDirectionChange(int direction) {
         int sign = 1 - ((direction & 1) << 1);
         int k = sign * (direction / 2);
         return k * DIR_STEP;
     }
 
-    public DecodedData decode(byte b) {
+    DecodedData decode(byte b) {
         boolean fast = (b & FAST_BIT) > 0;
         int steps = 1 + ((b & STEPS_MASK) >> 4);
         int direction = b & DIRECTION_MASK;
         return new DecodedData(direction, fast, steps);
     }
 
-    public static class DecodedData {
+    static class DecodedData {
         public final int direction;
         public final boolean fast;
         public final int steps;

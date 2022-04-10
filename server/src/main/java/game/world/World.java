@@ -18,12 +18,14 @@ public class World {
     public final WorldChunkCollection chunks;
     public final Vector center = new Vector(0, 0);
     @Getter private final GameConfig config;
+    @Getter private final HeatMap heatMap;
     public BoundingBox box;
 
     public World(double chunkSize, int repetitions) {
         this.config = new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions));
         chunks = WorldChunkFactory.createChunks(this);
         box = new BoundingBox(new Vector(0, 0), chunkSize * repetitions, chunkSize * repetitions);
+        heatMap = new HeatMap(config, chunks::stream);
     }
 
     public World() {
@@ -34,6 +36,7 @@ public class World {
         this.config = config;
         chunks = WorldChunkFactory.createChunks(this);
         box = new BoundingBox(new Vector(0, 0), config.chunks.size * config.chunks.columns, config.chunks.size * config.chunks.rows);
+        heatMap = new HeatMap(config, chunks::stream);
     }
 
     public Vector findSpawnPosition() {
@@ -55,7 +58,9 @@ public class World {
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {
-        chunks.findIntersectingChunks(snakeChunk.getBoundingBox())
+        // Snake width can change throughout the lifetime of a snake chunk.
+        // To avoid updating world chunks later we assume maximum width here.
+        chunks.findNearbyChunks(snakeChunk.getBoundingBox(), 0.5 * config.snakes.maxWidth)
                 .forEach(chunk -> chunk.addSnakeChunk(snakeChunk));
     }
 

@@ -2,6 +2,7 @@ package game.world;
 
 import game.GameConfig;
 import game.snake.SnakeChunk;
+import lombok.Getter;
 import math.BoundingBox;
 import math.Vector;
 
@@ -10,13 +11,12 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-
 public class WorldChunk {
     private static final int FOOD_HEADER_SIZE = 4;
     public final BoundingBox box;
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
-    private final List<SnakeChunk> snakeChunks = new LinkedList<>();
-    private final byte x, y;
+    private final Set<SnakeChunk> snakeChunks = new HashSet<>();
+    private @Getter final byte x, y;
     private final World world;
     private final List<Food> foodList = new LinkedList<>();
     private int foodVersion = 0;
@@ -67,7 +67,7 @@ public class WorldChunk {
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {
-        assert (BoundingBox.intersect(snakeChunk.getBoundingBox(), box));
+        assert (Math.sqrt(BoundingBox.distance2(snakeChunk.getBoundingBox(), box)) <= 0.5 * world.getConfig().snakes.maxWidth);
 
         snakeChunks.add(snakeChunk);
     }
@@ -141,5 +141,10 @@ public class WorldChunk {
             }
         }
         throw new RuntimeException("No free spawn position found!");
+    }
+
+    @Override
+    public int hashCode() {
+        return (x << 8) + y;
     }
 }

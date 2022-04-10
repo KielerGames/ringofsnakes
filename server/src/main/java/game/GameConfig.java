@@ -4,7 +4,7 @@ public final class GameConfig {
     public final double tickDuration = 1.0 / 25.0; // in seconds
     public final double foodNutritionalValue = 1.0;
     public final double foodConversionEfficiency = 0.5;
-    public final int targetSnakePopulation = 42;
+    public final int targetSnakePopulation = 60;
     public final boolean selfCollision = false;
 
     public final ChunkInfo chunks;
@@ -19,7 +19,7 @@ public final class GameConfig {
         this.snakes = new SnakeInfo(0.3);
     }
 
-    public static class ChunkInfo {
+    public static final class ChunkInfo {
         public final double size;
         public final int columns;
         public final int rows;
@@ -35,7 +35,7 @@ public final class GameConfig {
         }
     }
 
-    public static class SnakeInfo {
+    public static final class SnakeInfo {
         public final double speed;
         public final double fastSpeed;
         public final double maxTurnDelta = Math.toRadians(6);

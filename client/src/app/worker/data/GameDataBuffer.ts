@@ -37,6 +37,7 @@ export default class GameDataBuffer {
             foodChunks: dataUpdate ? dataUpdate.foodChunkData : [],
             snakeDeaths,
             leaderboard,
+            heatMap: dataUpdate?.heatMap,
             moreUpdates
         };
     }

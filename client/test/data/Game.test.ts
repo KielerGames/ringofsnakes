@@ -1,9 +1,6 @@
 import Game from "../../src/app/data/Game";
 import RemoteMock from "../worker/worker.mock";
-import {
-    createSingleSnakeDataUpdate,
-    emptyDataUpdate
-} from "./dto/DataUpdateDTO.prefab";
+import { createSingleSnakeDataUpdate, emptyDataUpdate } from "./dto/DataUpdateDTO.prefab";
 import * as UserInput from "../../src/app/input/UserInput";
 import { DataUpdateDTO } from "../../src/app/data/dto/DataUpdateDTO";
 import * as FrameTime from "../../src/app/util/FrameTime";
@@ -53,6 +50,16 @@ describe("Game", () => {
         expect(RemoteMock.getDataChanges).toHaveBeenCalledTimes(1);
     });
 
+    test("an empty update should not pause snakes", async () => {
+        const [game] = await Game.joinAsPlayer("TestPlayer");
+        const snakeId = 1;
+        await updateGame(game, createSingleSnakeDataUpdate(snakeId));
+        const snake = game.snakes.get(snakeId)!;
+        expect(snake.speed).toBeGreaterThan(0.0);
+        await updateGame(game, emptyDataUpdate);
+        expect(snake.speed).toBeGreaterThan(0.0);
+    });
+
     describe("Prediction", () => {
         const snakeId = 1;
         test("SnakeChunks should be predicted once", async () => {
@@ -66,7 +73,7 @@ describe("Game", () => {
             FrameTime.update(1000);
             game.predict();
 
-            for(const spy of spies) {
+            for (const spy of spies) {
                 expect(spy).toBeCalledTimes(1);
             }
         });
@@ -82,7 +89,7 @@ describe("Game", () => {
             FrameTime.update(1000);
             game.predict();
 
-            for(const spy of spies) {
+            for (const spy of spies) {
                 expect(spy).toBeCalledTimes(1);
             }
         });

@@ -109,7 +109,9 @@ public class Snake {
         // update chunks
         currentChunk.append(encDirDelta, fast);
 
-        //TODO:consider the snake head size when checking the snake head position
+        //TODO:
+        // - consider the snake head size when checking the snake head position
+        // - add a test for this
         //add currentChunk to currentWorldChunk if the worldChunk is changed
         var currentWorldChunk = world.chunks.findChunk(headPosition);
         if (!lastWorldChunk.equals(currentWorldChunk)) {

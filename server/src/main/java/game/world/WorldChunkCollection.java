@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class WorldChunkCollection {
@@ -42,6 +43,15 @@ public abstract class WorldChunkCollection {
         }
 
         return intersectingChunks;
+    }
+
+    public Set<WorldChunk> findIntersectingChunks(Vector position, double radius) {
+        final var boundingBox = new BoundingBox(position, 2 * radius, 2 * radius);
+
+        return findIntersectingChunks(boundingBox)
+                .stream()
+                .filter(wc -> wc.box.distance2(position) < radius * radius)
+                .collect(Collectors.toSet());
     }
 
     public Stream<WorldChunk> stream() {

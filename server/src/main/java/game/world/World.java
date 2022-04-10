@@ -58,7 +58,9 @@ public class World {
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {
-        chunks.findIntersectingChunks(snakeChunk.getBoundingBox())
+        // Snake width can change throughout the lifetime of a snake chunk.
+        // To avoid updating world chunks later we assume maximum width here.
+        chunks.findNearbyChunks(snakeChunk.getBoundingBox(), 0.5 * config.snakes.maxWidth)
                 .forEach(chunk -> chunk.addSnakeChunk(snakeChunk));
     }
 

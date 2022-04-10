@@ -77,6 +77,9 @@ public abstract class SnakeChunk implements Collidable {
         forceJunk = true;
     }
 
+    /**
+     * Return the minimal bounding box assuming snake width 0.
+     */
     public abstract BoundingBox getBoundingBox();
 
     public abstract double getOffset();
@@ -107,5 +110,10 @@ public abstract class SnakeChunk implements Collidable {
 
         assert minPoint != null;
         return minPoint;
+    }
+
+    @Override
+    public int hashCode() {
+        return getUniqueId();
     }
 }

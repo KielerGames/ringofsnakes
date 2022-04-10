@@ -54,6 +54,7 @@ public class BoundingBoxTest {
         var a = new BoundingBox(-1.0, 1.0, -1.0, 1.0);
         var b = new BoundingBox(-0.5, 0.5, -0.5, 0.5);
         assertTrue(BoundingBox.intersect(a, b));
+        assertEquals(0.0, BoundingBox.distance2(a, b));
     }
 
     @Test
@@ -61,6 +62,7 @@ public class BoundingBoxTest {
         var a = new BoundingBox(-1.0, -0.25, -1.0, 1.0);
         var b = new BoundingBox(0.25, 1.0, -1.0, 1.0);
         assertFalse(BoundingBox.intersect(a, b));
+        assertTrue(BoundingBox.distance2(a, b) > 0.0);
     }
 
     @Test
@@ -69,6 +71,7 @@ public class BoundingBoxTest {
         var b = new BoundingBox(0, 0, 0, 0);
         assertTrue(BoundingBox.intersect(a, b));
         assertTrue(BoundingBox.intersect(b, b));
+        assertEquals(0.0, BoundingBox.distance2(a, b));
     }
 
     @Test
@@ -81,8 +84,13 @@ public class BoundingBoxTest {
 
             var ab = BoundingBox.intersect(a, b);
             var ba = BoundingBox.intersect(b, a);
-
             assertEquals(ab, ba);
+
+            var dab = BoundingBox.distance2(a, b);
+            var dba = BoundingBox.distance2(b, a);
+            assertEquals(dab, dba, 1e-8);
+
+            assertEquals(ab, dab <= 1e-8);
         }
     }
 }

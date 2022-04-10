@@ -11,7 +11,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-
 public class WorldChunk {
     private static final int FOOD_HEADER_SIZE = 4;
     public final BoundingBox box;
@@ -142,5 +141,10 @@ public class WorldChunk {
             }
         }
         throw new RuntimeException("No free spawn position found!");
+    }
+
+    @Override
+    public int hashCode() {
+        return (x << 8) + y;
     }
 }

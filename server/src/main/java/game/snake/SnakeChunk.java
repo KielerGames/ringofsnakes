@@ -111,4 +111,9 @@ public abstract class SnakeChunk implements Collidable {
         assert minPoint != null;
         return minPoint;
     }
+
+    @Override
+    public int hashCode() {
+        return getUniqueId();
+    }
 }

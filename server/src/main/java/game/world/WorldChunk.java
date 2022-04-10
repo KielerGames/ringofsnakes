@@ -67,7 +67,7 @@ public class WorldChunk {
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {
-        assert (BoundingBox.intersect(snakeChunk.getBoundingBox(), box));
+        assert (Math.sqrt(BoundingBox.distance2(snakeChunk.getBoundingBox(), box)) <= 0.5 * world.getConfig().snakes.maxWidth);
 
         snakeChunks.add(snakeChunk);
     }

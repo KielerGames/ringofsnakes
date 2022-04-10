@@ -11,10 +11,7 @@ import util.BitWithShortHistory;
 import util.Direction;
 
 import java.nio.ByteBuffer;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -87,7 +84,7 @@ public class Snake {
         final boolean fast = userWantsFast && length > config.snakes.minLength;
         fastHistory.set(fast);
 
-        var lastWorldChunk = world.chunks.findChunk(headPosition);
+        var oldSnakeHeadIntersectingWorldChunks = world.chunks.findIntersectingChunks(headPosition, getWidth() / 2);
 
         // update direction
         int encDirDelta = coder.sampleDirectionChange(targetDirection, headDirection);
@@ -109,14 +106,12 @@ public class Snake {
         // update chunks
         currentChunk.append(encDirDelta, fast);
 
-        //TODO:
-        // - consider the snake head size when checking the snake head position
-        // - add a test for this
-        //add currentChunk to currentWorldChunk if the worldChunk is changed
-        var currentWorldChunk = world.chunks.findChunk(headPosition);
-        if (!lastWorldChunk.equals(currentWorldChunk)) {
-            currentWorldChunk.addSnakeChunk(currentChunk);
-        }
+        //ensures that the current snakechunk is added to all worldchunks in which the snake exists
+        var currentSnakeHeadIntersectingWorldChunks = world.chunks.findIntersectingChunks(headPosition, getWidth() / 2);
+        var newWorldChunks = new HashSet<>(currentSnakeHeadIntersectingWorldChunks);
+        newWorldChunks.removeAll(oldSnakeHeadIntersectingWorldChunks);
+        newWorldChunks.forEach(worldChunk -> worldChunk.addSnakeChunk(currentChunk));
+
 
         // after an update a chunk might be full
         if (currentChunk.isFull()) {

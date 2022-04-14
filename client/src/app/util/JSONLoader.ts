@@ -21,7 +21,7 @@ export async function loadJSON<T>(path: string, options: LoadOptions<T> = {}): P
     });
 
     if (!response.ok) {
-        return Promise.reject(`Request failed (${path})`);
+        return Promise.reject(new Error(`Request failed (${path})`));
     }
 
     const data = await response.json();
@@ -29,6 +29,6 @@ export async function loadJSON<T>(path: string, options: LoadOptions<T> = {}): P
     if (guard(data)) {
         return data;
     } else {
-        return Promise.reject("Invalid data.");
+        return Promise.reject(new Error("Invalid data."));
     }
 }

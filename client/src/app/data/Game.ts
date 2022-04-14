@@ -86,6 +86,7 @@ export default class Game {
         return [game, player];
     }
 
+    // eslint-disable-next-line require-await
     static async joinAsSpectator(): Promise<Game> {
         throw new Error("not implemented");
     }

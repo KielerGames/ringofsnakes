@@ -17,7 +17,13 @@
         "no-implicit-coercion": "error",
         "no-extend-native": "error",
         "no-lonely-if": "error",
-        "@typescript-eslint/no-unused-vars": "error"
+        "@typescript-eslint/no-unused-vars": "error",
+        "no-throw-literal": "error",
+        "no-unused-expressions": "error",
+        "no-useless-call": "error",
+        "prefer-promise-reject-errors": ["error", {"allowEmptyReject": true}],
+        "require-await": "error",
+        "prefer-const": "warn"
     },
     "env": {
         "browser": true

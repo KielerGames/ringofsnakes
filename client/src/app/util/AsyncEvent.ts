@@ -28,9 +28,9 @@ export default class AsyncEvent {
      * Wait for the event to be set (or fail after timeout).
      * @param timeout Timeout in ms. Values <= 0 are ignored.
      */
-    async wait(timeout: number = 0): Promise<void> {
+    wait(timeout: number = 0): Promise<void> {
         if (this.flag) {
-            return;
+            return Promise.resolve();
         }
 
         if (this.promise === undefined) {

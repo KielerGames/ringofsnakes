@@ -41,7 +41,7 @@ export class WorkerAPI {
         socket = await connect(url);
 
         const spawnInfo: SpawnInfo = await new Promise((resolve, reject) => {
-            const timeoutId = setTimeout(() => reject("SpawnInfo timeout."), 2000);
+            const timeoutId = setTimeout(() => reject(new Error("SpawnInfo timeout.")), 2000);
 
             socket!.onJSONMessage = (message) => {
                 if (message.tag === "SpawnInfo") {
@@ -83,7 +83,7 @@ export class WorkerAPI {
         };
     }
 
-    async sendUserInput(alpha: number, wantsFast: boolean, viewBox: TransferableBox) {
+    sendUserInput(alpha: number, wantsFast: boolean, viewBox: TransferableBox): void {
         userInputRateLimiter.setValue({
             targetAlpha: alpha,
             wantsToBeFast: wantsFast,

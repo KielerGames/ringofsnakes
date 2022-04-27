@@ -2,8 +2,18 @@
 /* eslint-disable no-undef */
 
 const webpack = require("webpack");
-const path = require("path");
+const path = require("node:path");
+const fs = require("node:fs");
+const crypto = require("node:crypto");
 const pkg = require("./package.json");
+
+const SHADER_HASH = (() => {
+    const fileBuffer = fs.readFileSync(path.join("public", "shaders.json"));
+    const hashSum = crypto.createHash("sha256");
+    hashSum.update(fileBuffer);
+
+    return hashSum.digest("hex").substring(0, 10);
+})();
 
 module.exports = {
     mode: "production",
@@ -37,6 +47,7 @@ module.exports = {
     plugins: [
         new webpack.DefinePlugin({
             __VERSION__: JSON.stringify(pkg.version),
+            __SHADER_HASH__: JSON.stringify(SHADER_HASH),
             __DEBUG__: "false",
             __TEST__: "false"
         })

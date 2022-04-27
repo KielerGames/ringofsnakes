@@ -11,7 +11,7 @@ const shaders = new Map<Filename, ShaderSource>();
 const loaded = new AsyncEvent();
 
 (async () => {
-    const filePath = "shaders.json?v=" + __VERSION__;
+    const filePath = "shaders.json?h=" + __SHADER_HASH__;
     const shaderData = await loadJSON<JSONData>(filePath, {
         guard: function (data: unknown): data is JSONData {
             if (typeof data !== "object") {

@@ -3,9 +3,7 @@ import { TransferableBox } from "../../math/Rectangle";
 import assert from "../../util/assert";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
-
-declare const __VERTEXSHADER_SOLIDCOLOR__: string;
-declare const __FRAGMENTSHADER_SOLIDCOLOR__: string;
+import { getShaderSource } from "../webgl/ShaderLoader";
 
 let shader: WebGLShaderProgram;
 let buffer: WebGLBuffer;
@@ -15,7 +13,11 @@ const boxesToDraw: { box: TransferableBox; color: RGBAColor }[] = [];
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
 
-    shader = new WebGLShaderProgram(gl, __VERTEXSHADER_SOLIDCOLOR__, __FRAGMENTSHADER_SOLIDCOLOR__);
+    shader = new WebGLShaderProgram(
+        gl,
+        await getShaderSource("solidcolor.vert"),
+        await getShaderSource("solidcolor.frag")
+    );
 
     buffer = gl.createBuffer()!;
     assert(buffer !== null);

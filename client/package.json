@@ -10,7 +10,7 @@
     "scripts": {
         "test": "jest --maxWorkers=1",
         "pack:shaders": "node pack-shaders.js",
-        "build:js": "webpack --config webpack.config.js",
+        "build:js": "webpack --config webpack.config.js --progress",
         "build:js:watch": "webpack --watch --config webpack.config.js",
         "build": "npm run pack:shaders && npm run build:js",
         "build:production": "npm run pack:shaders && webpack --config webpack.config.production.js",
@@ -19,7 +19,7 @@
         "check:format": "prettier --check --no-color \"src/**/*.ts\" \"src/**/*.tsx\"",
         "coverage": "jest --maxWorkers=1 --coverage"
     },
-    "author": "Tim Weißenfels",
+    "author": "KielerGames",
     "devDependencies": {
         "@types/jest": "^27.4.1",
         "@typescript-eslint/eslint-plugin": "^5.15.0",

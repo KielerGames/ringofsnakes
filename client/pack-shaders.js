@@ -24,4 +24,4 @@ const shaders = fs
 
 console.log("Done. Writing...");
 fs.writeFileSync(OUTPUT_FILE, JSON.stringify(shaders));
-console.log(" --> " + OUTPUT_FILE);
+console.log(" --> " + OUTPUT_FILE + "\n");

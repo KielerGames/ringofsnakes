@@ -4,7 +4,7 @@ import * as SkinManager from "../SkinLoader";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import assert from "../../util/assert";
 import Game from "../../data/Game";
-import { getShaderSource } from "../webgl/ShaderLoader";
+import { compileShader } from "../webgl/ShaderLoader";
 
 let buffer: WebGLBuffer;
 let shader: WebGLShaderProgram;
@@ -23,11 +23,7 @@ const rotOffset = -0.5 * Math.PI;
     buffer = gl.createBuffer()!;
     assert(buffer !== null);
 
-    shader = new WebGLShaderProgram(
-        gl,
-        await getShaderSource("head.vert"),
-        await getShaderSource("head.frag")
-    );
+    shader = await compileShader(gl, "head");
 
     // send data to GPU (once)
     shader.use();

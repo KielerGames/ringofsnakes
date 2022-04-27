@@ -1,5 +1,7 @@
+import { dialog } from "../../ui/Dialogs";
 import AsyncEvent from "../../util/AsyncEvent";
 import { loadJSON } from "../../util/JSONLoader";
+import WebGLShaderProgram from "./WebGLShaderProgram";
 
 type Filename = string;
 type ShaderSource = string;
@@ -47,7 +49,7 @@ const loaded = new AsyncEvent();
  * Load the shader code defined in src/shader/${filename}.
  * Does not load the file directly, shaders must be packed in public/shaders.json.
  */
-export async function getShaderSource(filename: Filename): Promise<ShaderSource> {
+async function getShaderSource(filename: Filename): Promise<ShaderSource> {
     await loaded.wait();
 
     if (!shaders.has(filename)) {
@@ -55,4 +57,24 @@ export async function getShaderSource(filename: Filename): Promise<ShaderSource>
     }
 
     return shaders.get(filename)!;
+}
+
+export async function compileShader(
+    gl: WebGLRenderingContext,
+    name: string,
+    attribOrder?: string[]
+): Promise<WebGLShaderProgram> {
+    const vertexShader = await getShaderSource(name + ".vert");
+    const fragmentShader = await getShaderSource(name + ".frag");
+
+    try {
+        return new WebGLShaderProgram(gl, vertexShader, fragmentShader, attribOrder);
+    } catch (e) {
+        console.error(e);
+        await dialog({
+            title: "Error",
+            content: `Failed to compile shader "${name}".`
+        });
+        return Promise.reject(e);
+    }
 }

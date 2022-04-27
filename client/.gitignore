@@ -2,4 +2,5 @@ node_modules
 public/*.bundle.js
 public/*.bundle.js.*
 public/client-config.json
+public/shaders.json
 coverage

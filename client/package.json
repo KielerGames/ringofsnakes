@@ -9,10 +9,11 @@
     "private": true,
     "scripts": {
         "test": "jest --maxWorkers=1",
+        "pack:shaders": "node pack-shaders.js",
         "build:js": "webpack --config webpack.config.js",
         "build:js:watch": "webpack --watch --config webpack.config.js",
-        "build": "npm run build:js",
-        "build:production": "webpack --config webpack.config.production.js",
+        "build": "npm run pack:shaders && npm run build:js",
+        "build:production": "npm run pack:shaders && webpack --config webpack.config.production.js",
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\"",
         "lint": "eslint ./src/app --ext .ts,.tsx",
         "check:format": "prettier --check --no-color \"src/**/*.ts\" \"src/**/*.tsx\"",

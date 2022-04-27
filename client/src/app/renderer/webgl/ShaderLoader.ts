@@ -59,6 +59,11 @@ async function getShaderSource(filename: Filename): Promise<ShaderSource> {
     return shaders.get(filename)!;
 }
 
+/**
+ * Compiles the shader using the code defined in
+ *  - src/shader/${name}.vert (vertex shader)
+ *  - src/shader/${name}.frag (fragment shader)
+ */
 export async function compileShader(
     gl: WebGLRenderingContext,
     name: string,

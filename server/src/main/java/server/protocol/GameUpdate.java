@@ -5,7 +5,6 @@ import game.snake.SnakeChunk;
 import game.world.HeatMap;
 import game.world.WorldChunk;
 
-import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,7 +17,7 @@ public class GameUpdate {
     private final List<ByteBuffer> snakeChunkBuffers = new LinkedList<>();
     private final List<ByteBuffer> foodChunkBuffers = new LinkedList<>();
     private final Set<Snake> snakes = new HashSet<>();
-    @Nullable private ByteBuffer heatMap = null;
+    private ByteBuffer heatMap = null;
     private int snakeChunkBufferSize = 0;
     private int foodChunkBufferSize = 0;
     private byte ticksSinceLastUpdate = 0;

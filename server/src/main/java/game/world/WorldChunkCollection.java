@@ -61,6 +61,12 @@ public abstract class WorldChunkCollection {
         return findNearbyChunks(box, 0.0);
     }
 
+    /**
+     * Returns a set of worldchunks which lie within a radius around a position
+     * @param position a 2D Vector, specifying the center
+     * @param radius
+     * @return a set of worldchunks
+     */
     public Set<WorldChunk> findIntersectingChunks(Vector position, double radius) {
         final var boundingBox = new BoundingBox(position, 2 * radius, 2 * radius);
 

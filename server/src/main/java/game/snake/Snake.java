@@ -88,8 +88,6 @@ public class Snake {
         final boolean fast = isFast();
         fastHistory.set(fast);
 
-        var oldSnakeHeadIntersectingWorldChunks = world.chunks.findIntersectingChunks(headPosition, getWidth() / 2);
-
         // update direction
         int encDirDelta = coder.sampleDirectionChange(targetDirection, headDirection);
         double dirDelta = coder.decodeDirectionChange(encDirDelta);
@@ -112,10 +110,7 @@ public class Snake {
 
         //ensures that the current snakechunk is added to all worldchunks in which the snake exists
         var currentSnakeHeadIntersectingWorldChunks = world.chunks.findIntersectingChunks(headPosition, getWidth() / 2);
-        var newWorldChunks = new HashSet<>(currentSnakeHeadIntersectingWorldChunks);
-        newWorldChunks.removeAll(oldSnakeHeadIntersectingWorldChunks);
-        newWorldChunks.forEach(worldChunk -> worldChunk.addSnakeChunk(currentChunk));
-
+        currentSnakeHeadIntersectingWorldChunks.forEach(wc -> wc.addSnakeChunk(currentChunk));
 
         // after an update a chunk might be full
         if (currentChunk.isFull()) {

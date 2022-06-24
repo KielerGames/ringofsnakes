@@ -25,4 +25,8 @@ public class Player extends Client {
         // TODO
         return new BoundingBox(snake.getHeadPosition(), viewBoxRatio * 48f, 48f);
     }
+
+    public String getName() {
+        return this.snake.name;
+    }
 }

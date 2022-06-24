@@ -22,8 +22,18 @@ public class SnakeFactory {
         return createSnake(position, direction, world);
     }
 
+    public static Snake createSnake(Vector position, World world, String name) {
+        final double direction = Direction.getRandom(random);
+        return createSnake(position, direction, world, name);
+    }
+
     public static Snake createSnake(Vector position, double direction, World world) {
-        Snake snake = new Snake(nextSnakeId++, world);
+        return createSnake(position, direction, world, null);
+    }
+
+    public static Snake createSnake(Vector position, double direction, World world, String name) {
+        final var id = nextSnakeId++;
+        Snake snake = name == null ? new Snake(id, world) : new Snake(id, world, name);
         snake.setSkin((byte) random.nextInt(7));
 
         // start position & rotation
@@ -38,7 +48,8 @@ public class SnakeFactory {
     }
 
     public static Snake createTestSnake() {
-        return createSnake(new Vector(0, 0), new World());
+        final double direction = Direction.getRandom(random);
+        return createSnake(new Vector(0, 0), direction, new World(), "TestSnake");
     }
 
     public static BoundarySnake createBoundarySnake(World world) {

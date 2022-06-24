@@ -4,6 +4,7 @@ import game.GameConfig;
 import game.world.Food;
 import game.world.World;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import math.Vector;
 import util.BitWithShortHistory;
@@ -31,6 +32,7 @@ public class Snake {
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private final BitWithShortHistory fastHistory = new BitWithShortHistory(false);
+    public final String name;
     public GrowingSnakeChunk currentChunk;
     @Getter protected double length;
     @Getter Vector headPosition;
@@ -46,12 +48,17 @@ public class Snake {
     private double foodTrailBuffer = 0f;
 
     Snake(char id, World world) {
+        this(id, world, "Snake " + ((int) id));
+    }
+
+    Snake(char id, World world, @NonNull String name) {
         this.id = id;
         this.world = world;
         config = world.getConfig();
         coder = new ChainCodeCoder(this);
         length = config.snakes.startLength;
         width = config.snakes.minWidth;
+        this.name = name;
 
         updateWidth();
     }

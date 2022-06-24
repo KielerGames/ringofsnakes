@@ -7,6 +7,7 @@ import game.ai.StupidBot;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.snake.SnakeFactory;
+import game.snake.SnakeNameGenerator;
 import game.world.Collidable;
 import game.world.World;
 import game.world.WorldChunk;
@@ -18,10 +19,7 @@ import server.protocol.SpawnInfo;
 import util.ExceptionalExecutorService;
 
 import javax.websocket.Session;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +42,7 @@ public class Game {
     private final Map<String, Client> clients = new HashMap<>(64);
     private final List<Bot> bots = new LinkedList<>();
     private byte ticksSinceLastUpdate = 0;
+    private final Set<String> usedNames = new HashSet<>();
 
     public Game() {
         this(new GameConfig());
@@ -77,8 +76,7 @@ public class Game {
     }
 
     private void onCollision(Snake snake, Collidable object) {
-        if (object instanceof SnakeChunk) {
-            final var snakeChunk = (SnakeChunk) object;
+        if (object instanceof final SnakeChunk snakeChunk) {
             final var otherSnake = snakeChunk.getSnake();
             System.out.println(snake + " collided with " + otherSnake + ".");
             snake.kill();
@@ -95,8 +93,15 @@ public class Game {
         final var spawnPos = world.findSpawnPosition();
 
         return CompletableFuture.supplyAsync(() -> {
-            final var snake = SnakeFactory.createSnake(spawnPos, world);
+            final String name;
+            synchronized (usedNames) {
+                name = SnakeNameGenerator.generateUnique(usedNames);
+                usedNames.add(name);
+            }
+
+            final var snake = SnakeFactory.createSnake(spawnPos, world, name);
             snakes.add(snake);
+
             return snake;
         }, executor).thenApply(snake -> {
             final var player = new Player(snake, session);
@@ -104,6 +109,7 @@ public class Game {
                 clients.put(session.getId(), player);
             }
             player.sendSync(gson.toJson(new SpawnInfo(config, snake)));
+            System.out.println("Player " + player.getName() + " has joined game");
             return player;
         });
     }
@@ -144,6 +150,12 @@ public class Game {
 
         // garbage-collection every second
         executor.scheduleAtFixedRate(() -> {
+            synchronized (usedNames) {
+                snakes.stream()
+                        .filter(Predicate.not(Snake::isAlive))
+                        .map(s -> s.name)
+                        .forEach(usedNames::remove);
+            }
             snakes.removeIf(Predicate.not(Snake::isAlive));
             world.chunks.forEach(WorldChunk::removeOldSnakeChunks);
             bots.removeIf(Predicate.not(Bot::isAlive));
@@ -165,6 +177,7 @@ public class Game {
         }, 1, 16, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + prettyGson.toJson(config));
+        System.out.println("Waiting for players to connect...");
     }
 
     /**

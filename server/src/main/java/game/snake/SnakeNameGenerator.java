@@ -1,10 +1,11 @@
-package game;
+package game.snake;
 
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class NameGenerator {
+public class SnakeNameGenerator {
 
     private static final String[] prefixes = {
             "Another", "Big", "One", "Super", "The", "Ultra"
@@ -31,7 +32,7 @@ public class NameGenerator {
             "Snake", "Snek", "Specimen", "Tube", "Villain", "Viper", "Wire", "Worm"
     };
 
-    private NameGenerator() {
+    private SnakeNameGenerator() {
 
     }
 
@@ -74,5 +75,9 @@ public class NameGenerator {
 
         final int n = rand.nextInt(100, 1000);
         return name + n;
+    }
+
+    public static String generateUnique(Set<String> usedNames) {
+        return generateUnique(ThreadLocalRandom.current(), usedNames);
     }
 }

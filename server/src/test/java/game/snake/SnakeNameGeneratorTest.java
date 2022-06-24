@@ -1,5 +1,6 @@
-package game;
+package game.snake;
 
+import game.snake.SnakeNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -7,7 +8,7 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class NameGeneratorTest {
+public class SnakeNameGeneratorTest {
     @Test
     void testGenerateMultipleUniqueNames() {
         final int n = 16;
@@ -16,7 +17,7 @@ public class NameGeneratorTest {
         final var names = new HashSet<String>();
 
         for (int i = 0; i < n; i++) {
-            names.add(NameGenerator.generateUnique(rand, names));
+            names.add(SnakeNameGenerator.generateUnique(names));
         }
 
         assertEquals(n, names.size());

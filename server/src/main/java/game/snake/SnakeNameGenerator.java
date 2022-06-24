@@ -59,8 +59,9 @@ public class SnakeNameGenerator {
 
     /**
      * Create a new snake name that is not in the given set.
+     * Package-private for testing.
      */
-    public static String generateUnique(Random rand, Set<String> usedNames) {
+    static String generateUnique(Random rand, Set<String> usedNames) {
         int attempts = 0;
         String name;
 
@@ -77,6 +78,9 @@ public class SnakeNameGenerator {
         return name + n;
     }
 
+    /**
+     * Create a new snake name that is not in the given set.
+     */
     public static String generateUnique(Set<String> usedNames) {
         return generateUnique(ThreadLocalRandom.current(), usedNames);
     }

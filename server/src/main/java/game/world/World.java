@@ -48,7 +48,7 @@ public class World {
         assert (chunks.numberOfChunks() > 0);
         var minimalSnakeChunkCount = chunks.stream().mapToInt(WorldChunk::getSnakeChunkCount).min().orElseThrow();
         var worldChunksWithMinimalSnakeChunkCount = chunks.stream()
-                .filter(worldChunk -> worldChunk.getSnakeChunkCount() == minimalSnakeChunkCount).collect(Collectors.toList());
+                .filter(worldChunk -> worldChunk.getSnakeChunkCount() == minimalSnakeChunkCount).toList();
         int randomIndex = World.random.nextInt(worldChunksWithMinimalSnakeChunkCount.size());
         return worldChunksWithMinimalSnakeChunkCount.get(randomIndex);
     }

@@ -25,7 +25,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static util.TaskMeasurer.measure;
@@ -223,7 +222,7 @@ public class Game {
 
             final var collectedFood = worldChunk.streamFood()
                     .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
-                    .collect(Collectors.toList());
+                    .toList();
 
             if (collectedFood.isEmpty()) {
                 return;

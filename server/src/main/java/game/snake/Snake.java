@@ -15,7 +15,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static util.MathFunctions.sigmoid;
@@ -230,7 +229,7 @@ public class Snake {
     }
 
     public List<SnakeChunk> getSnakeChunks() {
-        return streamSnakeChunks().collect(Collectors.toList());
+        return streamSnakeChunks().toList();
     }
 
     public void kill() {

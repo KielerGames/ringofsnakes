@@ -5,7 +5,6 @@ import game.snake.Snake;
 import server.Player;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Leaderboard extends ServerToClientJSONMessage {
 
@@ -18,7 +17,7 @@ public class Leaderboard extends ServerToClientJSONMessage {
                 .sorted(Comparator.comparing(Snake::getLength).reversed())
                 .limit(n)
                 .map(LeaderboardEntry::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static class LeaderboardEntry {

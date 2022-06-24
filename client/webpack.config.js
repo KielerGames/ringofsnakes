@@ -2,30 +2,18 @@
 /* eslint-disable no-undef */
 
 const webpack = require("webpack");
-const path = require("path");
+const path = require("node:path");
+const fs = require("node:fs");
+const crypto = require("node:crypto");
 const pkg = require("./package.json");
-const fs = require("fs");
 
-const SHADER_DIR = "src/shader";
-const shaders = {};
+const SHADER_HASH = (() => {
+    const fileBuffer = fs.readFileSync(path.join("public", "shaders.json"));
+    const hashSum = crypto.createHash("sha256");
+    hashSum.update(fileBuffer);
 
-console.log("Loading shaders...");
-let shaderFiles = fs.readdirSync(SHADER_DIR);
-shaderFiles.forEach((filename) => {
-    if (filename.endsWith(".vert") || filename.endsWith(".frag")) {
-        console.log(" --> " + filename);
-        let content = fs.readFileSync(SHADER_DIR + "/" + filename, "utf8");
-        content = JSON.stringify(content.trim());
-
-        let stn = filename.endsWith(".vert")
-            ? "VERTEXSHADER"
-            : "FRAGMENTSHADER";
-        let id = filename.slice(0, filename.length - 5).toUpperCase();
-
-        shaders["__" + stn + "_" + id + "__"] = content;
-    }
-});
-console.log("Done. Running webpack...");
+    return hashSum.digest("hex").substring(0, 10);
+})();
 
 module.exports = {
     mode: "development",
@@ -58,16 +46,12 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.DefinePlugin(
-            Object.assign(
-                {
-                    __VERSION__: JSON.stringify(`${pkg.version}-dev`),
-                    __DEBUG__: "true",
-                    __TEST__: "false"
-                },
-                shaders
-            )
-        )
+        new webpack.DefinePlugin({
+            __VERSION__: JSON.stringify(`${pkg.version}-dev`),
+            __SHADER_HASH__: JSON.stringify(SHADER_HASH),
+            __DEBUG__: "true",
+            __TEST__: "false"
+        })
     ],
     output: {
         filename: "[name].bundle.js",

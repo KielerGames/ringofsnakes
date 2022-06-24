@@ -5,9 +5,7 @@ import Vector from "../../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as BoxRenderer from "./BoxRenderer";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
-
-declare const __VERTEXSHADER_FOOD__: string;
-declare const __FRAGMENTSHADER_FOOD__: string;
+import { compileShader } from "../webgl/ShaderLoader";
 
 let shader: WebGLShaderProgram;
 
@@ -16,12 +14,7 @@ const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
 
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
-
-    shader = new WebGLShaderProgram(gl, __VERTEXSHADER_FOOD__, __FRAGMENTSHADER_FOOD__, [
-        "aPosition",
-        "aLocalPos",
-        "aColorIndex"
-    ]);
+    shader = await compileShader(gl, "food", ["aPosition", "aLocalPos", "aColorIndex"]);
 })();
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix) {

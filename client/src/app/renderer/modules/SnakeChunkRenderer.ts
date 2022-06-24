@@ -7,9 +7,7 @@ import * as SkinLoader from "../SkinLoader";
 import assert from "../../util/assert";
 import Game from "../../data/Game";
 import Vector from "../../math/Vector";
-
-declare const __VERTEXSHADER_SNAKE__: string;
-declare const __FRAGMENTSHADER_SNAKE__: string;
+import { compileShader } from "../webgl/ShaderLoader";
 
 let basicMaterialShader: WebGLShaderProgram;
 let buffer: WebGLBuffer;
@@ -17,12 +15,12 @@ let buffer: WebGLBuffer;
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
 
-    basicMaterialShader = new WebGLShaderProgram(
-        gl,
-        __VERTEXSHADER_SNAKE__,
-        __FRAGMENTSHADER_SNAKE__,
-        ["aPosition", "aNormal", "aNormalOffset", "aRelativePathOffset"]
-    );
+    basicMaterialShader = await compileShader(gl, "snake", [
+        "aPosition",
+        "aNormal",
+        "aNormalOffset",
+        "aRelativePathOffset"
+    ]);
 
     buffer = gl.createBuffer()!;
     assert(buffer !== null);

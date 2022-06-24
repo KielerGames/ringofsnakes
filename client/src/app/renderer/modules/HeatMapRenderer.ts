@@ -4,9 +4,7 @@ import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import assert from "../../util/assert";
 import Vector from "../../math/Vector";
 import Matrix from "../../math/Matrix";
-
-declare const __VERTEXSHADER_HEATMAP__: string;
-declare const __FRAGMENTSHADER_HEATMAP__: string;
+import { compileShader } from "../webgl/ShaderLoader";
 
 const transform = new Matrix(true);
 let shaderProgram: WebGLShaderProgram;
@@ -30,11 +28,7 @@ const heatMapSize = 128;
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
 
-    shaderProgram = new WebGLShaderProgram(
-        gl,
-        __VERTEXSHADER_HEATMAP__,
-        __FRAGMENTSHADER_HEATMAP__
-    );
+    shaderProgram = await compileShader(gl, "heatmap");
 
     buffer = gl.createBuffer()!;
     assert(buffer !== null);

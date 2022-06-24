@@ -15,9 +15,11 @@ export default class GameDataBuffer {
     private leaderboard: LeaderboardDTO | undefined;
     private updateQueue: DecodedGameUpdate[] = [];
     private snakeDeaths: SnakeId[] = [];
+    private snakeNames = new Map<SnakeId, string>();
 
     init(spawnInfo: SpawnInfo): void {
         this.config = spawnInfo.gameConfig;
+        this.snakeNames.set(spawnInfo.snakeId, spawnInfo.snakeName);
     }
 
     nextUpdate(): DataUpdateDTO {
@@ -29,6 +31,11 @@ export default class GameDataBuffer {
 
         const snakeDeaths = this.snakeDeaths;
         this.snakeDeaths = [];
+
+        if (dataUpdate) {
+            // set snake name field if that data is available
+            dataUpdate.snakeInfos.forEach((si) => (si.name = this.snakeNames.get(si.id)));
+        }
 
         return {
             ticksSinceLastUpdate: dataUpdate ? dataUpdate.ticksSinceLastUpdate : 0,

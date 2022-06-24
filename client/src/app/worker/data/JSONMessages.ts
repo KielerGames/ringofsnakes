@@ -1,15 +1,11 @@
 import { GameConfig } from "../../data/config/GameConfig";
-export type ClientToServerJSONMessage = UpdatePlayerName;
+export type ClientToServerJSONMessage = never;
 export type ServerToClientJSONMessage = SpawnInfo | SnakeDeathInfo | LeaderboardData;
-
-export type UpdatePlayerName = {
-    tag: "UpdatePlayerName";
-    name: string;
-};
 
 export type SpawnInfo = Readonly<{
     tag: "SpawnInfo";
     snakeId: number;
+    snakeName: string;
     gameConfig: GameConfig;
 }>;
 

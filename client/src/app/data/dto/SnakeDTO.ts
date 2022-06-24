@@ -8,4 +8,5 @@ export type SnakeDTO = {
     fast: boolean;
     fastHistory: boolean[]; // [current fast state, previous tick, ...]
     headChunkId: number;
+    name?: string;
 };

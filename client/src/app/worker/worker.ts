@@ -74,8 +74,6 @@ export class WorkerAPI {
             self.close();
         };
 
-        socket.sendJSON({ tag: "UpdatePlayerName", name });
-
         return {
             config: data.config,
             targetSnakeId: spawnInfo.snakeId,

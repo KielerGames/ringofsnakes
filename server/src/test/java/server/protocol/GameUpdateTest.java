@@ -120,7 +120,7 @@ public class GameUpdateTest {
         when(session.isOpen()).thenReturn(true);
         when(session.getAsyncRemote()).thenReturn(remoteEndpoint);
 
-        client.sendUpdate((byte) 0);
+        client.sendGameUpdate((byte) 0);
 
         var captor = ArgumentCaptor.forClass(ByteBuffer.class);
         verify(remoteEndpoint).sendBinary(captor.capture());

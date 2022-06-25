@@ -19,7 +19,7 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
                 runnable.run();
             } catch (Exception e) {
                 executor.shutdown();
-                if(exceptionHandler != null) {
+                if (exceptionHandler != null) {
                     exceptionHandler.accept(e);
                 }
             }
@@ -27,8 +27,8 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
     }
 
     @Override
-    public ScheduledFuture<?> schedule(Runnable runnable, long l, TimeUnit timeUnit) {
-        return executor.schedule(runnable, l, timeUnit);
+    public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
+        return executor.schedule(runnable, delay, timeUnit);
     }
 
     @Override
@@ -37,8 +37,8 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
     }
 
     @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long l, long l1, TimeUnit timeUnit) {
-        return executor.scheduleAtFixedRate(createExceptionalRunnable(runnable), l, l1, timeUnit);
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit timeUnit) {
+        return executor.scheduleAtFixedRate(createExceptionalRunnable(runnable), initialDelay, period, timeUnit);
     }
 
     @Override
@@ -67,8 +67,8 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
     }
 
     @Override
-    public boolean awaitTermination(long l, TimeUnit timeUnit) throws InterruptedException {
-        return executor.awaitTermination(l, timeUnit);
+    public boolean awaitTermination(long timeout, TimeUnit timeUnit) throws InterruptedException {
+        return executor.awaitTermination(timeout, timeUnit);
     }
 
     @Override
@@ -77,8 +77,8 @@ public class ExceptionalExecutorService implements ScheduledExecutorService {
     }
 
     @Override
-    public <T> Future<T> submit(Runnable runnable, T t) {
-        return executor.submit(runnable, t);
+    public <T> Future<T> submit(Runnable runnable, T result) {
+        return executor.submit(runnable, result);
     }
 
     @Override

@@ -32,6 +32,10 @@ public class SnakeNameGenerator {
             "Snake", "Snek", "Specimen", "Tube", "Villain", "Viper", "Wire", "Worm"
     };
 
+    private static final String[] botNouns = {
+            "Bot", "Droid", "Machine", "SnekBot"
+    };
+
     private SnakeNameGenerator() {
 
     }
@@ -83,5 +87,12 @@ public class SnakeNameGenerator {
      */
     public static String generateUnique(Set<String> usedNames) {
         return generateUnique(ThreadLocalRandom.current(), usedNames);
+    }
+
+    public static String generateBotName() {
+        Random rand = ThreadLocalRandom.current();
+        final var adjective = adjectives[rand.nextInt(adjectives.length)];
+        final var noun = botNouns[rand.nextInt(botNouns.length)];
+        return adjective + noun + " " + rand.nextInt(100,999);
     }
 }

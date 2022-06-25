@@ -164,7 +164,11 @@ public class Game {
         executor.scheduleAtFixedRate(() -> {
             final var topTenJson = gson.toJson(new Leaderboard(this));
             clients.forEach((__, client) -> client.send(topTenJson));
-        }, 1, 1, TimeUnit.SECONDS);
+        }, 1, 2, TimeUnit.SECONDS);
+
+        executor.scheduleAtFixedRate(() -> {
+            clients.forEach((__, client) -> client.sendNameUpdate());
+        }, 420, 1500, TimeUnit.MILLISECONDS);
 
         // spawn bots every 20 seconds
         executor.scheduleAtFixedRate(() -> {
@@ -207,7 +211,7 @@ public class Game {
                 worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
                 worldChunks.forEach(client::updateClientFoodChunk);
                 client.updateHeatMap(world.getHeatMap());
-                client.sendUpdate(ticksSinceLastUpdate);
+                client.sendGameUpdate(ticksSinceLastUpdate);
                 client.cleanupKnowledge();
             });
         }

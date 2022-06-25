@@ -36,11 +36,11 @@ describe("Game", () => {
     });
 
     test("instantiation", async () => {
-        await Game.joinAsPlayer("TestPlayer");
+        await Game.joinAsPlayer();
     });
 
     it("should only update after notification", async () => {
-        const [game] = await Game.joinAsPlayer("TestPlayer");
+        const [game] = await Game.joinAsPlayer();
 
         // without an update notification game.update should not do anything
         await game.update();
@@ -51,7 +51,7 @@ describe("Game", () => {
     });
 
     test("an empty update should not pause snakes", async () => {
-        const [game] = await Game.joinAsPlayer("TestPlayer");
+        const [game] = await Game.joinAsPlayer();
         const snakeId = 1;
         await updateGame(game, createSingleSnakeDataUpdate(snakeId));
         const snake = game.snakes.get(snakeId)!;
@@ -63,7 +63,7 @@ describe("Game", () => {
     describe("Prediction", () => {
         const snakeId = 1;
         test("SnakeChunks should be predicted once", async () => {
-            const [game] = await Game.joinAsPlayer("TestPlayer");
+            const [game] = await Game.joinAsPlayer();
             await updateGame(game, createSingleSnakeDataUpdate(snakeId, 1, 0));
 
             const spies = Array.from(game.snakeChunks.values()).map((chunk) =>
@@ -79,7 +79,7 @@ describe("Game", () => {
         });
 
         test("Snakes should be predicted once", async () => {
-            const [game] = await Game.joinAsPlayer("TestPlayer");
+            const [game] = await Game.joinAsPlayer();
             await updateGame(game, createSingleSnakeDataUpdate(snakeId, 1, 0));
 
             const spies = Array.from(game.snakes.values()).map((snake) =>

@@ -69,6 +69,13 @@ export default class GameDataBuffer {
                 update.list.forEach(({ id, name }) => this.snakeNames.set(id, name));
                 break;
             }
+            case "SnakeNameUpdate": {
+                for (const [strId, name] of Object.entries(update.names)) {
+                    const id = parseInt(strId, 10);
+                    this.snakeNames.set(id, name);
+                }
+                break;
+            }
             default: {
                 throw new Error(`Unexpected message from server. (tag = ${update.tag})`);
             }

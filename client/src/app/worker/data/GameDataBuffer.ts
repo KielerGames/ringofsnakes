@@ -59,12 +59,14 @@ export default class GameDataBuffer {
             case "SnakeDeathInfo": {
                 console.info(`Snake ${update.snakeId} has died.`);
                 this.snakeDeaths.push(update.snakeId);
+                this.snakeNames.delete(update.snakeId);
                 break;
             }
             case "Leaderboard": {
                 this.leaderboard = {
                     list: update.list
                 };
+                update.list.forEach(({ id, name }) => this.snakeNames.set(id, name));
                 break;
             }
             default: {

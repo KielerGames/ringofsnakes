@@ -16,10 +16,11 @@ export type SnakeDeathInfo = Readonly<{
 
 export type LeaderboardData = Readonly<{
     tag: "Leaderboard";
-    list: LeaderboardEntry[];
+    list: LeaderboardSnake[];
 }>;
 
-export type LeaderboardEntry = Readonly<{
+export type LeaderboardSnake = Readonly<{
     name: string;
+    id: number;
     score: number;
 }>;

@@ -77,7 +77,7 @@ export class WorkerAPI {
         return {
             config: data.config,
             targetSnakeId: spawnInfo.snakeId,
-            startPosition: { x: 0, y: 0 } // TODO
+            startPosition: spawnInfo.snakePosition
         };
     }
 

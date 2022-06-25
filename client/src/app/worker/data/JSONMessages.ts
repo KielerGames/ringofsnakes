@@ -6,6 +6,7 @@ export type SpawnInfo = Readonly<{
     tag: "SpawnInfo";
     snakeId: number;
     snakeName: string;
+    snakePosition: { x: number; y: number };
     gameConfig: GameConfig;
 }>;
 

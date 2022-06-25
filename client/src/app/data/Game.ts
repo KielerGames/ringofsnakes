@@ -49,12 +49,12 @@ export default class Game {
         this.foodChunks = new ManagedMap((dto) => new FoodChunk(dto));
     }
 
-    static async joinAsPlayer(name: string): Promise<[Game, Player]> {
+    static async joinAsPlayer(): Promise<[Game, Player]> {
         const clientConfig = await ClientConfig.get();
         const game = new Game();
         const remote = game.remote;
 
-        const info = await remote.init(name, clientConfig).catch(async (e) => {
+        const info = await remote.init(clientConfig).catch(async (e) => {
             await dialog({ title: "Error", content: `Failed to connect to the game server.` });
             return Promise.reject(e);
         });

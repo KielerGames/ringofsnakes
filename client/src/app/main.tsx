@@ -59,7 +59,7 @@ document.title = `Ring of Snakes ${__VERSION__}`;
     }
 
     FrameTime.update(performance.now());
-    const [game, player] = await Game.joinAsPlayer("SnakeForceOne"); // TODO
+    const [game, player] = await Game.joinAsPlayer();
 
     function renderLoop(time: number) {
         FrameTime.update(time);

@@ -15,7 +15,7 @@
         <!-- maven shade plugin does not support Java 16 and above -->
 
         <javax.websocket.api.version>1.1</javax.websocket.api.version>
-        <jetty.version>9.4.46.v20220331</jetty.version>
+        <jetty.version>9.4.48.v20220622</jetty.version>
         <mockito.version>4.5.1</mockito.version>
         <junit.version>5.8.2</junit.version>
     </properties>

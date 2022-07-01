@@ -15,7 +15,7 @@
         <!-- maven shade plugin does not support Java 16 and above -->
 
         <javax.websocket.api.version>1.1</javax.websocket.api.version>
-        <jetty.version>9.4.46.v20220331</jetty.version>
+        <jetty.version>9.4.48.v20220622</jetty.version>
         <mockito.version>4.6.1</mockito.version>
         <junit.version>5.8.2</junit.version>
     </properties>
@@ -87,16 +87,16 @@
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>3.0.0-M7</version>
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>3.0.0-M7</version>
             </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.6</version>
+                <version>0.0.8</version>
                 <configuration>
                     <mainClass>debugview.DebugView</mainClass>
                 </configuration>

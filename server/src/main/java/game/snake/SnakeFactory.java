@@ -52,6 +52,11 @@ public class SnakeFactory {
         return createSnake(new Vector(0, 0), direction, new World(), "TestSnake");
     }
 
+    public static Snake createTestSnake(World world) {
+        final double direction = Direction.getRandom(random);
+        return createSnake(new Vector(0, 0), direction, world, "TestSnake");
+    }
+
     public static BoundarySnake createBoundarySnake(World world) {
         final var snake = new BoundarySnake(nextSnakeId++, world);
         snake.setSkin((byte) random.nextInt(7));

@@ -9,6 +9,7 @@ import java.util.HashSet;
 
 import static game.world.WorldChunkFactory.createChunks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class WorldChunkTest {
@@ -76,5 +77,19 @@ public class WorldChunkTest {
         assertEquals(1, worldChunksInRadius.size());
         worldChunksInRadius = world.chunks.findIntersectingChunks(position, worldChunkSize / 2 + epsilon);
         assertEquals(5, worldChunksInRadius.size());
+    }
+
+    @Test
+    void testSnakeHeadChunkIsAlwaysInAChunk() {
+        final var snake = SnakeFactory.createTestSnake(world);
+
+        for (int i = 0; i < 512; i++) {
+            snake.tick();
+            final var snakeHeadWorldChunk = world.chunks.findChunk(snake.getHeadPosition());
+
+            assertTrue(
+                    snakeHeadWorldChunk.streamSnakeChunks().anyMatch(sc -> sc == snake.currentChunk)
+            );
+        }
     }
 }

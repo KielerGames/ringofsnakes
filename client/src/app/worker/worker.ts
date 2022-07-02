@@ -31,7 +31,7 @@ const data = new GameDataBuffer();
 const eventListeners = new Map<WorkerEvent, Callback>();
 
 export class WorkerAPI {
-    async init(name: string, cfg: Readonly<ClientConfig>): Promise<GameInfoDTO> {
+    async init(cfg: Readonly<ClientConfig>): Promise<GameInfoDTO> {
         if (socket !== null) {
             throw new Error("Worker is already initialized.");
         }
@@ -74,12 +74,10 @@ export class WorkerAPI {
             self.close();
         };
 
-        socket.sendJSON({ tag: "UpdatePlayerName", name });
-
         return {
             config: data.config,
             targetSnakeId: spawnInfo.snakeId,
-            startPosition: { x: 0, y: 0 } // TODO
+            startPosition: spawnInfo.snakePosition
         };
     }
 

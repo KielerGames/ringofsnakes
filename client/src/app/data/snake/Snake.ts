@@ -25,6 +25,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     private _length: number;
     private _fast: boolean;
     private _width: number;
+    private _name: string;
     private _paused: boolean = false;
     private gameConfig: GameConfig;
 
@@ -62,6 +63,9 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         this.targetDirection = dto.headDirection[1];
         this._fast = dto.fast;
         this._width = dto.width;
+        if (dto.name) {
+            this._name = dto.name;
+        }
 
         if (this._paused) {
             this.predictedHeadPosition = Vector.fromObject(dto.headPosition);
@@ -165,7 +169,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     }
 
     get name(): string {
-        return `Snake ${this.id}`; // TODO
+        return this._name ?? `Snake ${this.id}`;
     }
 
     get fast(): boolean {

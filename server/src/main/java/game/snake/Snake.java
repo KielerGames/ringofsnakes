@@ -3,8 +3,8 @@ package game.snake;
 import game.GameConfig;
 import game.world.Food;
 import game.world.World;
-import game.world.WorldChunk;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import math.Vector;
 import util.BitWithShortHistory;
@@ -12,7 +12,6 @@ import util.Direction;
 
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static util.MathFunctions.sigmoid;
@@ -29,6 +28,7 @@ public class Snake {
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private final BitWithShortHistory fastHistory = new BitWithShortHistory(false);
+    public final String name;
     public GrowingSnakeChunk currentChunk;
     @Getter protected double length;
     @Getter Vector headPosition;
@@ -44,12 +44,17 @@ public class Snake {
     private double foodTrailBuffer = 0f;
 
     Snake(char id, World world) {
+        this(id, world, "Snake " + ((int) id));
+    }
+
+    Snake(char id, World world, @NonNull String name) {
         this.id = id;
         this.world = world;
         config = world.getConfig();
         coder = new ChainCodeCoder(this);
         length = config.snakes.startLength;
         width = config.snakes.minWidth;
+        this.name = name;
 
         updateWidth();
     }
@@ -108,9 +113,8 @@ public class Snake {
         // update chunks
         currentChunk.append(encDirDelta, fast);
 
-        //ensures that the current snakechunk is added to all worldchunks in which the snake exists
-        var currentSnakeHeadIntersectingWorldChunks = world.chunks.findIntersectingChunks(headPosition, getWidth() / 2);
-        currentSnakeHeadIntersectingWorldChunks.forEach(wc -> wc.addSnakeChunk(currentChunk));
+        // ensures that the current SnakeChunk is added to all WorldChunks in which the snake exists
+        world.chunks.findIntersectingChunks(headPosition, getWidth() / 2).forEach(wc -> wc.addSnakeChunk(currentChunk));
 
         // after an update a chunk might be full
         if (currentChunk.isFull()) {
@@ -226,7 +230,7 @@ public class Snake {
     }
 
     public List<SnakeChunk> getSnakeChunks() {
-        return streamSnakeChunks().collect(Collectors.toList());
+        return streamSnakeChunks().toList();
     }
 
     public void kill() {

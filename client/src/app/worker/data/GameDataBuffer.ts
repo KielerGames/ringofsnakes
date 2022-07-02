@@ -15,9 +15,11 @@ export default class GameDataBuffer {
     private leaderboard: LeaderboardDTO | undefined;
     private updateQueue: DecodedGameUpdate[] = [];
     private snakeDeaths: SnakeId[] = [];
+    private snakeNames = new Map<SnakeId, string>();
 
     init(spawnInfo: SpawnInfo): void {
         this.config = spawnInfo.gameConfig;
+        this.snakeNames.set(spawnInfo.snakeId, spawnInfo.snakeName);
     }
 
     nextUpdate(): DataUpdateDTO {
@@ -29,6 +31,11 @@ export default class GameDataBuffer {
 
         const snakeDeaths = this.snakeDeaths;
         this.snakeDeaths = [];
+
+        if (dataUpdate) {
+            // set snake name field if that data is available
+            dataUpdate.snakeInfos.forEach((si) => (si.name = this.snakeNames.get(si.id)));
+        }
 
         return {
             ticksSinceLastUpdate: dataUpdate ? dataUpdate.ticksSinceLastUpdate : 0,
@@ -52,12 +59,21 @@ export default class GameDataBuffer {
             case "SnakeDeathInfo": {
                 console.info(`Snake ${update.snakeId} has died.`);
                 this.snakeDeaths.push(update.snakeId);
+                this.snakeNames.delete(update.snakeId);
                 break;
             }
             case "Leaderboard": {
                 this.leaderboard = {
                     list: update.list
                 };
+                update.list.forEach(({ id, name }) => this.snakeNames.set(id, name));
+                break;
+            }
+            case "SnakeNameUpdate": {
+                for (const [strId, name] of Object.entries(update.names)) {
+                    const id = parseInt(strId, 10);
+                    this.snakeNames.set(id, name);
+                }
                 break;
             }
             default: {

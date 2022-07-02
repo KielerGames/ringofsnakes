@@ -5,30 +5,31 @@ import game.snake.Snake;
 import server.Player;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Leaderboard extends ServerToClientJSONMessage {
+    private static final int LIMIT = 10;
 
-    private final List<LeaderboardEntry> list;
+    final List<LeaderboardSnake> list;
 
-    public Leaderboard(Game game, int n) {
+    public Leaderboard(Game game) {
         list = game.streamClients().filter(Player.class::isInstance)
                 .map(client -> ((Player) client).snake)
                 .filter(Snake::isAlive)
                 .sorted(Comparator.comparing(Snake::getLength).reversed())
-                .limit(Math.min(n, game.snakes.size()))
-                .map(LeaderboardEntry::new)
-                .collect(Collectors.toList());
+                .limit(LIMIT)
+                .map(LeaderboardSnake::new)
+                .toList();
     }
 
-    private class LeaderboardEntry {
+    private static class LeaderboardSnake {
+        final int id;
+        final String name;
+        final int score;
 
-        private final String name;
-        private final int score;
-
-        private LeaderboardEntry(Snake snake) {
-            this.name = snake.toString();
+        private LeaderboardSnake(Snake snake) {
+            this.name = snake.name;
             this.score = (int) snake.getLength();
+            this.id = snake.id;
         }
     }
 }

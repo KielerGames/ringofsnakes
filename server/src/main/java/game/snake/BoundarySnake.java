@@ -9,11 +9,11 @@ import java.util.Random;
 
 public class BoundarySnake extends Snake {
     private static final double DIRECTION_SCATTERING = Math.toRadians(1.5);
-    private BoundingBox bottom, right, up, left;
-    private Random random = new Random();
+    private final BoundingBox bottom, right, up, left;
+    private final Random random = new Random();
 
     BoundarySnake(char id, World world) {
-        super(id, world);
+        super(id, world, "BoundarySnake");
         updateLengthAndWidth();
 
         // start at bottom center

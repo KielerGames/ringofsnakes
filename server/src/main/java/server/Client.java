@@ -1,11 +1,13 @@
 package server;
 
+import com.google.gson.Gson;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.world.HeatMap;
 import game.world.WorldChunk;
 import math.BoundingBox;
 import server.protocol.GameUpdate;
+import server.protocol.SnakeNameUpdate;
 
 import javax.websocket.Session;
 import java.io.IOException;
@@ -16,13 +18,15 @@ import java.util.*;
  * Player/Spectator abstraction.
  */
 public abstract class Client {
+    private static final Gson gson = new Gson();
     public final Session session;
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private final Map<WorldChunk, Integer> knownFoodChunks = new HashMap<>();
     private final Map<Snake, Integer> knownSnakes = new HashMap<>();
     protected float viewBoxRatio = 1f;
-    private GameUpdate nextUpdate = new GameUpdate();
+    private GameUpdate nextGameUpdate = new GameUpdate();
     private long lastHeatMapUpdate = System.currentTimeMillis();
+    private SnakeNameUpdate nextNameUpdate = new SnakeNameUpdate();
 
     public Client(Session session) {
         this.session = session;
@@ -36,7 +40,7 @@ public abstract class Client {
         if (knownSnakeChunks.contains(chunk)) {
             updateClientSnake(chunk.getSnake());
         } else {
-            nextUpdate.addSnakeChunk(chunk);
+            nextGameUpdate.addSnakeChunk(chunk);
             if (chunk.isFull()) {
                 knownSnakeChunks.add(chunk);
             }
@@ -46,21 +50,26 @@ public abstract class Client {
     public void updateClientFoodChunk(WorldChunk chunk) {
         final int knownVersion = knownFoodChunks.getOrDefault(chunk, -1);
         if (knownVersion != chunk.getFoodVersion()) {
-            nextUpdate.addFoodChunk(chunk);
+            nextGameUpdate.addFoodChunk(chunk);
         }
         knownFoodChunks.put(chunk, chunk.getFoodVersion());
     }
 
     private void updateClientSnake(Snake snake) {
-        knownSnakes.put(snake, 0);
-        nextUpdate.addSnake(snake);
+        // reset knowledge-decay
+        final var previousValue = knownSnakes.put(snake, 0);
+        nextGameUpdate.addSnake(snake);
+
+        if (previousValue == null) {
+            this.nextNameUpdate.addNameOf(snake);
+        }
     }
 
     public void updateHeatMap(HeatMap heatMap) {
         final long now = System.currentTimeMillis();
         final long elapsed = now - lastHeatMapUpdate;
         if (elapsed >= 1000) {
-            nextUpdate.addHeatMap(heatMap);
+            nextGameUpdate.addHeatMap(heatMap);
             lastHeatMapUpdate = now;
         }
     }
@@ -88,12 +97,21 @@ public abstract class Client {
         });
     }
 
-    public void sendUpdate(byte ticksSinceLastUpdate) {
-        final var update = this.nextUpdate;
+    public void sendGameUpdate(byte ticksSinceLastUpdate) {
+        final var update = this.nextGameUpdate;
         update.setTicksSinceLastUpdate(ticksSinceLastUpdate);
-        this.nextUpdate = new GameUpdate();
+        this.nextGameUpdate = new GameUpdate();
         onBeforeUpdateBufferIsCreated(update);
         send(update.createUpdateBuffer());
+    }
+
+    public void sendNameUpdate() {
+        if (this.nextNameUpdate.isEmpty()) {
+            return;
+        }
+        final var encodedUpdate = gson.toJson(this.nextNameUpdate);
+        this.nextNameUpdate = new SnakeNameUpdate();
+        send(encodedUpdate);
     }
 
     public void send(ByteBuffer binaryData) {

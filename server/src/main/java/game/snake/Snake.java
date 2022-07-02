@@ -113,9 +113,8 @@ public class Snake {
         // update chunks
         currentChunk.append(encDirDelta, fast);
 
-        //ensures that the current snakechunk is added to all worldchunks in which the snake exists
-        var currentSnakeHeadIntersectingWorldChunks = world.chunks.findIntersectingChunks(headPosition, getWidth() / 2);
-        currentSnakeHeadIntersectingWorldChunks.forEach(wc -> wc.addSnakeChunk(currentChunk));
+        // ensures that the current SnakeChunk is added to all WorldChunks in which the snake exists
+        world.chunks.findIntersectingChunks(headPosition, getWidth() / 2).forEach(wc -> wc.addSnakeChunk(currentChunk));
 
         // after an update a chunk might be full
         if (currentChunk.isFull()) {

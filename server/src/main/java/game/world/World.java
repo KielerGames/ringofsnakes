@@ -10,7 +10,6 @@ import math.Vector;
 
 import java.util.Comparator;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class World {
     private static final int FOOD_THRESHOLD = 16;

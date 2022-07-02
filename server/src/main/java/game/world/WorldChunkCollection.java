@@ -25,7 +25,7 @@ public abstract class WorldChunkCollection {
     }
 
     /**
-     * Find the set of WorldChunks that close to the given BoundingBox.
+     * Find the set of {@link WorldChunk} close to the given BoundingBox.
      * Here close means they either intersect or the distance is below the given bound.
      *
      * @param maxDistance maximum distance between WorldChunk and BoundingBox
@@ -62,10 +62,10 @@ public abstract class WorldChunkCollection {
     }
 
     /**
-     * Returns a set of worldchunks which lie within a radius around a position
+     * Returns a set of {@link WorldChunk} which lie within a radius around a position
      * @param position a 2D Vector, specifying the center
      * @param radius
-     * @return a set of worldchunks
+     * @return a set of {@link WorldChunk}
      */
     public Set<WorldChunk> findIntersectingChunks(Vector position, double radius) {
         final var boundingBox = new BoundingBox(position, 2 * radius, 2 * radius);

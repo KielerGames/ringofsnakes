@@ -17,7 +17,7 @@ import java.util.OptionalInt;
 
 public class DebugView extends Application {
 
-    private static final double ZOOM = 1.0;
+    private static final double ZOOM = 16.0;
     private static final boolean FOLLOW_PLAYER = true;
     private static final boolean DRAW_TAILS = true;
     private static DebugGame game;
@@ -102,9 +102,11 @@ public class DebugView extends Application {
                     .forEach(pd -> {
                         final var x = pd.point.x;
                         final var y = pd.point.y;
-                        g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize * ZOOM,
-                                300 - (y - camera.y) * ZOOM - snakeSize * ZOOM,
-                                snakeSize * ZOOM, snakeSize * ZOOM);
+                        final float snakeScale = 1f;
+
+                        g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize/2.0 * snakeScale * ZOOM,
+                                300 - (y - camera.y) * ZOOM - snakeSize/2.0 * snakeScale * ZOOM,
+                                snakeSize * snakeScale * ZOOM, snakeSize * snakeScale* ZOOM);
                     });
 
             if (DRAW_TAILS) {

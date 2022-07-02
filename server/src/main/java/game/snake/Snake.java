@@ -11,10 +11,7 @@ import util.BitWithShortHistory;
 import util.Direction;
 
 import java.nio.ByteBuffer;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static util.MathFunctions.sigmoid;
@@ -115,6 +112,11 @@ public class Snake {
 
         // update chunks
         currentChunk.append(encDirDelta, fast);
+
+        //ensures that the current snakechunk is added to all worldchunks in which the snake exists
+        var currentSnakeHeadIntersectingWorldChunks = world.chunks.findIntersectingChunks(headPosition, getWidth() / 2);
+        currentSnakeHeadIntersectingWorldChunks.forEach(wc -> wc.addSnakeChunk(currentChunk));
+
         // after an update a chunk might be full
         if (currentChunk.isFull()) {
             beginChunk();

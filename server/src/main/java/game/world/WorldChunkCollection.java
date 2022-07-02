@@ -5,6 +5,7 @@ import math.Vector;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class WorldChunkCollection {
@@ -24,7 +25,7 @@ public abstract class WorldChunkCollection {
     }
 
     /**
-     * Find the set of WorldChunks that close to the given BoundingBox.
+     * Find the set of {@link WorldChunk} close to the given BoundingBox.
      * Here close means they either intersect or the distance is below the given bound.
      *
      * @param maxDistance maximum distance between WorldChunk and BoundingBox
@@ -58,6 +59,21 @@ public abstract class WorldChunkCollection {
      */
     public Set<WorldChunk> findIntersectingChunks(BoundingBox box) {
         return findNearbyChunks(box, 0.0);
+    }
+
+    /**
+     * Returns a set of {@link WorldChunk} which lie within a radius around a position
+     * @param position a 2D Vector, specifying the center
+     * @param radius
+     * @return a set of {@link WorldChunk}
+     */
+    public Set<WorldChunk> findIntersectingChunks(Vector position, double radius) {
+        final var boundingBox = new BoundingBox(position, 2 * radius, 2 * radius);
+
+        return findIntersectingChunks(boundingBox)
+                .stream()
+                .filter(wc -> wc.box.distance2(position) < radius * radius)
+                .collect(Collectors.toSet());
     }
 
     public Stream<WorldChunk> stream() {

@@ -3,6 +3,7 @@ package game.snake;
 import game.GameConfig;
 import game.world.Food;
 import game.world.World;
+import game.world.WorldChunk;
 import lombok.Getter;
 import lombok.Setter;
 import math.Vector;
@@ -10,10 +11,7 @@ import util.BitWithShortHistory;
 import util.Direction;
 
 import java.nio.ByteBuffer;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -109,6 +107,11 @@ public class Snake {
 
         // update chunks
         currentChunk.append(encDirDelta, fast);
+
+        //ensures that the current snakechunk is added to all worldchunks in which the snake exists
+        var currentSnakeHeadIntersectingWorldChunks = world.chunks.findIntersectingChunks(headPosition, getWidth() / 2);
+        currentSnakeHeadIntersectingWorldChunks.forEach(wc -> wc.addSnakeChunk(currentChunk));
+
         // after an update a chunk might be full
         if (currentChunk.isFull()) {
             beginChunk();

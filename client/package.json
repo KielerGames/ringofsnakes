@@ -29,7 +29,7 @@
         "jest": "^27.5.1",
         "less": "^4.1.2",
         "less-loader": "^9.1.0",
-        "prettier": "^2.6.0",
+        "prettier": "^2.7.1",
         "rand-seed": "^1.0.0",
         "style-loader": "^3.3.1",
         "ts-jest": "^27.1.3",

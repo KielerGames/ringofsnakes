@@ -40,6 +40,6 @@
     },
     "dependencies": {
         "comlink": "^4.3.1",
-        "preact": "^10.8.2"
+        "preact": "^10.9.0"
     }
 }

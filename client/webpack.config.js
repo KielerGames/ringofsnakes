@@ -15,14 +15,14 @@ const SHADER_HASH = (() => {
     return hashSum.digest("hex").substring(0, 10);
 })();
 
-module.exports = {
-    mode: "development",
+module.exports = (env, {mode}) => ({
+    mode: mode ?? "development",
     entry: {
         main: path.join(__dirname, "src", "app", "main.tsx"),
         worker: path.join(__dirname, "src", "app", "worker", "worker.ts")
     },
     target: "web",
-    devtool: "eval-cheap-module-source-map",
+    devtool: mode !== "development" ? undefined : "eval-cheap-module-source-map",
     resolve: {
         extensions: [".ts", ".tsx", ".js"]
     },
@@ -47,9 +47,9 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            __VERSION__: JSON.stringify(`${pkg.version}-dev`),
+            __VERSION__: JSON.stringify(pkg.version + (mode === "development" ? "-dev" : "")),
             __SHADER_HASH__: JSON.stringify(SHADER_HASH),
-            __DEBUG__: "true",
+            __DEBUG__: mode === "development" ? "true" : "false",
             __TEST__: "false"
         })
     ],
@@ -57,4 +57,4 @@ module.exports = {
         filename: "[name].bundle.js",
         path: path.resolve(__dirname, "public")
     }
-};
+});

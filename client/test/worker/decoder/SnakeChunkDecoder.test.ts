@@ -100,7 +100,7 @@ describe("SnakeChunkDecoder", () => {
     test("should be a straight line", () => {
         const buffer = createSnakeChunkBuffer(
             13,
-            { x: 0, y: 0, alpha: 0 },
+            { x: 0, y: 0, alpha: 0, id: 2 },
             null
         );
 

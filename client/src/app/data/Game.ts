@@ -155,7 +155,11 @@ export default class Game {
             });
         }
 
-        this.removeJunk();
+        if (changes.moreUpdates) {
+            await this.update();
+        } else {
+            this.removeJunk();
+        }
     }
 
     predict(): void {

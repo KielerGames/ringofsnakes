@@ -52,6 +52,10 @@ export default class GameDataBuffer {
     addBinaryUpdate(buffer: ArrayBuffer): void {
         const update = GameUpdateDecoder.decode(this.config, buffer);
         this.updateQueue.push(update);
+
+        if (this.duration > 0.5) {
+            console.warn(`Update congestion! Current delay: ${this.duration.toFixed(2)}s`);
+        }
     }
 
     addJSONUpdate(update: ServerToClientJSONMessage): void {
@@ -80,6 +84,13 @@ export default class GameDataBuffer {
                 throw new Error(`Unexpected message from server. (tag = ${update.tag})`);
             }
         }
+    }
+
+    get duration(): number {
+        return (
+            this.config.tickDuration *
+            this.updateQueue.map((update) => update.ticksSinceLastUpdate).reduce((a, b) => a + b, 0)
+        );
     }
 }
 

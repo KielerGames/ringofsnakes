@@ -18,6 +18,10 @@ export default class GameDataBuffer {
         this.snakeNames.set(spawnInfo.snakeId, spawnInfo.snakeName);
     }
 
+    /**
+     * Get and remove the next update from the queue.
+     * If the queue is empty an empty update (0 ticks) is returned.
+     */
     nextUpdate(): DataUpdateDTO {
         const queuedUpdate = this.updateQueue.shift();
         const moreUpdates = this.updateQueue.length > 0;
@@ -89,6 +93,7 @@ export default class GameDataBuffer {
                     const id = parseInt(strId, 10);
                     this.snakeNames.set(id, name);
                 }
+                // TODO: avoid update call / event trigger
                 break;
             }
             default: {
@@ -107,6 +112,10 @@ export default class GameDataBuffer {
         );
     }
 
+    /**
+     * Adds information to the latest game update.
+     * If the queue is empty it creates a new update with 0 ticks.
+     */
     private addInformation(data: Partial<QueuedUpdate>): void {
         let update: QueuedUpdate;
 

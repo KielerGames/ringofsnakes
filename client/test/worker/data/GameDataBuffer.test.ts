@@ -6,6 +6,22 @@ import { UPDATE_HEADER_SIZE } from "../../../src/app/worker/decoder/GameUpdateDe
 import { SNAKE_INFO_SIZE } from "../../../src/app/worker/decoder/SnakeInfoDecoder";
 
 describe("GameDataBuffer", () => {
+    test("empty buffer duration", () => {
+        const buffer = new GameDataBuffer();
+        const spawnInfo = createSpawnInfo(7);
+        buffer.init(spawnInfo);
+
+        expect(buffer.duration).toBe(0);
+    });
+
+    test("empty buffer should throw", () => {
+        const buffer = new GameDataBuffer();
+        const spawnInfo = createSpawnInfo(13);
+        buffer.init(spawnInfo);
+
+        expect(() => buffer.nextUpdate()).toThrowError("update");
+    });
+
     test("snakes should stay dead", () => {
         const buffer = new GameDataBuffer();
         const spawnInfo = createSpawnInfo(42);

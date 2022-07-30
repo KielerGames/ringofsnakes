@@ -23,6 +23,10 @@ export default class GameDataBuffer {
     }
 
     nextUpdate(): DataUpdateDTO {
+        if (this.updateQueue.length === 0) {
+            throw new Error("No game update available.");
+        }
+        
         const dataUpdate = this.updateQueue.shift();
         const moreUpdates = this.updateQueue.length > 0;
 

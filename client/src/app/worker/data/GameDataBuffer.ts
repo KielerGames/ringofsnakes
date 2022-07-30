@@ -1,6 +1,4 @@
 import { GameConfig } from "../../data/config/GameConfig";
-import { LeaderboardDTO } from "../../data/dto/Leaderboard";
-import { DecodedGameUpdate } from "../decoder/GameUpdateDecoder";
 import { ServerToClientJSONMessage, SpawnInfo } from "./JSONMessages";
 import * as GameUpdateDecoder from "../decoder/GameUpdateDecoder";
 import { DataUpdateDTO } from "../../data/dto/DataUpdateDTO";
@@ -12,9 +10,7 @@ import { DataUpdateDTO } from "../../data/dto/DataUpdateDTO";
 export default class GameDataBuffer {
     config: GameConfig;
 
-    private leaderboard: LeaderboardDTO | undefined;
-    private updateQueue: DecodedGameUpdate[] = [];
-    private snakeDeaths: SnakeId[] = [];
+    private updateQueue: QueuedUpdate[] = [];
     private snakeNames = new Map<SnakeId, string>();
 
     init(spawnInfo: SpawnInfo): void {
@@ -23,39 +19,48 @@ export default class GameDataBuffer {
     }
 
     nextUpdate(): DataUpdateDTO {
-        if (this.updateQueue.length === 0) {
-            throw new Error("No game update available.");
-        }
-        
-        const dataUpdate = this.updateQueue.shift();
+        const queuedUpdate = this.updateQueue.shift();
         const moreUpdates = this.updateQueue.length > 0;
 
-        const leaderboard = this.leaderboard;
-        this.leaderboard = undefined;
-
-        const snakeDeaths = this.snakeDeaths;
-        this.snakeDeaths = [];
-
-        if (dataUpdate) {
+        if (queuedUpdate) {
             // set snake name field if that data is available
-            dataUpdate.snakeInfos.forEach((si) => (si.name = this.snakeNames.get(si.id)));
+            queuedUpdate.snakes.forEach((si) => (si.name = this.snakeNames.get(si.id)));
         }
 
         return {
-            ticksSinceLastUpdate: dataUpdate ? dataUpdate.ticksSinceLastUpdate : 0,
-            snakes: dataUpdate ? dataUpdate.snakeInfos : [],
-            snakeChunks: dataUpdate ? dataUpdate.snakeChunkData : [],
-            foodChunks: dataUpdate ? dataUpdate.foodChunkData : [],
-            snakeDeaths,
-            leaderboard,
-            heatMap: dataUpdate?.heatMap,
+            ...createEmptyUpdate(),
+            ...queuedUpdate,
             moreUpdates
         };
     }
 
     addBinaryUpdate(buffer: ArrayBuffer): void {
-        const update = GameUpdateDecoder.decode(this.config, buffer);
-        this.updateQueue.push(update);
+        const data = GameUpdateDecoder.decode(this.config, buffer);
+
+        if (data.ticksSinceLastUpdate <= 0) {
+            console.error(`Binary update not supported! ticks: ${data.ticksSinceLastUpdate}`);
+        }
+
+        const enhance =
+            this.updateQueue.length > 0 &&
+            this.updateQueue[this.updateQueue.length - 1].ticksSinceLastUpdate === 0;
+
+        const update = enhance
+            ? this.updateQueue[this.updateQueue.length - 1]
+            : createEmptyUpdate();
+
+        update.ticksSinceLastUpdate = data.ticksSinceLastUpdate;
+        update.snakes.push(...data.snakeInfos);
+        update.snakeChunks.push(...data.snakeChunkData);
+        update.foodChunks.push(...data.foodChunkData);
+
+        if (data.heatMap) {
+            update.heatMap = data.heatMap;
+        }
+
+        if (!enhance) {
+            this.updateQueue.push(update);
+        }
 
         if (this.duration > 0.5) {
             console.warn(`Update congestion! Current delay: ${this.duration.toFixed(2)}s`);
@@ -66,14 +71,16 @@ export default class GameDataBuffer {
         switch (update.tag) {
             case "SnakeDeathInfo": {
                 console.info(`Snake ${update.snakeId} has died.`);
-                this.snakeDeaths.push(update.snakeId);
+                this.addInformation({
+                    snakeDeaths: [update.snakeId]
+                });
                 this.snakeNames.delete(update.snakeId);
                 break;
             }
             case "Leaderboard": {
-                this.leaderboard = {
-                    list: update.list
-                };
+                this.addInformation({
+                    leaderboard: { list: update.list }
+                });
                 update.list.forEach(({ id, name }) => this.snakeNames.set(id, name));
                 break;
             }
@@ -90,12 +97,46 @@ export default class GameDataBuffer {
         }
     }
 
+    /**
+     * The total duration of the update queue in seconds.
+     */
     get duration(): number {
         return (
             this.config.tickDuration *
             this.updateQueue.map((update) => update.ticksSinceLastUpdate).reduce((a, b) => a + b, 0)
         );
     }
+
+    private addInformation(data: Partial<QueuedUpdate>): void {
+        let update: QueuedUpdate;
+
+        if (this.updateQueue.length === 0) {
+            update = createEmptyUpdate();
+            this.updateQueue.push(update);
+        } else {
+            update = this.updateQueue[this.updateQueue.length - 1];
+        }
+
+        if (data.leaderboard) {
+            update.leaderboard = data.leaderboard;
+        }
+
+        if (data.snakeDeaths) {
+            update.snakeDeaths.push(...data.snakeDeaths);
+        }
+    }
+}
+
+function createEmptyUpdate(): QueuedUpdate {
+    return {
+        ticksSinceLastUpdate: 0,
+        snakes: [],
+        snakeChunks: [],
+        foodChunks: [],
+        snakeDeaths: []
+    };
 }
 
 type SnakeId = number;
+
+type QueuedUpdate = Omit<DataUpdateDTO, "moreUpdates">;

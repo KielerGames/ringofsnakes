@@ -14,14 +14,6 @@ describe("GameDataBuffer", () => {
         expect(buffer.duration).toBe(0);
     });
 
-    test("empty buffer should throw", () => {
-        const buffer = new GameDataBuffer();
-        const spawnInfo = createSpawnInfo(13);
-        buffer.init(spawnInfo);
-
-        expect(() => buffer.nextUpdate()).toThrowError("update");
-    });
-
     test("snakes should stay dead", () => {
         const buffer = new GameDataBuffer();
         const spawnInfo = createSpawnInfo(42);
@@ -39,6 +31,11 @@ describe("GameDataBuffer", () => {
         });
 
         let lastUpdate = buffer.nextUpdate();
+
+        while (lastUpdate.snakeDeaths.length === 0 && lastUpdate.moreUpdates) {
+            lastUpdate = buffer.nextUpdate();
+        }
+
         expect(lastUpdate.snakeDeaths.length).toBe(1);
 
         // snake is now dead and should not receive anymore updates

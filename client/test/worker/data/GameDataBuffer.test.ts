@@ -48,6 +48,33 @@ describe("GameDataBuffer", () => {
             expect(snakeChunkDTOs.length).toBe(0);
         }
     });
+
+    test("update event trigger", () => {
+        const eventCallback = jest.fn();
+        const buffer = new GameDataBuffer(eventCallback);
+        const spawnInfo = createSpawnInfo(127);
+        buffer.init(spawnInfo);
+
+        buffer.addJSONUpdate({
+            tag: "SnakeNameUpdate",
+            names: {
+                "42": "ASnakeWithNoName"
+            }
+        });
+
+        expect(eventCallback).not.toHaveBeenCalled();
+
+        buffer.addJSONUpdate({
+            tag: "SnakeDeathInfo",
+            snakeId: 13
+        });
+
+        expect(eventCallback).toHaveBeenCalledTimes(1);
+
+        buffer.addBinaryUpdate(createGameUpdateBuffer(spawnInfo, 16));
+
+        expect(eventCallback).toHaveBeenCalledTimes(2);
+    });
 });
 
 function createSpawnInfo(snakeId: number): SpawnInfo {

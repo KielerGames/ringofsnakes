@@ -12,6 +12,11 @@ export default class GameDataBuffer {
 
     private updateQueue: QueuedUpdate[] = [];
     private snakeNames = new Map<SnakeId, string>();
+    private serverUpdateEventTrigger?: () => void;
+
+    constructor(trigger?: () => void) {
+        this.serverUpdateEventTrigger = trigger;
+    }
 
     init(spawnInfo: SpawnInfo): void {
         this.config = spawnInfo.gameConfig;
@@ -69,6 +74,8 @@ export default class GameDataBuffer {
         if (this.duration > 0.5) {
             console.warn(`Update congestion! Current delay: ${this.duration.toFixed(2)}s`);
         }
+
+        this.triggerUpdateEvent();
     }
 
     addJSONUpdate(update: ServerToClientJSONMessage): void {
@@ -79,6 +86,7 @@ export default class GameDataBuffer {
                     snakeDeaths: [update.snakeId]
                 });
                 this.snakeNames.delete(update.snakeId);
+                this.triggerUpdateEvent();
                 break;
             }
             case "Leaderboard": {
@@ -86,6 +94,7 @@ export default class GameDataBuffer {
                     leaderboard: { list: update.list }
                 });
                 update.list.forEach(({ id, name }) => this.snakeNames.set(id, name));
+                this.triggerUpdateEvent();
                 break;
             }
             case "SnakeNameUpdate": {
@@ -93,7 +102,6 @@ export default class GameDataBuffer {
                     const id = parseInt(strId, 10);
                     this.snakeNames.set(id, name);
                 }
-                // TODO: avoid update call / event trigger
                 break;
             }
             default: {
@@ -133,6 +141,14 @@ export default class GameDataBuffer {
         if (data.snakeDeaths) {
             update.snakeDeaths.push(...data.snakeDeaths);
         }
+    }
+
+    private triggerUpdateEvent(): void {
+        if (!this.serverUpdateEventTrigger) {
+            return;
+        }
+
+        this.serverUpdateEventTrigger();
     }
 }
 

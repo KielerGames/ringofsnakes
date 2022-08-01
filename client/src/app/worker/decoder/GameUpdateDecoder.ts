@@ -7,7 +7,7 @@ import { FoodChunkDTO } from "../../data/dto/FoodChunkDTO";
 import { SnakeDTO } from "../../data/dto/SnakeDTO";
 import { SnakeChunkDTO } from "../../data/dto/SnakeChunkDTO";
 
-const UPDATE_HEADER_SIZE = 5;
+export const UPDATE_HEADER_SIZE = 5;
 
 export function decode(config: GameConfig, buffer: ArrayBuffer): DecodedGameUpdate {
     const view = new DataView(buffer);

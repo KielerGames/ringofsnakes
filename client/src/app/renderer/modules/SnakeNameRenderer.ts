@@ -18,6 +18,11 @@ export function render(game: Readonly<Game>): void {
         const p = game.camera.computeScreenCoordinates(snake.position, canvas);
         const offset = 10 + 0.5 * snake.width;
         const text = snake.name;
+
+        if (!text) {
+            continue;
+        }
+
         TextRenderer.addText(text, `snake${snake.id}`, {
             color: "white",
             x: p.x,

@@ -25,7 +25,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     private _length: number;
     private _fast: boolean;
     private _width: number;
-    private _name: string;
+    private _name?: string;
     private _paused: boolean = false;
     private gameConfig: GameConfig;
 
@@ -168,8 +168,12 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         this._paused = true;
     }
 
-    get name(): string {
-        return this._name ?? `Snake ${this.id}`;
+    get name(): string | undefined {
+        if (__DEBUG__) {
+            return this._name ?? `Snake ${this.id}`;
+        }
+
+        return this._name;
     }
 
     get fast(): boolean {

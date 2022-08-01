@@ -26,7 +26,7 @@ const userInputRateLimiter = new RateLimiter<ClientData>(1000 / 30, (data) => {
     }
 });
 
-const data = new GameDataBuffer();
+const data = new GameDataBuffer(() => triggerEvent("server-update"));
 
 const eventListeners = new Map<WorkerEvent, Callback>();
 
@@ -61,12 +61,10 @@ export class WorkerAPI {
                     data.addJSONUpdate(message);
                 }
             }
-            triggerEvent("server-update");
         };
 
         socket.onBinaryMessage = (message) => {
             data.addBinaryUpdate(message);
-            triggerEvent("server-update");
         };
 
         socket.onclose = () => {

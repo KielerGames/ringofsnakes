@@ -1,7 +1,7 @@
 {
     "server": {
         "wss": false,
-        "host": "20.107.14.35",
+        "host": "ws.ringofsnakes.io",
         "port": 80
     }
 }

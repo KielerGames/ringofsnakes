@@ -1,9 +1,10 @@
 package server;
 
 import game.Game;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
 import javax.websocket.Session;
@@ -20,9 +21,12 @@ public class SnakeServer {
         SnakeServer.game = game;
 
         Server server = new Server();
-        ServerConnector connector = new ServerConnector(server);
-        connector.setPort(8080);
-        server.addConnector(connector);
+
+        ServerConnector wsConnector = new ServerConnector(server);
+        wsConnector.setPort(8080);
+        server.addConnector(wsConnector);
+
+        addSecureConnector(server);
 
         // Set up the basic application "context" for this application at "/"
         // This is also known as the handler tree (in jetty speak)
@@ -30,25 +34,22 @@ public class SnakeServer {
         context.setContextPath("/");
         server.setHandler(context);
 
-        // Initialize javax.websocket layer
-        WebSocketServerContainerInitializer.configure(context,
-                (servletContext, wsContainer) ->
-                {
-                    // This lambda will be called at the appropriate place in the
-                    // ServletContext initialization phase where you can initialize
-                    // and configure  your websocket container.
+        WebSocketServerContainerInitializer.configure(context, (servletContext, wsContainer) -> {
+            // This lambda will be called at the appropriate place in the
+            // ServletContext initialization phase where you can initialize
+            // and configure  your websocket container.
 
-                    // Configure defaults for container
-                    wsContainer.setDefaultMaxTextMessageBufferSize(65535);
+            // Configure defaults for container
+            wsContainer.setDefaultMaxTextMessageBufferSize(65535);
 
-                    // Add WebSocket endpoint to javax.websocket layer
-                    wsContainer.addEndpoint(EventSocket.class);
-                });
+            // Add WebSocket endpoint to javax.websocket layer
+            wsContainer.addEndpoint(EventSocket.class);
+        });
 
         try {
             server.start();
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Failed to start jetty server.", e);
         }
 
         return server;
@@ -91,5 +92,27 @@ public class SnakeServer {
         } else {
             System.err.println("Illegal request from client.");
         }
+    }
+
+    /**
+     * Based on <a href="https://stackoverflow.com/a/38026079/3315770">this SO answer</a>
+     * TODO #133:
+     *  - check if all of this is required
+     *  - keystore
+     */
+    private static void addSecureConnector(Server server) {
+        final var sslContextFactory = new SslContextFactory.Server();
+        //sslContextFactory.setKeyStorePath("...");
+        //sslContextFactory.setKeyStorePassword("...");
+
+        final var sslConnectionFactory = new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString());
+        final var httpConfiguration = new HttpConfiguration();
+        httpConfiguration.setSecureScheme("https");
+        httpConfiguration.setSecurePort(8443);
+        final var httpConnectionFactory = new HttpConnectionFactory(httpConfiguration);
+
+        final ServerConnector wssConnector = new ServerConnector(server, sslConnectionFactory, httpConnectionFactory);
+        wssConnector.setPort(8443);
+        server.addConnector(wssConnector);
     }
 }

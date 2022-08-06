@@ -40,8 +40,8 @@ public class Game {
     protected final ExceptionalExecutorService executor;
     private final Map<String, Client> clients = new HashMap<>(64);
     private final List<Bot> bots = new LinkedList<>();
-    private byte ticksSinceLastUpdate = 0;
     private final Set<String> usedNames = new HashSet<>();
+    private byte ticksSinceLastUpdate = 0;
 
     public Game() {
         this(new GameConfig());
@@ -166,9 +166,11 @@ public class Game {
             clients.forEach((__, client) -> client.send(topTenJson));
         }, 1, 2, TimeUnit.SECONDS);
 
-        executor.scheduleAtFixedRate(() -> {
-            clients.forEach((__, client) -> client.sendNameUpdate());
-        }, 420, 1500, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(
+                () -> clients.forEach((__, client) -> client.sendNameUpdate()),
+                420, 1500,
+                TimeUnit.MILLISECONDS
+        );
 
         // spawn bots every 20 seconds
         executor.scheduleAtFixedRate(() -> {
@@ -208,7 +210,9 @@ public class Game {
         synchronized (clients) {
             clients.forEach((__, client) -> {
                 final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
-                worldChunks.stream().flatMap(WorldChunk::streamSnakeChunks).forEach(client::updateClientSnakeChunk);
+                worldChunks.stream()
+                        .flatMap(WorldChunk::streamSnakeChunks)
+                        .forEach(client::updateClientSnakeChunk);
                 worldChunks.forEach(client::updateClientFoodChunk);
                 client.updateHeatMap(world.getHeatMap());
                 client.sendGameUpdate(ticksSinceLastUpdate);

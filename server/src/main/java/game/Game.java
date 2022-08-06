@@ -193,13 +193,9 @@ public class Game {
     }
 
     protected void tick() {
-        forEachSnake(snake -> {
-            if (snake.isAlive()) {
-                snake.tick();
-                killDesertingSnakes(snake);
-            }
-        });
+        forEachSnake(Snake::tick);
         bots.stream().filter(Bot::isAlive).forEach(Bot::act);
+        killDesertingSnakes();
         eatFood();
         world.getHeatMap().update();
         collisionManager.detectCollisions();
@@ -244,11 +240,13 @@ public class Game {
         });
     }
 
-    private void killDesertingSnakes(Snake s) {
-        if (!world.box.isWithinSubBox(s.getHeadPosition(), 0.5 * s.getWidth())) {
-            System.out.println("Removing Snake " + s.id + " from Game, because it is leaving the map.");
-            s.kill();
-        }
+    private void killDesertingSnakes() {
+        forEachSnake(s -> {
+            if (!world.box.isWithinSubBox(s.getHeadPosition(), 0.5 * s.getWidth())) {
+                System.out.println("Snake " + s.id + " is out of bounds.");
+                s.kill();
+            }
+        });
     }
 
     public void stop() {

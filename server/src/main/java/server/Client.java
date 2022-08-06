@@ -32,6 +32,10 @@ public abstract class Client {
         this.session = session;
     }
 
+    /**
+     * Include a {@link SnakeChunk} in the next update.
+     * This will also add the corresponding snake to that update.
+     */
     public void updateClientSnakeChunk(SnakeChunk chunk) {
         if (chunk.isJunk()) {
             return;
@@ -47,6 +51,11 @@ public abstract class Client {
         }
     }
 
+    /**
+     * Add this food chunk to the next update if
+     * - the client does not know it already or
+     * - the food chunk contains changes not yet known by the client
+     */
     public void updateClientFoodChunk(WorldChunk chunk) {
         final int knownVersion = knownFoodChunks.getOrDefault(chunk, -1);
         if (knownVersion != chunk.getFoodVersion()) {
@@ -55,6 +64,9 @@ public abstract class Client {
         knownFoodChunks.put(chunk, chunk.getFoodVersion());
     }
 
+    /**
+     * Add a snake to the next update that gets sent to the client.
+     */
     private void updateClientSnake(Snake snake) {
         // reset knowledge-decay
         final var previousValue = knownSnakes.put(snake, 0);
@@ -65,6 +77,11 @@ public abstract class Client {
         }
     }
 
+    /**
+     * Inform client about updated heat map. This will not always cause a heat map update
+     * to be sent to the client as this implementation performs throttling.
+     * Therefore, this method can be safely called once per tick.
+     */
     public void updateHeatMap(HeatMap heatMap) {
         final long now = System.currentTimeMillis();
         final long elapsed = now - lastHeatMapUpdate;

@@ -35,19 +35,22 @@ public abstract class Client {
     /**
      * Include a {@link SnakeChunk} in the next update.
      * This will also add the corresponding snake to that update.
+     * Junk chunks will be ignored.
      */
     public void updateClientSnakeChunk(SnakeChunk chunk) {
-        if (chunk.isJunk()) {
+        if (chunk.isJunk() || knownSnakeChunks.contains(chunk)) {
+            // client knows this chunk already but should still
+            // receive updates about the snake it would have gotten
+            // if this chunk was part of the update
+            updateClientSnake(chunk.getSnake());
             return;
         }
 
-        if (knownSnakeChunks.contains(chunk)) {
-            updateClientSnake(chunk.getSnake());
-        } else {
-            nextGameUpdate.addSnakeChunk(chunk);
-            if (chunk.isFull()) {
-                knownSnakeChunks.add(chunk);
-            }
+        nextGameUpdate.addSnakeChunk(chunk);
+
+        if (chunk.isFull()) {
+            // full/final chunks don't require updates anymore
+            knownSnakeChunks.add(chunk);
         }
     }
 

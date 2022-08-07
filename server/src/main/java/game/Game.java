@@ -212,7 +212,6 @@ public class Game {
                 worldChunks.forEach(client::updateClientFoodChunk);
                 client.updateHeatMap(world.getHeatMap());
                 client.sendGameUpdate(ticksSinceLastUpdate);
-                client.cleanupKnowledge();
             });
         }
         ticksSinceLastUpdate = 0;

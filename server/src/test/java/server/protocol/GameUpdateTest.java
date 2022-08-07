@@ -55,6 +55,7 @@ public class GameUpdateTest {
     @Test
     void testBinarySameChunkOnce() {
         var client = new TestClient(session);
+        client.knowledgeBox = world.box;
         var chunk = new WorldChunk(world, 0, 0, 42, 42, 0, 0);
 
         client.updateClientFoodChunk(chunk);

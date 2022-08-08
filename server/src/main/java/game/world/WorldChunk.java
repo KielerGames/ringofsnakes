@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class WorldChunk {
-    private static final int FOOD_HEADER_SIZE = 4;
+    public static final int FOOD_HEADER_SIZE = 4;
     public final BoundingBox box;
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
     private final Set<SnakeChunk> snakeChunks = new HashSet<>();

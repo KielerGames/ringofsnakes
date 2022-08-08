@@ -1,5 +1,7 @@
 package server.protocol;
 
+import game.snake.Snake;
+import game.snake.SnakeChunk;
 import game.snake.SnakeFactory;
 import game.world.World;
 import game.world.WorldChunk;
@@ -45,7 +47,6 @@ public class GameUpdateTest {
     void testBinaryEmptyUpdate() {
         var client = new TestClient(session);
         var updateData = captureUpdateData(client);
-        assertNotNull(updateData);
         assertEquals(GameUpdate.HEADER_SIZE, updateData.capacity());
         assertEquals(0, updateData.get(1));
         assertEquals(0, updateData.get(2));
@@ -60,11 +61,10 @@ public class GameUpdateTest {
 
         client.updateClientFoodChunk(chunk);
         var update1 = captureUpdateData(client);
-        assertNotNull(update1);
+        verifyUpdateIsNotEmpty(update1);
 
         client.updateClientFoodChunk(chunk);
         var update2 = captureUpdateData(client);
-        assertNotNull(update2);
 
         assertNotEquals(update1, update2);
         assertTrue(update1.capacity() > update2.capacity());
@@ -78,13 +78,11 @@ public class GameUpdateTest {
 
         client.updateClientFoodChunk(chunk);
         var update1 = captureUpdateData(client);
-        assertNotNull(update1);
         assertEquals(1, update1.get(3));
 
         chunk.addFood();
         client.updateClientFoodChunk(chunk);
         var update2 = captureUpdateData(client);
-        assertNotNull(update2);
         assertEquals(1, update2.get(3));
     }
 
@@ -126,7 +124,43 @@ public class GameUpdateTest {
         var captor = ArgumentCaptor.forClass(ByteBuffer.class);
         verify(remoteEndpoint).sendBinary(captor.capture());
 
-        return captor.getValue();
+        var updateData = captor.getValue();
+        verifyUpdate(updateData);
+
+        return updateData;
+    }
+
+    private void verifyUpdate(ByteBuffer update) {
+        assertNotNull(update);
+
+        final var size = update.capacity();
+        assertTrue(size >= GameUpdate.HEADER_SIZE);
+
+        final int numSnakeInfos = update.get(1);
+        final int numSnakeChunks = update.get(2);
+        final int numFoodChunks = update.get(3);
+        final var hasHeatMap = update.get(4) != 0;
+
+        if (numSnakeChunks > 0) {
+            assertTrue(numSnakeInfos > 0);
+        }
+
+        int minDataSize = GameUpdate.HEADER_SIZE
+                + numSnakeInfos * Snake.INFO_BYTE_SIZE
+                + numSnakeChunks * SnakeChunk.HEADER_BYTE_SIZE
+                + numFoodChunks * WorldChunk.FOOD_HEADER_SIZE
+                + (hasHeatMap ? 1 : 0);
+
+        assertTrue(minDataSize <= size);
+    }
+
+    private void verifyUpdateIsNotEmpty(ByteBuffer update) {
+        final int numSnakeInfos = update.get(1);
+        final int numSnakeChunks = update.get(2);
+        final int numFoodChunks = update.get(3);
+        final var hasHeatMap = update.get(4) != 0;
+
+        assertTrue(numSnakeInfos > 0 || numSnakeChunks > 0 || numFoodChunks > 0 || hasHeatMap);
     }
 
     private void sendUpdate(Client client) {

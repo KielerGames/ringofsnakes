@@ -107,6 +107,15 @@ public final class BoundingBox {
         return dX * dX + dY * dY;
     }
 
+    /**
+     * Compute the distance between two bounding boxes.
+     * For performance reasons you should instead use {@link #distance2(BoundingBox, BoundingBox)}
+     * whenever possible.
+     */
+    public static double distance(BoundingBox a, BoundingBox b) {
+        return Math.sqrt(distance2(a, b));
+    }
+
     public double getWidth() {
         return maxX - minX;
     }

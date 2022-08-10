@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 
 import static game.world.WorldChunkFactory.createChunks;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class WorldChunkTest {
@@ -54,7 +53,6 @@ public class WorldChunkTest {
     void testAddASnake() {
         var world = new World();
         var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
-        world.addSnake(snake);
 
         for (int i = 0; i < 512; i++) {
             snake.tick();
@@ -91,5 +89,39 @@ public class WorldChunkTest {
                     snakeHeadWorldChunk.streamSnakeChunks().anyMatch(sc -> sc == snake.currentChunk)
             );
         }
+    }
+
+    @Test
+    void testSnakesWithinWorldChunk() {
+        var world = new World();
+        var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+
+        for (int i = 0; i < 512; i++) {
+            snake.tick();
+        }
+
+        world.chunks.stream().forEach(worldChunk -> {
+            if (worldChunk.getSnakeChunkCount() > 0) {
+                assertEquals(1, worldChunk.getSnakes().size());
+            } else {
+                assertTrue(worldChunk.getSnakes().isEmpty());
+            }
+        });
+    }
+
+    @Test
+    void testSnakeGetsRemoved() {
+        var world = new World();
+        var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+        snake.tick();
+        var worldChunk = world.chunks.stream()
+                .filter(chunk -> chunk.getSnakeChunkCount() > 0)
+                .findAny()
+                .orElseThrow();
+        assertTrue(worldChunk.getSnakes().contains(snake));
+        snake.kill();
+        worldChunk.removeOldSnakeChunks();
+        assertFalse(worldChunk.getSnakes().contains(snake));
+        assertEquals(0, worldChunk.getSnakeChunkCount());
     }
 }

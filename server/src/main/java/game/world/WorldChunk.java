@@ -1,6 +1,7 @@
 package game.world;
 
 import game.GameConfig;
+import game.snake.Snake;
 import game.snake.SnakeChunk;
 import lombok.Getter;
 import math.BoundingBox;
@@ -19,6 +20,14 @@ public class WorldChunk {
     private @Getter final byte x, y;
     private final World world;
     private final List<Food> foodList = new LinkedList<>();
+    /**
+     * A map that stores the number of {@link SnakeChunk}s for each {@link Snake} in this chunk.
+     */
+    private final Map<Snake, Integer> snakes = new HashMap<>(6);
+    /**
+     * A readonly set view of the {@link #snakes} map.
+     */
+    private final Set<Snake> snakesView = Collections.unmodifiableSet(snakes.keySet());
     private int foodVersion = 0;
 
     public WorldChunk(World world, double left, double bottom, double width, double height, int x, int y) {
@@ -67,9 +76,16 @@ public class WorldChunk {
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {
-        assert (Math.sqrt(BoundingBox.distance2(snakeChunk.getBoundingBox(), box)) <= 0.5 * world.getConfig().snakes.maxWidth);
+        assert (Math.sqrt(BoundingBox.distance(snakeChunk.getBoundingBox(), box)) <= 0.5 * world.getConfig().snakes.maxWidth);
 
-        snakeChunks.add(snakeChunk);
+        if (!snakeChunks.add(snakeChunk)) {
+            // SnakeChunk has already been added, no further actions required
+            return;
+        }
+
+        // initialize or increment SnakeChunk counter
+        snakes.merge(snakeChunk.getSnake(), 1, Integer::sum);
+        assert (snakes.get(snakeChunk.getSnake()) > 0);
     }
 
     public ByteBuffer encodeFood() {
@@ -100,10 +116,28 @@ public class WorldChunk {
     }
 
     /**
-     * Removes snake chunks that are junk.
+     * Removes {@link SnakeChunk}s that are junk from this {@link WorldChunk}.
      */
     public void removeOldSnakeChunks() {
-        snakeChunks.removeIf(SnakeChunk::isJunk);
+        // remove SnakeChunks
+        snakeChunks.removeIf(snakeChunk -> {
+            if (!snakeChunk.isJunk()) {
+                // keep this SnakeChunk
+                return false;
+            }
+
+            // update SnakeChunk count
+            snakes.computeIfPresent(
+                    snakeChunk.getSnake(),
+                    (snake, chunks) -> chunks - 1
+            );
+
+            // remove this SnakeChunk
+            return true;
+        });
+
+        // remove Snakes
+        snakes.entrySet().removeIf(entry -> entry.getValue() <= 0);
     }
 
     public String toString() {
@@ -114,9 +148,20 @@ public class WorldChunk {
         return snakeChunks.stream().filter(Predicate.not(SnakeChunk::isJunk));
     }
 
+    /**
+     * Every food change (additions/deletions) will increment this version.
+     * Can be used to detect changes.
+     */
     public int getFoodVersion() {
         assert foodVersion >= 0;
         return foodVersion;
+    }
+
+    /**
+     * Get a readonly collection of snakes that have {@link SnakeChunk}s in this {@link WorldChunk}.
+     */
+    public Collection<Snake> getSnakes() {
+        return snakesView;
     }
 
     public Vector findSnakeSpawnPosition(Random rnd) {

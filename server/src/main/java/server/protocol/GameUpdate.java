@@ -36,7 +36,7 @@ public class GameUpdate {
         if (foodChunkBuffers.size() >= ITEM_LIMIT) {
             return;
         }
-        final var encodedFoodChunk = chunk.encodeFood();
+        final var encodedFoodChunk = chunk.getEncodedFoodData();
         foodChunkBuffers.add(encodedFoodChunk);
         foodChunkBufferSize += encodedFoodChunk.capacity();
     }

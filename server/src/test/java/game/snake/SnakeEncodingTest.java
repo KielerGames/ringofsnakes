@@ -64,6 +64,7 @@ public class SnakeEncodingTest {
         var chunk = snake.getSnakeChunks().get(n);
         assertFalse(chunk.isEmpty());
         var chunkBuffer = chunk.getBuffer();
+        assertEquals(0, chunkBuffer.position());
         assertEquals(FinalSnakeChunk.BYTE_SIZE, chunkBuffer.capacity());
         var testBuffer = ByteBuffer.allocate(FinalSnakeChunk.BYTE_SIZE + 1);
         testBuffer.put(chunkBuffer);

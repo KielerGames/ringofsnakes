@@ -115,7 +115,7 @@ public class Game {
 
     private void addBotsRandomly(int n) {
         for (int i = 0; i < n; i++) {
-            StupidBot bot = new StupidBot(this, this.world.findSpawnPosition());
+            StupidBot bot = new StupidBot(world, world.findSpawnPosition());
             snakes.add(bot.getSnake());
             bots.add(bot);
         }

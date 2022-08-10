@@ -1,25 +1,20 @@
 package game.ai;
 
-import game.Game;
 import game.snake.Snake;
 import game.snake.SnakeFactory;
 import game.snake.SnakeNameGenerator;
+import game.world.World;
+import lombok.Getter;
 import math.Vector;
 
-import java.util.Collections;
-
 public abstract class Bot {
-    private final Game game;
-    private Snake snake;
+    protected World world;
+    @Getter private final Snake snake;
 
-    public Bot(Game game, Vector spawnPosition) {
+    public Bot(World world, Vector spawnPosition) {
         final var name = SnakeNameGenerator.generateBotName();
-        this.game = game;
-        this.snake = SnakeFactory.createSnake(spawnPosition, game.world, name);
-    }
-
-    public Snake getSnake() {
-        return this.snake;
+        this.world = world;
+        this.snake = SnakeFactory.createSnake(spawnPosition, world, name);
     }
 
     public boolean isAlive() {

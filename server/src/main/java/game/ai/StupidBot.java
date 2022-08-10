@@ -1,6 +1,5 @@
 package game.ai;
 
-import game.Game;
 import game.snake.Snake;
 import game.world.World;
 import math.Vector;
@@ -11,9 +10,8 @@ import java.util.Random;
 public class StupidBot extends Bot {
 
     private final static Random random = new Random();
-    private final double keepThisDistanceToMapEdge = 40;
-    private final World world;
-    private final int takeThisNumberOfStepsTowardsCenter = 150;
+    private static final double keepThisDistanceToMapEdge = 40;
+    private static final int takeThisNumberOfStepsTowardsCenter = 150;
     private boolean turnClockwise = true;
     private boolean movingToPosition = false;
     private int counter = 1;
@@ -22,9 +20,8 @@ public class StupidBot extends Bot {
     private double alpha = -Math.PI;
     private double turningRate = Math.PI / 120;
 
-    public StupidBot(Game game, Vector spawnPosition) {
-        super(game, spawnPosition);
-        this.world = game.world;
+    public StupidBot(World world, Vector spawnPosition) {
+        super(world, spawnPosition);
     }
 
     @Override

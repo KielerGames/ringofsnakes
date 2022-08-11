@@ -35,12 +35,12 @@ public class Snake {
     public GrowingSnakeChunk currentChunk;
     @Getter protected double length;
     @Getter Vector headPosition;
-    double headDirection;
+    @Getter double headDirection;
     private char currentChunkId;
     @Setter private byte skin;
     @Getter private boolean alive = true;
     private char nextChunkId = 0;
-    @Getter private double targetDirection;
+    private double targetDirection;
     private boolean userWantsFast = false;
     private double lengthBuffer = 0;
     @Getter private double width;

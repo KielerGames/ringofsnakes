@@ -58,7 +58,7 @@ class KamikazeBot extends Bot {
 
         final var lookAhead = 12.0 * snake.config.snakes.speed;
         final var pos = closestSnake.getHeadPosition().clone();
-        pos.addDirection(closestSnake.getTargetDirection(), lookAhead);
+        pos.addDirection(closestSnake.getHeadDirection(), lookAhead);
 
         snake.setTargetDirection(
                 Math.atan2(pos.y - headPosition.y, pos.x - headPosition.x)

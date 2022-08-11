@@ -3,7 +3,7 @@ package game;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import game.ai.Bot;
-import game.ai.StupidBot;
+import game.ai.BotFactory;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.snake.SnakeFactory;
@@ -115,7 +115,7 @@ public class Game {
 
     private void addBotsRandomly(int n) {
         for (int i = 0; i < n; i++) {
-            StupidBot bot = new StupidBot(world, world.findSpawnPosition());
+            final Bot bot = BotFactory.createBot(world);
             snakes.add(bot.getSnake());
             bots.add(bot);
         }

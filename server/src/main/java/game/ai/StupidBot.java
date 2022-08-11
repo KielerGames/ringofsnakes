@@ -20,8 +20,8 @@ public class StupidBot extends Bot {
     private double alpha = -Math.PI;
     private double turningRate = Math.PI / 120;
 
-    public StupidBot(World world, Vector spawnPosition) {
-        super(world, spawnPosition);
+    public StupidBot(World world) {
+        super(world);
     }
 
     @Override

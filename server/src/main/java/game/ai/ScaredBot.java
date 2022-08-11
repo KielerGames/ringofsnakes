@@ -3,17 +3,16 @@ package game.ai;
 import game.world.World;
 import math.Vector;
 
-import java.util.HashSet;
 import java.util.Random;
 
 public class ScaredBot extends Bot {
 
     private static final double TAU = Math.PI * 2.0;
     private final Random random = new Random();
-    private int counter = 0;
+    private int counter = random.nextInt(3);
 
-    public ScaredBot(World world, Vector spawnPosition) {
-        super(world, spawnPosition);
+    public ScaredBot(World world) {
+        super(world);
     }
 
     @Override
@@ -28,12 +27,7 @@ public class ScaredBot extends Bot {
 
         final var snake = this.getSnake();
         final var headPosition = snake.getHeadPosition();
-
-        // find snakes in other chunks
-        final var chunk = world.chunks.findChunk(headPosition);
-        final var otherSnakes = new HashSet<>(chunk.getSnakes());
-        chunk.neighbors.forEach(c -> otherSnakes.addAll(c.getSnakes()));
-        otherSnakes.remove(snake);
+        final var otherSnakes = getSnakesInNeighborhood();
 
         if (otherSnakes.isEmpty()) {
             if (random.nextDouble() < 0.25) {

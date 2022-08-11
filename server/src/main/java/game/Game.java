@@ -66,7 +66,7 @@ public class Game {
         this.config = config;
         this.world = world;
         executor = new ExceptionalExecutorService();
-        executor.onExceptionDo((exception) -> {
+        executor.onExceptionOrErrorDo((exception) -> {
             exception.printStackTrace();
             System.exit(1);
         });

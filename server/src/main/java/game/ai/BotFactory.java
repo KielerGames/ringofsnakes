@@ -12,7 +12,7 @@ public class BotFactory {
 
         if (p < 0.25) {
             return new ScaredBot(world);
-        } else if (p < 0.64) {
+        } else if (p < 0.6) {
             return new KamikazeBot(world);
         }
 

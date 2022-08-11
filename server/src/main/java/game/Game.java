@@ -66,8 +66,8 @@ public class Game {
         this.config = config;
         this.world = world;
         executor = new ExceptionalExecutorService();
-        executor.onExceptionOrErrorDo((exception) -> {
-            exception.printStackTrace();
+        executor.onExceptionOrErrorDo((throwable) -> {
+            throwable.printStackTrace();
             System.exit(1);
         });
         collisionManager = new CollisionManager(this);
@@ -170,14 +170,14 @@ public class Game {
             clients.forEach((__, client) -> client.sendNameUpdate());
         }, 420, 1500, TimeUnit.MILLISECONDS);
 
-        // spawn bots every 12 seconds
+        // spawn bots every 8 seconds
         executor.scheduleAtFixedRate(() -> {
             final var n = snakes.stream().filter(Snake::isAlive).count();
 
             if (n < config.targetSnakePopulation) {
                 addBotsRandomly((int) Math.min(6, config.targetSnakePopulation - n));
             }
-        }, 1, 12, TimeUnit.SECONDS);
+        }, 1, 8, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + prettyGson.toJson(config));
         System.out.println("Waiting for players to connect...");

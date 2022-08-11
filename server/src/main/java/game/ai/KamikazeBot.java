@@ -9,8 +9,11 @@ class KamikazeBot extends Bot {
 
     private int counter = random.nextInt(4) - 42;
 
+    private final double minKamikazeLength;
+
     public KamikazeBot(World world) {
         super(world);
+        minKamikazeLength = 1.5 * world.getConfig().snakes.minLength;
     }
 
     @Override
@@ -23,6 +26,17 @@ class KamikazeBot extends Bot {
 
         counter = 0;
 
+        if (getSnake().getLength() < minKamikazeLength) {
+            if (random.nextDouble() < 0.3) {
+                moveInRandomDirection();
+            }
+            return;
+        }
+
+        kamikaze();
+    }
+
+    private void kamikaze() {
         final var snake = this.getSnake();
 
         if (snake.getLength() < snake.config.snakes.minLength) {

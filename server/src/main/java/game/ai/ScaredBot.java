@@ -3,15 +3,11 @@ package game.ai;
 import game.world.World;
 import math.Vector;
 
-import java.util.Random;
+class ScaredBot extends Bot {
 
-public class ScaredBot extends Bot {
+    private int counter = random.nextInt(3) - 10;
 
-    private static final double TAU = Math.PI * 2.0;
-    private final Random random = new Random();
-    private int counter = random.nextInt(3);
-
-    public ScaredBot(World world) {
+    ScaredBot(World world) {
         super(world);
     }
 
@@ -31,7 +27,7 @@ public class ScaredBot extends Bot {
 
         if (otherSnakes.isEmpty()) {
             if (random.nextDouble() < 0.25) {
-                snake.setTargetDirection(random.nextDouble() * TAU - Math.PI);
+                moveInRandomDirection();
             }
             return;
         }

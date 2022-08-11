@@ -11,7 +11,10 @@ import util.BitWithShortHistory;
 import util.Direction;
 
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Stream;
 
 import static util.MathFunctions.sigmoid;
@@ -23,12 +26,12 @@ public class Snake {
 
     public final GameConfig config;
     public final char id;
+    public final String name;
     protected final World world;
     private final ChainCodeCoder coder;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private final BitWithShortHistory fastHistory = new BitWithShortHistory(false);
-    public final String name;
     public GrowingSnakeChunk currentChunk;
     @Getter protected double length;
     @Getter Vector headPosition;
@@ -37,7 +40,7 @@ public class Snake {
     @Setter private byte skin;
     @Getter private boolean alive = true;
     private char nextChunkId = 0;
-    private double targetDirection;
+    @Getter private double targetDirection;
     private boolean userWantsFast = false;
     private double lengthBuffer = 0;
     @Getter private double width;
@@ -79,6 +82,10 @@ public class Snake {
         }
     }
 
+    /**
+     * Sets the user/controller preference if the snake should go fast or slow.
+     * The actual speed will be determined every tick based on multiple factors.
+     */
     public void setUserFast(boolean wantsFast) {
         userWantsFast = wantsFast;
     }

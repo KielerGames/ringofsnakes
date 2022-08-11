@@ -5,11 +5,7 @@ import game.world.World;
 import math.Vector;
 import util.Direction;
 
-import java.util.Random;
-
-public class StupidBot extends Bot {
-
-    private final static Random random = new Random();
+class StupidBot extends Bot {
     private static final double keepThisDistanceToMapEdge = 40;
     private static final int takeThisNumberOfStepsTowardsCenter = 150;
     private boolean turnClockwise = true;
@@ -20,7 +16,7 @@ public class StupidBot extends Bot {
     private double alpha = -Math.PI;
     private double turningRate = Math.PI / 120;
 
-    public StupidBot(World world) {
+    StupidBot(World world) {
         super(world);
     }
 

@@ -8,8 +8,12 @@ public class BotFactory {
     private static final Random random = new Random();
 
     public static Bot createBot(World world) {
-        if (random.nextDouble() < 0.33) {
+        final var p = random.nextDouble();
+
+        if (p < 0.25) {
             return new ScaredBot(world);
+        } else if (p < 0.64) {
+            return new KamikazeBot(world);
         }
 
         return new StupidBot(world);

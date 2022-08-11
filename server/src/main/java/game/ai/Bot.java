@@ -8,9 +8,12 @@ import lombok.Getter;
 import math.Vector;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public abstract class Bot {
+    protected final static Random random = new Random();
+    protected static final double TAU = Math.PI * 2.0;
     @Getter private final Snake snake;
     protected World world;
 
@@ -33,6 +36,7 @@ public abstract class Bot {
     /**
      * Get snakes in the current {@link game.world.WorldChunk} and its neighbors,
      * excluding the snake of this bot.
+     *
      * @return A modifiable set of snakes
      */
     protected Set<Snake> getSnakesInNeighborhood() {
@@ -41,5 +45,10 @@ public abstract class Bot {
         chunk.neighbors.forEach(c -> otherSnakes.addAll(c.getSnakes()));
         otherSnakes.remove(snake);
         return otherSnakes;
+    }
+
+    protected void moveInRandomDirection() {
+        // TODO: avoid BoundarySnake
+        snake.setTargetDirection(random.nextDouble() * TAU - Math.PI);
     }
 }

@@ -45,3 +45,22 @@ jobs:
           name: server-uber-jar
           path: server/snake-server-*.jar
           if-no-files-found: error
+  
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download jar from previous job
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: server-uber-jar
+
+      - name: Initialize SSH
+        uses: kielabokkie/ssh-key-and-known-hosts-action@v1.3.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          ssh-host: ${{ secrets.DEPLOY_SERVER }}
+      
+      - name: Upload new jar to server
+        run: scp snake-server-*.jar ci@${{ secrets.DEPLOY_SERVER }}:/home/ci

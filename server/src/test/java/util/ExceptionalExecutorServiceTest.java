@@ -12,8 +12,8 @@ public class ExceptionalExecutorServiceTest {
     @Test
     void testExceptionGetsReported() throws InterruptedException {
         final var service = new ExceptionalExecutorService();
-        @SuppressWarnings("unchecked") final var exceptionConsumer = (Consumer<Exception>) Mockito.spy(Consumer.class);
-        service.onExceptionDo(exceptionConsumer);
+        @SuppressWarnings("unchecked") final var throwableConsumer = (Consumer<Throwable>) Mockito.spy(Consumer.class);
+        service.onExceptionOrErrorDo(throwableConsumer);
 
         service.execute(() -> {
             throw new IllegalStateException("test error");
@@ -23,6 +23,6 @@ public class ExceptionalExecutorServiceTest {
         assertTrue(service.awaitTermination(100, TimeUnit.MILLISECONDS));
 
         // expect exception:
-        Mockito.verify(exceptionConsumer).accept(Mockito.any(Exception.class));
+        Mockito.verify(throwableConsumer).accept(Mockito.any(Exception.class));
     }
 }

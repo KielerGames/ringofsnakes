@@ -44,3 +44,4 @@ jobs:
         with:
           name: server-uber-jar
           path: server/snake-server-*.jar
+          if-no-files-found: error

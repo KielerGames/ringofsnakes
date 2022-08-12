@@ -7,20 +7,20 @@ import java.util.function.Consumer;
 
 public class ExceptionalExecutorService implements ScheduledExecutorService {
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    private Consumer<Exception> exceptionHandler;
+    private Consumer<Throwable> exceptionOrErrorHandler;
 
-    public void onExceptionDo(Consumer<Exception> exceptionHandler) {
-        this.exceptionHandler = exceptionHandler;
+    public void onExceptionOrErrorDo(Consumer<Throwable> exceptionHandler) {
+        this.exceptionOrErrorHandler = exceptionHandler;
     }
 
     private Runnable createExceptionalRunnable(Runnable runnable) {
         return () -> {
             try {
                 runnable.run();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 executor.shutdown();
-                if (exceptionHandler != null) {
-                    exceptionHandler.accept(e);
+                if (exceptionOrErrorHandler != null) {
+                    exceptionOrErrorHandler.accept(e);
                 }
             }
         };

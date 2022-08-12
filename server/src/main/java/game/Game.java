@@ -3,7 +3,7 @@ package game;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import game.ai.Bot;
-import game.ai.StupidBot;
+import game.ai.BotFactory;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.snake.SnakeFactory;
@@ -66,8 +66,8 @@ public class Game {
         this.config = config;
         this.world = world;
         executor = new ExceptionalExecutorService();
-        executor.onExceptionDo((exception) -> {
-            exception.printStackTrace();
+        executor.onExceptionOrErrorDo((throwable) -> {
+            throwable.printStackTrace();
             System.exit(1);
         });
         collisionManager = new CollisionManager(this);
@@ -115,7 +115,7 @@ public class Game {
 
     private void addBotsRandomly(int n) {
         for (int i = 0; i < n; i++) {
-            StupidBot bot = new StupidBot(this, this.world.findSpawnPosition());
+            final Bot bot = BotFactory.createBot(world);
             snakes.add(bot.getSnake());
             bots.add(bot);
         }
@@ -172,14 +172,14 @@ public class Game {
                 TimeUnit.MILLISECONDS
         );
 
-        // spawn bots every 20 seconds
+        // spawn bots every 8 seconds
         executor.scheduleAtFixedRate(() -> {
             final var n = snakes.stream().filter(Snake::isAlive).count();
 
             if (n < config.targetSnakePopulation) {
-                addBotsRandomly((int) Math.min(5, config.targetSnakePopulation - n));
+                addBotsRandomly((int) Math.min(6, config.targetSnakePopulation - n));
             }
-        }, 1, 16, TimeUnit.SECONDS);
+        }, 1, 8, TimeUnit.SECONDS);
 
         System.out.println("Game started. Config:\n" + prettyGson.toJson(config));
         System.out.println("Waiting for players to connect...");

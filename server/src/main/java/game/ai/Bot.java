@@ -1,25 +1,30 @@
 package game.ai;
 
-import game.Game;
 import game.snake.Snake;
 import game.snake.SnakeFactory;
 import game.snake.SnakeNameGenerator;
+import game.world.World;
+import lombok.Getter;
 import math.Vector;
 
-import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 public abstract class Bot {
-    private final Game game;
-    private Snake snake;
+    protected final static Random random = new Random();
+    protected static final double TAU = Math.PI * 2.0;
+    @Getter private final Snake snake;
+    protected World world;
 
-    public Bot(Game game, Vector spawnPosition) {
+    public Bot(World world, Vector spawnPosition) {
         final var name = SnakeNameGenerator.generateBotName();
-        this.game = game;
-        this.snake = SnakeFactory.createSnake(spawnPosition, game.world, name);
+        this.world = world;
+        this.snake = SnakeFactory.createSnake(spawnPosition, world, name);
     }
 
-    public Snake getSnake() {
-        return this.snake;
+    public Bot(World world) {
+        this(world, world.findSpawnPosition());
     }
 
     public boolean isAlive() {
@@ -27,4 +32,23 @@ public abstract class Bot {
     }
 
     public abstract void act();
+
+    /**
+     * Get snakes in the current {@link game.world.WorldChunk} and its neighbors,
+     * excluding the snake of this bot.
+     *
+     * @return A modifiable set of snakes
+     */
+    protected Set<Snake> getSnakesInNeighborhood() {
+        final var chunk = world.chunks.findChunk(snake.getHeadPosition());
+        final var otherSnakes = new HashSet<>(chunk.getSnakes());
+        chunk.neighbors.forEach(c -> otherSnakes.addAll(c.getSnakes()));
+        otherSnakes.remove(snake);
+        return otherSnakes;
+    }
+
+    protected void moveInRandomDirection() {
+        // TODO: avoid BoundarySnake
+        snake.setTargetDirection(random.nextDouble() * TAU - Math.PI);
+    }
 }

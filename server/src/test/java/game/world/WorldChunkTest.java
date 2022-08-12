@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
+import java.util.Random;
 
 import static game.world.WorldChunkFactory.createChunks;
 import static org.junit.jupiter.api.Assertions.*;
@@ -123,5 +124,25 @@ public class WorldChunkTest {
         worldChunk.removeOldSnakeChunks();
         assertFalse(worldChunk.getSnakes().contains(snake));
         assertEquals(0, worldChunk.getSnakeChunkCount());
+    }
+
+    @Test
+    void testFoodEncoding() {
+        final var rand = new Random(1337);
+        final var chunk = new WorldChunk(world, 0, 0, 42, 42, 0, 0);
+
+        for (int i = 0; i < 42; i++) {
+            if (rand.nextDouble() < 0.2) {
+                chunk.addFood();
+            }
+
+            final var data = chunk.getEncodedFoodData();
+            assertNotNull(data);
+            assertEquals(0, data.position());
+            assertTrue(data.capacity() >= WorldChunk.FOOD_HEADER_SIZE);
+
+            // simulate a consumer changing the position
+            data.position(2);
+        }
     }
 }

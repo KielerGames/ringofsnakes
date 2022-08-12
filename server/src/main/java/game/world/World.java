@@ -18,7 +18,7 @@ public class World {
     public final Vector center = new Vector(0, 0);
     @Getter private final GameConfig config;
     @Getter private final HeatMap heatMap;
-    public BoundingBox box;
+    public final BoundingBox box;
 
     public World(double chunkSize, int repetitions) {
         this.config = new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions));

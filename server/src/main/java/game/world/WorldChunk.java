@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class WorldChunk {
-    private static final int FOOD_HEADER_SIZE = 4;
+    public static final int FOOD_HEADER_SIZE = 4;
     public final BoundingBox box;
     public final List<WorldChunk> neighbors = new ArrayList<>(8);
     private final Set<SnakeChunk> snakeChunks = new HashSet<>();
@@ -29,6 +29,7 @@ public class WorldChunk {
      */
     private final Set<Snake> snakesView = Collections.unmodifiableSet(snakes.keySet());
     private int foodVersion = 0;
+    private ByteBuffer encodedFoodData;
 
     public WorldChunk(World world, double left, double bottom, double width, double height, int x, int y) {
         assert (width > 0.0);
@@ -43,7 +44,7 @@ public class WorldChunk {
 
     private void onFoodChange() {
         foodVersion++;
-        // TODO: store time of last change
+        encodedFoodData = null;
     }
 
     public void addNeighbor(WorldChunk neighbor) {
@@ -71,8 +72,9 @@ public class WorldChunk {
             return;
         }
 
-        foodList.removeAll(foodToRemove);
-        onFoodChange();
+        if (foodList.removeAll(foodToRemove)) {
+            onFoodChange();
+        }
     }
 
     public void addSnakeChunk(SnakeChunk snakeChunk) {
@@ -88,19 +90,35 @@ public class WorldChunk {
         assert (snakes.get(snakeChunk.getSnake()) > 0);
     }
 
-    public ByteBuffer encodeFood() {
+    /**
+     * Return the food in this chunk encoded into a {@link ByteBuffer}.
+     * The encoding is will be performed only when necessary.
+     */
+    public ByteBuffer getEncodedFoodData() {
+        // every food change should reset encodedFoodData to null
+        if (encodedFoodData != null) {
+            // return cached data
+            return encodedFoodData.asReadOnlyBuffer().flip();
+        }
+
+        // encode food data
         final int numFood = Math.min(foodList.size(), Character.MAX_VALUE);
         ByteBuffer buffer = ByteBuffer.allocate(FOOD_HEADER_SIZE + numFood * Food.BYTE_SIZE);
 
+        // header
         buffer.put(this.x);
         buffer.put(this.y);
         buffer.putChar((char) foodList.size());
 
+        // body
         assert (foodList.isEmpty() || buffer.hasRemaining());
         foodList.stream().limit(Character.MAX_VALUE).forEach(food -> food.addToByteBuffer(buffer));
         assert (!buffer.hasRemaining());
 
-        return buffer.asReadOnlyBuffer().flip();
+        // cache data for next call
+        encodedFoodData = buffer;
+
+        return encodedFoodData.asReadOnlyBuffer().flip();
     }
 
     public int getFoodCount() {

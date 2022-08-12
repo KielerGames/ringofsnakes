@@ -56,6 +56,9 @@ jobs:
         with:
           name: server-uber-jar
 
+      - name: Rename file
+        run: mv snake-server-*.jar snake-server.jar
+
       - name: Initialize SSH
         uses: kielabokkie/ssh-key-and-known-hosts-action@v1.3.0
         with:
@@ -63,4 +66,4 @@ jobs:
           ssh-host: ${{ secrets.DEPLOY_SERVER }}
       
       - name: Upload new jar to server
-        run: scp snake-server-*.jar ci@${{ secrets.DEPLOY_SERVER }}:/home/ci
+        run: scp snake-server.jar ci@${{ secrets.DEPLOY_SERVER }}:/home/ci

@@ -71,7 +71,7 @@ export default class GameDataBuffer {
             this.updateQueue.push(update);
         }
 
-        if (this.duration > 0.5) {
+        if (!__TEST__ &&  this.duration > 0.5) {
             console.warn(`Update congestion! Current delay: ${this.duration.toFixed(2)}s`);
         }
 

@@ -67,3 +67,6 @@ jobs:
       
       - name: Upload new jar to server
         run: scp snake-server.jar ci@${{ secrets.DEPLOY_SERVER }}:/home/ci
+
+      - name: Restart server
+        run: ssh ci@${{ secrets.DEPLOY_SERVER }} "./restart.sh"

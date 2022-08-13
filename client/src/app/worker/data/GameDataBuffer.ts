@@ -92,8 +92,8 @@ export default class GameDataBuffer {
             case "GameStatistics": {
                 this.addInformation({
                     /*eslint-disable */
-                    // this code copies the update object but omitting the tag key
-                    // eslint does not like this because tag is unused
+                    // This code copies the update object but omits the tag key.
+                    // Eslint does not like this because tag is unused.
                     leaderboard: (({ tag, ...rest }) => rest)(update)
                     /*eslint-enable */
                 });

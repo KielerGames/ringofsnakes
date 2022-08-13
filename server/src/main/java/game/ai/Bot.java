@@ -16,6 +16,7 @@ import static util.Direction.TAU;
 
 public abstract class Bot {
     protected final static Random random = new Random();
+    protected static final double keepThisDistanceToMapEdge = 40;
     @Getter private final Snake snake;
     protected World world;
 
@@ -50,8 +51,12 @@ public abstract class Bot {
     }
 
     protected void moveInRandomDirection() {
-        // TODO: avoid BoundarySnake
-        snake.setTargetDirection(random.nextDouble() * TAU - Math.PI);
+        final var snakeIsSafe = world.box.isWithinSubBox(snake.getHeadPosition(), keepThisDistanceToMapEdge);
+        if (snakeIsSafe) {
+            snake.setTargetDirection(random.nextDouble() * TAU - Math.PI);
+        } else {
+            moveTowardsPosition(world.center);
+        }
     }
 
     protected void moveTowardsPosition(Vector targetPosition) {

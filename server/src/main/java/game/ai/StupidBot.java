@@ -5,7 +5,6 @@ import math.Vector;
 import util.Direction;
 
 class StupidBot extends Bot {
-    private static final double keepThisDistanceToMapEdge = 40;
     private static final int takeThisNumberOfStepsTowardsCenter = 150;
     private boolean turnClockwise = true;
     private boolean movingToPosition = false;

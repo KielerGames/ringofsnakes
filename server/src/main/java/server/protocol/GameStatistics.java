@@ -4,10 +4,13 @@ import game.Game;
 import game.snake.Snake;
 import server.Player;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 
 public class GameStatistics extends ServerToClientJSONMessage {
     final List<LeaderboardEntry> leaderboard;
+    final int numPlayers;
+    final int numBots;
 
     public GameStatistics(Game game) {
         leaderboard = game.streamClients().filter(Player.class::isInstance)
@@ -17,6 +20,9 @@ public class GameStatistics extends ServerToClientJSONMessage {
                 .limit(10)
                 .map(LeaderboardEntry::new)
                 .toList();
+
+        numPlayers = (int) game.streamClients().filter(Player.class::isInstance).count();
+        numBots = game.getNumberOfBots();
     }
 
     private static class LeaderboardEntry {

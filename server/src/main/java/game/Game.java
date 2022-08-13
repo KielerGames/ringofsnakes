@@ -255,4 +255,8 @@ public class Game {
     public Stream<Client> streamClients() {
         return clients.values().stream();
     }
+
+    public int getNumberOfBots() {
+        return this.bots.size();
+    }
 }

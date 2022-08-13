@@ -7,14 +7,14 @@ type LeaderboardProps = {
 
 export default class Leaderboard extends Component<LeaderboardProps> {
     render() {
-        const leaderboardData = this.props.data;
-        if (!leaderboardData) {
+        const gameStats = this.props.data;
+        if (!gameStats) {
             return null;
         }
 
         return (
             <div id="leaderboard">
-                {leaderboardData.list.map((entry, index) => (
+                {gameStats.leaderboard.map((entry, index) => (
                     <LeaderboardView key={entry.name} data={entry} index={index} />
                 ))}
             </div>

@@ -23,7 +23,7 @@ export default class Game {
     readonly snakes: ManagedMap<SnakeDTO, SnakeId, Snake, number>;
     readonly snakeChunks: ManagedMap<SnakeChunkDTO, SnakeChunkId, SnakeChunk>;
     readonly foodChunks: ManagedMap<FoodChunkDTO, FoodChunkId, FoodChunk>;
-    leaderboard: GameStatisticsDTO = { list: [] };
+    leaderboard: GameStatisticsDTO = { leaderboard: [], numPlayers: 0, numBots: 0 };
     heatMap: Uint8Array;
 
     private remote: Comlink.Remote<WorkerAPI>;

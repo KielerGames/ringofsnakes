@@ -1,8 +1,11 @@
 export type GameStatisticsDTO = {
-    list: LeaderboardEntry[];
+    leaderboard: LeaderboardEntry[];
+    numPlayers: number;
+    numBots: number;
 };
 
 export type LeaderboardEntry = {
+    id: number;
     name: string;
     score: number;
 };

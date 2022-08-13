@@ -1,0 +1,50 @@
+#game-stats {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    padding: 5px;
+    min-width: 100px;
+
+    background-color: rgb(64,64,64);
+    color: white;
+    font-size: 12px;
+
+    animation: game-stats-in 0.33s ease-out;
+
+    @keyframes game-stats-in {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0px);
+        }
+    }
+}
+
+#leaderboard {
+    border-bottom: 1px solid rgb(128,128,128);
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+
+    .entry {
+        display: flex;
+        flex-direction: row;
+        padding: 3px;
+        font-weight: bold;
+        font-size: 12px;
+        font-family: monospace;
+    }
+}
+
+#player-numbers {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    font-size: 0.9em;
+
+    > div:nth-child(even) {
+        text-align: right;
+    }
+}

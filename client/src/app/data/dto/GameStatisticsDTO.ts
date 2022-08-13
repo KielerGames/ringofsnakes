@@ -1,4 +1,4 @@
-export type LeaderboardDTO = {
+export type GameStatisticsDTO = {
     list: LeaderboardEntry[];
 };
 

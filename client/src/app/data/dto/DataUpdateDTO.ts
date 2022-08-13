@@ -1,5 +1,5 @@
 import { FoodChunkDTO } from "./FoodChunkDTO";
-import { LeaderboardDTO } from "./Leaderboard";
+import { GameStatisticsDTO } from "./GameStatisticsDTO";
 import { SnakeChunkDTO } from "./SnakeChunkDTO";
 import { SnakeDTO } from "./SnakeDTO";
 
@@ -12,7 +12,7 @@ export type DataUpdateDTO = {
     snakeDeaths: SnakeId[];
     foodChunks: FoodChunkDTO[];
 
-    leaderboard?: LeaderboardDTO;
+    leaderboard?: GameStatisticsDTO;
     heatMap?: Uint8Array;
 };
 

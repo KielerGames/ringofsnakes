@@ -1,8 +1,8 @@
 import { Component } from "preact";
-import { LeaderboardDTO, LeaderboardEntry } from "../../data/dto/Leaderboard";
+import { GameStatisticsDTO, LeaderboardEntry } from "../../data/dto/GameStatisticsDTO";
 
 type LeaderboardProps = {
-    data: Readonly<LeaderboardDTO>;
+    data: Readonly<GameStatisticsDTO>;
 };
 
 export default class Leaderboard extends Component<LeaderboardProps> {

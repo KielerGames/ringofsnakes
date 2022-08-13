@@ -1,6 +1,6 @@
 [![Java CI with Maven](https://github.com/KielerGames/ringofsnakes/actions/workflows/server.yml/badge.svg)](https://github.com/KielerGames/ringofsnakes/actions/workflows/server.yml)
 
-Requires Java 15 or newer.
+Requires Java 17 or newer.
 
 ## Run
 
@@ -9,6 +9,7 @@ To launch the server with the debug view run `mvn javafx:run`. If you do not nee
 ## Build
 
 You can build the jar file yourself by running `mvn package`.
+You can also download the latest version from GitHub by clicking on the latest run of `Java CI with Maven / build` and click summary and download the `server-uber-jar` artifact (a zip file containing the jar file).
 
 ## IntelliJ Setup
 Make sure

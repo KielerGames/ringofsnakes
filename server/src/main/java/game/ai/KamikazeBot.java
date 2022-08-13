@@ -20,7 +20,7 @@ class KamikazeBot extends Bot {
         minKamikazeLength = 1.5 * config.snakes.minLength;
         final double ticks = 8.0 + 4.0 * random.nextDouble();
         lookAheadDistance = ticks * config.snakes.speed;
-        targetSelectionRadius = (0.9 + 0.3 * random.nextDouble()) * config.chunks.size;
+        targetSelectionRadius = 28.0;
     }
 
     @Override
@@ -77,7 +77,7 @@ class KamikazeBot extends Bot {
 
     private Snake findNextTarget() {
         final var headPosition = getSnake().getHeadPosition();
-        final var otherSnakes = getSnakesInNeighborhood();
+        final var otherSnakes = getSnakesInVicinity(targetSelectionRadius);
 
         Snake closestSnake = null;
         var closestDistance2 = Double.POSITIVE_INFINITY;
@@ -89,10 +89,6 @@ class KamikazeBot extends Bot {
 
             final var pos = otherSnake.getHeadPosition();
             final var d2 = Vector.distance2(headPosition, pos);
-
-            if (d2 > targetSelectionRadius * targetSelectionRadius) {
-                continue;
-            }
 
             if (d2 < closestDistance2) {
                 closestSnake = otherSnake;

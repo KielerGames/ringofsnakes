@@ -39,7 +39,7 @@ class ScaredBot extends Bot {
 
         final var snake = this.getSnake();
         final var headPosition = snake.getHeadPosition();
-        final var otherSnakes = getSnakesInNeighborhood();
+        final var otherSnakes = getSnakesInVicinity(30.0);
 
         if (otherSnakes.isEmpty()) {
             if (random.nextDouble() < 0.25) {

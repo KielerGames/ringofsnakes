@@ -38,15 +38,26 @@ public abstract class Bot {
 
     /**
      * Get snakes in the current {@link game.world.WorldChunk} and its neighbors,
-     * excluding the snake of this bot.
+     * excluding the snake of this bot and all snakes that are out of the given
+     * search radius.
      *
+     * @param radius search radius, should not be too big as this method
+     *               will only consider neighboring chunks
      * @return A modifiable set of snakes
      */
-    protected Set<Snake> getSnakesInNeighborhood() {
+    protected Set<Snake> getSnakesInVicinity(double radius) {
+        assert radius > 0.0;
+        assert radius < 2.0 * world.getConfig().chunks.size;
+
+        final var bound = radius * radius;
+        final var head = snake.getHeadPosition();
         final var chunk = world.chunks.findChunk(snake.getHeadPosition());
+
         final var otherSnakes = new HashSet<>(chunk.getSnakes());
         chunk.neighbors.forEach(c -> otherSnakes.addAll(c.getSnakes()));
         otherSnakes.remove(snake);
+        otherSnakes.removeIf(s -> Vector.distance2(head, s.getHeadPosition()) <= bound);
+
         return otherSnakes;
     }
 

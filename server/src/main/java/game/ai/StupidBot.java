@@ -12,7 +12,7 @@ class StupidBot extends Bot {
     private int counter = 1;
     private int changeDirectionAtCounter = 120;
     private int stepsTakenTowardsPositions = 0; //a "step" is a call of act()
-    private double alpha = -Math.PI;
+    private double alpha = Direction.LEFT;
     private double turningRate = Math.PI / 120;
 
     StupidBot(World world) {
@@ -42,7 +42,7 @@ class StupidBot extends Bot {
 
         if (counter > changeDirectionAtCounter) {
             turnClockwise = random.nextBoolean();
-            turningRate = Math.PI / 60 * random.nextFloat();
+            turningRate = Math.PI / 60 * random.nextDouble();
             changeDirectionAtCounter = 60 + random.nextInt(120);
             counter = 0;
         }

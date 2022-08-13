@@ -4,6 +4,8 @@ import game.world.World;
 import math.Vector;
 import util.Direction;
 
+import static util.Direction.TAU;
+
 class ScaredBot extends Bot {
 
     private int counter = random.nextInt(3) - 10;
@@ -52,7 +54,7 @@ class ScaredBot extends Bot {
         otherSnakes.forEach(otherSnake -> {
             final var pos = otherSnake.getHeadPosition();
             final var d2 = Vector.distance2(headPosition, pos);
-            final var escapeDir = Math.atan2(headPosition.y - pos.y, headPosition.x - pos.x);
+            final var escapeDir = Direction.getFromTo(pos, headPosition);
             final int bucket = (int) Math.floor(numBuckets * (escapeDir + Math.PI) / TAU);
             buckets[bucket] += otherSnake.getWidth() / d2;
         });

@@ -4,6 +4,7 @@ import game.snake.BoundarySnake;
 import game.snake.Snake;
 import game.world.World;
 import math.Vector;
+import util.Direction;
 
 class KamikazeBot extends Bot {
 
@@ -63,7 +64,7 @@ class KamikazeBot extends Bot {
         pos.addDirection(target.getHeadDirection(), lookAheadDistance);
 
         snake.setTargetDirection(
-                Math.atan2(pos.y - headPosition.y, pos.x - headPosition.x)
+                Direction.getFromTo(headPosition, pos)
         );
 
         if (!snake.isFast() && random.nextBoolean()) {

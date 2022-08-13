@@ -12,9 +12,10 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import static util.Direction.TAU;
+
 public abstract class Bot {
     protected final static Random random = new Random();
-    protected static final double TAU = Math.PI * 2.0;
     @Getter private final Snake snake;
     protected World world;
 

@@ -5,6 +5,8 @@ import math.Vector;
 import java.util.Random;
 
 public final class Direction {
+    public static final double TAU = Math.PI * 2.0;
+
     public static final double RIGHT = 0.0;
     public static final double UP = 0.5 * Math.PI;
     public static final double LEFT = Math.PI;
@@ -16,7 +18,7 @@ public final class Direction {
         }
 
         while (Math.abs(direction) > Math.PI) {
-            direction -= Math.signum(direction) * 2.0 * Math.PI;
+            direction -= Math.signum(direction) * TAU;
         }
 
         assert Math.abs(direction) <= Math.PI;
@@ -29,8 +31,8 @@ public final class Direction {
     }
 
     public static double getFromTo(Vector from, Vector to) {
-        Vector delta = new Vector(to.x - from.x, to.y - from.y);
-        delta.normalize();
-        return delta.getAlpha();
+        final var x = to.x - from.x;
+        final var y = to.y - from.y;
+        return Math.atan2(y, x);
     }
 }

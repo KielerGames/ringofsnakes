@@ -162,8 +162,8 @@ public class Game {
 
         // update leaderboard every second
         executor.scheduleAtFixedRate(() -> {
-            final var topTenJson = gson.toJson(new GameStatistics(this));
-            clients.forEach((__, client) -> client.send(topTenJson));
+            final var statsJson = gson.toJson(new GameStatistics(this));
+            clients.forEach((__, client) -> client.send(statsJson));
         }, 1, 2, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(

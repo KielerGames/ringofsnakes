@@ -18,7 +18,7 @@ class KamikazeBot extends Bot {
         super(world);
         final var config = world.getConfig();
         minKamikazeLength = 1.5 * config.snakes.minLength;
-        final double ticks = 8.0 + 4.0 * random.nextDouble();
+        final double ticks = 9.0 + 3.5 * random.nextDouble();
         lookAheadDistance = ticks * config.snakes.speed;
         targetSelectionRadius = 28.0;
     }

@@ -6,6 +6,7 @@ import game.snake.SnakeNameGenerator;
 import game.world.World;
 import lombok.Getter;
 import math.Vector;
+import util.Direction;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -50,5 +51,10 @@ public abstract class Bot {
     protected void moveInRandomDirection() {
         // TODO: avoid BoundarySnake
         snake.setTargetDirection(random.nextDouble() * TAU - Math.PI);
+    }
+
+    protected void moveTowardsPosition(Vector targetPosition) {
+        final var targetDirection = Direction.getFromTo(snake.getHeadPosition(), targetPosition);
+        snake.setTargetDirection(targetDirection);
     }
 }

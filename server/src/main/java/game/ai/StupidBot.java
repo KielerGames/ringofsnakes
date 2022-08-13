@@ -1,6 +1,5 @@
 package game.ai;
 
-import game.snake.Snake;
 import game.world.World;
 import math.Vector;
 import util.Direction;
@@ -26,7 +25,7 @@ class StupidBot extends Bot {
 
         if (!world.box.isWithinSubBox(snake.getHeadPosition(), keepThisDistanceToMapEdge)
                 && !movingToPosition) {
-            moveTowardsPosition(snake, world.center);
+            moveTowardsPosition(world.center);
             stepsTakenTowardsPositions = 0;
         }
 
@@ -51,9 +50,9 @@ class StupidBot extends Bot {
         counter++;
     }
 
-    private void moveTowardsPosition(Snake snake, Vector targetPosition) {
+    @Override
+    protected void moveTowardsPosition(Vector targetPosition) {
+        super.moveTowardsPosition(targetPosition);
         this.movingToPosition = true;
-        final var targetDirection = Direction.getFromTo(snake.getHeadPosition(), targetPosition);
-        snake.setTargetDirection(targetDirection);
     }
 }

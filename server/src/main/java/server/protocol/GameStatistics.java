@@ -21,8 +21,8 @@ public class GameStatistics extends ServerToClientJSONMessage {
                 .map(LeaderboardEntry::new)
                 .toList();
 
-        numPlayers = (int) game.streamClients().filter(Player.class::isInstance).count();
         numBots = game.getNumberOfBots();
+        numPlayers = game.snakes.size() - numBots;
     }
 
     private static class LeaderboardEntry {

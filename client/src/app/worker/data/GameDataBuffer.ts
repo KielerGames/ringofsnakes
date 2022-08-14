@@ -71,7 +71,7 @@ export default class GameDataBuffer {
             this.updateQueue.push(update);
         }
 
-        if (!__TEST__ &&  this.duration > 0.5) {
+        if (!__TEST__ && this.duration > 0.5) {
             console.warn(`Update congestion! Current delay: ${this.duration.toFixed(2)}s`);
         }
 
@@ -89,11 +89,15 @@ export default class GameDataBuffer {
                 this.triggerUpdateEvent();
                 break;
             }
-            case "Leaderboard": {
+            case "GameStatistics": {
                 this.addInformation({
-                    leaderboard: { list: update.list }
+                    /*eslint-disable */
+                    // This code copies the update object but omits the tag key.
+                    // Eslint does not like this because tag is unused.
+                    leaderboard: (({ tag, ...rest }) => rest)(update)
+                    /*eslint-enable */
                 });
-                update.list.forEach(({ id, name }) => this.snakeNames.set(id, name));
+                update.leaderboard.forEach(({ id, name }) => this.snakeNames.set(id, name));
                 this.triggerUpdateEvent();
                 break;
             }

@@ -5,7 +5,7 @@ import { GameConfig } from "./config/GameConfig";
 import Camera from "./camera/Camera";
 import Snake from "./snake/Snake";
 import SnakeChunk from "./snake/SnakeChunk";
-import { LeaderboardDTO } from "./dto/Leaderboard";
+import { GameStatisticsDTO } from "./dto/GameStatisticsDTO";
 import Vector from "../math/Vector";
 import Player from "./Player";
 import FoodChunk from "./world/FoodChunk";
@@ -23,7 +23,7 @@ export default class Game {
     readonly snakes: ManagedMap<SnakeDTO, SnakeId, Snake, number>;
     readonly snakeChunks: ManagedMap<SnakeChunkDTO, SnakeChunkId, SnakeChunk>;
     readonly foodChunks: ManagedMap<FoodChunkDTO, FoodChunkId, FoodChunk>;
-    leaderboard: LeaderboardDTO = { list: [] };
+    leaderboard: GameStatisticsDTO = { leaderboard: [], numPlayers: 0, numBots: 0 };
     heatMap: Uint8Array;
 
     private remote: Comlink.Remote<WorkerAPI>;

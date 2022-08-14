@@ -13,7 +13,7 @@ import game.world.World;
 import game.world.WorldChunk;
 import server.Client;
 import server.Player;
-import server.protocol.Leaderboard;
+import server.protocol.GameStatistics;
 import server.protocol.SnakeDeathInfo;
 import server.protocol.SpawnInfo;
 import util.ExceptionalExecutorService;
@@ -162,8 +162,8 @@ public class Game {
 
         // update leaderboard every second
         executor.scheduleAtFixedRate(() -> {
-            final var topTenJson = gson.toJson(new Leaderboard(this));
-            clients.forEach((__, client) -> client.send(topTenJson));
+            final var statsJson = gson.toJson(new GameStatistics(this));
+            clients.forEach((__, client) -> client.send(statsJson));
         }, 1, 2, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(
@@ -254,5 +254,9 @@ public class Game {
 
     public Stream<Client> streamClients() {
         return clients.values().stream();
+    }
+
+    public int getNumberOfBots() {
+        return this.bots.size();
     }
 }

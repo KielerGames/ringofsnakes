@@ -1,4 +1,5 @@
 import { GameConfig } from "../../data/config/GameConfig";
+import { GameStatisticsDTO } from "../../data/dto/GameStatisticsDTO";
 export type ClientToServerJSONMessage = never;
 export type ServerToClientJSONMessage =
     | SpawnInfo
@@ -19,10 +20,11 @@ export type SnakeDeathInfo = Readonly<{
     snakeId: number;
 }>;
 
-export type LeaderboardData = Readonly<{
-    tag: "Leaderboard";
-    list: LeaderboardSnake[];
-}>;
+export type LeaderboardData = Readonly<
+    {
+        tag: "GameStatistics";
+    } & GameStatisticsDTO
+>;
 
 export type LeaderboardSnake = Readonly<{
     name: string;

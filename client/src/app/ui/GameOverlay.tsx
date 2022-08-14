@@ -1,7 +1,7 @@
 import { Component } from "preact";
 import Game from "../data/Game";
 import FPSStats from "./components/debug/FPSStats";
-import Leaderboard from "./components/Leaderboard";
+import GameStatistics from "./components/GameStatistics";
 import SnakeInfoUI from "./components/SnakeInfoUI";
 
 type Props = {
@@ -26,7 +26,7 @@ export default class GameOverlay extends Component<Props> {
 
         return (
             <>
-                <Leaderboard data={game.leaderboard} />
+                <GameStatistics data={game.leaderboard} />
                 <FPSStats />
                 <SnakeInfoUI snake={game.targetSnake} />
             </>

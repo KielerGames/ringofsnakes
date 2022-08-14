@@ -4,12 +4,17 @@ import game.world.World;
 import math.Vector;
 import util.Direction;
 
+import static util.Direction.TAU;
+
 class ScaredBot extends Bot {
 
+    private static final int BUCKETS = 16;
+    private final double maxDistanceFromCenter;
     private int counter = random.nextInt(3) - 10;
 
     ScaredBot(World world) {
         super(world);
+        maxDistanceFromCenter = 0.4 * world.box.getWidth();
     }
 
     private static int findIndexOfMaxValue(double[] values) {
@@ -37,7 +42,7 @@ class ScaredBot extends Bot {
 
         final var snake = this.getSnake();
         final var headPosition = snake.getHeadPosition();
-        final var otherSnakes = getSnakesInNeighborhood();
+        final var otherSnakes = getSnakesInVicinity(30.0);
 
         if (otherSnakes.isEmpty()) {
             if (random.nextDouble() < 0.25) {
@@ -47,15 +52,22 @@ class ScaredBot extends Bot {
         }
 
         // each bucket represents an escape direction
-        final int numBuckets = 16;
-        final var buckets = new double[numBuckets];
+        final var buckets = new double[BUCKETS];
         otherSnakes.forEach(otherSnake -> {
             final var pos = otherSnake.getHeadPosition();
             final var d2 = Vector.distance2(headPosition, pos);
-            final var escapeDir = Math.atan2(headPosition.y - pos.y, headPosition.x - pos.x);
-            final int bucket = (int) Math.floor(numBuckets * (escapeDir + Math.PI) / TAU);
+            final var escapeDir = Direction.getFromTo(pos, headPosition);
+            final int bucket = getBucketIndex(escapeDir);
             buckets[bucket] += otherSnake.getWidth() / d2;
         });
+
+        // move towards center (when close to the edge)
+        {
+            final var centerDir = Direction.getFromTo(headPosition, world.center);
+            final var centerDist = Vector.distance(headPosition, world.center);
+            final int bucket = getBucketIndex(centerDir);
+            buckets[bucket] += 0.05 * Math.max(0.0, centerDist - maxDistanceFromCenter);
+        }
 
         // TODO: consider SnakeChunks in vicinity
 
@@ -67,10 +79,14 @@ class ScaredBot extends Bot {
             return;
         }
 
-        final var bucketDirection = maxIndex * (TAU / numBuckets) - Math.PI;
+        final var bucketDirection = maxIndex * (TAU / BUCKETS) - Math.PI;
         // this offset should make the movement seem more natural
-        final var offset = (random.nextDouble() - 0.5) * (TAU / numBuckets);
+        final var offset = (random.nextDouble() - 0.5) * (TAU / BUCKETS);
 
         snake.setTargetDirection(Direction.normalize(bucketDirection + offset));
+    }
+
+    private int getBucketIndex(double direction) {
+        return (int) Math.floor(BUCKETS * (direction + Math.PI) / TAU);
     }
 }

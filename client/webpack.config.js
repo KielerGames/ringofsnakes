@@ -6,6 +6,7 @@ const path = require("node:path");
 const fs = require("node:fs");
 const crypto = require("node:crypto");
 const pkg = require("./package.json");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const SHADER_HASH = (() => {
     const fileBuffer = fs.readFileSync(path.join("public", "shaders.json"));
@@ -49,6 +50,12 @@ module.exports = (env, argv) => {
             ]
         },
         plugins: [
+            new HtmlWebpackPlugin({
+                chunks: ["main"], // exclude worker script
+                title: "Ring of Snakes",
+                minify: false,
+                hash: true // important for caching
+            }),
             new webpack.DefinePlugin({
                 __VERSION__: JSON.stringify(pkg.version + (mode === "development" ? "-dev" : "")),
                 __SHADER_HASH__: JSON.stringify(SHADER_HASH),

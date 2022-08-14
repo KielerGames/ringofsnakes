@@ -4,7 +4,13 @@ const path = require("node:path");
 /* eslint-enable */
 
 const SHADER_DIR = path.join("src", "shader");
-const OUTPUT_FILE = path.join("public", "shaders.json");
+const OUTPUT_FOLDER = "public";
+const OUTPUT_FILE = path.join(OUTPUT_FOLDER, "shaders.json");
+
+if (!fs.existsSync(OUTPUT_FOLDER)) {
+    console.info(`Creating folder: ${OUTPUT_FOLDER}`);
+    fs.mkdirSync(OUTPUT_FOLDER);
+}
 
 console.log("Loading shaders...");
 

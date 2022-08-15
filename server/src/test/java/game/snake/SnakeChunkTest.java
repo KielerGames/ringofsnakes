@@ -4,7 +4,7 @@ import game.GameConfig;
 import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Test;
-import util.Direction;
+import math.Direction;
 
 import java.util.List;
 import java.util.Random;

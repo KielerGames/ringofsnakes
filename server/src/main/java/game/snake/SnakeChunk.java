@@ -9,7 +9,7 @@ import math.Vector;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import static util.MathFunctions.clamp;
+import static math.MathFunctions.clamp;
 
 public abstract class SnakeChunk implements Collidable {
 

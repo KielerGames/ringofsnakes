@@ -2,7 +2,7 @@ package game.snake;
 
 import game.GameConfig;
 
-import static util.MathFunctions.clamp;
+import static math.MathFunctions.clamp;
 
 class ChainCodeCoder {
     static final int DIRECTION_MASK = 15;

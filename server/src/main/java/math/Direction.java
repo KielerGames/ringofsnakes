@@ -1,4 +1,4 @@
-package util;
+package math;
 
 import math.Vector;
 
@@ -34,5 +34,22 @@ public final class Direction {
         final var x = to.x - from.x;
         final var y = to.y - from.y;
         return Math.atan2(y, x);
+    }
+
+    /**
+     * The dot product of {@code new Vector(alpha)} and {@code new Vector(beta)}.
+     *
+     * @param alpha Direction of the first vector.
+     * @param beta  Direction of the second vector.
+     * @return {@code Vector.dot(new Vector(alpha), new Vector(beta))}
+     */
+    public static double dot(double alpha, double beta) {
+        assert Double.isFinite(alpha);
+        assert Double.isFinite(beta);
+
+        // dot(vec(alpha),vec(beta))
+        // = cos(alpha)*cos(beta) + sin(alpha)*sin(beta)
+        // = cos(alpha - beta)  [addition theorem]
+        return Math.cos(alpha - beta);
     }
 }

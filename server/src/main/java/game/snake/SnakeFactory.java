@@ -2,7 +2,7 @@ package game.snake;
 
 import game.world.World;
 import math.Vector;
-import util.Direction;
+import math.Direction;
 
 import java.util.Random;
 

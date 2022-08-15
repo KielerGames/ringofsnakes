@@ -6,13 +6,13 @@ import game.snake.SnakeNameGenerator;
 import game.world.World;
 import lombok.Getter;
 import math.Vector;
-import util.Direction;
+import math.Direction;
 
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import static util.Direction.TAU;
+import static math.Direction.TAU;
 
 public abstract class Bot {
     protected final static Random random = new Random();

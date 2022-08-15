@@ -2,9 +2,9 @@ package game.ai;
 
 import game.world.World;
 import math.Vector;
-import util.Direction;
+import math.Direction;
 
-import static util.Direction.TAU;
+import static math.Direction.TAU;
 
 class ScaredBot extends Bot {
 

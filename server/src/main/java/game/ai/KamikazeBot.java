@@ -3,8 +3,8 @@ package game.ai;
 import game.snake.BoundarySnake;
 import game.snake.Snake;
 import game.world.World;
+import math.Direction;
 import math.Vector;
-import util.Direction;
 
 class KamikazeBot extends Bot {
 
@@ -97,5 +97,18 @@ class KamikazeBot extends Bot {
         }
 
         return closestSnake;
+    }
+
+    private void abort() {
+        final var snake = getSnake();
+        if (target != null) {
+            // move away from current target
+            final var away = Direction.getFromTo(target.getHeadPosition(), snake.getHeadPosition());
+            snake.setTargetDirection(away);
+            // wait a few ticks until selecting a new target
+            counter = -50;
+        }
+        target = null;
+        snake.setUserFast(false);
     }
 }

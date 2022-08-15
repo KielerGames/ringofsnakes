@@ -8,7 +8,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import math.Vector;
 import util.BitWithShortHistory;
-import util.Direction;
+import math.Direction;
 
 import java.nio.ByteBuffer;
 import java.util.Comparator;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import static util.MathFunctions.sigmoid;
+import static math.MathFunctions.sigmoid;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 26;

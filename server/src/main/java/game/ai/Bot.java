@@ -5,8 +5,8 @@ import game.snake.SnakeFactory;
 import game.snake.SnakeNameGenerator;
 import game.world.World;
 import lombok.Getter;
-import math.Vector;
 import math.Direction;
+import math.Vector;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -17,8 +17,8 @@ import static math.Direction.TAU;
 public abstract class Bot {
     protected final static Random random = new Random();
     protected static final double keepThisDistanceToMapEdge = 40;
+    protected final World world;
     @Getter private final Snake snake;
-    protected World world;
 
     public Bot(World world, Vector spawnPosition) {
         final var name = SnakeNameGenerator.generateBotName();

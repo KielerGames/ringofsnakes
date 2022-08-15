@@ -30,8 +30,8 @@ public class ChainCodeEncodingTest {
     void testSpecificEncoding(int d, boolean f, int s) {
         byte b = coder.encode(d, f, s);
         var data = coder.decode(b);
-        assertEquals(d, data.direction);
-        assertEquals(f, data.fast);
-        assertEquals(s, data.steps);
+        assertEquals(d, data.direction());
+        assertEquals(f, data.fast());
+        assertEquals(s, data.steps());
     }
 }

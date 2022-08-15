@@ -7,7 +7,7 @@ import server.protocol.GameUpdate;
 import javax.websocket.Session;
 
 public class Player extends Client {
-    public Snake snake;
+    public final Snake snake;
 
     public Player(Snake snake, Session session) {
         super(session);

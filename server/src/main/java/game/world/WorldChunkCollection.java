@@ -64,7 +64,7 @@ public abstract class WorldChunkCollection {
     /**
      * Returns a set of {@link WorldChunk} which lie within a radius around a position
      * @param position a 2D Vector, specifying the center
-     * @param radius
+     * @param radius radius
      * @return a set of {@link WorldChunk}
      */
     public Set<WorldChunk> findIntersectingChunks(Vector position, double radius) {

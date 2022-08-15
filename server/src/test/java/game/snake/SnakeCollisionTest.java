@@ -90,13 +90,6 @@ public class SnakeCollisionTest {
         }
     }
 
-    private static class CollisionInfo {
-        public final Snake snake;
-        public final Collidable object;
-
-        public CollisionInfo(Snake snake, Collidable object) {
-            this.snake = snake;
-            this.object = object;
-        }
+    private record CollisionInfo(Snake snake, Collidable object) {
     }
 }

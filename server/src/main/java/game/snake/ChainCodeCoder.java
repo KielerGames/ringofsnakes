@@ -87,26 +87,17 @@ class ChainCodeCoder {
         return new DecodedData(direction, fast, steps);
     }
 
-    static class DecodedData {
-        public final int direction;
-        public final boolean fast;
-        public final int steps;
-
-        DecodedData(int direction, boolean fast, int steps) {
-            this.direction = direction;
-            this.fast = fast;
-            this.steps = steps;
-        }
+    record DecodedData(int direction, boolean fast, int steps) {
 
         @Override
-        public String toString() {
-            String s = "";
-            s += "fast: " + this.fast + "\n";
-            s += "steps: " + this.steps + "\n";
-            s += "direction: " + this.direction + "\n";
-            return s;
+            public String toString() {
+                String s = "";
+                s += "fast: " + this.fast + "\n";
+                s += "steps: " + this.steps + "\n";
+                s += "direction: " + this.direction + "\n";
+                return s;
+            }
         }
-    }
 }
 
 

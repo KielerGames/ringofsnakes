@@ -33,9 +33,7 @@ jobs:
         working-directory: client
         
       - name: Build client
-        run: |
-          npm run pack:shaders
-          npm run build:production
+        run: npm run build:production
         working-directory: client
         
       - name: Run tests

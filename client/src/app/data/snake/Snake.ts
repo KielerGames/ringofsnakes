@@ -103,6 +103,9 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         this.chunks.set(chunk.id, chunk);
         if (chunk.id === this.headChunkId) {
             if (this.headChunk !== null) {
+                // The mesh data of the head chunk will be changed
+                // so that it is always connected to the (predicted)
+                // snake head. These changes have to be reset.
                 this.headChunk.resetMesh();
             }
             this.headChunk = chunk;
@@ -251,30 +254,41 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         this.predictedDirection = normalizeAngle(p1 + 0.15 * getMinDifference(p1, p2));
     }
 
+    /**
+     * @param ticks server ticks since the last chun offset update
+     * @param fastHistory snake speed for the last 8 ticks
+     */
     private updateChunkOffsets(ticks: number, fastHistory: boolean[]) {
         if (ticks === 0) {
+            // No server time has passed since the last update.
             return;
-        }
-
-        if (__DEBUG__ && fastHistory.length !== 8) {
-            console.warn("unexpected fast history array", fastHistory);
         }
 
         const fastSpeed = this.gameConfig.snakes.fastSpeed;
         const slowSpeed = this.gameConfig.snakes.speed;
 
-        let chunkOffset = 0;
+        // The offset of the snake chunks changes based on the distance the
+        // snake has travelled since the last update.
+        let distance = 0.0;
+        const N = Math.min(ticks, fastHistory.length);
+        for (let i = 0; i < N; i++) {
+            distance += fastHistory[i] ? fastSpeed : slowSpeed;
+        }
 
-        for (let i = 0; i < ticks; i++) {
-            chunkOffset += fastHistory[i] ? fastSpeed : slowSpeed;
+        // We have no more speed data at this point so for all previous ticks
+        // we assume slow speed. In practice this should never happen as the
+        // server update rate should be close to the server tick rate.
+        for (let i = N; i < ticks; i++) {
+            distance += slowSpeed;
         }
 
         for (const chunk of this.chunks.values()) {
             if (chunk.id === this.headChunkId) {
+                // After an update the head chunk offset is always 0.
                 continue;
             }
 
-            chunk.updateOffset(chunkOffset);
+            chunk.updateOffset(distance);
         }
     }
 }

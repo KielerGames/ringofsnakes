@@ -13,6 +13,7 @@ public class DirectionTest {
 
         assertEquals(1.0, Direction.dot(Direction.LEFT, Direction.LEFT), 1e-8);
         assertEquals(0.0, Direction.dot(Direction.UP, Direction.RIGHT), 1e-8);
+        assertEquals(-1.0, Direction.dot(Direction.LEFT, Direction.RIGHT), 1e-8);
 
         for (int i = 0; i < 50; i++) {
             var alpha = Direction.getRandom(random);

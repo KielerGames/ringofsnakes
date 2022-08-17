@@ -10,9 +10,9 @@ public class BotFactory {
     public static Bot createBot(World world) {
         final var p = random.nextDouble();
 
-        if (p < 0.2) {
+        if (p < 0.25) {
             return new ScaredBot(world);
-        } else if (p < 0.6) {
+        } else if (p < 0.65) {
             return new KamikazeBot(world);
         }
 

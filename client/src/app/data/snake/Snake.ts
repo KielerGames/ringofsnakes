@@ -18,7 +18,9 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     target: boolean = false;
     headChunk: SnakeChunk | null = null;
 
-    private readonly chunks = new Map<number, SnakeChunk>();
+    private readonly gameConfig: GameConfig;
+    private readonly chunks: SnakeChunk[] = [];
+    private readonly chunkIds = new Set<SnakeChunk["id"]>();
     private lastUpdateTime: number;
     private lastPredictionTime: number;
     private headChunkId: number;
@@ -27,7 +29,6 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     private _width: number;
     private _name?: string;
     private _paused: boolean = false;
-    private gameConfig: GameConfig;
 
     // head position & interpolation
     private lastKnownHeadPosition: Vector;
@@ -83,7 +84,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         this.predictDirection();
 
         // predict body
-        for (const snakeChunk of this.chunks.values()) {
+        for (const snakeChunk of this.chunks) {
             snakeChunk.predict();
         }
 
@@ -97,15 +98,18 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     }
 
     registerSnakeChunk(chunk: SnakeChunk): void {
-        if (__DEBUG__ && this.chunks.has(chunk.id)) {
-            console.warn(`Snake ${this.id} already has a registered chunk with id ${chunk.id}.`);
+        if (this.chunkIds.has(chunk.id)) {
+            return;
         }
-        this.chunks.set(chunk.id, chunk);
+        // TODO: order should be the order of the chunks within the snake, not insertion order
+        this.chunks.push(chunk);
+        this.chunkIds.add(chunk.id);
+
         if (chunk.id === this.headChunkId) {
             if (this.headChunk !== null) {
-                // The mesh data of the head chunk will be changed
-                // so that it is always connected to the (predicted)
-                // snake head. These changes have to be reset.
+                // The mesh data of the head chunk will be changed so that
+                // it is always connected to the (predicted) snake head.
+                // These changes have to be reset when there is a new head chunk.
                 this.headChunk.resetMesh();
             }
             this.headChunk = chunk;
@@ -113,10 +117,14 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     }
 
     unregisterSnakeChunk(chunk: SnakeChunk): void {
-        if (__DEBUG__ && !this.chunks.has(chunk.id)) {
-            console.warn(`Snake ${this.id} has no chunk with id ${chunk.id}.`);
+        const i = this.chunks.findIndex((c) => c === chunk);
+        if (i < 0) {
+            if (__DEBUG__) {
+                console.warn(`Snake ${this.id} has no chunk with id ${chunk.id}.`);
+            }
+            return;
         }
-        this.chunks.delete(chunk.id);
+        this.chunks.splice(i, 1);
     }
 
     getSnakeChunksIterator(): IterableIterator<SnakeChunk> {
@@ -124,18 +132,18 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     }
 
     hasChunks(): boolean {
-        return this.chunks.size > 0;
+        return this.chunks.length > 0;
     }
 
     toString(): string {
-        return `Snake ${this.id} with ${this.chunks.size} chunks`;
+        return `Snake ${this.id} with ${this.chunks.length} chunks`;
     }
 
     /**
      * True if the snake or some of its body is visible.
      */
     isVisible(camera: Camera, epsilon: number = 0.0): boolean {
-        for (const chunk of this.chunks.values()) {
+        for (const chunk of this.chunks) {
             if (chunk.isVisible(camera, epsilon)) {
                 return true;
             }
@@ -282,7 +290,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             distance += slowSpeed;
         }
 
-        for (const chunk of this.chunks.values()) {
+        for (const chunk of this.chunks) {
             if (chunk.id === this.headChunkId) {
                 // After an update the head chunk offset is always 0.
                 continue;

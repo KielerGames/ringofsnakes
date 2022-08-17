@@ -21,7 +21,7 @@ class KamikazeBot extends Bot {
         final var config = world.getConfig();
         minKamikazeLength = 1.5 * config.snakes.minLength;
         minTargetLength = 2.0 * config.snakes.minLength;
-        final var ticks = 9.0 + 3.5 * random.nextDouble();
+        final var ticks = 10.0 + 4.0 * random.nextDouble();
         maxLookAheadDistance = ticks * config.snakes.speed;
         targetSelectionRadius = 20.0;
         oneSecondDistance = config.snakes.speed / config.tickDuration;
@@ -83,7 +83,7 @@ class KamikazeBot extends Bot {
 
         // when moving sideways at the target (abs(dp) = 0) move towards
         // a position in front of the target to have a chance to actually hit it
-        final var lookAheadDistance = (1.0 - Math.abs(dp)) * maxLookAheadDistance;
+        final var lookAheadDistance = Math.min(1.0 - Math.abs(dp), 0.2) * maxLookAheadDistance;
         targetPos.addDirection(target.getHeadDirection(), lookAheadDistance);
         snake.setTargetDirection(
                 Direction.getFromTo(headPosition, targetPos)

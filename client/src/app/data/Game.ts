@@ -135,7 +135,9 @@ export default class Game {
                 continue;
             }
 
-            for (const snakeChunk of snake.getSnakeChunksIterator()) {
+            // To avoid concurrent modification errors we have to copy the array here.
+            const snakeChunks = Array.from(snake.getSnakeChunksIterator());
+            for (const snakeChunk of snakeChunks) {
                 this.snakeChunks.remove(snakeChunk.id);
             }
 

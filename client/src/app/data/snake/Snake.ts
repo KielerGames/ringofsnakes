@@ -92,9 +92,8 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         }
 
         // fix head chunk mesh
-        const headChunk = this.headChunk;
-        if (headChunk) {
-            headChunk.connectMeshToHead();
+        if (this.headChunk) {
+            this.headChunk.connectMeshToHead();
         }
 
         this.lastPredictionTime = FrameTime.now();
@@ -152,15 +151,17 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     unregisterSnakeChunk(chunk: SnakeChunk): void {
         const i = this.chunks.findIndex((c) => c === chunk);
         if (i < 0) {
-            if (__DEBUG__) {
-                console.warn(`Snake ${this.id} has no chunk with id ${chunk.id}.`);
-            }
-            return;
+            throw new Error(`Cannot unregister: Snake ${this.id} has no chunk with id ${chunk.id}.`);
         }
         this.chunkIds.delete(chunk.id);
         this.chunks.splice(i, 1);
     }
 
+    /**
+     * Intended for iterating over SnakeChunks. You may not remove
+     * SnakeChunks during this iteration, that causes SnakeChunks 
+     * to be skipped.
+     */
     getSnakeChunksIterator(): IterableIterator<SnakeChunk> {
         return this.chunks.values();
     }

@@ -9,6 +9,9 @@ import Camera from "../camera/Camera";
 import Rectangle from "../../math/Rectangle";
 import { ManagedObject } from "../../util/ManagedMap";
 
+// eslint-disable-next-line no-bitwise
+const CHUNK_ID_MASK = (1 << 16) - 1;
+
 /**
  * Represents a snake on the main thread.
  */
@@ -101,11 +104,13 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         if (this.chunkIds.has(chunk.id)) {
             return;
         }
-        // TODO: order should be the order of the chunks within the snake, not insertion order
-        this.chunks.push(chunk);
+
         this.chunkIds.add(chunk.id);
 
         if (chunk.id === this.headChunkId) {
+            // As the latest chunk of the snake it should be the last element (rendering order)
+            this.chunks.push(chunk);
+
             if (this.headChunk !== null) {
                 // The mesh data of the head chunk will be changed so that
                 // it is always connected to the (predicted) snake head.
@@ -113,7 +118,35 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
                 this.headChunk.resetMesh();
             }
             this.headChunk = chunk;
+
+            return;
         }
+
+        if (this.chunks.length === 0) {
+            // If this is the only chunk, order does not matter.
+            this.chunks.push(chunk);
+            return;
+        }
+
+        // This is an older chunk that the client did not yet know of. We have to find
+        // the correct position for insertion into the array. The unique chunk id is
+        // the combination of snake id and chunk id, here we only need the latter.
+        // eslint-disable-next-line no-bitwise
+        const offset = CHUNK_ID_MASK - (this.headChunkId & CHUNK_ID_MASK);
+        const newChunkId = getComparableChunkId(chunk, offset);
+
+        // TODO: use Array.prototype.findLastIndex when its available in all modern browsers
+        let i = this.chunks.length - 1;
+        for (; 0 <= i; i--) {
+            const cId = getComparableChunkId(this.chunks[i], offset);
+            if (cId < newChunkId) {
+                // Insert the new chunk after this one.
+                break;
+            }
+        }
+
+        // If no chunk with a smaller id was found (i==-1) the new chunk will be inserted at index 0.
+        this.chunks.splice(i + 1, 0, chunk);
     }
 
     unregisterSnakeChunk(chunk: SnakeChunk): void {
@@ -124,6 +157,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             }
             return;
         }
+        this.chunkIds.delete(chunk.id);
         this.chunks.splice(i, 1);
     }
 
@@ -173,7 +207,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
      * Pause snake movement until the next server update.
      */
     pause() {
-        if (__DEBUG__ && !this._paused) {
+        if (__DEBUG__ && !__TEST__ && !this._paused) {
             console.info(`Snake ${this.id} has been paused.`);
         }
         this._paused = true;
@@ -299,4 +333,9 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             chunk.updateOffset(distance);
         }
     }
+}
+
+function getComparableChunkId(chunk: SnakeChunk, offset: number): number {
+    // eslint-disable-next-line no-bitwise
+    return ((chunk.id & CHUNK_ID_MASK) + offset) & CHUNK_ID_MASK;
 }

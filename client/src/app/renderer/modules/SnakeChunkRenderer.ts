@@ -4,15 +4,14 @@ import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import * as BoxRenderer from "./BoxRenderer";
 import * as TextRenderer from "./TextRenderer";
 import * as SkinLoader from "../SkinLoader";
-import assert from "../../util/assert";
 import Game from "../../data/Game";
 import Vector from "../../math/Vector";
 import { compileShader } from "../webgl/ShaderLoader";
 import SnakeChunk from "../../data/snake/SnakeChunk";
 
 const finalChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
+const growingChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
 let basicMaterialShader: WebGLShaderProgram;
-let growingChunkBuffer: WebGLBuffer;
 
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
@@ -23,9 +22,6 @@ let growingChunkBuffer: WebGLBuffer;
         "aNormalOffset",
         "aRelativePathOffset"
     ]);
-
-    growingChunkBuffer = gl.createBuffer()!;
-    assert(growingChunkBuffer !== null);
 })();
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
@@ -64,25 +60,28 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
             const data = chunk.gpuData;
 
             if (chunk.final) {
-                if (finalChunkBuffers.has(chunk)) {
-                    // Reuse previous data as it cannot change.
-                    gl.bindBuffer(gl.ARRAY_BUFFER, finalChunkBuffers.get(chunk)!);
-                } else {
-                    const newBuffer = gl.createBuffer();
-                    if (!newBuffer) {
-                        throw new Error("Failed to create buffer for SnakeChunk.");
-                    }
-                    finalChunkBuffers.set(chunk, newBuffer);
+                if (!finalChunkBuffers.has(chunk)) {
+                    // Create a new buffer or move existing buffer to finalChunkBuffers.
+                    const buffer = growingChunkBuffers.get(chunk) ?? createBuffer();
+                    finalChunkBuffers.set(chunk, buffer);
+                    growingChunkBuffers.delete(chunk);
 
                     // Transfer the data of final chunks only once (STATIC_DRAW).
-                    gl.bindBuffer(gl.ARRAY_BUFFER, newBuffer);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
                     gl.bufferData(gl.ARRAY_BUFFER, data.buffer, gl.STATIC_DRAW);
+                } else {
+                    // Data has already been transferred to the GPU.
+                    gl.bindBuffer(gl.ARRAY_BUFFER, finalChunkBuffers.get(chunk)!);
                 }
             } else {
+                // Create a new buffer or reuse existing.
+                const buffer = growingChunkBuffers.get(chunk) ?? createBuffer();
+                growingChunkBuffers.set(chunk, buffer);
+
                 // Growing snake chunks can change with every frame, therefore
-                // we have to copy the data to the GPU once per frame (DYNAMIC_DRAW).
-                gl.bindBuffer(gl.ARRAY_BUFFER, growingChunkBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, data.buffer, gl.DYNAMIC_DRAW);
+                // we have to copy the data to the GPU once per frame (STREAM_DRAW).
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+                gl.bufferData(gl.ARRAY_BUFFER, data.buffer, gl.STREAM_DRAW);
             }
 
             // Draw the snake chunk
@@ -113,4 +112,13 @@ function addDebugBox(game: Readonly<Game>, chunk: Readonly<SnakeChunk>) {
             debug: true
         });
     }
+}
+
+function createBuffer(): WebGLBuffer {
+    const gl = WebGLContextProvider.getContext();
+    const buffer = gl.createBuffer();
+    if (buffer === null) {
+        throw new Error("Failed to create WebGL buffer.");
+    }
+    return buffer;
 }

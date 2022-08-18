@@ -151,7 +151,9 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     unregisterSnakeChunk(chunk: SnakeChunk): void {
         const i = this.chunks.findIndex((c) => c === chunk);
         if (i < 0) {
-            throw new Error(`Cannot unregister: Snake ${this.id} has no chunk with id ${chunk.id}.`);
+            throw new Error(
+                `Cannot unregister: Snake ${this.id} has no chunk with id ${chunk.id}.`
+            );
         }
         this.chunkIds.delete(chunk.id);
         this.chunks.splice(i, 1);
@@ -159,7 +161,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
 
     /**
      * Intended for iterating over SnakeChunks. You may not remove
-     * SnakeChunks during this iteration, that causes SnakeChunks 
+     * SnakeChunks during this iteration, that causes SnakeChunks
      * to be skipped.
      */
     getSnakeChunksIterator(): IterableIterator<SnakeChunk> {

@@ -33,6 +33,9 @@ export default class Game {
     private stopped: boolean = false;
 
     private readonly events = {
+        /**
+         * Fired if a snake that the client knows dies.
+         */
         snakeDeath: new AppEvent<Snake>()
     };
 
@@ -132,8 +135,6 @@ export default class Game {
                 continue;
             }
 
-            this.events.snakeDeath.trigger(snake);
-
             for (const snakeChunk of snake.getSnakeChunksIterator()) {
                 this.snakeChunks.remove(snakeChunk.id);
             }
@@ -143,6 +144,8 @@ export default class Game {
             if (snakeId === this.targetSnakeId) {
                 this.targetSnakeId = undefined;
             }
+
+            this.events.snakeDeath.trigger(snake);
         }
 
         const updatedSnakeIds = new Set<SnakeId>(changes.snakes.map((snake) => snake.id));
@@ -218,4 +221,4 @@ type SnakeId = number;
 type SnakeChunkId = number;
 type FoodChunkId = number;
 
-type EventName = "snakeDeath";
+type EventName = keyof Game["events"];

@@ -37,15 +37,13 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
     shader.setUniform("uTransform", transform.data);
     shader.setUniform("uColorSampler", 0);
 
-    for (const chunk of game.snakeChunks.values()) {
-        if (!chunk.isVisible(camera)) {
+    for (const snake of game.snakes.values()) {
+        if (!snake.hasChunks()) {
             continue;
         }
-        const snake = chunk.snake;
-        const data = chunk.gpuData;
 
+        // Set the snake specific uniforms once.
         SkinLoader.setColor(shader, "uSkin", snake.skin);
-        shader.setUniform("uChunkPathOffset", chunk.offset);
         shader.setUniform("uSnakeLength", snake.length);
         shader.setUniform("uSnakeMaxWidth", snake.width);
         shader.setUniform(
@@ -53,27 +51,42 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
             Math.min(0.75, snake.length * 0.025) * snake.length
         );
 
-        // TODO tim-we: optimize final chunks
-        gl.bufferData(gl.ARRAY_BUFFER, data.buffer, gl.STREAM_DRAW);
-        shader.run(data.vertices, { mode: gl.TRIANGLE_STRIP });
+        // The SnakeChunks are sorted by chunk id, s.t. the latest
+        // chunk will be last. Therefore newer chunks will be rendered
+        // on top of older chunks.
+        for (const chunk of snake.getSnakeChunksIterator()) {
+            if (!chunk.isVisible(camera)) {
+                continue;
+            }
 
-        if (__DEBUG__) {
-            BoxRenderer.addBox(
-                chunk.boundingBox.createTransferable(0.5 * snake.width),
-                SkinLoader.getFloatColor(snake.skin, chunk.final ? 0.64 : 0.3)
-            );
+            const data = chunk.gpuData;
+            shader.setUniform("uChunkPathOffset", chunk.offset);
 
-            if (chunk !== snake.headChunk) {
-                const worldPosition = new Vector(chunk.boundingBox.minX, chunk.boundingBox.maxY);
-                const canvasPosition = game.camera.computeScreenCoordinates(
-                    worldPosition,
-                    gl.canvas
+            // TODO tim-we: optimize final chunks
+            gl.bufferData(gl.ARRAY_BUFFER, data.buffer, gl.STREAM_DRAW);
+            shader.run(data.vertices, { mode: gl.TRIANGLE_STRIP });
+
+            if (__DEBUG__) {
+                BoxRenderer.addBox(
+                    chunk.boundingBox.createTransferable(0.5 * snake.width),
+                    SkinLoader.getFloatColor(snake.skin, chunk.final ? 0.64 : 0.3)
                 );
-                TextRenderer.addText(chunk.debugInfo, `sc${chunk.id}`, {
-                    x: canvasPosition.x,
-                    y: canvasPosition.y,
-                    debug: true
-                });
+
+                if (chunk !== snake.headChunk) {
+                    const worldPosition = new Vector(
+                        chunk.boundingBox.minX,
+                        chunk.boundingBox.maxY
+                    );
+                    const canvasPosition = game.camera.computeScreenCoordinates(
+                        worldPosition,
+                        gl.canvas
+                    );
+                    TextRenderer.addText(chunk.debugInfo, "sc" + chunk.id, {
+                        x: canvasPosition.x,
+                        y: canvasPosition.y,
+                        debug: true
+                    });
+                }
             }
         }
     }

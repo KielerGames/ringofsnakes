@@ -8,9 +8,11 @@ import assert from "../../util/assert";
 import Game from "../../data/Game";
 import Vector from "../../math/Vector";
 import { compileShader } from "../webgl/ShaderLoader";
+import SnakeChunk from "../../data/snake/SnakeChunk";
 
+const finalChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
 let basicMaterialShader: WebGLShaderProgram;
-let buffer: WebGLBuffer;
+let growingChunkBuffer: WebGLBuffer;
 
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
@@ -22,8 +24,8 @@ let buffer: WebGLBuffer;
         "aRelativePathOffset"
     ]);
 
-    buffer = gl.createBuffer()!;
-    assert(buffer !== null);
+    growingChunkBuffer = gl.createBuffer()!;
+    assert(growingChunkBuffer !== null);
 })();
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
@@ -33,7 +35,6 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
     const shader = basicMaterialShader;
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
     shader.setUniform("uColorSampler", 0);
 
@@ -59,35 +60,57 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
                 continue;
             }
 
-            const data = chunk.gpuData;
             shader.setUniform("uChunkPathOffset", chunk.offset);
+            const data = chunk.gpuData;
 
-            // TODO tim-we: optimize final chunks
-            gl.bufferData(gl.ARRAY_BUFFER, data.buffer, gl.STREAM_DRAW);
+            if (chunk.final) {
+                if (finalChunkBuffers.has(chunk)) {
+                    // Reuse previous data as it cannot change.
+                    gl.bindBuffer(gl.ARRAY_BUFFER, finalChunkBuffers.get(chunk)!);
+                } else {
+                    const newBuffer = gl.createBuffer();
+                    if (!newBuffer) {
+                        throw new Error("Failed to create buffer for SnakeChunk.");
+                    }
+                    finalChunkBuffers.set(chunk, newBuffer);
+
+                    // Transfer the data of final chunks only once (STATIC_DRAW).
+                    gl.bindBuffer(gl.ARRAY_BUFFER, newBuffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, data.buffer, gl.STATIC_DRAW);
+                }
+            } else {
+                // Growing snake chunks can change with every frame, therefore
+                // we have to copy the data to the GPU once per frame (DYNAMIC_DRAW).
+                gl.bindBuffer(gl.ARRAY_BUFFER, growingChunkBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, data.buffer, gl.DYNAMIC_DRAW);
+            }
+
+            // Draw the snake chunk
             shader.run(data.vertices, { mode: gl.TRIANGLE_STRIP });
 
             if (__DEBUG__) {
-                BoxRenderer.addBox(
-                    chunk.boundingBox.createTransferable(0.5 * snake.width),
-                    SkinLoader.getFloatColor(snake.skin, chunk.final ? 0.64 : 0.3)
-                );
-
-                if (chunk !== snake.headChunk) {
-                    const worldPosition = new Vector(
-                        chunk.boundingBox.minX,
-                        chunk.boundingBox.maxY
-                    );
-                    const canvasPosition = game.camera.computeScreenCoordinates(
-                        worldPosition,
-                        gl.canvas
-                    );
-                    TextRenderer.addText(chunk.debugInfo, "sc" + chunk.id, {
-                        x: canvasPosition.x,
-                        y: canvasPosition.y,
-                        debug: true
-                    });
-                }
+                addDebugBox(game, chunk);
             }
         }
+    }
+}
+
+function addDebugBox(game: Readonly<Game>, chunk: Readonly<SnakeChunk>) {
+    const gl = WebGLContextProvider.getContext();
+    const snake = chunk.snake;
+
+    BoxRenderer.addBox(
+        chunk.boundingBox.createTransferable(0.5 * snake.width),
+        SkinLoader.getFloatColor(snake.skin, chunk.final ? 0.64 : 0.3)
+    );
+
+    if (chunk !== snake.headChunk) {
+        const worldPosition = new Vector(chunk.boundingBox.minX, chunk.boundingBox.maxY);
+        const canvasPosition = game.camera.computeScreenCoordinates(worldPosition, gl.canvas);
+        TextRenderer.addText(chunk.debugInfo, "sc" + chunk.id, {
+            x: canvasPosition.x,
+            y: canvasPosition.y,
+            debug: true
+        });
     }
 }

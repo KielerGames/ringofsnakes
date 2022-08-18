@@ -127,7 +127,7 @@ export default class SnakeChunk implements ManagedObject<number, SnakeChunkDTO> 
         vb[vbo1 + 5] = vb[vbo2 + 5];
     }
 
-    isVisible(camera: Camera, epsilon: number = 0.0): boolean {
+    couldBeVisible(camera: Camera, epsilon: number = 0.0): boolean {
         const d = Rectangle.distance2(camera.viewBox, this.bounds);
         const ub = 0.5 * this.snake.width + epsilon;
         return d <= ub * ub;

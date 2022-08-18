@@ -177,11 +177,13 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     }
 
     /**
-     * True if the snake or some of its body is visible.
+     * True if any of the snakes bounding boxes intersect with the viewport.
+     * The snake could still be not visible though. If this method returns
+     * false the snake cannot be visible.
      */
-    isVisible(camera: Camera, epsilon: number = 0.0): boolean {
+    couldBeVisible(camera: Camera, epsilon: number = 0.0): boolean {
         for (const chunk of this.chunks) {
-            if (chunk.isVisible(camera, epsilon)) {
+            if (chunk.couldBeVisible(camera, epsilon)) {
                 return true;
             }
         }

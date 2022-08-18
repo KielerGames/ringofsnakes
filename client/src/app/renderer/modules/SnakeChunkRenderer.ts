@@ -52,7 +52,7 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
         // chunk will be last. Therefore newer chunks will be rendered
         // on top of older chunks.
         for (const chunk of snake.getSnakeChunksIterator()) {
-            if (!chunk.isVisible(camera)) {
+            if (!chunk.couldBeVisible(camera)) {
                 continue;
             }
 

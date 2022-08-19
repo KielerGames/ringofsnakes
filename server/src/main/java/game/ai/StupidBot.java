@@ -2,7 +2,7 @@ package game.ai;
 
 import game.world.World;
 import math.Vector;
-import util.Direction;
+import math.Direction;
 
 class StupidBot extends Bot {
     private static final int takeThisNumberOfStepsTowardsCenter = 150;

@@ -34,9 +34,4 @@ public class SnakePathPoint {
         assert this.snakeChunk instanceof GrowingSnakeChunk;
         this.snakeChunk = snakeChunk;
     }
-
-    public boolean isJunk() {
-        final var offset = getOffsetInSnake();
-        return offset > snakeChunk.getSnake().getLength();
-    }
 }

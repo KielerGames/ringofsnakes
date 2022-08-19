@@ -2,9 +2,9 @@ package game.ai;
 
 import game.world.World;
 import math.Vector;
-import util.Direction;
+import math.Direction;
 
-import static util.Direction.TAU;
+import static math.Direction.TAU;
 
 class ScaredBot extends Bot {
 
@@ -42,7 +42,7 @@ class ScaredBot extends Bot {
 
         final var snake = this.getSnake();
         final var headPosition = snake.getHeadPosition();
-        final var otherSnakes = getSnakesInVicinity(30.0);
+        final var otherSnakes = getSnakesInVicinity(28.0);
 
         if (otherSnakes.isEmpty()) {
             if (random.nextDouble() < 0.25) {
@@ -60,6 +60,12 @@ class ScaredBot extends Bot {
             final int bucket = getBucketIndex(escapeDir);
             buckets[bucket] += otherSnake.getWidth() / d2;
         });
+
+        // slight preference for the current direction
+        {
+            final int bucket = getBucketIndex(snake.getHeadDirection());
+            buckets[bucket] += snake.getWidth() / 20.0;
+        }
 
         // move towards center (when close to the edge)
         {

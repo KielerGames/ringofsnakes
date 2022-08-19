@@ -2,9 +2,9 @@ package game.snake;
 
 import game.GameConfig;
 import game.world.World;
+import math.Direction;
 import math.Vector;
 import org.junit.jupiter.api.Test;
-import util.Direction;
 
 import java.util.List;
 import java.util.Random;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SnakeChunkTest {
-    static GameConfig config = new GameConfig();
+    static final GameConfig config = new GameConfig();
 
     static double computeSnakeChunkLength(SnakeChunk chunk) {
         final var snakeLength = chunk.getSnake().getLength();

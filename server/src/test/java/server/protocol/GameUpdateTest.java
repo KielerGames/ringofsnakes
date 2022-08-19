@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GameUpdateTest {
-    World world = new World();
+    final World world = new World();
     @Mock
     Session session;
 

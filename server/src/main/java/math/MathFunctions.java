@@ -1,4 +1,4 @@
-package util;
+package math;
 
 public final class MathFunctions {
     private MathFunctions() {

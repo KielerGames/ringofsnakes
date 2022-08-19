@@ -37,10 +37,6 @@ public class Food {
         );
     }
 
-    public Food(Vector position, WorldChunk chunk, Size size) {
-        this(position, chunk, size, (byte) rand.nextInt(64));
-    }
-
     public Food(WorldChunk chunk) {
         // generate position
         final var bytePosition = new byte[2];

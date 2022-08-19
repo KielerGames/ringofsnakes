@@ -48,6 +48,10 @@ public final class Vector implements Cloneable {
         return dx * dx + dy * dy;
     }
 
+    public static double dot(Vector a, Vector b) {
+        return a.x * b.x + a.y * b.y;
+    }
+
     @SuppressWarnings("SpellCheckingInspection")
     public static Vector lerp(Vector a, Vector b, double t) {
         assert !Double.isNaN(t);

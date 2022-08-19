@@ -33,6 +33,9 @@ export default class Game {
     private stopped: boolean = false;
 
     private readonly events = {
+        /**
+         * Fired if a snake that the client knows dies.
+         */
         snakeDeath: new AppEvent<Snake>()
     };
 
@@ -132,9 +135,9 @@ export default class Game {
                 continue;
             }
 
-            this.events.snakeDeath.trigger(snake);
-
-            for (const snakeChunk of snake.getSnakeChunksIterator()) {
+            // To avoid concurrent modification errors we have to copy the array here.
+            const snakeChunks = Array.from(snake.getSnakeChunksIterator());
+            for (const snakeChunk of snakeChunks) {
                 this.snakeChunks.remove(snakeChunk.id);
             }
 
@@ -143,6 +146,8 @@ export default class Game {
             if (snakeId === this.targetSnakeId) {
                 this.targetSnakeId = undefined;
             }
+
+            this.events.snakeDeath.trigger(snake);
         }
 
         const updatedSnakeIds = new Set<SnakeId>(changes.snakes.map((snake) => snake.id));
@@ -200,7 +205,8 @@ export default class Game {
         const safeDist = 2 * this._config.snakes.fastSpeed;
 
         this.snakeChunks.removeIf(
-            (chunk) => chunk.junk || (!chunk.isVisible(camera, safeDist) && chunk.clientAge > 1.0)
+            (chunk) =>
+                chunk.junk || (!chunk.couldBeVisible(camera, safeDist) && chunk.clientAge > 1.0)
         );
 
         this.foodChunks.removeIf((chunk) => !chunk.isVisible(camera, safeDist) && chunk.age > 1.0);
@@ -209,7 +215,7 @@ export default class Game {
             (snake) =>
                 snake.id !== this.targetSnakeId &&
                 !snake.hasChunks() &&
-                !snake.isVisible(camera, safeDist)
+                !snake.couldBeVisible(camera, safeDist)
         );
     }
 }
@@ -218,4 +224,4 @@ type SnakeId = number;
 type SnakeChunkId = number;
 type FoodChunkId = number;
 
-type EventName = "snakeDeath";
+type EventName = keyof Game["events"];

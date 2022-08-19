@@ -9,6 +9,9 @@ import Camera from "../camera/Camera";
 import Rectangle from "../../math/Rectangle";
 import { ManagedObject } from "../../util/ManagedMap";
 
+// eslint-disable-next-line no-bitwise
+const CHUNK_ID_MASK = (1 << 16) - 1;
+
 /**
  * Represents a snake on the main thread.
  */
@@ -18,7 +21,9 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     target: boolean = false;
     headChunk: SnakeChunk | null = null;
 
-    private readonly chunks = new Map<number, SnakeChunk>();
+    private readonly gameConfig: GameConfig;
+    private readonly chunks: SnakeChunk[] = [];
+    private readonly chunkIds = new Set<SnakeChunk["id"]>();
     private lastUpdateTime: number;
     private lastPredictionTime: number;
     private headChunkId: number;
@@ -27,7 +32,6 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     private _width: number;
     private _name?: string;
     private _paused: boolean = false;
-    private gameConfig: GameConfig;
 
     // head position & interpolation
     private lastKnownHeadPosition: Vector;
@@ -83,57 +87,103 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         this.predictDirection();
 
         // predict body
-        for (const snakeChunk of this.chunks.values()) {
+        for (const snakeChunk of this.chunks) {
             snakeChunk.predict();
         }
 
         // fix head chunk mesh
-        const headChunk = this.headChunk;
-        if (headChunk) {
-            headChunk.connectMeshToHead();
+        if (this.headChunk) {
+            this.headChunk.connectMeshToHead();
         }
 
         this.lastPredictionTime = FrameTime.now();
     }
 
     registerSnakeChunk(chunk: SnakeChunk): void {
-        if (__DEBUG__ && this.chunks.has(chunk.id)) {
-            console.warn(`Snake ${this.id} already has a registered chunk with id ${chunk.id}.`);
+        if (this.chunkIds.has(chunk.id)) {
+            return;
         }
-        this.chunks.set(chunk.id, chunk);
+
+        this.chunkIds.add(chunk.id);
+
         if (chunk.id === this.headChunkId) {
+            // As the latest chunk of the snake it should be the last element (rendering order)
+            this.chunks.push(chunk);
+
             if (this.headChunk !== null) {
+                // The mesh data of the head chunk will be changed so that
+                // it is always connected to the (predicted) snake head.
+                // These changes have to be reset when there is a new head chunk.
                 this.headChunk.resetMesh();
             }
             this.headChunk = chunk;
+
+            return;
         }
+
+        if (this.chunks.length === 0) {
+            // If this is the only chunk, order does not matter.
+            this.chunks.push(chunk);
+            return;
+        }
+
+        // This is an older chunk that the client did not yet know of. We have to find
+        // the correct position for insertion into the array. The unique chunk id is
+        // the combination of snake id and chunk id, here we only need the latter.
+        // eslint-disable-next-line no-bitwise
+        const offset = CHUNK_ID_MASK - (this.headChunkId & CHUNK_ID_MASK);
+        const newChunkId = getComparableChunkId(chunk, offset);
+
+        // TODO: use Array.prototype.findLastIndex when its available in all modern browsers
+        let i = this.chunks.length - 1;
+        for (; 0 <= i; i--) {
+            const cId = getComparableChunkId(this.chunks[i], offset);
+            if (cId < newChunkId) {
+                // Insert the new chunk after this one.
+                break;
+            }
+        }
+
+        // If no chunk with a smaller id was found (i==-1) the new chunk will be inserted at index 0.
+        this.chunks.splice(i + 1, 0, chunk);
     }
 
     unregisterSnakeChunk(chunk: SnakeChunk): void {
-        if (__DEBUG__ && !this.chunks.has(chunk.id)) {
-            console.warn(`Snake ${this.id} has no chunk with id ${chunk.id}.`);
+        const i = this.chunks.findIndex((c) => c === chunk);
+        if (i < 0) {
+            throw new Error(
+                `Cannot unregister: Snake ${this.id} has no chunk with id ${chunk.id}.`
+            );
         }
-        this.chunks.delete(chunk.id);
+        this.chunkIds.delete(chunk.id);
+        this.chunks.splice(i, 1);
     }
 
+    /**
+     * Intended for iterating over SnakeChunks. You may not remove
+     * SnakeChunks during this iteration, that causes SnakeChunks
+     * to be skipped.
+     */
     getSnakeChunksIterator(): IterableIterator<SnakeChunk> {
         return this.chunks.values();
     }
 
     hasChunks(): boolean {
-        return this.chunks.size > 0;
+        return this.chunks.length > 0;
     }
 
     toString(): string {
-        return `Snake ${this.id} with ${this.chunks.size} chunks`;
+        return `Snake ${this.id} with ${this.chunks.length} chunks`;
     }
 
     /**
-     * True if the snake or some of its body is visible.
+     * True if any of the snakes bounding boxes intersect with the viewport.
+     * The snake could still be not visible though. If this method returns
+     * false the snake cannot be visible.
      */
-    isVisible(camera: Camera, epsilon: number = 0.0): boolean {
-        for (const chunk of this.chunks.values()) {
-            if (chunk.isVisible(camera, epsilon)) {
+    couldBeVisible(camera: Camera, epsilon: number = 0.0): boolean {
+        for (const chunk of this.chunks) {
+            if (chunk.couldBeVisible(camera, epsilon)) {
                 return true;
             }
         }
@@ -162,7 +212,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
      * Pause snake movement until the next server update.
      */
     pause() {
-        if (__DEBUG__ && !this._paused) {
+        if (__DEBUG__ && !__TEST__ && !this._paused) {
             console.info(`Snake ${this.id} has been paused.`);
         }
         this._paused = true;
@@ -251,30 +301,46 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         this.predictedDirection = normalizeAngle(p1 + 0.15 * getMinDifference(p1, p2));
     }
 
+    /**
+     * @param ticks server ticks since the last chun offset update
+     * @param fastHistory snake speed for the last 8 ticks
+     */
     private updateChunkOffsets(ticks: number, fastHistory: boolean[]) {
         if (ticks === 0) {
+            // No server time has passed since the last update.
             return;
-        }
-
-        if (__DEBUG__ && fastHistory.length !== 8) {
-            console.warn("unexpected fast history array", fastHistory);
         }
 
         const fastSpeed = this.gameConfig.snakes.fastSpeed;
         const slowSpeed = this.gameConfig.snakes.speed;
 
-        let chunkOffset = 0;
-
-        for (let i = 0; i < ticks; i++) {
-            chunkOffset += fastHistory[i] ? fastSpeed : slowSpeed;
+        // The offset of the snake chunks changes based on the distance the
+        // snake has travelled since the last update.
+        let distance = 0.0;
+        const N = Math.min(ticks, fastHistory.length);
+        for (let i = 0; i < N; i++) {
+            distance += fastHistory[i] ? fastSpeed : slowSpeed;
         }
 
-        for (const chunk of this.chunks.values()) {
+        // We have no more speed data at this point so for all previous ticks
+        // we assume slow speed. In practice this should never happen as the
+        // server update rate should be close to the server tick rate.
+        for (let i = N; i < ticks; i++) {
+            distance += slowSpeed;
+        }
+
+        for (const chunk of this.chunks) {
             if (chunk.id === this.headChunkId) {
+                // After an update the head chunk offset is always 0.
                 continue;
             }
 
-            chunk.updateOffset(chunkOffset);
+            chunk.updateOffset(distance);
         }
     }
+}
+
+function getComparableChunkId(chunk: SnakeChunk, offset: number): number {
+    // eslint-disable-next-line no-bitwise
+    return ((chunk.id & CHUNK_ID_MASK) + offset) & CHUNK_ID_MASK;
 }

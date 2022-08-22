@@ -41,7 +41,10 @@ function LeaderboardEntry(props: Readonly<Props>) {
 
     return (
         <div class="entry">
-            {index + 1}. {entry.name}: {entry.score}
+            <span>{index + 1}.</span>
+            <span>{entry.name}</span>
+            <span title="length">{entry.length}</span>
+            <span title="kills">{entry.kills === 0 ? "-" : entry.kills + "K"}</span>
         </div>
     );
 }

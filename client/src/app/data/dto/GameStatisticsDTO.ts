@@ -7,5 +7,6 @@ export type GameStatisticsDTO = {
 export type LeaderboardEntry = {
     id: number;
     name: string;
-    score: number;
+    length: number;
+    kills: number;
 };

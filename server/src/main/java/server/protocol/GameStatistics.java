@@ -29,12 +29,14 @@ public class GameStatistics extends ServerToClientJSONMessage {
     private static class LeaderboardEntry {
         final int id;
         final String name;
-        final int score;
+        final int length;
+        final int kills;
 
         private LeaderboardEntry(Snake snake) {
-            this.name = snake.name;
-            this.score = (int) snake.getLength();
-            this.id = snake.id;
+            name = snake.name;
+            length = (int) snake.getLength();
+            id = snake.id;
+            kills = snake.getKills();
         }
     }
 }

@@ -17,7 +17,8 @@ export type SpawnInfo = Readonly<{
 
 export type SnakeDeathInfo = Readonly<{
     tag: "SnakeDeathInfo";
-    snakeId: number;
+    deadSnakeId: number;
+    killerSnakeId?: number;
 }>;
 
 export type LeaderboardData = Readonly<

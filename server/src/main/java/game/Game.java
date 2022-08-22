@@ -86,7 +86,7 @@ public class Game {
             }
 
             otherSnake.addKill();
-            final var killMessage = gson.toJson(new SnakeDeathInfo(snake));
+            final var killMessage = gson.toJson(new SnakeDeathInfo(snake, otherSnake));
             executor.schedule(() -> clients.forEach((sId, client) -> client.send(killMessage)), 0, TimeUnit.MILLISECONDS);
         }
     }

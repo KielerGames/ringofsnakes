@@ -81,11 +81,16 @@ export default class GameDataBuffer {
     addJSONUpdate(update: ServerToClientJSONMessage): void {
         switch (update.tag) {
             case "SnakeDeathInfo": {
-                console.info(`Snake ${update.snakeId} has died.`);
+                console.info(`Snake ${update.deadSnakeId} has died.`);
                 this.addInformation({
-                    snakeDeaths: [update.snakeId]
+                    snakeDeaths: [
+                        {
+                            deadSnakeId: update.deadSnakeId,
+                            killerSnakeId: update.killerSnakeId
+                        }
+                    ]
                 });
-                this.snakeNames.delete(update.snakeId);
+                this.snakeNames.delete(update.deadSnakeId);
                 this.triggerUpdateEvent();
                 break;
             }

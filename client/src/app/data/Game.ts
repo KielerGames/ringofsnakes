@@ -30,6 +30,7 @@ export default class Game {
     private _config: GameConfig;
     private updateAvailable: boolean = false;
     private targetSnakeId: number | undefined;
+    private _targetSnakeKills: number = 0;
     private stopped: boolean = false;
 
     private readonly events = {
@@ -128,8 +129,12 @@ export default class Game {
         this.snakeChunks.addMultiple(changes.snakeChunks);
 
         // remove dead snakes
-        for (const snakeId of changes.snakeDeaths) {
-            const snake = this.snakes.get(snakeId);
+        for (const { deadSnakeId, killerSnakeId } of changes.snakeDeaths) {
+            const snake = this.snakes.get(deadSnakeId);
+
+            if (killerSnakeId === this.targetSnakeId) {
+                this._targetSnakeKills++;
+            }
 
             if (!snake) {
                 continue;
@@ -141,9 +146,9 @@ export default class Game {
                 this.snakeChunks.remove(snakeChunk.id);
             }
 
-            this.snakes.remove(snakeId);
+            this.snakes.remove(deadSnakeId);
 
-            if (snakeId === this.targetSnakeId) {
+            if (deadSnakeId === this.targetSnakeId) {
                 this.targetSnakeId = undefined;
             }
 
@@ -198,6 +203,10 @@ export default class Game {
         }
 
         return this.snakes.get(this.targetSnakeId);
+    }
+
+    get targetSnakeKills(): number {
+        return this._targetSnakeKills;
     }
 
     private removeJunk() {

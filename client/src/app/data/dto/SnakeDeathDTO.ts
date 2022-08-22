@@ -1,6 +1,9 @@
 export type SnakeDeathDTO = {
     deadSnakeId: SnakeId;
-    killerSnakeId?: SnakeId;
+    killer?: {
+        snakeId: SnakeId;
+        name: string;
+    };
 };
 
 type SnakeId = number;

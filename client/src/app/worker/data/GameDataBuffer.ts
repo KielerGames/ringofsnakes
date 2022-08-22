@@ -88,7 +88,13 @@ export default class GameDataBuffer {
                     snakeDeaths: [
                         {
                             deadSnakeId: update.deadSnakeId,
-                            killerSnakeId: update.killerSnakeId
+                            killer:
+                                update.killerSnakeId !== undefined
+                                    ? {
+                                          snakeId: update.killerSnakeId,
+                                          name: this.getSnakeName(update.killerSnakeId)
+                                      }
+                                    : undefined
                         }
                     ]
                 });
@@ -160,6 +166,10 @@ export default class GameDataBuffer {
         }
 
         this.serverUpdateEventTrigger();
+    }
+
+    private getSnakeName(snakeId: SnakeId): string {
+        return this.snakeNames.get(snakeId) ?? `Snake ${snakeId}`;
     }
 }
 

@@ -23,7 +23,8 @@ export default class Game {
     readonly snakeChunks: ManagedMap<SnakeChunkDTO, SnakeChunkId, SnakeChunk>;
     readonly foodChunks: ManagedMap<FoodChunkDTO, FoodChunkId, FoodChunk>;
     readonly events = {
-        snakeDeath: new AppEvent<SnakeDeathDTO & { snake?: Snake }>()
+        snakeDeath: new AppEvent<SnakeDeathDTO & { snake?: Snake }>(),
+        gameEnd: new AppEvent<GameEndReason>()
     };
 
     camera: Camera = new Camera();
@@ -49,13 +50,15 @@ export default class Game {
         });
         this.foodChunks = new ManagedMap((dto) => new FoodChunk(dto));
 
-        this.events.snakeDeath.addListener(({ deadSnakeId, killerSnakeId }) => {
+        this.events.snakeDeath.addListener(({ deadSnakeId, killer }) => {
             if (deadSnakeId === this.targetSnakeId) {
                 this.targetSnakeId = undefined;
+                this.stopped = true;
+                this.events.gameEnd.trigger({ reason: "death", killer: killer?.name ?? "???" });
                 return;
             }
 
-            if (killerSnakeId === this.targetSnakeId) {
+            if (killer && killer.snakeId === this.targetSnakeId) {
                 this._targetSnakeKills++;
             }
         });
@@ -86,10 +89,7 @@ export default class Game {
             "disconnect",
             Comlink.proxy(() => {
                 game.stopped = true;
-                dialog({
-                    title: "Disconnected",
-                    content: `You have been disconnected from the server.`
-                });
+                game.events.gameEnd.trigger({ reason: "disconnect" });
             })
         );
 
@@ -137,10 +137,10 @@ export default class Game {
         this.snakeChunks.addMultiple(changes.snakeChunks);
 
         // remove dead snakes
-        for (const { deadSnakeId, killerSnakeId } of changes.snakeDeaths) {
+        for (const { deadSnakeId, killer } of changes.snakeDeaths) {
             const snake = this.snakes.get(deadSnakeId);
 
-            this.events.snakeDeath.trigger({ deadSnakeId, killerSnakeId, snake });
+            this.events.snakeDeath.trigger({ deadSnakeId, killer, snake });
 
             if (!snake) {
                 continue;
@@ -228,3 +228,4 @@ export default class Game {
 type SnakeId = number;
 type SnakeChunkId = number;
 type FoodChunkId = number;
+type GameEndReason = { reason: "disconnect" } | { reason: "death"; killer: string };

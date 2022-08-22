@@ -15,14 +15,18 @@ import { SnakeDTO } from "./dto/SnakeDTO";
 import { SnakeChunkDTO } from "./dto/SnakeChunkDTO";
 import { FoodChunkDTO } from "./dto/FoodChunkDTO";
 import { AppEvent } from "../util/AppEvent";
-import { Consumer } from "../util/FunctionTypes";
 import { dialog } from "../ui/Dialogs";
+import { SnakeDeathDTO } from "./dto/SnakeDeathDTO";
 
 export default class Game {
-    camera: Camera = new Camera();
     readonly snakes: ManagedMap<SnakeDTO, SnakeId, Snake, number>;
     readonly snakeChunks: ManagedMap<SnakeChunkDTO, SnakeChunkId, SnakeChunk>;
     readonly foodChunks: ManagedMap<FoodChunkDTO, FoodChunkId, FoodChunk>;
+    readonly events = {
+        snakeDeath: new AppEvent<SnakeDeathDTO & { snake?: Snake }>()
+    };
+
+    camera: Camera = new Camera();
     leaderboard: GameStatisticsDTO = { leaderboard: [], numPlayers: 0, numBots: 0 };
     heatMap: Uint8Array;
 
@@ -32,13 +36,6 @@ export default class Game {
     private targetSnakeId: number | undefined;
     private _targetSnakeKills: number = 0;
     private stopped: boolean = false;
-
-    private readonly events = {
-        /**
-         * Fired if a snake that the client knows dies.
-         */
-        snakeDeath: new AppEvent<Snake>()
-    };
 
     private constructor() {
         this.remote = createRemote();
@@ -152,7 +149,7 @@ export default class Game {
                 this.targetSnakeId = undefined;
             }
 
-            this.events.snakeDeath.trigger(snake);
+            this.events.snakeDeath.trigger({ deadSnakeId, killerSnakeId, snake });
         }
 
         const updatedSnakeIds = new Set<SnakeId>(changes.snakes.map((snake) => snake.id));
@@ -187,10 +184,6 @@ export default class Game {
     quit(): void {
         this.remote.quit();
         this.stopped = true;
-    }
-
-    addEventListener(event: EventName, listener: Consumer<Snake>): void {
-        this.events[event].addListener(listener);
     }
 
     get config(): GameConfig {
@@ -232,5 +225,3 @@ export default class Game {
 type SnakeId = number;
 type SnakeChunkId = number;
 type FoodChunkId = number;
-
-type EventName = keyof Game["events"];

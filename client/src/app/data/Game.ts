@@ -48,6 +48,17 @@ export default class Game {
             return new SnakeChunk(snake, dto);
         });
         this.foodChunks = new ManagedMap((dto) => new FoodChunk(dto));
+
+        this.events.snakeDeath.addListener(({ deadSnakeId, killerSnakeId }) => {
+            if (deadSnakeId === this.targetSnakeId) {
+                this.targetSnakeId = undefined;
+                return;
+            }
+
+            if (killerSnakeId === this.targetSnakeId) {
+                this._targetSnakeKills++;
+            }
+        });
     }
 
     static async joinAsPlayer(): Promise<[Game, Player]> {
@@ -93,7 +104,7 @@ export default class Game {
     }
 
     /**
-     *
+     * Get and apply the latest game updates from the worker thread.
      */
     async update(): Promise<void> {
         if (!this.updateAvailable) {
@@ -129,9 +140,7 @@ export default class Game {
         for (const { deadSnakeId, killerSnakeId } of changes.snakeDeaths) {
             const snake = this.snakes.get(deadSnakeId);
 
-            if (killerSnakeId === this.targetSnakeId) {
-                this._targetSnakeKills++;
-            }
+            this.events.snakeDeath.trigger({ deadSnakeId, killerSnakeId, snake });
 
             if (!snake) {
                 continue;
@@ -144,12 +153,6 @@ export default class Game {
             }
 
             this.snakes.remove(deadSnakeId);
-
-            if (deadSnakeId === this.targetSnakeId) {
-                this.targetSnakeId = undefined;
-            }
-
-            this.events.snakeDeath.trigger({ deadSnakeId, killerSnakeId, snake });
         }
 
         const updatedSnakeIds = new Set<SnakeId>(changes.snakes.map((snake) => snake.id));

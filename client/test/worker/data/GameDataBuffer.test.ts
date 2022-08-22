@@ -27,7 +27,7 @@ describe("GameDataBuffer", () => {
 
         buffer.addJSONUpdate({
             tag: "SnakeDeathInfo",
-            snakeId: spawnInfo.snakeId
+            deadSnakeId: spawnInfo.snakeId
         });
 
         let lastUpdate = buffer.nextUpdate();
@@ -66,7 +66,7 @@ describe("GameDataBuffer", () => {
 
         buffer.addJSONUpdate({
             tag: "SnakeDeathInfo",
-            snakeId: 13
+            deadSnakeId: 13
         });
 
         expect(eventCallback).toHaveBeenCalledTimes(1);

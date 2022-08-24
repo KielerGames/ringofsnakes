@@ -9,7 +9,7 @@ varying float vPathOffset;
 varying float vNormalOffset;
 
 const vec3 darkGrey = vec3(0.1, 0.1, 0.1);
-const vec3 fastColorBoost = vec3(0.15, 0.15, 0.15);
+const vec3 fastColorBoost = vec3(0.175, 0.175, 0.175);
 
 void main(void) {
 	vec3 skinColor = texture2D(uColorSampler, vec2(uSkin, 0.25)).rgb;

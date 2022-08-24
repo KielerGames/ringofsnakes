@@ -41,6 +41,7 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
 
         // Set the snake specific uniforms once.
         SkinLoader.setColor(shader, "uSkin", snake.skin);
+        shader.setUniform("uSnakeFast", snake.fast ? 1.0 : 0.0);
         shader.setUniform("uSnakeLength", snake.length);
         shader.setUniform("uSnakeMaxWidth", snake.width);
         shader.setUniform(

@@ -29,6 +29,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     private headChunkId: number;
     private _length: number;
     private _fast: boolean;
+    private _smoothedFastValue: number;
     private _width: number;
     private _name?: string;
     private _paused: boolean = false;
@@ -50,6 +51,8 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
 
         this.predictedHeadPosition = Vector.fromObject(dto.headPosition);
         this.predictedDirection = dto.headDirection[0];
+
+        this._smoothedFastValue = dto.fast ? 1.0 : 0.0;
 
         this.update(dto, 0);
     }
@@ -95,6 +98,8 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         if (this.headChunk) {
             this.headChunk.connectMeshToHead();
         }
+
+        this.updateSmoothedFastValue();
 
         this.lastPredictionTime = FrameTime.now();
     }
@@ -230,6 +235,14 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         return this._fast;
     }
 
+    /**
+     * Returns 1.0 if the snake is fast and 0.0 if the snake is slow.
+     * The value will not switch immediately but will be smoothly interpolated.
+     */
+    get smoothedFastValue(): number {
+        return this._smoothedFastValue;
+    }
+
     get length(): number {
         return this._length;
     }
@@ -299,6 +312,13 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
 
         // combine predictions
         this.predictedDirection = normalizeAngle(p1 + 0.15 * getMinDifference(p1, p2));
+    }
+
+    private updateSmoothedFastValue() {
+        const delta = (FrameTime.now() - this.lastPredictionTime) / 1000; // in seconds
+        const targetValue = this.fast ? 1.0 : 0.0;
+        const x = clamp(0.0, 5.0 * delta, 1.0);
+        this._smoothedFastValue = x * targetValue + (1.0 - x) * this._smoothedFastValue;
     }
 
     /**

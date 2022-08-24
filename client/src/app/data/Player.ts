@@ -26,8 +26,8 @@ export default class Player {
 
         UserInput.addListener(this.inputListener);
 
-        game.addEventListener("snakeDeath", (snake) => {
-            if (snake.id !== this.snakeId) {
+        game.events.snakeDeath.addListener(({ deadSnakeId }) => {
+            if (deadSnakeId !== this.snakeId) {
                 return;
             }
 

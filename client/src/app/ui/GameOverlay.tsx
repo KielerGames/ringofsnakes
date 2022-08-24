@@ -28,7 +28,7 @@ export default class GameOverlay extends Component<Props> {
             <>
                 <GameStatistics data={game.leaderboard} />
                 <FPSStats />
-                <SnakeInfoUI snake={game.targetSnake} />
+                <SnakeInfoUI snake={game.targetSnake} kills={game.targetSnakeKills} />
             </>
         );
     }

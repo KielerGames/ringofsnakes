@@ -4,26 +4,32 @@
     "plugins": ["@typescript-eslint"],
     "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
     "rules": {
-        "no-console": "off",
-        "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/no-inferrable-types": "off",
-        "no-empty-function": "off",
-        "@typescript-eslint/no-empty-function": "warn",
+        "no-alert": "warn",
         "no-bitwise": "error",
+        "no-console": "off",
+        "no-constant-condition": ["error", { "checkLoops": false }],
+        "no-empty-function": "off",
         "no-eval": "error",
         "no-eq-null": "error",
-        "no-alert": "warn",
-        "max-classes-per-file": ["error", 1],
-        "no-implicit-coercion": "error",
-        "no-extend-native": "error",
-        "no-lonely-if": "error",
-        "@typescript-eslint/no-unused-vars": "error",
         "no-throw-literal": "error",
         "no-unused-expressions": "error",
         "no-useless-call": "error",
-        "prefer-promise-reject-errors": ["error", {"allowEmptyReject": true}],
-        "require-await": "error",
-        "prefer-const": "warn"
+        "no-implicit-coercion": "error",
+        "no-extend-native": "error",
+        "no-lonely-if": "error",
+
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/no-empty-function": "warn",
+        "@typescript-eslint/no-unused-vars": "error",
+
+        "max-classes-per-file": ["error", 1],
+        
+        "prefer-promise-reject-errors": ["error", { "allowEmptyReject": true }],
+        "prefer-const": "warn",
+
+        "require-await": "error"
+        
     },
     "env": {
         "browser": true

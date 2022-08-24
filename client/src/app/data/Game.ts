@@ -15,14 +15,19 @@ import { SnakeDTO } from "./dto/SnakeDTO";
 import { SnakeChunkDTO } from "./dto/SnakeChunkDTO";
 import { FoodChunkDTO } from "./dto/FoodChunkDTO";
 import { AppEvent } from "../util/AppEvent";
-import { Consumer } from "../util/FunctionTypes";
 import { dialog } from "../ui/Dialogs";
+import { SnakeDeathDTO } from "./dto/SnakeDeathDTO";
 
 export default class Game {
-    camera: Camera = new Camera();
     readonly snakes: ManagedMap<SnakeDTO, SnakeId, Snake, number>;
     readonly snakeChunks: ManagedMap<SnakeChunkDTO, SnakeChunkId, SnakeChunk>;
     readonly foodChunks: ManagedMap<FoodChunkDTO, FoodChunkId, FoodChunk>;
+    readonly events = {
+        snakeDeath: new AppEvent<SnakeDeathDTO & { snake?: Snake }>(),
+        gameEnd: new AppEvent<GameEndReason>()
+    };
+
+    camera: Camera = new Camera();
     leaderboard: GameStatisticsDTO = { leaderboard: [], numPlayers: 0, numBots: 0 };
     heatMap: Uint8Array;
 
@@ -30,14 +35,8 @@ export default class Game {
     private _config: GameConfig;
     private updateAvailable: boolean = false;
     private targetSnakeId: number | undefined;
+    private _targetSnakeKills: number = 0;
     private stopped: boolean = false;
-
-    private readonly events = {
-        /**
-         * Fired if a snake that the client knows dies.
-         */
-        snakeDeath: new AppEvent<Snake>()
-    };
 
     private constructor() {
         this.remote = createRemote();
@@ -50,6 +49,19 @@ export default class Game {
             return new SnakeChunk(snake, dto);
         });
         this.foodChunks = new ManagedMap((dto) => new FoodChunk(dto));
+
+        this.events.snakeDeath.addListener(({ deadSnakeId, killer }) => {
+            if (deadSnakeId === this.targetSnakeId) {
+                this.targetSnakeId = undefined;
+                this.stopped = true;
+                this.events.gameEnd.trigger({ reason: "death", killer: killer?.name ?? "???" });
+                return;
+            }
+
+            if (killer && killer.snakeId === this.targetSnakeId) {
+                this._targetSnakeKills++;
+            }
+        });
     }
 
     static async joinAsPlayer(): Promise<[Game, Player]> {
@@ -77,10 +89,7 @@ export default class Game {
             "disconnect",
             Comlink.proxy(() => {
                 game.stopped = true;
-                dialog({
-                    title: "Disconnected",
-                    content: `You have been disconnected from the server.`
-                });
+                game.events.gameEnd.trigger({ reason: "disconnect" });
             })
         );
 
@@ -89,13 +98,13 @@ export default class Game {
         return [game, player];
     }
 
-    // eslint-disable-next-line require-await
     static async joinAsSpectator(): Promise<Game> {
-        throw new Error("not implemented");
+        await Promise.reject(new Error("not implemented"));
+        return new Game(); // TODO
     }
 
     /**
-     *
+     * Get and apply the latest game updates from the worker thread.
      */
     async update(): Promise<void> {
         if (!this.updateAvailable) {
@@ -128,8 +137,10 @@ export default class Game {
         this.snakeChunks.addMultiple(changes.snakeChunks);
 
         // remove dead snakes
-        for (const snakeId of changes.snakeDeaths) {
-            const snake = this.snakes.get(snakeId);
+        for (const { deadSnakeId, killer } of changes.snakeDeaths) {
+            const snake = this.snakes.get(deadSnakeId);
+
+            this.events.snakeDeath.trigger({ deadSnakeId, killer, snake });
 
             if (!snake) {
                 continue;
@@ -141,13 +152,7 @@ export default class Game {
                 this.snakeChunks.remove(snakeChunk.id);
             }
 
-            this.snakes.remove(snakeId);
-
-            if (snakeId === this.targetSnakeId) {
-                this.targetSnakeId = undefined;
-            }
-
-            this.events.snakeDeath.trigger(snake);
+            this.snakes.remove(deadSnakeId);
         }
 
         const updatedSnakeIds = new Set<SnakeId>(changes.snakes.map((snake) => snake.id));
@@ -184,10 +189,6 @@ export default class Game {
         this.stopped = true;
     }
 
-    addEventListener(event: EventName, listener: Consumer<Snake>): void {
-        this.events[event].addListener(listener);
-    }
-
     get config(): GameConfig {
         return this._config;
     }
@@ -198,6 +199,10 @@ export default class Game {
         }
 
         return this.snakes.get(this.targetSnakeId);
+    }
+
+    get targetSnakeKills(): number {
+        return this._targetSnakeKills;
     }
 
     private removeJunk() {
@@ -223,5 +228,4 @@ export default class Game {
 type SnakeId = number;
 type SnakeChunkId = number;
 type FoodChunkId = number;
-
-type EventName = keyof Game["events"];
+type GameEndReason = { reason: "disconnect" } | { reason: "death"; killer: string };

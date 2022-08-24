@@ -81,11 +81,24 @@ export default class GameDataBuffer {
     addJSONUpdate(update: ServerToClientJSONMessage): void {
         switch (update.tag) {
             case "SnakeDeathInfo": {
-                console.info(`Snake ${update.snakeId} has died.`);
+                if (!__TEST__) {
+                    console.info(`Snake ${update.deadSnakeId} has died.`);
+                }
                 this.addInformation({
-                    snakeDeaths: [update.snakeId]
+                    snakeDeaths: [
+                        {
+                            deadSnakeId: update.deadSnakeId,
+                            killer:
+                                update.killerSnakeId !== undefined
+                                    ? {
+                                          snakeId: update.killerSnakeId,
+                                          name: this.getSnakeName(update.killerSnakeId)
+                                      }
+                                    : undefined
+                        }
+                    ]
                 });
-                this.snakeNames.delete(update.snakeId);
+                this.snakeNames.delete(update.deadSnakeId);
                 this.triggerUpdateEvent();
                 break;
             }
@@ -153,6 +166,10 @@ export default class GameDataBuffer {
         }
 
         this.serverUpdateEventTrigger();
+    }
+
+    private getSnakeName(snakeId: SnakeId): string {
+        return this.snakeNames.get(snakeId) ?? `Snake ${snakeId}`;
     }
 }
 

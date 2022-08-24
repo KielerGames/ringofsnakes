@@ -2,6 +2,7 @@ import * as Preact from "preact";
 import Game from "./data/Game";
 import GameOverlay from "./ui/GameOverlay";
 import * as FrameTime from "./util/FrameTime";
+import AsyncEvent from "./util/AsyncEvent";
 import * as WebGLContextProvider from "./renderer/webgl/WebGLContextProvider";
 import * as TextRenderer from "./renderer/modules/TextRenderer";
 import * as GameRenderer from "./renderer/GameRenderer";
@@ -59,22 +60,29 @@ document.title = `Ring of Snakes ${__VERSION__}`;
     }
 
     FrameTime.update(performance.now());
+
+    while (true) {
+        await runGame();
+    }
+})();
+
+async function runGame() {
     const [game, player] = await Game.joinAsPlayer();
+    const gameStopped = new AsyncEvent();
 
     function renderLoop(time: number) {
         FrameTime.update(time);
         game.predict();
         GameRenderer.render(game);
+
+        if (!player.alive) {
+            return;
+        }
+
         UserInput.tick();
 
-        if (player.alive) {
-            setTimeout(() => game.update());
-            window.requestAnimationFrame(renderLoop);
-        } else {
-            game.quit();
-            console.log("Game stopped.");
-            document.exitPointerLock();
-        }
+        setTimeout(() => game.update());
+        window.requestAnimationFrame(renderLoop);
     }
 
     // start render loop
@@ -88,4 +96,31 @@ document.title = `Ring of Snakes ${__VERSION__}`;
         game.quit();
         console.error("Stopped due to unhandled error.", e);
     });
-})();
+
+    game.events.gameEnd.addListener(async (info) => {
+        if (info.reason === "death") {
+            document.exitPointerLock();
+            console.log("Game stopped.");
+
+            await dialog({
+                title: "Game over",
+                content: `You are dead because you crashed into ${info.killer}.`,
+                buttons: [
+                    {
+                        label: "Try again",
+                        value: "try-again"
+                    }
+                ]
+            });
+
+            gameStopped.set();
+        } else if (info.reason === "disconnect") {
+            await dialog({
+                title: "Disconnected",
+                content: `You have been disconnected from the server.`
+            });
+        }
+    });
+
+    return gameStopped.wait();
+}

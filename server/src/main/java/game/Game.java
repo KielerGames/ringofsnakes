@@ -80,11 +80,14 @@ public class Game {
             System.out.println(snake + " collided with " + otherSnake + ".");
             snake.kill();
 
-            if (!snake.isAlive()) {
-                // some snakes, such as the BoundarySnake are not killable
-                final var killMessage = gson.toJson(new SnakeDeathInfo(snake));
-                executor.schedule(() -> clients.forEach((sId, client) -> client.send(killMessage)), 0, TimeUnit.MILLISECONDS);
+            if (snake.isAlive()) {
+                // Some snakes, such as the BoundarySnake are not killable.
+                return;
             }
+
+            otherSnake.addKill();
+            final var killMessage = gson.toJson(new SnakeDeathInfo(snake, otherSnake));
+            executor.schedule(() -> clients.forEach((sId, client) -> client.send(killMessage)), 0, TimeUnit.MILLISECONDS);
         }
     }
 

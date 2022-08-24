@@ -6,9 +6,9 @@ import game.world.World;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import math.Direction;
 import math.Vector;
 import util.BitWithShortHistory;
-import math.Direction;
 
 import java.nio.ByteBuffer;
 import java.util.Comparator;
@@ -45,6 +45,7 @@ public class Snake {
     private double lengthBuffer = 0;
     @Getter private double width;
     private double foodTrailBuffer = 0f;
+    @Getter private int kills = 0;
 
     Snake(char id, World world) {
         this(id, world, "Snake " + ((int) id));
@@ -243,6 +244,15 @@ public class Snake {
     public void kill() {
         recycleSnake();
         alive = false;
+    }
+
+    public void addKill() {
+        if (kills == Integer.MAX_VALUE) {
+            // Avoid integer overflow. Very unlikely to ever happen to
+            // a normal snake but this could happen to the BoundarySnake.
+            return;
+        }
+        kills++;
     }
 
     public Vector getTailPosition() {

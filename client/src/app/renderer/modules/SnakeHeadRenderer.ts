@@ -48,6 +48,7 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
         shader.setUniform("uSnakeWidth", 1.25 * snake.width);
         shader.setUniform("uHeadPosition", [x, y]);
         shader.setUniform("uHeadRotation", snake.direction + rotOffset);
+        shader.setUniform("uSnakeFast", snake.smoothedFastValue);
         SkinManager.setColor(shader, "uSkin", snake.skin);
 
         shader.run(vertexData.length / VERTEX_SIZE, {

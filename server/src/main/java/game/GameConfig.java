@@ -48,7 +48,7 @@ public final class GameConfig {
 
         public SnakeInfo(double speed) {
             this.speed = speed;
-            fastSpeed = 2.0 * speed;
+            fastSpeed = 2.5 * speed;
         }
     }
 }

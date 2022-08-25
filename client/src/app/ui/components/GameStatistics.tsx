@@ -40,11 +40,11 @@ function LeaderboardEntry(props: Readonly<Props>) {
     const index = props.index;
 
     return (
-        <div class="entry">
+        <>
             <span>{index + 1}.</span>
             <span>{entry.name}</span>
             <span title="length">{entry.length}</span>
             <span title="kills">{entry.kills === 0 ? "-" : entry.kills + "K"}</span>
-        </div>
+        </>
     );
 }

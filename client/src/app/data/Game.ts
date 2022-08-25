@@ -28,7 +28,7 @@ export default class Game {
     };
 
     camera: Camera = new Camera();
-    leaderboard: GameStatisticsDTO = { leaderboard: [], numPlayers: 0, numBots: 0 };
+    statistics: GameStatisticsDTO = { leaderboard: [], numPlayers: 0, numBots: 0 };
     heatMap: Uint8Array;
 
     private remote: Comlink.Remote<WorkerAPI>;
@@ -118,7 +118,7 @@ export default class Game {
 
         // update leaderboard
         if (changes.leaderboard) {
-            this.leaderboard = changes.leaderboard;
+            this.statistics = changes.leaderboard;
         }
 
         // update heat map

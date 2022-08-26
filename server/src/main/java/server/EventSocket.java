@@ -40,7 +40,7 @@ public class EventSocket {
     @OnClose
     public void onWebSocketClose(Session session, CloseReason reason) {
         System.out.println("Socket Closed: " + reason);
-        SnakeServer.removePlayer(session);
+        SnakeServer.removeClient(session);
     }
 
     @OnError

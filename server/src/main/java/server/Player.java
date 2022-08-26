@@ -1,13 +1,14 @@
 package server;
 
 import game.snake.Snake;
+import lombok.Getter;
 import math.BoundingBox;
 import server.protocol.GameUpdate;
 
 import javax.websocket.Session;
 
 public class Player extends Client {
-    public final Snake snake;
+    @Getter private final Snake snake;
 
     public Player(Snake snake, Session session) {
         super(session);

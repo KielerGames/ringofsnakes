@@ -55,7 +55,12 @@ public class DebugView extends Application {
                     ctx.clearRect(0, 0, 800, 600);
 
                     if (!game.snakes.isEmpty()) {
-                        final var playerId = game.streamClients().filter(Player.class::isInstance).mapToInt(p -> ((Player) p).snake.id).findFirst();
+                        final var playerId = game.streamClients()
+                                .filter(Player.class::isInstance)
+                                .map(Player.class::cast)
+                                .map(Player::getSnake)
+                                .mapToInt(snake -> snake.id)
+                                .findFirst();
 
                         drawSnakes(ctx, playerId);
                         drawFood(ctx);
@@ -104,9 +109,9 @@ public class DebugView extends Application {
                         final var y = pd.point.y;
                         final float snakeScale = 1f;
 
-                        g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize/2.0 * snakeScale * ZOOM,
-                                300 - (y - camera.y) * ZOOM - snakeSize/2.0 * snakeScale * ZOOM,
-                                snakeSize * snakeScale * ZOOM, snakeSize * snakeScale* ZOOM);
+                        g.fillOval((x - camera.x) * ZOOM + 400 - snakeSize / 2.0 * snakeScale * ZOOM,
+                                300 - (y - camera.y) * ZOOM - snakeSize / 2.0 * snakeScale * ZOOM,
+                                snakeSize * snakeScale * ZOOM, snakeSize * snakeScale * ZOOM);
                     });
 
             if (DRAW_TAILS) {

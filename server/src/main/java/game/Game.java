@@ -131,9 +131,8 @@ public class Game {
             client = clients.remove(sessionId);
         }
 
-        if (client instanceof Player) {
-            final var snake = ((Player) client).snake;
-            snake.kill();
+        if (client instanceof final Player player) {
+            player.getSnake().kill();
         }
     }
 

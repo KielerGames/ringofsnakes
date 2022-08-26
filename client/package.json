@@ -1,6 +1,6 @@
 {
     "name": "ringofsnakes-client",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "description": "",
     "repository": {
         "type": "git",
@@ -9,10 +9,11 @@
     "private": true,
     "scripts": {
         "test": "jest --maxWorkers=1",
-        "pack:shaders": "node pack-shaders.js",
+        "pack:shaders:dev": "node pack-shaders.js",
+        "pack:shaders": "node pack-shaders.js --minify",
         "build:js": "webpack --progress",
         "build:js:watch": "webpack --watch",
-        "build": "npm run pack:shaders && npm run build:js",
+        "build": "npm run pack:shaders:dev && npm run build:js",
         "build:production": "npm run pack:shaders && webpack --mode=production",
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\"",
         "lint": "eslint ./src/app --ext .ts,.tsx",

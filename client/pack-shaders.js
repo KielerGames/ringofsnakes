@@ -7,12 +7,16 @@ const SHADER_DIR = path.join("src", "shader");
 const OUTPUT_FOLDER = "public";
 const OUTPUT_FILE = path.join(OUTPUT_FOLDER, "shaders.json");
 
+// eslint-disable-next-line no-undef
+const args = new Set(process.argv.slice(2).map((a) => a.replace(/^--/, "")));
+const minify = args.has("minify");
+
 if (!fs.existsSync(OUTPUT_FOLDER)) {
     console.info(`Creating folder: ${OUTPUT_FOLDER}`);
     fs.mkdirSync(OUTPUT_FOLDER);
 }
 
-console.log("Loading shaders...");
+console.log(minify ? "Loading and minifying shaders..." : "Loading shaders...");
 
 const shaders = fs
     .readdirSync(SHADER_DIR)
@@ -20,10 +24,8 @@ const shaders = fs
     .reduce((shaders, filename) => {
         console.log(" --> " + filename);
 
-        const rawContent = fs.readFileSync(SHADER_DIR + "/" + filename, "utf8");
-        shaders[filename] = rawContent.trim();
-
-        // TODO: consider minifying shaders (remove unnecessary whitespaces, rename variables, ...)
+        const rawContent = fs.readFileSync(SHADER_DIR + "/" + filename, "utf8").trim();
+        shaders[filename] = args.has("minify") ? minifyShaderCode(rawContent) : rawContent;
 
         return shaders;
     }, {});
@@ -31,3 +33,12 @@ const shaders = fs
 console.log("Done. Writing...");
 fs.writeFileSync(OUTPUT_FILE, JSON.stringify(shaders));
 console.log(" --> " + OUTPUT_FILE + "\n");
+
+function minifyShaderCode(shaderCode) {
+    return shaderCode
+        .replace(/\r/g, "") // Remove carriage returns (only newlines)
+        .replace(/\/\*[\s\S]*?\*\//g, "") // Remove multiline comments
+        .replace(/\/\/[^\n]*/g, "\n") // Remove single line comments
+        .replace(/;[\s\n]+/g, ";") // Remove unnecessary whitespaces and line breaks
+        .replace(/\{[\s\n]+/g, "{"); // Remove unnecessary whitespaces and line breaks
+}

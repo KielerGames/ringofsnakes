@@ -66,11 +66,12 @@ public class SnakeServer {
 
     public static void onNewClientConnected(Session session) {
         System.out.println("A new client has connected.");
-        Player player;
+        Client player;
         try {
             player = game.createPlayer(session).get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+            // TODO: close connection
             return;
         }
 
@@ -87,14 +88,15 @@ public class SnakeServer {
     public static void onUserInputUpdate(Session session, float alpha, boolean fast, float ratio) {
         final var client = clients.get(session.getId());
 
-        if (client instanceof final Player player) {
-            player.getSnake().setTargetDirection(alpha);
-            player.getSnake().setUserFast(fast);
-            player.setViewBoxRatio(ratio);
+        if (client.isPlayer()) {
+            client.getSnake().setTargetDirection(alpha);
+            client.getSnake().setUserFast(fast);
+            client.setViewBoxRatio(ratio);
         } else {
             System.err.println("Illegal request from client.");
             try {
                 session.close(ILLEGAL_INPUT);
+                // TODO: does this trigger EventSocket.onWebSocketClose and thus call removeClient ?
             } catch (IOException e) {
                 System.err.println(e.getMessage());
             }

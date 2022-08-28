@@ -5,7 +5,9 @@ import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.world.HeatMap;
 import game.world.WorldChunk;
+import lombok.Getter;
 import math.BoundingBox;
+import math.Vector;
 import server.protocol.GameUpdate;
 import server.protocol.SnakeNameUpdate;
 
@@ -17,19 +19,28 @@ import java.util.*;
 /**
  * Player/Spectator abstraction.
  */
-public abstract class Client {
+public class Client {
     private static final Gson gson = new Gson();
     public final Session session;
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private final Map<WorldChunk, Integer> knownFoodChunks = new HashMap<>();
     private final Map<Snake, Integer> knownSnakes = new HashMap<>();
-    protected float viewBoxRatio = 1f;
+    private float viewBoxRatio = 1f;
     private GameUpdate nextGameUpdate = new GameUpdate();
     private long lastHeatMapUpdate = System.currentTimeMillis();
     private SnakeNameUpdate nextNameUpdate = new SnakeNameUpdate();
+    @Getter private Snake snake;
+    @Getter private Type type;
 
-    public Client(Session session) {
+    protected Client(Session session, Type type) {
         this.session = session;
+        this.type = type;
+    }
+
+    public static Client createPlayer(Session session, Snake snake) {
+        final var client = new Client(session, Type.PLAYER);
+        client.snake = snake;
+        return client;
     }
 
     /**
@@ -99,7 +110,11 @@ public abstract class Client {
      * turned into a byte buffer for transfer to the client.
      */
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
+        if (snake == null) {
+            return;
+        }
 
+        update.addSnakeChunk(snake.currentChunk);
     }
 
     /**
@@ -150,7 +165,13 @@ public abstract class Client {
         }
     }
 
-    public abstract BoundingBox getKnowledgeBox();
+    public BoundingBox getKnowledgeBox() {
+        if (snake == null) {
+            return new BoundingBox(Vector.ORIGIN, viewBoxRatio * 48f, 48f);
+        }
+
+        return new BoundingBox(snake.getHeadPosition(), viewBoxRatio * 48f, 48f);
+    }
 
     private void updateKnowledge(GameUpdate update) {
         final var knowledgeBox = getKnowledgeBox();
@@ -185,5 +206,21 @@ public abstract class Client {
     public void setViewBoxRatio(float ratio) {
         assert (ratio > 0f && ratio < 3f);
         viewBoxRatio = ratio;
+    }
+
+    public String getName() {
+        if (snake == null) {
+            return "Spectator";
+        }
+
+        return snake.name;
+    }
+
+    public boolean isPlayer() {
+        return this.type == Type.PLAYER;
+    }
+
+    public enum Type {
+        PLAYER, SPECTATOR, FIXED_SPECTATOR
     }
 }

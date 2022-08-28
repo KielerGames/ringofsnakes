@@ -172,7 +172,7 @@ public class GameUpdateTest {
         public GameUpdate lastSentUpdate;
 
         TestClient(Session session) {
-            super(session);
+            super(session, Type.PLAYER);
         }
 
         @Override

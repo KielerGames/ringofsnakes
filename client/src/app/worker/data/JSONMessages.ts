@@ -2,17 +2,18 @@ import { GameConfig } from "../../data/config/GameConfig";
 import { GameStatisticsDTO } from "../../data/dto/GameStatisticsDTO";
 export type ClientToServerJSONMessage = never;
 export type ServerToClientJSONMessage =
-    | SpawnInfo
+    | GameInfo
     | SnakeDeathInfo
     | LeaderboardData
     | SnakeNameUpdate;
 
-export type SpawnInfo = Readonly<{
-    tag: "SpawnInfo";
+export type GameInfo = Readonly<{
+    tag: "GameInfo";
     snakeId: number;
-    snakeName: string;
-    snakePosition: { x: number; y: number };
+    snakeName?: string;
+    startPosition: { x: number; y: number };
     gameConfig: GameConfig;
+    clientType: "PLAYER" | "SPECTATOR" | "STATIONARY_SPECTATOR";
 }>;
 
 export type SnakeDeathInfo = Readonly<{

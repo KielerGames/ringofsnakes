@@ -5,7 +5,7 @@ import RateLimiter from "../util/RateLimiter";
 import GameDataBuffer from "./data/GameDataBuffer";
 import { ClientData } from "./data/ClientData";
 import { Callback } from "../util/FunctionTypes";
-import { SpawnInfo } from "./data/JSONMessages";
+import { GameInfo } from "./data/JSONMessages";
 import Rectangle, { TransferableBox } from "../math/Rectangle";
 import { DataUpdateDTO } from "../data/dto/DataUpdateDTO";
 import { GameInfoDTO } from "../data/dto/GameInfoDTO";
@@ -40,11 +40,11 @@ export class WorkerAPI {
         const url = `${protocol}://${cfg.server.host}:${cfg.server.port}/game`;
         socket = await connect(url);
 
-        const spawnInfo: SpawnInfo = await new Promise((resolve, reject) => {
-            const timeoutId = setTimeout(() => reject(new Error("SpawnInfo timeout.")), 2000);
+        const gameInfo: GameInfo = await new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => reject(new Error("GameInfo timeout.")), 2000);
 
             socket!.onJSONMessage = (message) => {
-                if (message.tag === "SpawnInfo") {
+                if (message.tag === "GameInfo") {
                     clearTimeout(timeoutId);
                     resolve(message);
                 } else {
@@ -53,7 +53,11 @@ export class WorkerAPI {
             };
         });
 
-        data.init(spawnInfo);
+        if (gameInfo.clientType !== "PLAYER") {
+            throw new Error("Unexpected client type " + gameInfo.clientType);
+        }
+
+        data.init(gameInfo);
 
         socket.onJSONMessage = (message) => {
             switch (message.tag) {
@@ -74,8 +78,8 @@ export class WorkerAPI {
 
         return {
             config: data.config,
-            targetSnakeId: spawnInfo.snakeId,
-            startPosition: spawnInfo.snakePosition
+            targetSnakeId: gameInfo.snakeId,
+            startPosition: gameInfo.startPosition
         };
     }
 

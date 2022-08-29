@@ -1,14 +1,14 @@
 package game.snake;
 
 import game.world.World;
-import math.Vector;
 import math.Direction;
+import math.Vector;
 
 import java.util.Random;
 
 public class SnakeFactory {
     private static final Random random = new Random();
-    private static char nextSnakeId = 0;
+    private static char nextSnakeId = 42;
 
     private SnakeFactory() {
     }
@@ -32,7 +32,7 @@ public class SnakeFactory {
     }
 
     public static Snake createSnake(Vector position, double direction, World world, String name) {
-        final var id = nextSnakeId++;
+        final var id = generateSnakeId();
         Snake snake = name == null ? new Snake(id, world) : new Snake(id, world, name);
         snake.setSkin((byte) random.nextInt(7));
 
@@ -58,7 +58,7 @@ public class SnakeFactory {
     }
 
     public static BoundarySnake createBoundarySnake(World world) {
-        final var snake = new BoundarySnake(nextSnakeId++, world);
+        final var snake = new BoundarySnake(generateSnakeId(), world);
         snake.setSkin((byte) random.nextInt(7));
 
         snake.beginChunk();
@@ -70,5 +70,18 @@ public class SnakeFactory {
         }
 
         return snake;
+    }
+
+    private static char generateSnakeId() {
+        final var id = nextSnakeId;
+
+        nextSnakeId++;
+
+        if (nextSnakeId == 0) {
+            // 0 is a special value reserved for later use as null
+            nextSnakeId++;
+        }
+
+        return id;
     }
 }

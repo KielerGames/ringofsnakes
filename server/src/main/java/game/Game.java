@@ -13,9 +13,9 @@ import game.world.World;
 import game.world.WorldChunk;
 import server.Client;
 import server.Player;
+import server.protocol.GameInfo;
 import server.protocol.GameStatistics;
 import server.protocol.SnakeDeathInfo;
-import server.protocol.SpawnInfo;
 import util.ExceptionalExecutorService;
 
 import javax.websocket.Session;
@@ -38,7 +38,7 @@ public class Game {
     public final CollisionManager collisionManager;
     public final List<Snake> snakes = new LinkedList<>();
     protected final ExceptionalExecutorService executor;
-    private final Map<String, Client> clients = new HashMap<>(64);
+    private final Map<Session, Client> clients = new HashMap<>(64);
     private final List<Bot> bots = new LinkedList<>();
     private final Set<String> usedNames = new HashSet<>();
     private byte ticksSinceLastUpdate = 0;
@@ -87,7 +87,7 @@ public class Game {
 
             otherSnake.addKill();
             final var killMessage = gson.toJson(new SnakeDeathInfo(snake, otherSnake));
-            executor.schedule(() -> clients.forEach((sId, client) -> client.send(killMessage)), 0, TimeUnit.MILLISECONDS);
+            executor.submit(() -> clients.values().forEach(client -> client.send(killMessage)));
         }
     }
 
@@ -108,9 +108,9 @@ public class Game {
         }, executor).thenApply(snake -> {
             final var player = new Player(snake, session);
             synchronized (clients) {
-                clients.put(session.getId(), player);
+                clients.put(session, player);
             }
-            player.sendSync(gson.toJson(new SpawnInfo(config, snake)));
+            player.sendSync(gson.toJson(GameInfo.createForPlayer(snake)));
             System.out.println("Player " + player.getName() + " has joined game");
             return player;
         });
@@ -124,11 +124,11 @@ public class Game {
         }
     }
 
-    public void removeClient(String sessionId) {
+    public void removeClient(Session session) {
         final Client client;
 
         synchronized (clients) {
-            client = clients.remove(sessionId);
+            client = clients.remove(session);
         }
 
         if (client instanceof final Player player) {
@@ -165,11 +165,11 @@ public class Game {
         // update leaderboard every second
         executor.scheduleAtFixedRate(() -> {
             final var statsJson = gson.toJson(new GameStatistics(this));
-            clients.forEach((__, client) -> client.send(statsJson));
+            clients.values().forEach(client -> client.send(statsJson));
         }, 1, 2, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(
-                () -> clients.forEach((__, client) -> client.sendNameUpdate()),
+                () -> clients.values().forEach(Client::sendNameUpdate),
                 420, 1500,
                 TimeUnit.MILLISECONDS
         );
@@ -206,7 +206,7 @@ public class Game {
 
     private void updateClients() {
         synchronized (clients) {
-            clients.forEach((__, client) -> {
+            clients.values().forEach(client -> {
                 final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
                 worldChunks.stream()
                         .flatMap(WorldChunk::streamSnakeChunks)

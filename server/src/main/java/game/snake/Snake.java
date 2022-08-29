@@ -242,6 +242,9 @@ public class Snake {
     }
 
     public void kill() {
+        if (!alive) {
+            return;
+        }
         recycleSnake();
         alive = false;
     }

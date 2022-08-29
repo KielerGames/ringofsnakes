@@ -80,7 +80,7 @@ public class SnakeServer {
     public static void removeClient(Session session) {
         final var sessionId = session.getId();
         clients.remove(sessionId);
-        game.removeClient(sessionId);
+        game.removeClient(session);
         System.out.println("Player has been removed. (" + sessionId + ")");
     }
 

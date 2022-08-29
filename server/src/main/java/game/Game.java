@@ -12,6 +12,7 @@ import game.world.Collidable;
 import game.world.World;
 import game.world.WorldChunk;
 import server.Client;
+import server.Player;
 import server.protocol.GameStatistics;
 import server.protocol.SnakeDeathInfo;
 import server.protocol.SpawnInfo;
@@ -90,7 +91,7 @@ public class Game {
         }
     }
 
-    public Future<Client> createPlayer(Session session) {
+    public Future<Player> createPlayer(Session session) {
         final var spawnPos = world.findSpawnPosition();
 
         return CompletableFuture.supplyAsync(() -> {
@@ -105,7 +106,7 @@ public class Game {
 
             return snake;
         }, executor).thenApply(snake -> {
-            final var player = Client.createPlayer(session, snake);
+            final var player = new Player(snake, session);
             synchronized (clients) {
                 clients.put(session.getId(), player);
             }
@@ -130,8 +131,8 @@ public class Game {
             client = clients.remove(sessionId);
         }
 
-        if (client.isPlayer()) {
-            client.getSnake().kill();
+        if (client instanceof final Player player) {
+            player.getSnake().kill();
         }
     }
 
@@ -205,7 +206,7 @@ public class Game {
 
     private void updateClients() {
         synchronized (clients) {
-            clients.values().forEach(client -> {
+            clients.forEach((__, client) -> {
                 final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
                 worldChunks.stream()
                         .flatMap(WorldChunk::streamSnakeChunks)

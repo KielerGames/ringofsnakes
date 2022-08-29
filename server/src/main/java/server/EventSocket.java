@@ -22,7 +22,7 @@ public class EventSocket {
 
     @OnMessage
     public void onWebSocketMessage(Session session, ByteBuffer buffer) {
-        if (buffer.capacity() != 9) {
+        if(buffer.capacity() != 9) {
             System.err.println("Illegal binary message from client.");
             return;
         }

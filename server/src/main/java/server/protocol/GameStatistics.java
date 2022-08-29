@@ -2,7 +2,7 @@ package server.protocol;
 
 import game.Game;
 import game.snake.Snake;
-import server.Client;
+import server.Player;
 
 import java.util.Comparator;
 import java.util.List;
@@ -14,8 +14,10 @@ public class GameStatistics extends ServerToClientJSONMessage {
 
     public GameStatistics(Game game) {
         leaderboard = game.streamClients()
-                .filter(Client::isPlayer)
-                .map(Client::getSnake)
+                .filter(Player.class::isInstance)
+                .map(Player.class::cast)
+                .map(Player::getSnake)
+                .filter(Snake::isAlive)
                 .sorted(Comparator.comparing(Snake::getLength).reversed())
                 .limit(10)
                 .map(LeaderboardEntry::new)

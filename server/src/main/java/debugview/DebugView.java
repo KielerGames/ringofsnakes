@@ -9,7 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import math.Vector;
-import server.Client;
+import server.Player;
 import server.SnakeServer;
 
 import java.util.OptionalInt;
@@ -56,8 +56,9 @@ public class DebugView extends Application {
 
                     if (!game.snakes.isEmpty()) {
                         final var playerId = game.streamClients()
-                                .filter(Client::isPlayer)
-                                .map(Client::getSnake)
+                                .filter(Player.class::isInstance)
+                                .map(Player.class::cast)
+                                .map(Player::getSnake)
                                 .mapToInt(snake -> snake.id)
                                 .findFirst();
 

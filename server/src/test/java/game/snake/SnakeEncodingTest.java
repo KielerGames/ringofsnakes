@@ -47,7 +47,7 @@ public class SnakeEncodingTest {
     @Test
     void testSnakeChunkBuffer() {
         World world = new World(64.0, 20);
-        Snake snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+        Snake snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
         var n = snake.getSnakeChunks().size();
         var i = 0;
 

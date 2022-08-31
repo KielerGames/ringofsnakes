@@ -47,10 +47,6 @@ public class Snake {
     private double foodTrailBuffer = 0f;
     @Getter private int kills = 0;
 
-    Snake(char id, World world) {
-        this(id, world, "Snake " + ((int) id));
-    }
-
     Snake(char id, World world, @NonNull String name) {
         this.id = id;
         this.world = world;

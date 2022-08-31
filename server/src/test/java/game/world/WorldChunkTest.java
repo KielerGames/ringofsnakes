@@ -53,7 +53,7 @@ public class WorldChunkTest {
     @Test
     void testAddASnake() {
         var world = new World();
-        var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+        var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
 
         for (int i = 0; i < 512; i++) {
             snake.tick();
@@ -95,7 +95,7 @@ public class WorldChunkTest {
     @Test
     void testSnakesWithinWorldChunk() {
         var world = new World();
-        var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+        var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
 
         for (int i = 0; i < 512; i++) {
             snake.tick();
@@ -113,7 +113,7 @@ public class WorldChunkTest {
     @Test
     void testSnakeGetsRemoved() {
         var world = new World();
-        var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+        var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
         snake.tick();
         var worldChunk = world.chunks.stream()
                 .filter(chunk -> chunk.getSnakeChunkCount() > 0)

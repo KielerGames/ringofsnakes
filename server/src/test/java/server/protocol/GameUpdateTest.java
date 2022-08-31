@@ -89,7 +89,7 @@ public class GameUpdateTest {
     @Test
     void testKnowledgeDecay() {
         var client = new TestClient(session);
-        var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+        var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
 
         for (int i = 0; i < 10; i++) {
             snake.tick();

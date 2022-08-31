@@ -1,5 +1,7 @@
 package game;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import game.ai.Bot;
@@ -16,6 +18,7 @@ import server.Player;
 import server.protocol.GameInfo;
 import server.protocol.GameStatistics;
 import server.protocol.SnakeDeathInfo;
+import util.Event;
 import util.ExceptionalExecutorService;
 
 import javax.websocket.Session;
@@ -35,10 +38,12 @@ public class Game {
     public final int id = 1; //TODO
     public final GameConfig config;
     public final World world;
+    public final GameEvents events = new GameEvents();
     public final CollisionManager collisionManager;
     public final List<Snake> snakes = new LinkedList<>();
     protected final ExceptionalExecutorService executor;
-    private final Map<Session, Client> clients = new HashMap<>(64);
+    private final Map<Session, Client> clientsBySession = new HashMap<>(64);
+    private final Multimap<Snake, Client> clientsBySnake = HashMultimap.create(64, 4);
     private final List<Bot> bots = new LinkedList<>();
     private final Set<String> usedNames = new HashSet<>();
     private byte ticksSinceLastUpdate = 0;
@@ -87,7 +92,7 @@ public class Game {
 
             otherSnake.addKill();
             final var killMessage = gson.toJson(new SnakeDeathInfo(snake, otherSnake));
-            executor.submit(() -> clients.values().forEach(client -> client.send(killMessage)));
+            executor.submit(() -> clientsBySession.values().forEach(client -> client.send(killMessage)));
         }
     }
 
@@ -107,8 +112,11 @@ public class Game {
             return snake;
         }, executor).thenApply(snake -> {
             final var player = new Player(snake, session);
-            synchronized (clients) {
-                clients.put(session, player);
+            synchronized (clientsBySession) {
+                clientsBySession.put(session, player);
+            }
+            synchronized (clientsBySnake) {
+                clientsBySnake.put(snake, player);
             }
             player.sendSync(gson.toJson(GameInfo.createForPlayer(snake)));
             System.out.println("Player " + player.getName() + " has joined game");
@@ -127,12 +135,16 @@ public class Game {
     public void removeClient(Session session) {
         final Client client;
 
-        synchronized (clients) {
-            client = clients.remove(session);
+        synchronized (clientsBySession) {
+            client = clientsBySession.remove(session);
         }
 
         if (client instanceof final Player player) {
-            player.getSnake().kill();
+            final var snake = player.getSnake();
+            snake.kill();
+            synchronized (clientsBySnake) {
+                clientsBySnake.remove(snake, player);
+            }
         }
     }
 
@@ -165,11 +177,11 @@ public class Game {
         // update leaderboard every second
         executor.scheduleAtFixedRate(() -> {
             final var statsJson = gson.toJson(new GameStatistics(this));
-            clients.values().forEach(client -> client.send(statsJson));
+            broadcast(statsJson);
         }, 1, 2, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(
-                () -> clients.values().forEach(Client::sendNameUpdate),
+                () -> clientsBySession.values().forEach(Client::sendNameUpdate),
                 420, 1500,
                 TimeUnit.MILLISECONDS
         );
@@ -205,8 +217,8 @@ public class Game {
     }
 
     private void updateClients() {
-        synchronized (clients) {
-            clients.values().forEach(client -> {
+        synchronized (clientsBySession) {
+            clientsBySession.values().forEach(client -> {
                 final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
                 worldChunks.stream()
                         .flatMap(WorldChunk::streamSnakeChunks)
@@ -255,10 +267,26 @@ public class Game {
     }
 
     public Stream<Client> streamClients() {
-        return clients.values().stream();
+        return clientsBySession.values().stream();
     }
 
     public int getNumberOfBots() {
         return this.bots.size();
+    }
+
+    private void broadcast(String encodedJsonData) {
+        synchronized (clientsBySession) {
+            clientsBySession.values().forEach(client -> client.send(encodedJsonData));
+        }
+    }
+
+    private static class GameEvents {
+        public final Event<String> snakeDeath;
+        private final Event.Trigger<String> snakeDeathTrigger;
+
+        private GameEvents() {
+            snakeDeathTrigger = Event.create();
+            snakeDeath = snakeDeathTrigger.getEvent();
+        }
     }
 }

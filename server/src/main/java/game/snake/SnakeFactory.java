@@ -22,8 +22,7 @@ public class SnakeFactory {
 
     public static Snake createSnake(Vector position, double direction, World world, String name) {
         final var id = generateSnakeId(world);
-        final var snake = new Snake(id, world, name);
-        snake.setSkin(pickSnakeSkin());
+        final var snake = new Snake(id, world, name, pickSnakeSkin());
 
         // start position & rotation
         snake.headPosition = position.clone();
@@ -38,7 +37,6 @@ public class SnakeFactory {
 
     public static BoundarySnake createBoundarySnake(World world) {
         final var snake = new BoundarySnake(generateSnakeId(world), world);
-        snake.setSkin(pickSnakeSkin());
 
         snake.beginChunk();
         world.addSnake(snake);
@@ -69,7 +67,7 @@ public class SnakeFactory {
     }
 
     private static byte pickSnakeSkin() {
-        return (byte) ThreadLocalRandom.current().nextInt(7);
+        return (byte) ThreadLocalRandom.current().nextInt(Snake.NUMBER_OF_SKINS);
     }
 
     // TODO: move methods only used by tests to the test source folder

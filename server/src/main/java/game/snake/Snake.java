@@ -4,8 +4,6 @@ import game.GameConfig;
 import game.world.Food;
 import game.world.World;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 import math.Direction;
 import math.Vector;
 import util.BitWithShortHistory;
@@ -21,6 +19,7 @@ import static math.MathFunctions.sigmoid;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
+    public static final int NUMBER_OF_SKINS = 7;
     public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 1024.0;
     private static final Random random = new Random();
 
@@ -32,12 +31,12 @@ public class Snake {
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private final BitWithShortHistory fastHistory = new BitWithShortHistory(false);
+    private final byte skin;
     public GrowingSnakeChunk currentChunk;
     @Getter protected double length;
     @Getter Vector headPosition;
     @Getter double headDirection;
     private char currentChunkId;
-    @Setter private byte skin;
     @Getter private boolean alive = true;
     private char nextChunkId = 0;
     private double targetDirection;
@@ -47,7 +46,7 @@ public class Snake {
     private double foodTrailBuffer = 0f;
     @Getter private int kills = 0;
 
-    Snake(char id, World world, @NonNull String name) {
+    Snake(char id, World world, String name, byte skin) {
         this.id = id;
         this.world = world;
         config = world.getConfig();
@@ -55,6 +54,7 @@ public class Snake {
         length = config.snakes.startLength;
         width = config.snakes.minWidth;
         this.name = name;
+        this.skin = skin;
 
         updateWidth();
     }

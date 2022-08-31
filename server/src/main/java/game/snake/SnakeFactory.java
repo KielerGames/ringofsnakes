@@ -4,10 +4,13 @@ import game.world.World;
 import math.Direction;
 import math.Vector;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SnakeFactory {
-    private static char nextSnakeId = 42;
+    private static final Map<World, Integer> nextSnakeIds = Collections.synchronizedMap(new WeakHashMap<>(1));
 
     private SnakeFactory() {
     }
@@ -18,7 +21,7 @@ public class SnakeFactory {
     }
 
     public static Snake createSnake(Vector position, double direction, World world, String name) {
-        final var id = generateSnakeId();
+        final var id = generateSnakeId(world);
         final var snake = new Snake(id, world, name);
         snake.setSkin(pickSnakeSkin());
 
@@ -34,7 +37,7 @@ public class SnakeFactory {
     }
 
     public static BoundarySnake createBoundarySnake(World world) {
-        final var snake = new BoundarySnake(generateSnakeId(), world);
+        final var snake = new BoundarySnake(generateSnakeId(world), world);
         snake.setSkin(pickSnakeSkin());
 
         snake.beginChunk();
@@ -48,17 +51,21 @@ public class SnakeFactory {
         return snake;
     }
 
-    private static char generateSnakeId() {
-        final var id = nextSnakeId;
+    private static char generateSnakeId(World world) {
+        final int intId = nextSnakeIds.compute(world, (w, oldId) -> {
+            if (oldId == null) {
+                return 42;
+            }
 
-        nextSnakeId++;
+            if (oldId == -1) {
+                // 0 is a special value reserved for later use as null
+                return 1;
+            }
 
-        if (nextSnakeId == 0) {
-            // 0 is a special value reserved for later use as null
-            nextSnakeId++;
-        }
+            return oldId + 1;
+        });
 
-        return id;
+        return (char) intId;
     }
 
     private static byte pickSnakeSkin() {

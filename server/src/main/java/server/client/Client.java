@@ -1,6 +1,5 @@
 package server.client;
 
-import com.google.gson.Gson;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.world.HeatMap;
@@ -8,6 +7,7 @@ import game.world.WorldChunk;
 import math.BoundingBox;
 import server.protocol.GameUpdate;
 import server.protocol.SnakeNameUpdate;
+import util.JSON;
 
 import javax.websocket.Session;
 import java.io.IOException;
@@ -18,7 +18,6 @@ import java.util.*;
  * Player/Spectator abstraction.
  */
 public abstract class Client {
-    private static final Gson gson = new Gson();
     public final Session session;
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private final Map<WorldChunk, Integer> knownFoodChunks = new HashMap<>();
@@ -123,7 +122,7 @@ public abstract class Client {
         if (this.nextNameUpdate.isEmpty()) {
             return;
         }
-        final var encodedUpdate = gson.toJson(this.nextNameUpdate);
+        final var encodedUpdate = JSON.stringify(this.nextNameUpdate);
         this.nextNameUpdate = new SnakeNameUpdate();
         send(encodedUpdate);
     }

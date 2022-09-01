@@ -2,8 +2,6 @@ package game;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import game.ai.Bot;
 import game.ai.BotFactory;
 import game.snake.Snake;
@@ -19,6 +17,7 @@ import server.protocol.GameInfo;
 import server.protocol.GameStatistics;
 import server.protocol.SnakeDeathInfo;
 import util.ExceptionalExecutorService;
+import util.JSON;
 
 import javax.websocket.Session;
 import java.util.*;
@@ -32,8 +31,6 @@ import java.util.stream.Stream;
 import static util.TaskMeasurer.measure;
 
 public class Game {
-    private static final Gson gson = new Gson();
-    private static final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     public final int id = 1; //TODO
     public final GameConfig config;
     public final World world;
@@ -89,7 +86,7 @@ public class Game {
             }
 
             otherSnake.addKill();
-            final var killMessage = gson.toJson(new SnakeDeathInfo(snake, otherSnake));
+            final var killMessage = JSON.stringify(new SnakeDeathInfo(snake, otherSnake));
             executor.submit(() -> clientsBySession.values().forEach(client -> client.send(killMessage)));
         }
     }
@@ -116,7 +113,7 @@ public class Game {
             synchronized (clientsBySnake) {
                 clientsBySnake.put(snake, player);
             }
-            player.sendSync(gson.toJson(GameInfo.createForPlayer(snake)));
+            player.sendSync(JSON.stringify(GameInfo.createForPlayer(snake)));
             System.out.println("Player " + player.getName() + " has joined game");
             return player;
         });
@@ -174,7 +171,7 @@ public class Game {
 
         // update leaderboard every second
         executor.scheduleAtFixedRate(() -> {
-            final var statsJson = gson.toJson(new GameStatistics(this));
+            final var statsJson = JSON.stringify(new GameStatistics(this));
             broadcast(statsJson);
         }, 1, 2, TimeUnit.SECONDS);
 
@@ -193,7 +190,7 @@ public class Game {
             }
         }, 1, 8, TimeUnit.SECONDS);
 
-        System.out.println("Game started. Config:\n" + prettyGson.toJson(config));
+        System.out.println("Game started. Config:\n" + JSON.stringify(config, true));
         System.out.println("Waiting for players to connect...");
     }
 

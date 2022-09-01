@@ -8,11 +8,13 @@ import math.Direction;
 import math.Vector;
 import util.BitWithShortHistory;
 
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static math.MathFunctions.sigmoid;
@@ -45,6 +47,7 @@ public class Snake {
     @Getter private double width;
     private double foodTrailBuffer = 0f;
     @Getter private int kills = 0;
+    @Nullable private Consumer<Snake> deathCallback;
 
     Snake(char id, World world, String name, byte skin) {
         this.id = id;
@@ -189,7 +192,12 @@ public class Snake {
             foodTrailBuffer -= smallFoodNutritionalValue;
             spawnFoodAtTailPosition();
         }
+    }
 
+    public void setDeathCallback(Consumer<Snake> callback) {
+        assert callback != null;
+        assert deathCallback == null;
+        deathCallback = callback;
     }
 
     private void spawnFoodAtTailPosition() {
@@ -241,8 +249,13 @@ public class Snake {
         if (!alive) {
             return;
         }
-        recycleSnake();
         alive = false;
+
+        recycleSnake();
+
+        if (deathCallback != null) {
+            deathCallback.accept(this);
+        }
     }
 
     public void addKill() {

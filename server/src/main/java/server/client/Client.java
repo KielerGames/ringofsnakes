@@ -1,4 +1,4 @@
-package server;
+package server.client;
 
 import com.google.gson.Gson;
 import game.snake.Snake;

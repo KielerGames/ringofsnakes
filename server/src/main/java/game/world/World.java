@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import math.BoundingBox;
 import math.Vector;
+import util.Event;
 
 import java.util.Comparator;
 import java.util.Random;
@@ -16,9 +17,10 @@ public class World {
     @Setter private static Random random = new Random();
     public final WorldChunkCollection chunks;
     public final Vector center = new Vector(0, 0);
+    public final BoundingBox box;
+    public final WorldEvents events = new WorldEvents();
     @Getter private final GameConfig config;
     @Getter private final HeatMap heatMap;
-    public final BoundingBox box;
 
     public World(double chunkSize, int repetitions) {
         this.config = new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions));
@@ -53,6 +55,7 @@ public class World {
     }
 
     public void addSnake(Snake snake) {
+        snake.setDeathCallback(this::handleSnakeDeath);
         snake.streamSnakeChunks().forEach(this::addSnakeChunk);
     }
 
@@ -71,5 +74,23 @@ public class World {
                 .sorted(Comparator.comparingInt(WorldChunk::getFoodCount))
                 .limit(numberOfChunksToSpawnSimultaneously)
                 .forEach(WorldChunk::addFood);
+    }
+
+    public void handleSnakeDeath(Snake snake) {
+        if (snake.isAlive()) {
+            throw new IllegalStateException("This snake ain't dead yet.");
+        }
+
+        events.snakeDeathTrigger.trigger("snake has died TODO");
+    }
+
+    private static class WorldEvents {
+        public final Event<String> snakeDeath;
+        private final Event.Trigger<String> snakeDeathTrigger;
+
+        private WorldEvents() {
+            snakeDeathTrigger = Event.create();
+            snakeDeath = snakeDeathTrigger.getEvent();
+        }
     }
 }

@@ -13,12 +13,11 @@ import game.snake.SnakeNameGenerator;
 import game.world.Collidable;
 import game.world.World;
 import game.world.WorldChunk;
-import server.Client;
-import server.Player;
+import server.client.Client;
+import server.client.Player;
 import server.protocol.GameInfo;
 import server.protocol.GameStatistics;
 import server.protocol.SnakeDeathInfo;
-import util.Event;
 import util.ExceptionalExecutorService;
 
 import javax.websocket.Session;
@@ -38,7 +37,6 @@ public class Game {
     public final int id = 1; //TODO
     public final GameConfig config;
     public final World world;
-    public final GameEvents events = new GameEvents();
     public final CollisionManager collisionManager;
     public final List<Snake> snakes = new LinkedList<>();
     protected final ExceptionalExecutorService executor;
@@ -277,16 +275,6 @@ public class Game {
     private void broadcast(String encodedJsonData) {
         synchronized (clientsBySession) {
             clientsBySession.values().forEach(client -> client.send(encodedJsonData));
-        }
-    }
-
-    private static class GameEvents {
-        public final Event<String> snakeDeath;
-        private final Event.Trigger<String> snakeDeathTrigger;
-
-        private GameEvents() {
-            snakeDeathTrigger = Event.create();
-            snakeDeath = snakeDeathTrigger.getEvent();
         }
     }
 }

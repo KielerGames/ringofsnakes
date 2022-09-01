@@ -6,6 +6,8 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import server.client.Client;
+import server.client.Player;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Session;

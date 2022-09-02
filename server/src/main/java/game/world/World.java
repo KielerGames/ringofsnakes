@@ -10,10 +10,11 @@ import math.Vector;
 
 import java.util.Comparator;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class World {
     private static final int FOOD_THRESHOLD = 16;
-    @Setter private static Random random = new Random();
+    @Setter private static Random randomForTests;
     public final WorldChunkCollection chunks;
     public final Vector center = new Vector(0, 0);
     public final BoundingBox box;
@@ -40,7 +41,7 @@ public class World {
 
     public Vector findSpawnPosition() {
         var worldChunkToSpawnIn = findRandomWorldChunkWithMinSnakeChunkCount();
-        return worldChunkToSpawnIn.findSnakeSpawnPosition(World.random);
+        return worldChunkToSpawnIn.findSnakeSpawnPosition(getRandom());
     }
 
     private WorldChunk findRandomWorldChunkWithMinSnakeChunkCount() {
@@ -48,7 +49,7 @@ public class World {
         var minimalSnakeChunkCount = chunks.stream().mapToInt(WorldChunk::getSnakeChunkCount).min().orElseThrow();
         var worldChunksWithMinimalSnakeChunkCount = chunks.stream()
                 .filter(worldChunk -> worldChunk.getSnakeChunkCount() == minimalSnakeChunkCount).toList();
-        int randomIndex = World.random.nextInt(worldChunksWithMinimalSnakeChunkCount.size());
+        int randomIndex = getRandom().nextInt(worldChunksWithMinimalSnakeChunkCount.size());
         return worldChunksWithMinimalSnakeChunkCount.get(randomIndex);
     }
 
@@ -74,6 +75,8 @@ public class World {
     }
 
     public void recycleDeadSnake(Snake snake) {
+        final var random = getRandom();
+
         //TODO:
         // - consider spawning larger food items for larger snakes
         // - fine adjust food value per dead snake
@@ -101,13 +104,11 @@ public class World {
         }
     }
 
-    private static class WorldEvents {
-        public final Event<SnakeDeathEvent> snakeDeath;
-        private final Event.Trigger<SnakeDeathEvent> snakeDeathTrigger;
-
-        private WorldEvents() {
-            snakeDeathTrigger = Event.create();
-            snakeDeath = snakeDeathTrigger.getEvent();
+    private Random getRandom() {
+        if (randomForTests != null) {
+            return randomForTests;
         }
+
+        return ThreadLocalRandom.current();
     }
 }

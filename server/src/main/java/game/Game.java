@@ -85,7 +85,11 @@ public class Game {
                 return;
             }
 
+            // update world and other snakes
+            world.recycleDeadSnake(snake);
             otherSnake.addKill();
+
+            // notify clients
             final var killMessage = JSON.stringify(new SnakeDeathInfo(snake, otherSnake));
             executor.submit(() -> clientsBySession.values().forEach(client -> client.send(killMessage)));
         }

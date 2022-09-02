@@ -1,6 +1,7 @@
 package game.world;
 
 import game.GameConfig;
+import game.events.SnakeDeathEvent;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import lombok.Getter;
@@ -55,7 +56,6 @@ public class World {
     }
 
     public void addSnake(Snake snake) {
-        snake.setDeathCallback(this::handleSnakeDeath);
         snake.streamSnakeChunks().forEach(this::addSnakeChunk);
     }
 
@@ -76,17 +76,37 @@ public class World {
                 .forEach(WorldChunk::addFood);
     }
 
-    public void handleSnakeDeath(Snake snake) {
-        if (snake.isAlive()) {
-            throw new IllegalStateException("This snake ain't dead yet.");
-        }
+    public void recycleDeadSnake(Snake snake) {
+        //TODO:
+        // - consider spawning larger food items for larger snakes
+        // - fine adjust food value per dead snake
+        final var foodScattering = 1.0;
+        final var caloricValueOfSnake = 0.64 * snake.getLength(); //TODO: adjust
+        final var caloricValueOfFoodSpawn = Food.Size.MEDIUM.value * Food.Size.MEDIUM.value * config.foodNutritionalValue;
+        final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
+        final var lengthUntilFoodSpawn = snake.getLength() / Math.max(1, numberOfFoodSpawns);
 
-        events.snakeDeathTrigger.trigger("snake has died TODO");
+        for (int i = 0; i < numberOfFoodSpawns; i++) {
+            final var offset = i * lengthUntilFoodSpawn;
+            final var spawnPosition = snake.getPositionAt(offset);
+            if (spawnPosition == null) {
+                // In some edge cases getPositionAt can return null.
+                // This can be ignored because the number of spawned food items is not critical.
+                continue;
+            }
+            spawnPosition.addScaled(new Vector(random.nextDouble(), random.nextDouble()), foodScattering);
+            if (!box.isWithinSubBox(spawnPosition, 1.0)) {
+                continue;
+            }
+            final var worldChunk = chunks.findChunk(spawnPosition);
+            final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM, snake.getSkin());
+            worldChunk.addFood(food);
+        }
     }
 
     private static class WorldEvents {
-        public final Event<String> snakeDeath;
-        private final Event.Trigger<String> snakeDeathTrigger;
+        public final Event<SnakeDeathEvent> snakeDeath;
+        private final Event.Trigger<SnakeDeathEvent> snakeDeathTrigger;
 
         private WorldEvents() {
             snakeDeathTrigger = Event.create();

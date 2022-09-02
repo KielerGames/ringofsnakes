@@ -95,7 +95,7 @@ public class GameUpdateTest {
             snake.tick();
         }
 
-        client.updateClientSnakeChunk(snake.getSnakeChunks().get(0));
+        client.updateClientSnakeChunk(snake.streamSnakeChunks().findFirst().orElseThrow());
         sendUpdate(client);
         var update1 = client.lastSentUpdate;
         assertTrue(update1.hasSnake(snake));

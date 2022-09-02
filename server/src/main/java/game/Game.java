@@ -2,6 +2,7 @@ package game;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import game.ai.Bot;
 import game.ai.BotFactory;
 import game.snake.Snake;
@@ -37,8 +38,8 @@ public class Game {
     public final CollisionManager collisionManager;
     public final List<Snake> snakes = new LinkedList<>();
     protected final ExceptionalExecutorService executor;
-    private final Map<Session, Client> clientsBySession = new HashMap<>(64);
-    private final Multimap<Snake, Client> clientsBySnake = HashMultimap.create(64, 4);
+    private final Map<Session, Client> clientsBySession = Collections.synchronizedMap(new HashMap<>(64));
+    private final Multimap<Snake, Client> clientsBySnake = Multimaps.synchronizedMultimap(HashMultimap.create(64, 4));
     private final List<Bot> bots = new LinkedList<>();
     private final Set<String> usedNames = new HashSet<>();
     private byte ticksSinceLastUpdate = 0;
@@ -89,10 +90,28 @@ public class Game {
             world.recycleDeadSnake(snake);
             otherSnake.addKill();
 
-            // notify clients
-            final var killMessage = JSON.stringify(new SnakeDeathInfo(snake, otherSnake));
-            executor.submit(() -> clientsBySession.values().forEach(client -> client.send(killMessage)));
+            handleSnakeDeath(snake, new SnakeDeathInfo(snake, otherSnake));
         }
+    }
+
+    private void handleSnakeDeath(Snake snake, SnakeDeathInfo info) {
+        assert !snake.isAlive();
+
+        // notify clients
+        final var killMessage = JSON.stringify(info);
+        executor.submit(() -> broadcast(killMessage));
+
+        // transfer clients
+        executor.submit(() -> {
+            // Remove clients after broadcast
+            final var clients = clientsBySnake.removeAll(snake);
+            clients.forEach(client -> clientsBySession.remove(client.session));
+            // TODO: make clients spectate killer
+        });
+    }
+
+    private void handleSnakeDeath(Snake snake) {
+        handleSnakeDeath(snake, new SnakeDeathInfo(snake, null));
     }
 
     public Future<Player> createPlayer(Session session) {
@@ -111,12 +130,8 @@ public class Game {
             return snake;
         }, executor).thenApply(snake -> {
             final var player = new Player(snake, session);
-            synchronized (clientsBySession) {
-                clientsBySession.put(session, player);
-            }
-            synchronized (clientsBySnake) {
-                clientsBySnake.put(snake, player);
-            }
+            clientsBySession.put(session, player);
+            clientsBySnake.put(snake, player);
             player.sendSync(JSON.stringify(GameInfo.createForPlayer(snake)));
             System.out.println("Player " + player.getName() + " has joined game");
             return player;
@@ -132,18 +147,17 @@ public class Game {
     }
 
     public void removeClient(Session session) {
-        final Client client;
-
-        synchronized (clientsBySession) {
-            client = clientsBySession.remove(session);
-        }
+        final var client = clientsBySession.remove(session);
 
         if (client instanceof final Player player) {
             final var snake = player.getSnake();
-            snake.kill();
-            synchronized (clientsBySnake) {
-                clientsBySnake.remove(snake, player);
+
+            if (!snake.isAlive()) {
+                return;
             }
+
+            snake.kill();
+            handleSnakeDeath(snake);
         }
     }
 
@@ -252,11 +266,19 @@ public class Game {
         });
     }
 
+    /**
+     * Kill snakes leaving the map boundaries. This should be prevented by the boundary snake.
+     * This is an extra safety layer to prevent corrupted state.
+     */
     private void killDesertingSnakes() {
-        forEachSnake(s -> {
-            if (!world.box.isWithinSubBox(s.getHeadPosition(), 0.5 * s.getWidth())) {
-                System.out.println("Snake " + s.id + " is out of bounds.");
-                s.kill();
+        forEachSnake(snake -> {
+            if (!world.box.isWithinSubBox(snake.getHeadPosition(), 0.5 * snake.getWidth())) {
+                System.out.println("Snake " + snake.id + " is out of bounds.");
+                snake.kill();
+
+                if (!snake.isAlive()) {
+                    handleSnakeDeath(snake);
+                }
             }
         });
     }
@@ -273,6 +295,9 @@ public class Game {
         return this.bots.size();
     }
 
+    /**
+     * Send a (string) message to all clients.
+     */
     private void broadcast(String encodedJsonData) {
         synchronized (clientsBySession) {
             clientsBySession.values().forEach(client -> client.send(encodedJsonData));

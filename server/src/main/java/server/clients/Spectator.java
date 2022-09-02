@@ -20,6 +20,7 @@ public class Spectator extends Client {
         final var info = (snake == null) ?
                 GameInfo.createForSpectator(null /* TODO */, position) :
                 GameInfo.createForSpectator(snake);
+        // TODO copy client knowledge info
         send(JSON.stringify(info));
     }
 

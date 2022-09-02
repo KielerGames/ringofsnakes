@@ -22,10 +22,7 @@ public class World {
     @Getter private final HeatMap heatMap;
 
     public World(double chunkSize, int repetitions) {
-        this.config = new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions));
-        chunks = WorldChunkFactory.createChunks(this);
-        box = new BoundingBox(new Vector(0, 0), chunkSize * repetitions, chunkSize * repetitions);
-        heatMap = new HeatMap(config, chunks::stream);
+        this(new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions)));
     }
 
     public World() {
@@ -37,6 +34,7 @@ public class World {
         chunks = WorldChunkFactory.createChunks(this);
         box = new BoundingBox(new Vector(0, 0), config.chunks.size * config.chunks.columns, config.chunks.size * config.chunks.rows);
         heatMap = new HeatMap(config, chunks::stream);
+        spawnInitialFood();
     }
 
     public Vector findSpawnPosition() {
@@ -78,7 +76,7 @@ public class World {
         final var random = getRandom();
 
         //TODO:
-        // - consider spawning larger food items for larger snakes
+        // - consider spawning larger food items for larger snakes #120
         // - fine adjust food value per dead snake
         final var foodScattering = 1.0;
         final var caloricValueOfSnake = 0.64 * snake.getLength(); //TODO: adjust
@@ -101,6 +99,16 @@ public class World {
             final var worldChunk = chunks.findChunk(spawnPosition);
             final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM, snake.getSkin());
             worldChunk.addFood(food);
+        }
+    }
+
+    private void spawnInitialFood() {
+        final int numChunks = config.chunks.rows * config.chunks.columns;
+        final double area = numChunks * config.chunks.size * config.chunks.size;
+        final int n = (int) (area / 900);
+
+        for (int i = 0; i < n; i++) {
+            spawnFood();
         }
     }
 

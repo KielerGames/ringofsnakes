@@ -48,11 +48,6 @@ public class Game {
     public Game() {
         this(new GameConfig());
 
-        // spawn some food
-        for (int i = 0; i < 256; i++) {
-            world.spawnFood();
-        }
-
         final var boundarySnake = SnakeFactory.createBoundarySnake(world);
         snakes.add(boundarySnake);
     }
@@ -280,8 +275,8 @@ public class Game {
     }
 
     /**
-     * Kill snakes leaving the map boundaries. This should be prevented by the boundary snake.
-     * This is an extra safety layer to prevent corrupted state.
+     * Kill snakes leaving the map. This should be prevented by the boundary snake.
+     * This is an extra safety layer to prevent corrupted server state.
      */
     private void killDesertingSnakes() {
         forEachSnake(snake -> {

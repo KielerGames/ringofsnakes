@@ -3,6 +3,8 @@ package server.clients;
 import game.snake.Snake;
 import math.BoundingBox;
 import math.Vector;
+import server.protocol.GameInfo;
+import util.JSON;
 
 import javax.annotation.Nullable;
 import javax.websocket.Session;
@@ -15,6 +17,10 @@ public class Spectator extends Client {
         super(session);
         this.snake = snake;
         this.position = position;
+        final var info = (snake == null) ?
+                GameInfo.createForSpectator(null /* TODO */, position) :
+                GameInfo.createForSpectator(snake);
+        send(JSON.stringify(info));
     }
 
     public static Spectator createFor(Snake snake, Session session) {

@@ -3,7 +3,9 @@ package server.clients;
 import game.snake.Snake;
 import lombok.Getter;
 import math.BoundingBox;
+import server.protocol.GameInfo;
 import server.protocol.GameUpdate;
+import util.JSON;
 
 import javax.websocket.Session;
 
@@ -13,6 +15,7 @@ public class Player extends Client {
     public Player(Snake snake, Session session) {
         super(session);
         this.snake = snake;
+        send(JSON.stringify(GameInfo.createForPlayer(snake)));
     }
 
     @Override

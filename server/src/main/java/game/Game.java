@@ -16,7 +16,6 @@ import server.SnakeServer;
 import server.clients.Client;
 import server.clients.Player;
 import server.clients.Spectator;
-import server.protocol.GameInfo;
 import server.protocol.GameStatistics;
 import server.protocol.SnakeDeathInfo;
 import util.ExceptionalExecutorService;
@@ -147,7 +146,6 @@ public class Game {
             final var player = new Player(snake, session);
             clientsBySession.put(session, player);
             clientsBySnake.put(snake, player);
-            player.sendSync(JSON.stringify(GameInfo.createForPlayer(snake)));
             System.out.println("Player " + player.getName() + " has joined game");
             return player;
         });

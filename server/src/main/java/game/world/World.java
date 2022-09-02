@@ -1,14 +1,12 @@
 package game.world;
 
 import game.GameConfig;
-import game.events.SnakeDeathEvent;
 import game.snake.Snake;
 import game.snake.SnakeChunk;
 import lombok.Getter;
 import lombok.Setter;
 import math.BoundingBox;
 import math.Vector;
-import util.Event;
 
 import java.util.Comparator;
 import java.util.Random;
@@ -19,7 +17,6 @@ public class World {
     public final WorldChunkCollection chunks;
     public final Vector center = new Vector(0, 0);
     public final BoundingBox box;
-    public final WorldEvents events = new WorldEvents();
     @Getter private final GameConfig config;
     @Getter private final HeatMap heatMap;
 

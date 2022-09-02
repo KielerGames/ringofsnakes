@@ -79,11 +79,12 @@ describe("GameDataBuffer", () => {
 
 function createSpawnInfo(snakeId: number): GameInfo {
     return {
-        tag: "SpawnInfo",
+        tag: "GameInfo",
         snakeId,
         snakeName: "TestSnakeName",
         startPosition: { x: 0, y: 0 },
-        gameConfig: defaultConfig
+        gameConfig: defaultConfig,
+        clientType: "PLAYER"
     };
 }
 

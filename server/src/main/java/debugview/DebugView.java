@@ -9,7 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import math.Vector;
-import server.client.Player;
+import server.clients.Player;
 import server.SnakeServer;
 
 import java.util.OptionalInt;

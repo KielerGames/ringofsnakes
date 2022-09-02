@@ -12,8 +12,10 @@ import game.snake.SnakeNameGenerator;
 import game.world.Collidable;
 import game.world.World;
 import game.world.WorldChunk;
-import server.client.Client;
-import server.client.Player;
+import server.SnakeServer;
+import server.clients.Client;
+import server.clients.Player;
+import server.clients.Spectator;
 import server.protocol.GameInfo;
 import server.protocol.GameStatistics;
 import server.protocol.SnakeDeathInfo;
@@ -96,6 +98,7 @@ public class Game {
 
     private void handleSnakeDeath(Snake snake, SnakeDeathInfo info) {
         assert !snake.isAlive();
+        final var killer = info.killer;
 
         // notify clients
         final var killMessage = JSON.stringify(info);
@@ -105,8 +108,20 @@ public class Game {
         executor.submit(() -> {
             // Remove clients after broadcast
             final var clients = clientsBySnake.removeAll(snake);
-            clients.forEach(client -> clientsBySession.remove(client.session));
-            // TODO: make clients spectate killer
+            clients.forEach(client -> {
+                clientsBySession.remove(client.session);
+
+                if (killer == null) {
+                    return;
+                }
+
+                if (client instanceof final Player player) {
+                    final var spectator = Spectator.createFor(killer, player.session);
+                    clientsBySession.put(spectator.session, spectator);
+                    clientsBySnake.put(killer, spectator);
+                    SnakeServer.updateClient(spectator);
+                }
+            });
         });
     }
 

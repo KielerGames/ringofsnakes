@@ -6,18 +6,19 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
-import server.client.Client;
-import server.client.Player;
+import server.clients.Client;
+import server.clients.Player;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class SnakeServer {
-    private final static Map<String, Client> clients = new HashMap<>(64);
+    private final static Map<String, Client> clients = Collections.synchronizedMap(new HashMap<>(64));
     private static final CloseReason ILLEGAL_INPUT = new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "User input not allowed as spectator.");
     private static Game game;
 
@@ -84,6 +85,12 @@ public class SnakeServer {
         clients.remove(sessionId);
         game.removeClient(session);
         System.out.println("Player has been removed. (" + sessionId + ")");
+    }
+
+    public static void updateClient(Client newClient) {
+        final var sessionId = newClient.session.getId();
+        final var oldClient = clients.put(sessionId, newClient);
+        assert oldClient != null;
     }
 
     public static void onUserInputUpdate(Session session, float alpha, boolean fast, float ratio) {

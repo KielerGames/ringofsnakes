@@ -2,7 +2,7 @@ package server.protocol;
 
 import game.Game;
 import game.snake.Snake;
-import server.client.Player;
+import server.clients.Player;
 
 import java.util.Comparator;
 import java.util.List;

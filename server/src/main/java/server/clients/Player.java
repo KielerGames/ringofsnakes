@@ -1,4 +1,4 @@
-package server.client;
+package server.clients;
 
 import game.snake.Snake;
 import lombok.Getter;

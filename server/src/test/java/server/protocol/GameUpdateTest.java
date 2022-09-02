@@ -13,7 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import server.client.Client;
+import server.clients.Client;
 
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;

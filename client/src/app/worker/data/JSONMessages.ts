@@ -5,7 +5,8 @@ export type ServerToClientJSONMessage =
     | GameInfo
     | SnakeDeathInfo
     | LeaderboardData
-    | SnakeNameUpdate;
+    | SnakeNameUpdate
+    | SpectatorChange;
 
 export type GameInfo = Readonly<{
     tag: "GameInfo";
@@ -13,7 +14,6 @@ export type GameInfo = Readonly<{
     snakeName?: string;
     startPosition: { x: number; y: number };
     gameConfig: GameConfig;
-    clientType: "PLAYER" | "SPECTATOR" | "STATIONARY_SPECTATOR";
 }>;
 
 export type SnakeDeathInfo = Readonly<{
@@ -37,4 +37,10 @@ export type LeaderboardSnake = Readonly<{
 export type SnakeNameUpdate = Readonly<{
     tag: "SnakeNameUpdate";
     names: Record<string, string>;
+}>;
+
+export type SpectatorChange = Readonly<{
+    tag: "SpectatorChange";
+    targetSnakeId: number;
+    position?: { x: number; y: number };
 }>;

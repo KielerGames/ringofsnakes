@@ -53,10 +53,6 @@ export class WorkerAPI {
             };
         });
 
-        if (gameInfo.clientType !== "PLAYER") {
-            throw new Error("Unexpected client type " + gameInfo.clientType);
-        }
-
         data.init(gameInfo);
 
         socket.onJSONMessage = (message) => {

@@ -75,11 +75,9 @@ async function runGame() {
         game.predict();
         GameRenderer.render(game);
 
-        if (!player.alive) {
-            return;
+        if (player.alive) {
+            UserInput.tick();
         }
-
-        UserInput.tick();
 
         setTimeout(() => game.update());
         window.requestAnimationFrame(renderLoop);
@@ -102,18 +100,24 @@ async function runGame() {
             document.exitPointerLock();
             console.log("Game stopped.");
 
-            await dialog({
+            const action = await dialog({
                 title: "Game over",
                 content: `You are dead because you crashed into ${info.killer}.`,
                 buttons: [
                     {
                         label: "Try again",
                         value: "try-again"
+                    },
+                    {
+                        label: "Spectate",
+                        value: "spectate"
                     }
                 ]
             });
 
-            gameStopped.set();
+            if (action === "try-again") {
+                gameStopped.set();
+            }
         } else if (info.reason === "disconnect") {
             await dialog({
                 title: "Disconnected",

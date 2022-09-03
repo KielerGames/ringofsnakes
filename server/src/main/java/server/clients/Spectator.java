@@ -3,7 +3,7 @@ package server.clients;
 import game.snake.Snake;
 import math.BoundingBox;
 import math.Vector;
-import server.protocol.GameInfo;
+import server.protocol.SpectatorChange;
 import util.JSON;
 
 import javax.annotation.Nullable;
@@ -18,8 +18,8 @@ public class Spectator extends Client {
         this.snake = snake;
         this.position = position;
         final var info = (snake == null) ?
-                GameInfo.createForSpectator(null /* TODO */, position) :
-                GameInfo.createForSpectator(snake);
+                new SpectatorChange(position) :
+                new SpectatorChange(snake);
         // TODO copy client knowledge info
         send(JSON.stringify(info));
     }
@@ -41,6 +41,9 @@ public class Spectator extends Client {
 
         if (this.snake != null) {
             position = this.snake.getHeadPosition();
+            send(JSON.stringify(new SpectatorChange(this.snake)));
+        } else {
+            send(JSON.stringify(new SpectatorChange(position)));
         }
     }
 

@@ -106,6 +106,7 @@ public class Game {
                 clientsBySession.remove(client.session);
 
                 if (killer == null) {
+                    // TODO
                     return;
                 }
 
@@ -114,6 +115,8 @@ public class Game {
                     clientsBySession.put(spectator.session, spectator);
                     clientsBySnake.put(killer, spectator);
                     SnakeServer.updateClient(spectator);
+                } else if (client instanceof final Spectator spectator) {
+                    spectator.setSnake(killer);
                 }
             });
         });

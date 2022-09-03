@@ -100,13 +100,20 @@ public class SnakeServer {
             player.getSnake().setTargetDirection(alpha);
             player.getSnake().setUserFast(fast);
             player.setViewBoxRatio(ratio);
-        } else {
-            System.err.println("Illegal request from client.");
-            try {
-                session.close(ILLEGAL_INPUT);
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
-            }
+            return;
+        }
+
+        if (client.getAgeInSeconds() < 2) {
+            // grace period to avoid race condition
+            return;
+        }
+
+        System.err.println("Illegal request from client.");
+        try {
+            session.close(ILLEGAL_INPUT);
+            // TODO: does this cause removeClient to be called?
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
     }
 

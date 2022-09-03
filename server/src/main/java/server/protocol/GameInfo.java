@@ -9,7 +9,7 @@ public class GameInfo extends ServerToClientJSONMessage {
     public final String snakeName;
     public final Position startPosition;
 
-    private GameInfo(Snake snake) {
+    public GameInfo(Snake snake) {
         gameConfig = snake.config;
         snakeId = snake.id;
         snakeName = snake.name;

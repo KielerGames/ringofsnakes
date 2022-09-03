@@ -10,7 +10,6 @@ import server.protocol.SnakeNameUpdate;
 import util.JSON;
 
 import javax.websocket.Session;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -22,6 +21,7 @@ public abstract class Client {
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private final Map<WorldChunk, Integer> knownFoodChunks = new HashMap<>();
     private final Map<Snake, Integer> knownSnakes = new HashMap<>();
+    private final long creationTime = System.currentTimeMillis();
     protected float viewBoxRatio = 1f;
     private GameUpdate nextGameUpdate = new GameUpdate();
     private long lastHeatMapUpdate = System.currentTimeMillis();
@@ -139,16 +139,6 @@ public abstract class Client {
         }
     }
 
-    public void sendSync(String textData) {
-        if (session.isOpen()) {
-            try {
-                session.getBasicRemote().sendText(textData);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public abstract BoundingBox getKnowledgeBox();
 
     private void updateKnowledge(GameUpdate update) {
@@ -184,5 +174,11 @@ public abstract class Client {
     public void setViewBoxRatio(float ratio) {
         assert (ratio > 0f && ratio < 3f);
         viewBoxRatio = ratio;
+    }
+
+    public int getAgeInSeconds() {
+        final var now = System.currentTimeMillis();
+        assert now >= creationTime;
+        return (int) ((now - creationTime) / 1000);
     }
 }

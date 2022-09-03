@@ -15,7 +15,7 @@ public class Player extends Client {
     public Player(Snake snake, Session session) {
         super(session);
         this.snake = snake;
-        send(JSON.stringify(GameInfo.createForPlayer(snake)));
+        send(JSON.stringify(new GameInfo(snake)));
     }
 
     @Override

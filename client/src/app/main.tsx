@@ -95,34 +95,48 @@ async function runGame() {
         console.error("Stopped due to unhandled error.", e);
     });
 
-    game.events.gameEnd.addListener(async (info) => {
-        if (info.reason === "death") {
-            document.exitPointerLock();
-            console.log("Game stopped.");
+    game.events.snakeDeath.addListener(async (info) => {
+        if (info.deadSnakeId !== player.snakeId) {
+            return;
+        }
 
-            const action = await dialog({
-                title: "Game over",
-                content: `You are dead because you crashed into ${info.killer}.`,
+        document.exitPointerLock();
+
+        const action = await dialog({
+            title: "Game over",
+            content: info.killer
+                ? `You are dead because you crashed into ${info.killer.name}.`
+                : "You are dead.",
+            buttons: [
+                {
+                    label: "Spectate",
+                    value: "spectate"
+                },
+                {
+                    label: "Try again",
+                    value: "try-again"
+                }
+            ]
+        });
+
+        if (action === "try-again") {
+            gameStopped.set();
+        }
+    });
+
+    game.events.gameEnd.addListener(async (info) => {
+        if (info.reason === "disconnect") {
+            await dialog({
+                title: "Disconnected",
+                content: `You have been disconnected from the server.`,
                 buttons: [
                     {
                         label: "Try again",
                         value: "try-again"
-                    },
-                    {
-                        label: "Spectate",
-                        value: "spectate"
                     }
                 ]
             });
-
-            if (action === "try-again") {
-                gameStopped.set();
-            }
-        } else if (info.reason === "disconnect") {
-            await dialog({
-                title: "Disconnected",
-                content: `You have been disconnected from the server.`
-            });
+            gameStopped.set();
         }
     });
 

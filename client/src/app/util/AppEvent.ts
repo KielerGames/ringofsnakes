@@ -1,6 +1,6 @@
 import { Consumer } from "./FunctionTypes";
 
-export class AppEvent<T> {
+export class AppEvent<T = void> {
     private readonly listeners = new Set<Consumer<T>>();
 
     addListener(listener: Consumer<T>): void {

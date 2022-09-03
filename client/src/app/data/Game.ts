@@ -23,7 +23,7 @@ export default class Game {
     readonly snakeChunks: ManagedMap<SnakeChunkDTO, SnakeChunkId, SnakeChunk>;
     readonly foodChunks: ManagedMap<FoodChunkDTO, FoodChunkId, FoodChunk>;
     readonly events = {
-        snakeDeath: new AppEvent<SnakeDeathDTO & { snake?: Snake }>(),
+        snakeDeath: new AppEvent<SnakeDeathDTO & { snake?: Snake }>(), // TODO
         gameEnd: new AppEvent<GameEndReason>()
     };
 
@@ -53,12 +53,11 @@ export default class Game {
         this.events.snakeDeath.addListener(({ deadSnakeId, killer }) => {
             if (deadSnakeId === this.targetSnakeId) {
                 this.targetSnakeId = undefined;
-                this.stopped = true;
-                this.events.gameEnd.trigger({ reason: "death", killer: killer?.name ?? "???" });
                 return;
             }
 
             if (killer && killer.snakeId === this.targetSnakeId) {
+                // TODO: avoid client-side counting
                 this._targetSnakeKills++;
             }
         });
@@ -79,7 +78,7 @@ export default class Game {
         game.heatMap = new Uint8Array(info.config.chunks.rows * info.config.chunks.columns);
 
         remote.addEventListener(
-            "server-update",
+            "serverUpdate",
             Comlink.proxy(() => {
                 game.updateAvailable = true;
             })
@@ -93,14 +92,20 @@ export default class Game {
             })
         );
 
+        remote.addEventListener(
+            "spectatorChange",
+            Comlink.proxy((id) => {
+                game.targetSnakeId = id as number;
+            })
+        );
+
         const player = new Player(remote, info.targetSnakeId, game);
 
         return [game, player];
     }
 
-    static async joinAsSpectator(): Promise<Game> {
-        await Promise.reject(new Error("not implemented"));
-        return new Game(); // TODO
+    static joinAsSpectator(): Promise<Game> {
+        throw new Error("not implemented");
     }
 
     /**
@@ -228,4 +233,4 @@ export default class Game {
 type SnakeId = number;
 type SnakeChunkId = number;
 type FoodChunkId = number;
-type GameEndReason = { reason: "disconnect" } | { reason: "death"; killer: string };
+type GameEndReason = { reason: "disconnect" };

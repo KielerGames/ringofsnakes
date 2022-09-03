@@ -241,17 +241,15 @@ public class Game {
     }
 
     private void updateClients() {
-        synchronized (clientsBySession) {
-            clientsBySession.values().forEach(client -> {
-                final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
-                worldChunks.stream()
-                        .flatMap(WorldChunk::streamSnakeChunks)
-                        .forEach(client::updateClientSnakeChunk);
-                worldChunks.forEach(client::updateClientFoodChunk);
-                client.updateHeatMap(world.getHeatMap());
-                client.sendGameUpdate(ticksSinceLastUpdate);
-            });
-        }
+        clientsBySession.values().forEach(client -> {
+            final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
+            worldChunks.stream()
+                    .flatMap(WorldChunk::streamSnakeChunks)
+                    .forEach(client::updateClientSnakeChunk);
+            worldChunks.forEach(client::updateClientFoodChunk);
+            client.updateHeatMap(world.getHeatMap());
+            client.sendGameUpdate(ticksSinceLastUpdate);
+        });
         ticksSinceLastUpdate = 0;
     }
 
@@ -310,8 +308,6 @@ public class Game {
      * Send a (string) message to all clients.
      */
     private void broadcast(String encodedJsonData) {
-        synchronized (clientsBySession) {
-            clientsBySession.values().forEach(client -> client.send(encodedJsonData));
-        }
+        clientsBySession.values().forEach(client -> client.send(encodedJsonData));
     }
 }

@@ -1,36 +1,32 @@
 package server.clients;
 
 import game.snake.Snake;
-import lombok.Getter;
 import math.BoundingBox;
 import server.protocol.GameInfo;
-import server.protocol.GameUpdate;
 import util.JSON;
 
 import javax.websocket.Session;
 
 public class Player extends Client {
-    @Getter private final Snake snake;
 
     public Player(Snake snake, Session session) {
-        super(session);
-        this.snake = snake;
+        super(session, snake);
         send(JSON.stringify(new GameInfo(snake)));
     }
 
     @Override
-    protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
-        super.onBeforeUpdateBufferIsCreated(update);
-        update.addSnakeChunk(snake.currentChunk);
-    }
-
-    @Override
     public BoundingBox getKnowledgeBox() {
+        if (snake == null) {
+            throw new IllegalStateException();
+        }
         // TODO
         return new BoundingBox(snake.getHeadPosition(), viewBoxRatio * 48f, 48f);
     }
 
     public String getName() {
+        if (this.snake == null) {
+            throw new IllegalStateException();
+        }
         return this.snake.name;
     }
 }

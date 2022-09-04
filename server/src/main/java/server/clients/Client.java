@@ -4,11 +4,13 @@ import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.world.HeatMap;
 import game.world.WorldChunk;
+import lombok.Getter;
 import math.BoundingBox;
 import server.protocol.GameUpdate;
 import server.protocol.SnakeNameUpdate;
 import util.JSON;
 
+import javax.annotation.Nullable;
 import javax.websocket.Session;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -23,12 +25,16 @@ public abstract class Client {
     private final Map<Snake, Integer> knownSnakes = new HashMap<>();
     private final long creationTime = System.currentTimeMillis();
     protected float viewBoxRatio = 1f;
+    @Getter
+    @Nullable
+    protected Snake snake;
     private GameUpdate nextGameUpdate = new GameUpdate();
     private long lastHeatMapUpdate = System.currentTimeMillis();
     private SnakeNameUpdate nextNameUpdate = new SnakeNameUpdate();
 
-    public Client(Session session) {
+    public Client(Session session, @Nullable Snake snake) {
         this.session = session;
+        this.snake = snake;
     }
 
     /**
@@ -98,7 +104,10 @@ public abstract class Client {
      * turned into a byte buffer for transfer to the client.
      */
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
-
+        if (snake == null) {
+            return;
+        }
+        update.addSnakeChunk(snake.currentChunk);
     }
 
     /**
@@ -139,6 +148,16 @@ public abstract class Client {
         }
     }
 
+
+    /**
+     * The knowledge box is the area that the client should receive updates about, including
+     * <ul>
+     *     <li>{@code SnakeChunk}s</li>
+     *     <li>snake meta info</li>
+     *     <li>food chunks</li>
+     * </ul>
+     * It should be slightly larger than what the client can see on their screen.
+     */
     public abstract BoundingBox getKnowledgeBox();
 
     private void updateKnowledge(GameUpdate update) {

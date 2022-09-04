@@ -10,12 +10,10 @@ import javax.annotation.Nullable;
 import javax.websocket.Session;
 
 public class Spectator extends Client {
-    private @Nullable Snake snake;
     private Vector position;
 
-    private Spectator(Session session, @Nullable Snake snake, Vector position) {
-        super(session);
-        this.snake = snake;
+    private Spectator(Session session, Vector position, @Nullable Snake snake) {
+        super(session, snake);
         this.position = position;
         final var info = (snake == null) ?
                 new SpectatorChange(position) :
@@ -25,7 +23,7 @@ public class Spectator extends Client {
     }
 
     public static Spectator createFor(Snake snake, Session session) {
-        return new Spectator(session, snake, snake.getHeadPosition());
+        return new Spectator(session, snake.getHeadPosition(), snake);
     }
 
     public void setSnake(@Nullable Snake snake) {

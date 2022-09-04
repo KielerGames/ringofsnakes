@@ -63,6 +63,7 @@ document.title = `Ring of Snakes ${__VERSION__}`;
 
     while (true) {
         await runGame();
+        // TODO make sure previous connection is closed or gets reused
     }
 })();
 

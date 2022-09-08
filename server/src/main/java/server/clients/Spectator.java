@@ -7,23 +7,26 @@ import server.protocol.SpectatorChange;
 import util.JSON;
 
 import javax.annotation.Nullable;
-import javax.websocket.Session;
 
 public class Spectator extends Client {
     private Vector position;
 
-    private Spectator(Session session, Vector position, @Nullable Snake snake) {
-        super(session, snake);
+    private Spectator(Player player, Vector position, @Nullable Snake snake) {
+        super(player.session, player.knowledge, snake);
         this.position = position;
+        sendInitialMessage();
+    }
+
+    public static Spectator createFor(Snake snake, Player player) {
+        return new Spectator(player, snake.getHeadPosition(), snake);
+    }
+
+    private void sendInitialMessage() {
         final var info = (snake == null) ?
                 new SpectatorChange(position) :
                 new SpectatorChange(snake);
-        // TODO copy client knowledge info
-        send(JSON.stringify(info));
-    }
 
-    public static Spectator createFor(Snake snake, Session session) {
-        return new Spectator(session, snake.getHeadPosition(), snake);
+        send(JSON.stringify(info));
     }
 
     public void setSnake(@Nullable Snake snake) {

@@ -111,7 +111,7 @@ public class Game {
                 }
 
                 if (client instanceof final Player player) {
-                    final var spectator = Spectator.createFor(killer, player.session);
+                    final var spectator = Spectator.createFor(killer, player);
                     clientsBySession.put(spectator.session, spectator);
                     clientsBySnake.put(killer, spectator);
                     SnakeServer.updateClient(spectator);

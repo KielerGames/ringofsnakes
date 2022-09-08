@@ -5,6 +5,7 @@ import math.BoundingBox;
 import server.protocol.GameInfo;
 import util.JSON;
 
+import javax.annotation.Nonnull;
 import javax.websocket.Session;
 
 public class Player extends Client {
@@ -28,5 +29,13 @@ public class Player extends Client {
             throw new IllegalStateException();
         }
         return this.snake.name;
+    }
+
+    @Override
+    @Nonnull
+    public Snake getSnake() {
+        // A player always has a snake.
+        assert snake != null;
+        return snake;
     }
 }

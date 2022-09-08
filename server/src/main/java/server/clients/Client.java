@@ -19,15 +19,23 @@ import java.nio.ByteBuffer;
 public abstract class Client {
     public final Session session;
     private final long creationTime = System.currentTimeMillis();
-    private final ClientKnowledge knowledge = new ClientKnowledge(this::getKnowledgeBox);
+    protected final ClientKnowledge knowledge;
     protected float viewBoxRatio = 1f;
     @Getter
     @Nullable
     protected Snake snake;
 
-    public Client(Session session, @Nullable Snake snake) {
+    protected Client(Session session, @Nullable Snake snake) {
         this.session = session;
         this.snake = snake;
+        this.knowledge = new ClientKnowledge(this::getKnowledgeBox);
+    }
+
+    protected Client(Session session, ClientKnowledge knowledge, @Nullable Snake snake) {
+        this.session = session;
+        this.snake = snake;
+        this.knowledge = knowledge;
+        knowledge.setBoxSupplier(this::getKnowledgeBox);
     }
 
     public void updateClientSnakeChunk(SnakeChunk chunk) {
@@ -110,5 +118,6 @@ public abstract class Client {
     /**
      * Hook for testing.
      */
-    protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {}
+    protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
+    }
 }

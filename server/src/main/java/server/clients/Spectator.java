@@ -14,6 +14,7 @@ public class Spectator extends Client {
     private Spectator(Player player, Vector position, @Nullable Snake snake) {
         super(player.session, player.knowledge, snake);
         this.position = position;
+        this.viewBoxRatio = player.viewBoxRatio;
         sendInitialMessage();
     }
 

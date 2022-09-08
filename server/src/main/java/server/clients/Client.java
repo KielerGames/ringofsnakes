@@ -30,20 +30,11 @@ public abstract class Client {
         this.snake = snake;
     }
 
-    /**
-     * Include a {@link SnakeChunk} in the next update.
-     * This will also add the corresponding snake to that update.
-     * Junk chunks will be ignored.
-     */
     public void updateClientSnakeChunk(SnakeChunk chunk) {
         knowledge.addSnakeChunk(chunk);
     }
 
-    /**
-     * Add this food chunk to the next update if
-     * - the client does not know it already or
-     * - the food chunk contains changes not yet known by the client
-     */
+
     public void updateClientFoodChunk(WorldChunk chunk) {
         knowledge.addFoodChunk(chunk);
     }
@@ -58,17 +49,6 @@ public abstract class Client {
     }
 
     /**
-     * A hook that gets called right before the given update instance gets
-     * turned into a byte buffer for transfer to the client.
-     */
-    protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
-        if (snake == null) {
-            return;
-        }
-        update.addSnakeChunk(snake.currentChunk);
-    }
-
-    /**
      * Send a binary update containing information added by previous calls to
      * - {@link #updateClientSnakeChunk(SnakeChunk)}
      * - {@link #updateClientFoodChunk(WorldChunk)}
@@ -77,7 +57,10 @@ public abstract class Client {
      */
     public final void sendGameUpdate(byte ticksSinceLastUpdate) {
         final var update = knowledge.createNextGameUpdate(ticksSinceLastUpdate);
-        onBeforeUpdateBufferIsCreated(update); // TODO remove/move?
+        if (snake != null) {
+            update.addSnakeChunk(snake.currentChunk);
+        }
+        onBeforeUpdateBufferIsCreated(update);
         send(update.createUpdateBuffer());
     }
 
@@ -90,7 +73,7 @@ public abstract class Client {
         send(encodedUpdate);
     }
 
-    public void send(ByteBuffer binaryData) {
+    protected void send(ByteBuffer binaryData) {
         if (session.isOpen()) {
             session.getAsyncRemote().sendBinary(binaryData);
         }
@@ -101,7 +84,6 @@ public abstract class Client {
             session.getAsyncRemote().sendText(textData);
         }
     }
-
 
     /**
      * The knowledge box is the area that the client should receive updates about, including
@@ -124,4 +106,9 @@ public abstract class Client {
         assert now >= creationTime;
         return (int) ((now - creationTime) / 1000);
     }
+
+    /**
+     * Hook for testing.
+     */
+    protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {}
 }

@@ -21,6 +21,7 @@ import server.protocol.SnakeDeathInfo;
 import util.ExceptionalExecutorService;
 import util.JSON;
 
+import javax.annotation.Nullable;
 import javax.websocket.Session;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -112,11 +113,11 @@ public class Game {
 
                 if (client instanceof final Player player) {
                     final var spectator = Spectator.createFor(killer, player);
-                    clientsBySession.put(spectator.session, spectator);
-                    clientsBySnake.put(killer, spectator);
+                    registerSpectator(spectator, killer);
                     SnakeServer.updateClient(spectator);
                 } else if (client instanceof final Spectator spectator) {
                     spectator.setSnake(killer);
+                    registerSpectator(spectator, killer);
                 }
             });
         });
@@ -124,6 +125,13 @@ public class Game {
 
     private void handleSnakeDeath(Snake snake) {
         handleSnakeDeath(snake, new SnakeDeathInfo(snake, null));
+    }
+
+    private void registerSpectator(Spectator spectator, @Nullable Snake targetSnake) {
+        clientsBySession.put(spectator.session, spectator);
+        if (targetSnake != null) {
+            clientsBySnake.put(targetSnake, spectator);
+        }
     }
 
     public Future<Player> createPlayer(Session session) {

@@ -5,10 +5,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import game.ai.Bot;
 import game.ai.BotFactory;
-import game.snake.Snake;
-import game.snake.SnakeChunk;
-import game.snake.SnakeFactory;
-import game.snake.SnakeNameGenerator;
+import game.snake.*;
 import game.world.Collidable;
 import game.world.World;
 import game.world.WorldChunk;
@@ -93,7 +90,7 @@ public class Game {
 
     private void handleSnakeDeath(Snake snake, SnakeDeathInfo info) {
         assert !snake.isAlive();
-        final var killer = info.killer;
+        final var spectatorTarget = info.killer instanceof BoundarySnake ? null : info.killer;
 
         // notify clients
         final var killMessage = JSON.stringify(info);
@@ -106,18 +103,13 @@ public class Game {
             clients.forEach(client -> {
                 clientsBySession.remove(client.session);
 
-                if (killer == null) {
-                    // TODO
-                    return;
-                }
-
                 if (client instanceof final Player player) {
-                    final var spectator = Spectator.createFor(killer, player);
-                    registerSpectator(spectator, killer);
+                    final var spectator = Spectator.createFor(spectatorTarget, player);
+                    registerSpectator(spectator, spectatorTarget);
                     SnakeServer.updateClient(spectator);
                 } else if (client instanceof final Spectator spectator) {
-                    spectator.setSnake(killer);
-                    registerSpectator(spectator, killer);
+                    spectator.setSnake(spectatorTarget);
+                    registerSpectator(spectator, spectatorTarget);
                 }
             });
         });

@@ -17,6 +17,7 @@ import { FoodChunkDTO } from "./dto/FoodChunkDTO";
 import { AppEvent } from "../util/AppEvent";
 import { dialog } from "../ui/Dialogs";
 import { SnakeDeathDTO } from "./dto/SnakeDeathDTO";
+import { SpectatorChangeDTO } from "./dto/SpectatorChangeDTO";
 
 export default class Game {
     readonly snakes: ManagedMap<SnakeDTO, SnakeId, Snake, number>;
@@ -94,8 +95,16 @@ export default class Game {
 
         remote.addEventListener(
             "spectatorChange",
-            Comlink.proxy((id) => {
-                game.targetSnakeId = id as number;
+            Comlink.proxy((info) => {
+                // TODO fix types
+                const changeInfo = info as SpectatorChangeDTO;
+
+                if (changeInfo.followSnake) {
+                    game.targetSnakeId = changeInfo.targetSnakeId;
+                } else {
+                    game.targetSnakeId = undefined;
+                    game.camera.moveTo(Vector.fromObject(changeInfo.position));
+                }
             })
         );
 

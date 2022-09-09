@@ -1,5 +1,6 @@
 import { GameConfig } from "../../data/config/GameConfig";
 import { GameStatisticsDTO } from "../../data/dto/GameStatisticsDTO";
+import { SpectatorChangeDTO } from "../../data/dto/SpectatorChangeDTO";
 export type ClientToServerJSONMessage = never;
 export type ServerToClientJSONMessage =
     | GameInfo
@@ -39,8 +40,8 @@ export type SnakeNameUpdate = Readonly<{
     names: Record<string, string>;
 }>;
 
-export type SpectatorChange = Readonly<{
-    tag: "SpectatorChange";
-    targetSnakeId: number;
-    position?: { x: number; y: number };
-}>;
+export type SpectatorChange = Readonly<
+    {
+        tag: "SpectatorChange";
+    } & SpectatorChangeDTO
+>;

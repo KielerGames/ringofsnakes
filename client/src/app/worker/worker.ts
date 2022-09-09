@@ -10,6 +10,7 @@ import { DataUpdateDTO } from "../data/dto/DataUpdateDTO";
 import { GameInfoDTO } from "../data/dto/GameInfoDTO";
 import { AppEvent } from "../util/AppEvent";
 import { Consumer } from "../util/FunctionTypes";
+import { SpectatorChangeDTO } from "../data/dto/SpectatorChangeDTO";
 
 let socket: Socket | null = null;
 
@@ -29,7 +30,7 @@ const events = {
     serverUpdate: new AppEvent(),
     error: new AppEvent<string>(),
     disconnect: new AppEvent(),
-    spectatorChange: new AppEvent<number>()
+    spectatorChange: new AppEvent<SpectatorChangeDTO>()
 };
 
 const data = new GameDataBuffer(triggerServerUpdateEvent);
@@ -62,7 +63,7 @@ const api = {
         socket.onJSONMessage = (message) => {
             switch (message.tag) {
                 case "SpectatorChange": {
-                    events.spectatorChange.trigger(message.targetSnakeId); //TODO
+                    events.spectatorChange.trigger(message);
                     break;
                 }
                 default: {

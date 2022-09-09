@@ -58,6 +58,8 @@ public class Spectator extends Client {
 
     @Override
     public void handleUserInput(float alpha, boolean fast) {
+        // Spectators are not allowed to send any input.
+
         if (getAgeInSeconds() < 2) {
             // Grace period to avoid race condition.
             return;

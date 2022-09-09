@@ -32,7 +32,6 @@ public class EventSocket {
         boolean fast = buffer.get(8) != 0;
 
         if (Float.isFinite(alpha) && Float.isFinite(viewBoxRatio)) {
-            // TODO(?) make sure float values are in a valid range
             SnakeServer.handleClientMessage(session, alpha, fast, viewBoxRatio);
         }
     }

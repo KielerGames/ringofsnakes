@@ -9,9 +9,7 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 import server.clients.Client;
 import server.clients.Player;
 
-import javax.websocket.CloseReason;
 import javax.websocket.Session;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +17,6 @@ import java.util.concurrent.ExecutionException;
 
 public class SnakeServer {
     private final static Map<String, Client> clients = Collections.synchronizedMap(new HashMap<>(64));
-    private static final CloseReason ILLEGAL_INPUT = new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "User input not allowed as spectator.");
     private static Game game;
 
     public static Server startServerWithGame(Game game) {
@@ -84,7 +81,7 @@ public class SnakeServer {
         final var sessionId = session.getId();
         clients.remove(sessionId);
         game.removeClient(session);
-        System.out.println("Player has been removed. (" + sessionId + ")");
+        System.out.println("Client has been removed. (" + sessionId + ")");
     }
 
     public static void updateClient(Client newClient) {
@@ -93,28 +90,10 @@ public class SnakeServer {
         assert oldClient != null;
     }
 
-    public static void onUserInputUpdate(Session session, float alpha, boolean fast, float ratio) {
+    public static void handleClientMessage(Session session, float alpha, boolean fast, float ratio) {
         final var client = clients.get(session.getId());
-
-        if (client instanceof final Player player) {
-            player.getSnake().setTargetDirection(alpha);
-            player.getSnake().setUserFast(fast);
-            player.setViewBoxRatio(ratio);
-            return;
-        }
-
-        if (client.getAgeInSeconds() < 2) {
-            // grace period to avoid race condition
-            return;
-        }
-
-        System.err.println("Illegal request from client.");
-        try {
-            session.close(ILLEGAL_INPUT);
-            // TODO: does this cause removeClient to be called?
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
+        client.setViewBoxRatio(ratio);
+        client.handleUserInput(alpha, fast);
     }
 
     /**

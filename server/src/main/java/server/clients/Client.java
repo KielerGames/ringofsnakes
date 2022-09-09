@@ -18,8 +18,8 @@ import java.nio.ByteBuffer;
  */
 public abstract class Client {
     public final Session session;
-    private final long creationTime = System.currentTimeMillis();
     protected final ClientKnowledge knowledge;
+    private final long creationTime = System.currentTimeMillis();
     protected float viewBoxRatio = 1f;
     @Getter
     @Nullable
@@ -105,8 +105,9 @@ public abstract class Client {
     public abstract BoundingBox getKnowledgeBox();
 
     public void setViewBoxRatio(float ratio) {
-        assert (ratio > 0f && ratio < 3f);
-        viewBoxRatio = ratio;
+        if (ratio > 0f && ratio < 3f) {
+            viewBoxRatio = ratio;
+        }
     }
 
     public int getAgeInSeconds() {
@@ -120,4 +121,6 @@ public abstract class Client {
      */
     protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
     }
+
+    public abstract void handleUserInput(float alpha, boolean fast);
 }

@@ -184,5 +184,10 @@ public class GameUpdateTest {
         protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
             lastSentUpdate = update;
         }
+
+        @Override
+        public void handleUserInput(float alpha, boolean fast) {
+            System.err.println("Warning: User input ignored in test.");
+        }
     }
 }

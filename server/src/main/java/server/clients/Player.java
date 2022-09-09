@@ -17,17 +17,20 @@ public class Player extends Client {
 
     @Override
     public BoundingBox getKnowledgeBox() {
-        if (snake == null) {
-            throw new IllegalStateException();
-        }
+        assert snake != null;
         // TODO
         return new BoundingBox(snake.getHeadPosition(), viewBoxRatio * 48f, 48f);
     }
 
+    @Override
+    public void handleUserInput(float alpha, boolean fast) {
+        assert snake != null;
+        snake.setTargetDirection(alpha);
+        snake.setUserFast(fast);
+    }
+
     public String getName() {
-        if (this.snake == null) {
-            throw new IllegalStateException();
-        }
+        assert snake != null;
         return this.snake.name;
     }
 

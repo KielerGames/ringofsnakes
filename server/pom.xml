@@ -15,7 +15,7 @@
 
         <javax.websocket.api.version>1.1</javax.websocket.api.version>
         <jetty.version>9.4.48.v20220622</jetty.version>
-        <mockito.version>4.7.0</mockito.version>
+        <mockito.version>4.8.0</mockito.version>
         <junit.version>5.9.0</junit.version>
     </properties>
 

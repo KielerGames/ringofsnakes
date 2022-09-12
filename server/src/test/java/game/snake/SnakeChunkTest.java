@@ -82,7 +82,7 @@ public class SnakeChunkTest {
     @Test
     void testPathDataLengthRemainsTheSame() {
         final var world = new World(config);
-        final var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+        final var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
 
         tickUntilFullLength(snake);
 
@@ -160,7 +160,7 @@ public class SnakeChunkTest {
     void testJunkChunksShouldStayJunk() {
         final var random = new Random(1234);
         final var world = new World(config);
-        final var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+        final var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
 
         snake.grow(64.0);
         tickUntilFullLength(snake);

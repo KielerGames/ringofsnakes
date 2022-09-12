@@ -4,13 +4,13 @@ import { connect, Socket } from "./socket";
 import RateLimiter from "../util/RateLimiter";
 import GameDataBuffer from "./data/GameDataBuffer";
 import { ClientData } from "./data/ClientData";
-import { Callback } from "../util/FunctionTypes";
-import { SpawnInfo } from "./data/JSONMessages";
+import { GameInfo } from "./data/JSONMessages";
 import Rectangle, { TransferableBox } from "../math/Rectangle";
 import { DataUpdateDTO } from "../data/dto/DataUpdateDTO";
 import { GameInfoDTO } from "../data/dto/GameInfoDTO";
-
-type WorkerEvent = "server-update" | "error" | "disconnect";
+import { AppEvent } from "../util/AppEvent";
+import { Consumer } from "../util/FunctionTypes";
+import { SpectatorChangeDTO } from "../data/dto/SpectatorChangeDTO";
 
 let socket: Socket | null = null;
 
@@ -26,12 +26,17 @@ const userInputRateLimiter = new RateLimiter<ClientData>(1000 / 30, (data) => {
     }
 });
 
-const data = new GameDataBuffer(() => triggerEvent("server-update"));
+const events = {
+    serverUpdate: new AppEvent(),
+    error: new AppEvent<string>(),
+    disconnect: new AppEvent(),
+    spectatorChange: new AppEvent<SpectatorChangeDTO>()
+};
 
-const eventListeners = new Map<WorkerEvent, Callback>();
+const data = new GameDataBuffer(triggerServerUpdateEvent);
 
-export class WorkerAPI {
-    async init(cfg: Readonly<ClientConfig>): Promise<GameInfoDTO> {
+const api = {
+    init: async function init(cfg: Readonly<ClientConfig>): Promise<GameInfoDTO> {
         if (socket !== null) {
             throw new Error("Worker is already initialized.");
         }
@@ -40,11 +45,11 @@ export class WorkerAPI {
         const url = `${protocol}://${cfg.server.host}:${cfg.server.port}/game`;
         socket = await connect(url);
 
-        const spawnInfo: SpawnInfo = await new Promise((resolve, reject) => {
-            const timeoutId = setTimeout(() => reject(new Error("SpawnInfo timeout.")), 2000);
+        const gameInfo: GameInfo = await new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => reject(new Error("GameInfo timeout.")), 2000);
 
             socket!.onJSONMessage = (message) => {
-                if (message.tag === "SpawnInfo") {
+                if (message.tag === "GameInfo") {
                     clearTimeout(timeoutId);
                     resolve(message);
                 } else {
@@ -53,10 +58,14 @@ export class WorkerAPI {
             };
         });
 
-        data.init(spawnInfo);
+        data.init(gameInfo);
 
         socket.onJSONMessage = (message) => {
             switch (message.tag) {
+                case "SpectatorChange": {
+                    events.spectatorChange.trigger(message);
+                    break;
+                }
                 default: {
                     data.addJSONUpdate(message);
                 }
@@ -68,26 +77,30 @@ export class WorkerAPI {
         };
 
         socket.onclose = () => {
-            triggerEvent("disconnect");
+            events.disconnect.trigger();
             self.close();
         };
 
         return {
             config: data.config,
-            targetSnakeId: spawnInfo.snakeId,
-            startPosition: spawnInfo.snakePosition
+            targetSnakeId: gameInfo.snakeId,
+            startPosition: gameInfo.startPosition
         };
-    }
+    },
 
-    sendUserInput(alpha: number, wantsFast: boolean, viewBox: TransferableBox): void {
+    sendUserInput: function sendUserInput(
+        alpha: number,
+        wantsFast: boolean,
+        viewBox: TransferableBox
+    ): void {
         userInputRateLimiter.setValue({
             targetAlpha: alpha,
             wantsToBeFast: wantsFast,
             viewBox
         });
-    }
+    },
 
-    getDataChanges(): DataUpdateDTO {
+    getDataChanges: function getDataChanges(): DataUpdateDTO {
         const update = data.nextUpdate();
 
         // avoid copying of ArrayBuffers
@@ -99,32 +112,33 @@ export class WorkerAPI {
         }
 
         return Comlink.transfer(update, transferables);
-    }
+    },
 
-    quit(): void {
+    quit: function quit(): void {
         if (socket) {
             socket.close();
         }
         self.close();
-    }
+    },
 
-    addEventListener(eventId: WorkerEvent, callback: Callback): void {
-        eventListeners.set(eventId, callback);
+    addEventListener: function addEventListener<T>(
+        event: keyof typeof events,
+        callback: Consumer<T>
+    ): void {
+        events[event].addListener(callback as Consumer<unknown>);
     }
+};
+
+function triggerServerUpdateEvent() {
+    events.serverUpdate.trigger();
 }
 
-function triggerEvent(event: WorkerEvent): void {
-    const listener = eventListeners.get(event);
-
-    if (listener) {
-        listener();
-    }
-}
+export type WorkerAPI = Readonly<typeof api>;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 self.onerror = (event, source, lineno, colno, error) => {
     // TODO
-    triggerEvent("error");
+    events.error.trigger(event.toString());
 };
 
-Comlink.expose(new WorkerAPI());
+Comlink.expose(api);

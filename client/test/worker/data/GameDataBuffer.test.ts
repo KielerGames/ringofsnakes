@@ -1,5 +1,5 @@
 import GameDataBuffer from "../../../src/app/worker/data/GameDataBuffer";
-import { SpawnInfo } from "../../../src/app/worker/data/JSONMessages";
+import { GameInfo } from "../../../src/app/worker/data/JSONMessages";
 import defaultConfig from "../../data/config/GameConfig.prefab";
 import { createSnakeChunkBuffer } from "../decoder/SnakeChunkBuffer.testFactory";
 import { UPDATE_HEADER_SIZE } from "../../../src/app/worker/decoder/GameUpdateDecoder";
@@ -77,21 +77,21 @@ describe("GameDataBuffer", () => {
     });
 });
 
-function createSpawnInfo(snakeId: number): SpawnInfo {
+function createSpawnInfo(snakeId: number): GameInfo {
     return {
-        tag: "SpawnInfo",
+        tag: "GameInfo",
         snakeId,
         snakeName: "TestSnakeName",
-        snakePosition: { x: 0, y: 0 },
+        startPosition: { x: 0, y: 0 },
         gameConfig: defaultConfig
     };
 }
 
-function createGameUpdateBuffer(spawnInfo: SpawnInfo, ccn: number): ArrayBuffer {
+function createGameUpdateBuffer(spawnInfo: GameInfo, ccn: number): ArrayBuffer {
     const siArray = new Uint8Array(SNAKE_INFO_SIZE);
     const scBuffer = createSnakeChunkBuffer(
         ccn,
-        { ...spawnInfo.snakePosition, alpha: 0, id: spawnInfo.snakeId },
+        { ...spawnInfo.startPosition, alpha: 0, id: spawnInfo.snakeId },
         null
     );
     const guArray = new Uint8Array(UPDATE_HEADER_SIZE + siArray.byteLength + scBuffer.byteLength);

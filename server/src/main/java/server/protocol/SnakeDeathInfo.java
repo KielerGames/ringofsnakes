@@ -2,12 +2,16 @@ package server.protocol;
 
 import game.snake.Snake;
 
-public class SnakeDeathInfo extends ServerToClientJSONMessage {
-    final int deadSnakeId;
-    final Integer killerSnakeId;
+import javax.annotation.Nullable;
 
-    public SnakeDeathInfo(Snake snake, Snake killer) {
+public class SnakeDeathInfo extends ServerToClientJSONMessage {
+    @Nullable public final transient Snake killer;
+    final int deadSnakeId;
+    @Nullable final Integer killerSnakeId;
+
+    public SnakeDeathInfo(Snake snake, @Nullable Snake killer) {
         deadSnakeId = snake.id;
+        this.killer = killer;
         killerSnakeId = (killer == null) ? null : ((int) killer.id);
     }
 }

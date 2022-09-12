@@ -25,7 +25,7 @@ class HeatMapTest {
     void testNonEmptyWorld() {
         final var world = new World();
         final var heatMap = world.getHeatMap();
-        final var snake = SnakeFactory.createSnake(world);
+        final var snake = SnakeFactory.createTestSnake(world);
 
         for (int i = 0; i < 10; i++) {
             snake.tick();

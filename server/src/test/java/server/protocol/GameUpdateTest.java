@@ -13,7 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import server.Client;
+import server.clients.Client;
 
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
@@ -89,13 +89,13 @@ public class GameUpdateTest {
     @Test
     void testKnowledgeDecay() {
         var client = new TestClient(session);
-        var snake = SnakeFactory.createSnake(new Vector(0, 0), world);
+        var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
 
         for (int i = 0; i < 10; i++) {
             snake.tick();
         }
 
-        client.updateClientSnakeChunk(snake.getSnakeChunks().get(0));
+        client.updateClientSnakeChunk(snake.streamSnakeChunks().findFirst().orElseThrow());
         sendUpdate(client);
         var update1 = client.lastSentUpdate;
         assertTrue(update1.hasSnake(snake));
@@ -172,7 +172,7 @@ public class GameUpdateTest {
         public GameUpdate lastSentUpdate;
 
         TestClient(Session session) {
-            super(session);
+            super(session, null);
         }
 
         @Override
@@ -183,6 +183,11 @@ public class GameUpdateTest {
         @Override
         protected void onBeforeUpdateBufferIsCreated(GameUpdate update) {
             lastSentUpdate = update;
+        }
+
+        @Override
+        public void handleUserInput(float alpha, boolean fast) {
+            System.err.println("Warning: User input ignored in test.");
         }
     }
 }

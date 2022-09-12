@@ -2,18 +2,16 @@ package game.snake;
 
 import game.world.World;
 import math.BoundingBox;
-import math.Vector;
 import math.Direction;
+import math.Vector;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BoundarySnake extends Snake {
-    private static final double DIRECTION_SCATTERING = Math.toRadians(1.5);
     private final BoundingBox bottom, right, up, left;
-    private final Random random = new Random();
 
     BoundarySnake(char id, World world) {
-        super(id, world, "BoundarySnake");
+        super(id, world, "BoundarySnake", pickSkin());
         updateLengthAndWidth();
 
         // start at bottom center
@@ -41,6 +39,10 @@ public class BoundarySnake extends Snake {
         assert Math.abs(up.getHeight() - boxWidth) < 1e-8;
         left = new BoundingBox(wb.minX, wb.minX + boxWidth, wb.minY + boxWidth, wb.maxY);
         assert Math.abs(left.getWidth() - boxWidth) < 1e-8;
+    }
+
+    private static byte pickSkin() {
+        return (byte) ThreadLocalRandom.current().nextInt(Snake.NUMBER_OF_SKINS);
     }
 
     public void updateLengthAndWidth() {
@@ -83,10 +85,7 @@ public class BoundarySnake extends Snake {
             throw new IllegalStateException("Boundary snake does not know where to go.");
         }
 
-        var direction = Direction.getFromTo(p, target);
-        // scattering
-        direction = Direction.normalize(direction + random.nextDouble() * DIRECTION_SCATTERING);
-        setTargetDirection(direction);
+        setTargetDirection(Direction.getFromTo(p, target));
     }
 
     @Override

@@ -19,7 +19,7 @@ jest.mock("comlink", () => ({
 
 async function updateGame(game: Game, dto: DataUpdateDTO): Promise<void> {
     const mock = RemoteMock.addEventListener.mock;
-    expect(mock.calls[0][0]).toBe("server-update");
+    expect(mock.calls[0][0]).toBe("serverUpdate");
     const serverUpdateNotifier = mock.calls[0][1];
     serverUpdateNotifier();
     RemoteMock.getDataChanges.mockReturnValueOnce(dto);

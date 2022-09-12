@@ -10,21 +10,19 @@ import math.Vector;
 
 import java.util.Comparator;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class World {
     private static final int FOOD_THRESHOLD = 16;
-    @Setter private static Random random = new Random();
+    @Setter private static Random randomForTests;
     public final WorldChunkCollection chunks;
     public final Vector center = new Vector(0, 0);
+    public final BoundingBox box;
     @Getter private final GameConfig config;
     @Getter private final HeatMap heatMap;
-    public final BoundingBox box;
 
     public World(double chunkSize, int repetitions) {
-        this.config = new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions));
-        chunks = WorldChunkFactory.createChunks(this);
-        box = new BoundingBox(new Vector(0, 0), chunkSize * repetitions, chunkSize * repetitions);
-        heatMap = new HeatMap(config, chunks::stream);
+        this(new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions)));
     }
 
     public World() {
@@ -36,11 +34,12 @@ public class World {
         chunks = WorldChunkFactory.createChunks(this);
         box = new BoundingBox(new Vector(0, 0), config.chunks.size * config.chunks.columns, config.chunks.size * config.chunks.rows);
         heatMap = new HeatMap(config, chunks::stream);
+        spawnInitialFood();
     }
 
     public Vector findSpawnPosition() {
         var worldChunkToSpawnIn = findRandomWorldChunkWithMinSnakeChunkCount();
-        return worldChunkToSpawnIn.findSnakeSpawnPosition(World.random);
+        return worldChunkToSpawnIn.findSnakeSpawnPosition(getRandom());
     }
 
     private WorldChunk findRandomWorldChunkWithMinSnakeChunkCount() {
@@ -48,7 +47,7 @@ public class World {
         var minimalSnakeChunkCount = chunks.stream().mapToInt(WorldChunk::getSnakeChunkCount).min().orElseThrow();
         var worldChunksWithMinimalSnakeChunkCount = chunks.stream()
                 .filter(worldChunk -> worldChunk.getSnakeChunkCount() == minimalSnakeChunkCount).toList();
-        int randomIndex = World.random.nextInt(worldChunksWithMinimalSnakeChunkCount.size());
+        int randomIndex = getRandom().nextInt(worldChunksWithMinimalSnakeChunkCount.size());
         return worldChunksWithMinimalSnakeChunkCount.get(randomIndex);
     }
 
@@ -71,5 +70,53 @@ public class World {
                 .sorted(Comparator.comparingInt(WorldChunk::getFoodCount))
                 .limit(numberOfChunksToSpawnSimultaneously)
                 .forEach(WorldChunk::addFood);
+    }
+
+    public void recycleDeadSnake(Snake snake) {
+        final var random = getRandom();
+
+        //TODO:
+        // - consider spawning larger food items for larger snakes #120
+        // - fine adjust food value per dead snake
+        final var foodScattering = 1.0;
+        final var caloricValueOfSnake = 0.64 * snake.getLength(); //TODO: adjust
+        final var caloricValueOfFoodSpawn = Food.Size.MEDIUM.value * Food.Size.MEDIUM.value * config.foodNutritionalValue;
+        final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
+        final var lengthUntilFoodSpawn = snake.getLength() / Math.max(1, numberOfFoodSpawns);
+
+        for (int i = 0; i < numberOfFoodSpawns; i++) {
+            final var offset = i * lengthUntilFoodSpawn;
+            final var spawnPosition = snake.getPositionAt(offset);
+            if (spawnPosition == null) {
+                // In some edge cases getPositionAt can return null.
+                // This can be ignored because the number of spawned food items is not critical.
+                continue;
+            }
+            spawnPosition.addScaled(new Vector(random.nextDouble(), random.nextDouble()), foodScattering);
+            if (!box.isWithinSubBox(spawnPosition, 1.0)) {
+                continue;
+            }
+            final var worldChunk = chunks.findChunk(spawnPosition);
+            final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM, snake.getSkin());
+            worldChunk.addFood(food);
+        }
+    }
+
+    private void spawnInitialFood() {
+        final int numChunks = config.chunks.rows * config.chunks.columns;
+        final double area = numChunks * config.chunks.size * config.chunks.size;
+        final int n = (int) (area / 900);
+
+        for (int i = 0; i < n; i++) {
+            spawnFood();
+        }
+    }
+
+    private Random getRandom() {
+        if (randomForTests != null) {
+            return randomForTests;
+        }
+
+        return ThreadLocalRandom.current();
     }
 }

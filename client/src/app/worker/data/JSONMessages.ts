@@ -1,17 +1,19 @@
 import { GameConfig } from "../../data/config/GameConfig";
 import { GameStatisticsDTO } from "../../data/dto/GameStatisticsDTO";
+import { SpectatorChangeDTO } from "../../data/dto/SpectatorChangeDTO";
 export type ClientToServerJSONMessage = never;
 export type ServerToClientJSONMessage =
-    | SpawnInfo
+    | GameInfo
     | SnakeDeathInfo
     | LeaderboardData
-    | SnakeNameUpdate;
+    | SnakeNameUpdate
+    | SpectatorChange;
 
-export type SpawnInfo = Readonly<{
-    tag: "SpawnInfo";
+export type GameInfo = Readonly<{
+    tag: "GameInfo";
     snakeId: number;
-    snakeName: string;
-    snakePosition: { x: number; y: number };
+    snakeName?: string;
+    startPosition: { x: number; y: number };
     gameConfig: GameConfig;
 }>;
 
@@ -37,3 +39,9 @@ export type SnakeNameUpdate = Readonly<{
     tag: "SnakeNameUpdate";
     names: Record<string, string>;
 }>;
+
+export type SpectatorChange = Readonly<
+    {
+        tag: "SpectatorChange";
+    } & SpectatorChangeDTO
+>;

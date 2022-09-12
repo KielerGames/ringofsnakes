@@ -17,13 +17,14 @@ import { FoodChunkDTO } from "./dto/FoodChunkDTO";
 import { AppEvent } from "../util/AppEvent";
 import { dialog } from "../ui/Dialogs";
 import { SnakeDeathDTO } from "./dto/SnakeDeathDTO";
+import { SpectatorChangeDTO } from "./dto/SpectatorChangeDTO";
 
 export default class Game {
     readonly snakes: ManagedMap<SnakeDTO, SnakeId, Snake, number>;
     readonly snakeChunks: ManagedMap<SnakeChunkDTO, SnakeChunkId, SnakeChunk>;
     readonly foodChunks: ManagedMap<FoodChunkDTO, FoodChunkId, FoodChunk>;
     readonly events = {
-        snakeDeath: new AppEvent<SnakeDeathDTO & { snake?: Snake }>(),
+        snakeDeath: new AppEvent<SnakeDeathDTO & { snake?: Snake }>(), // TODO
         gameEnd: new AppEvent<GameEndReason>()
     };
 
@@ -53,12 +54,11 @@ export default class Game {
         this.events.snakeDeath.addListener(({ deadSnakeId, killer }) => {
             if (deadSnakeId === this.targetSnakeId) {
                 this.targetSnakeId = undefined;
-                this.stopped = true;
-                this.events.gameEnd.trigger({ reason: "death", killer: killer?.name ?? "???" });
                 return;
             }
 
             if (killer && killer.snakeId === this.targetSnakeId) {
+                // TODO: avoid client-side counting
                 this._targetSnakeKills++;
             }
         });
@@ -79,7 +79,7 @@ export default class Game {
         game.heatMap = new Uint8Array(info.config.chunks.rows * info.config.chunks.columns);
 
         remote.addEventListener(
-            "server-update",
+            "serverUpdate",
             Comlink.proxy(() => {
                 game.updateAvailable = true;
             })
@@ -93,14 +93,28 @@ export default class Game {
             })
         );
 
+        remote.addEventListener(
+            "spectatorChange",
+            Comlink.proxy((info) => {
+                // TODO fix types
+                const changeInfo = info as SpectatorChangeDTO;
+
+                if (changeInfo.followSnake) {
+                    game.targetSnakeId = changeInfo.targetSnakeId;
+                } else {
+                    game.targetSnakeId = undefined;
+                    game.camera.moveTo(Vector.fromObject(changeInfo.position));
+                }
+            })
+        );
+
         const player = new Player(remote, info.targetSnakeId, game);
 
         return [game, player];
     }
 
-    static async joinAsSpectator(): Promise<Game> {
-        await Promise.reject(new Error("not implemented"));
-        return new Game(); // TODO
+    static joinAsSpectator(): Promise<Game> {
+        throw new Error("not implemented");
     }
 
     /**
@@ -228,4 +242,4 @@ export default class Game {
 type SnakeId = number;
 type SnakeChunkId = number;
 type FoodChunkId = number;
-type GameEndReason = { reason: "disconnect" } | { reason: "death"; killer: string };
+type GameEndReason = { reason: "disconnect" };

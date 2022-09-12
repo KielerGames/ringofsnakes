@@ -1,23 +1,24 @@
 package game;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import game.ai.Bot;
 import game.ai.BotFactory;
-import game.snake.Snake;
-import game.snake.SnakeChunk;
-import game.snake.SnakeFactory;
-import game.snake.SnakeNameGenerator;
+import game.snake.*;
 import game.world.Collidable;
 import game.world.World;
 import game.world.WorldChunk;
-import server.Client;
-import server.Player;
+import server.SnakeServer;
+import server.clients.Client;
+import server.clients.Player;
+import server.clients.Spectator;
 import server.protocol.GameStatistics;
 import server.protocol.SnakeDeathInfo;
-import server.protocol.SpawnInfo;
 import util.ExceptionalExecutorService;
+import util.JSON;
 
+import javax.annotation.Nullable;
 import javax.websocket.Session;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -30,26 +31,20 @@ import java.util.stream.Stream;
 import static util.TaskMeasurer.measure;
 
 public class Game {
-    private static final Gson gson = new Gson();
-    private static final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     public final int id = 1; //TODO
     public final GameConfig config;
     public final World world;
     public final CollisionManager collisionManager;
     public final List<Snake> snakes = new LinkedList<>();
     protected final ExceptionalExecutorService executor;
-    private final Map<String, Client> clients = new HashMap<>(64);
+    private final Map<Session, Client> clientsBySession = Collections.synchronizedMap(new HashMap<>(64));
+    private final Multimap<Snake, Client> clientsBySnake = Multimaps.synchronizedMultimap(HashMultimap.create(64, 4));
     private final List<Bot> bots = new LinkedList<>();
     private final Set<String> usedNames = new HashSet<>();
     private byte ticksSinceLastUpdate = 0;
 
     public Game() {
         this(new GameConfig());
-
-        // spawn some food
-        for (int i = 0; i < 256; i++) {
-            world.spawnFood();
-        }
 
         final var boundarySnake = SnakeFactory.createBoundarySnake(world);
         snakes.add(boundarySnake);
@@ -85,9 +80,49 @@ public class Game {
                 return;
             }
 
+            // update world and other snakes
+            world.recycleDeadSnake(snake);
             otherSnake.addKill();
-            final var killMessage = gson.toJson(new SnakeDeathInfo(snake, otherSnake));
-            executor.schedule(() -> clients.forEach((sId, client) -> client.send(killMessage)), 0, TimeUnit.MILLISECONDS);
+
+            handleSnakeDeath(snake, new SnakeDeathInfo(snake, otherSnake));
+        }
+    }
+
+    private void handleSnakeDeath(Snake snake, SnakeDeathInfo info) {
+        assert !snake.isAlive();
+        final var spectatorTarget = info.killer instanceof BoundarySnake ? null : info.killer;
+
+        // notify clients
+        final var killMessage = JSON.stringify(info);
+        executor.submit(() -> broadcast(killMessage));
+
+        // transfer clients
+        executor.submit(() -> {
+            // Remove clients after broadcast
+            final var clients = clientsBySnake.removeAll(snake);
+            clients.forEach(client -> {
+                clientsBySession.remove(client.session);
+
+                if (client instanceof final Player player) {
+                    final var spectator = Spectator.createFor(spectatorTarget, player);
+                    registerSpectator(spectator, spectatorTarget);
+                    SnakeServer.updateClient(spectator);
+                } else if (client instanceof final Spectator spectator) {
+                    spectator.setSnake(spectatorTarget);
+                    registerSpectator(spectator, spectatorTarget);
+                }
+            });
+        });
+    }
+
+    private void handleSnakeDeath(Snake snake) {
+        handleSnakeDeath(snake, new SnakeDeathInfo(snake, null));
+    }
+
+    private void registerSpectator(Spectator spectator, @Nullable Snake targetSnake) {
+        clientsBySession.put(spectator.session, spectator);
+        if (targetSnake != null) {
+            clientsBySnake.put(targetSnake, spectator);
         }
     }
 
@@ -107,10 +142,8 @@ public class Game {
             return snake;
         }, executor).thenApply(snake -> {
             final var player = new Player(snake, session);
-            synchronized (clients) {
-                clients.put(session.getId(), player);
-            }
-            player.sendSync(gson.toJson(new SpawnInfo(config, snake)));
+            clientsBySession.put(session, player);
+            clientsBySnake.put(snake, player);
             System.out.println("Player " + player.getName() + " has joined game");
             return player;
         });
@@ -124,16 +157,18 @@ public class Game {
         }
     }
 
-    public void removeClient(String sessionId) {
-        final Client client;
+    public void removeClient(Session session) {
+        final var client = clientsBySession.remove(session);
 
-        synchronized (clients) {
-            client = clients.remove(sessionId);
-        }
+        if (client instanceof final Player player) {
+            final var snake = player.getSnake();
 
-        if (client instanceof Player) {
-            final var snake = ((Player) client).snake;
+            if (!snake.isAlive()) {
+                return;
+            }
+
             snake.kill();
+            handleSnakeDeath(snake);
         }
     }
 
@@ -165,12 +200,12 @@ public class Game {
 
         // update leaderboard every second
         executor.scheduleAtFixedRate(() -> {
-            final var statsJson = gson.toJson(new GameStatistics(this));
-            clients.forEach((__, client) -> client.send(statsJson));
+            final var statsJson = JSON.stringify(new GameStatistics(this));
+            broadcast(statsJson);
         }, 1, 2, TimeUnit.SECONDS);
 
         executor.scheduleAtFixedRate(
-                () -> clients.forEach((__, client) -> client.sendNameUpdate()),
+                () -> clientsBySession.values().forEach(Client::sendNameUpdate),
                 420, 1500,
                 TimeUnit.MILLISECONDS
         );
@@ -184,7 +219,7 @@ public class Game {
             }
         }, 1, 8, TimeUnit.SECONDS);
 
-        System.out.println("Game started. Config:\n" + prettyGson.toJson(config));
+        System.out.println("Game started. Config:\n" + JSON.stringify(config, true));
         System.out.println("Waiting for players to connect...");
     }
 
@@ -206,17 +241,15 @@ public class Game {
     }
 
     private void updateClients() {
-        synchronized (clients) {
-            clients.forEach((__, client) -> {
-                final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
-                worldChunks.stream()
-                        .flatMap(WorldChunk::streamSnakeChunks)
-                        .forEach(client::updateClientSnakeChunk);
-                worldChunks.forEach(client::updateClientFoodChunk);
-                client.updateHeatMap(world.getHeatMap());
-                client.sendGameUpdate(ticksSinceLastUpdate);
-            });
-        }
+        clientsBySession.values().forEach(client -> {
+            final var worldChunks = world.chunks.findIntersectingChunks(client.getKnowledgeBox());
+            worldChunks.stream()
+                    .flatMap(WorldChunk::streamSnakeChunks)
+                    .forEach(client::updateClientSnakeChunk);
+            worldChunks.forEach(client::updateClientFoodChunk);
+            client.updateHeatMap(world.getHeatMap());
+            client.sendGameUpdate(ticksSinceLastUpdate);
+        });
         ticksSinceLastUpdate = 0;
     }
 
@@ -242,11 +275,19 @@ public class Game {
         });
     }
 
+    /**
+     * Kill snakes leaving the map. This should be prevented by the boundary snake.
+     * This is an extra safety layer to prevent corrupted server state.
+     */
     private void killDesertingSnakes() {
-        forEachSnake(s -> {
-            if (!world.box.isWithinSubBox(s.getHeadPosition(), 0.5 * s.getWidth())) {
-                System.out.println("Snake " + s.id + " is out of bounds.");
-                s.kill();
+        forEachSnake(snake -> {
+            if (!world.box.isWithinSubBox(snake.getHeadPosition(), 0.5 * snake.getWidth())) {
+                System.out.println("Snake " + snake.id + " is out of bounds.");
+                snake.kill();
+
+                if (!snake.isAlive()) {
+                    handleSnakeDeath(snake);
+                }
             }
         });
     }
@@ -256,10 +297,17 @@ public class Game {
     }
 
     public Stream<Client> streamClients() {
-        return clients.values().stream();
+        return clientsBySession.values().stream();
     }
 
     public int getNumberOfBots() {
         return this.bots.size();
+    }
+
+    /**
+     * Send a (string) message to all clients.
+     */
+    private void broadcast(String encodedJsonData) {
+        clientsBySession.values().forEach(client -> client.send(encodedJsonData));
     }
 }

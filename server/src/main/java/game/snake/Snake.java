@@ -4,8 +4,6 @@ import game.GameConfig;
 import game.world.Food;
 import game.world.World;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 import math.Direction;
 import math.Vector;
 import util.BitWithShortHistory;
@@ -14,15 +12,14 @@ import java.nio.ByteBuffer;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Stream;
 
 import static math.MathFunctions.sigmoid;
 
 public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
+    public static final int NUMBER_OF_SKINS = 7;
     public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 1024.0;
-    private static final Random random = new Random();
 
     public final GameConfig config;
     public final char id;
@@ -32,12 +29,12 @@ public class Snake {
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();
     private final BitWithShortHistory fastHistory = new BitWithShortHistory(false);
+    @Getter private final byte skin;
     public GrowingSnakeChunk currentChunk;
     @Getter protected double length;
     @Getter Vector headPosition;
     @Getter double headDirection;
     private char currentChunkId;
-    @Setter private byte skin;
     @Getter private boolean alive = true;
     private char nextChunkId = 0;
     private double targetDirection;
@@ -47,11 +44,7 @@ public class Snake {
     private double foodTrailBuffer = 0f;
     @Getter private int kills = 0;
 
-    Snake(char id, World world) {
-        this(id, world, "Snake " + ((int) id));
-    }
-
-    Snake(char id, World world, @NonNull String name) {
+    Snake(char id, World world, String name, byte skin) {
         this.id = id;
         this.world = world;
         config = world.getConfig();
@@ -59,6 +52,7 @@ public class Snake {
         length = config.snakes.startLength;
         width = config.snakes.minWidth;
         this.name = name;
+        this.skin = skin;
 
         updateWidth();
     }
@@ -78,9 +72,10 @@ public class Snake {
     public void setTargetDirection(double alpha) {
         if (Math.abs(alpha) > Math.PI + 1e-4) {
             System.err.println("Alpha out of range: " + alpha);
-        } else {
-            this.targetDirection = alpha;
+            return;
         }
+
+        this.targetDirection = alpha;
     }
 
     /**
@@ -193,7 +188,6 @@ public class Snake {
             foodTrailBuffer -= smallFoodNutritionalValue;
             spawnFoodAtTailPosition();
         }
-
     }
 
     private void spawnFoodAtTailPosition() {
@@ -237,15 +231,24 @@ public class Snake {
         return Stream.concat(Stream.of(currentChunk), chunks.stream());
     }
 
-    public List<SnakeChunk> getSnakeChunks() {
+    List<SnakeChunk> getSnakeChunks() {
         return streamSnakeChunks().toList();
     }
 
+    /**
+     * Set the internal alive flag to false.
+     */
     public void kill() {
-        recycleSnake();
+        if (!alive) {
+            return;
+        }
         alive = false;
     }
 
+    /**
+     * Increment kill counter. Should be called when another snake dies
+     * by crashing into this snake.
+     */
     public void addKill() {
         if (kills == Integer.MAX_VALUE) {
             // Avoid integer overflow. Very unlikely to ever happen to
@@ -267,7 +270,18 @@ public class Snake {
         return headPosition.clone();
     }
 
+    /**
+     * Get a point on the snakes body.
+     * <ul>
+     *     <li>{@code getPositionAt(0)} will return the closest point to the snakes head</li>
+     *     <li>{@code getPositionAt(lengthOfSnake)} will return the tail position</li>
+     * </ul>
+     */
     public Vector getPositionAt(double offset) {
+        if (offset < 0.0 || offset > length) {
+            return null;
+        }
+
         final var chunk = streamSnakeChunks()
                 .filter(snakeChunk -> {
                     final var sco = snakeChunk.getOffset();
@@ -276,37 +290,13 @@ public class Snake {
                 .findFirst();
 
         if (chunk.isEmpty()) {
+            // This might occur at the tail position. We could add a special case for that
+            // and return getTailPosition() instead but that is computationally more expensive
+            // and not necessary for the current use case (food spawning).
             return null;
         }
 
         return chunk.get().getPositionAt(offset);
-    }
-
-
-    private void recycleSnake() {
-        //TODO:
-        // - consider spawning larger food items for larger snakes
-        // - fine adjust food value per dead snake
-        final var foodScattering = 1.0;
-        final var caloricValueOfSnake = length / 2.0; //TODO: adjust
-        final var caloricValueOfFoodSpawn = Food.Size.MEDIUM.value * Food.Size.MEDIUM.value * config.foodNutritionalValue;
-        final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
-        final var lengthUntilFoodSpawn = length / Math.max(1, numberOfFoodSpawns);
-
-        for (int i = 0; i < numberOfFoodSpawns; i++) {
-            final var offset = i * lengthUntilFoodSpawn;
-            final var spawnPosition = getPositionAt(offset);
-            if (spawnPosition == null) {
-                continue;
-            }
-            spawnPosition.addScaled(new Vector(random.nextDouble(), random.nextDouble()), foodScattering);
-            if (!world.box.isWithinSubBox(spawnPosition, 1.0)) {
-                continue;
-            }
-            final var worldChunk = world.chunks.findChunk(spawnPosition);
-            final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM, skin);
-            worldChunk.addFood(food);
-        }
     }
 
     @Override

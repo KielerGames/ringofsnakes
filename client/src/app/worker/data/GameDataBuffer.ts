@@ -1,5 +1,5 @@
 import { GameConfig } from "../../data/config/GameConfig";
-import { ServerToClientJSONMessage, SpawnInfo } from "./JSONMessages";
+import { ServerToClientJSONMessage, GameInfo } from "./JSONMessages";
 import * as GameUpdateDecoder from "../decoder/GameUpdateDecoder";
 import { DataUpdateDTO } from "../../data/dto/DataUpdateDTO";
 
@@ -18,9 +18,11 @@ export default class GameDataBuffer {
         this.serverUpdateEventTrigger = trigger;
     }
 
-    init(spawnInfo: SpawnInfo): void {
-        this.config = spawnInfo.gameConfig;
-        this.snakeNames.set(spawnInfo.snakeId, spawnInfo.snakeName);
+    init(gameInfo: GameInfo): void {
+        this.config = gameInfo.gameConfig;
+        if (gameInfo.snakeName) {
+            this.snakeNames.set(gameInfo.snakeId, gameInfo.snakeName);
+        }
     }
 
     /**

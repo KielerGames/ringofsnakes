@@ -32,15 +32,14 @@ public class EventSocket {
         boolean fast = buffer.get(8) != 0;
 
         if (Float.isFinite(alpha) && Float.isFinite(viewBoxRatio)) {
-            // TODO(?) make sure float values are in a valid range
-            SnakeServer.onUserInputUpdate(session, alpha, fast, viewBoxRatio);
+            SnakeServer.handleClientMessage(session, alpha, fast, viewBoxRatio);
         }
     }
 
     @OnClose
     public void onWebSocketClose(Session session, CloseReason reason) {
         System.out.println("Socket Closed: " + reason);
-        SnakeServer.removePlayer(session);
+        SnakeServer.removeClient(session);
     }
 
     @OnError

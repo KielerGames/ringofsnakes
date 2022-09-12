@@ -6,15 +6,17 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import server.clients.Client;
+import server.clients.Player;
 
 import javax.websocket.Session;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class SnakeServer {
-    private final static Map<String, Player> players = new HashMap<>(64);
-
+    private final static Map<String, Client> clients = Collections.synchronizedMap(new HashMap<>(64));
     private static Game game;
 
     public static Server startServerWithGame(Game game) {
@@ -72,26 +74,26 @@ public class SnakeServer {
             return;
         }
 
-        players.put(session.getId(), player);
+        clients.put(session.getId(), player);
     }
 
-    public static void removePlayer(Session session) {
-        var sessionId = session.getId();
-        players.remove(sessionId);
-        game.removeClient(sessionId);
-        System.out.println("Player has been removed. (" + sessionId + ")");
+    public static void removeClient(Session session) {
+        final var sessionId = session.getId();
+        clients.remove(sessionId);
+        game.removeClient(session);
+        System.out.println("Client has been removed. (" + sessionId + ")");
     }
 
-    public static void onUserInputUpdate(Session session, float alpha, boolean fast, float ratio) {
-        var player = players.get(session.getId());
+    public static void updateClient(Client newClient) {
+        final var sessionId = newClient.session.getId();
+        final var oldClient = clients.put(sessionId, newClient);
+        assert oldClient != null;
+    }
 
-        if (player != null) {
-            player.snake.setTargetDirection(alpha);
-            player.snake.setUserFast(fast);
-            player.setViewBoxRatio(ratio);
-        } else {
-            System.err.println("Illegal request from client.");
-        }
+    public static void handleClientMessage(Session session, float alpha, boolean fast, float ratio) {
+        final var client = clients.get(session.getId());
+        client.setViewBoxRatio(ratio);
+        client.handleUserInput(alpha, fast);
     }
 
     /**

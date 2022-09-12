@@ -143,9 +143,6 @@ export default class Game {
         this.foodChunks.addMultiple(changes.foodChunks);
 
         this.snakes.addMultiple(changes.snakes, ticks);
-        if (this.#targetSnakeId !== undefined) {
-            this.snakes.runIfPresent(this.#targetSnakeId, (snake) => (snake.target = true));
-        }
 
         // update snake chunks AFTER snakes
         this.snakeChunks.addMultiple(changes.snakeChunks);

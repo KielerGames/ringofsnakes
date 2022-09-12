@@ -21,36 +21,37 @@ const boxCoords = [
 export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
     static readonly FOOD_VERTEX_SIZE = 2 + 2 + 1; // x,y, u,v, c
 
-    id: number;
-    private gpuBuffer: WebGLBuffer;
-    private gpuData: Float32Array | undefined = new Float32Array(32 * boxCoords.length);
-    private numFoodItems: number;
-    private lastUpdateTime: number;
+    readonly id: number;
     readonly box: Rectangle;
+
+    #gpuBuffer: WebGLBuffer;
+    #gpuData: Float32Array | undefined = new Float32Array(32 * boxCoords.length);
+    #numFoodItems: number;
+    #lastUpdateTime: number;
 
     constructor(dto: FoodChunkDTO) {
         this.id = dto.id;
         this.box = Rectangle.fromTransferable(dto.bounds);
-        this.gpuBuffer = BufferManager.create();
+        this.#gpuBuffer = BufferManager.create();
         this.update(dto);
     }
 
     update(dto: FoodChunkDTO): void {
-        this.numFoodItems = dto.items.length;
-        this.gpuData = createGPUData(dto.items, this.gpuData);
-        this.lastUpdateTime = FrameTime.now();
+        this.#numFoodItems = dto.items.length;
+        this.#gpuData = createGPUData(dto.items, this.#gpuData);
+        this.#lastUpdateTime = FrameTime.now();
     }
 
     destroy(): void {
-        BufferManager.free(this.gpuBuffer);
+        BufferManager.free(this.#gpuBuffer);
     }
 
     useBuffer(gl: WebGLRenderingContext): void {
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.gpuBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.#gpuBuffer);
 
-        if (this.gpuData) {
-            gl.bufferData(gl.ARRAY_BUFFER, this.gpuData, gl.STATIC_DRAW);
-            this.gpuData = undefined;
+        if (this.#gpuData) {
+            gl.bufferData(gl.ARRAY_BUFFER, this.#gpuData, gl.STATIC_DRAW);
+            this.#gpuData = undefined;
         }
     }
 
@@ -59,14 +60,14 @@ export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
     }
 
     get numberOfVertices(): number {
-        return this.numFoodItems * boxCoords.length;
+        return this.#numFoodItems * boxCoords.length;
     }
 
     /**
      * Time since this chunk was created or last updated.
      */
     get age(): number {
-        return 0.001 * (FrameTime.now() - this.lastUpdateTime);
+        return 0.001 * (FrameTime.now() - this.#lastUpdateTime);
     }
 }
 

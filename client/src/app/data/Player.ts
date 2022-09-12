@@ -7,36 +7,36 @@ import * as UserInput from "../input/UserInput";
 type Remote = Comlink.Remote<WorkerAPI>;
 
 export default class Player {
-    private remote: Remote;
-    private game: Game;
     readonly snakeId: number;
-    private _alive: boolean = true;
-    private inputListener: UserInputListener;
+    #remote: Remote;
+    #game: Game;
+    #alive: boolean = true;
+    #inputListener: UserInputListener;
 
     constructor(remote: Remote, snakeId: number, game: Game) {
-        this.remote = remote;
         this.snakeId = snakeId;
-        this.game = game;
+        this.#remote = remote;
+        this.#game = game;
 
-        this.inputListener = (wantsFast, direction) => {
+        this.#inputListener = (wantsFast, direction) => {
             if (this.alive) {
-                this.remote.sendUserInput(direction, wantsFast, this.game.camera.viewBox);
+                this.#remote.sendUserInput(direction, wantsFast, this.#game.camera.viewBox);
             }
         };
 
-        UserInput.addListener(this.inputListener);
+        UserInput.addListener(this.#inputListener);
 
         game.events.snakeDeath.addListener(({ deadSnakeId }) => {
             if (deadSnakeId !== this.snakeId) {
                 return;
             }
 
-            this._alive = false;
-            UserInput.removeListener(this.inputListener);
+            this.#alive = false;
+            UserInput.removeListener(this.#inputListener);
         });
     }
 
     get alive(): boolean {
-        return this._alive;
+        return this.#alive;
     }
 }

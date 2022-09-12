@@ -5,12 +5,12 @@ const ring = document.createElement("div");
 const marker = document.createElement("div");
 
 export function appendTo(parent: HTMLElement): void {
-    parent.appendChild(container);
+    parent.append(container);
 }
 
 (function init() {
-    ring.appendChild(marker);
-    container.appendChild(ring);
+    ring.append(marker);
+    container.append(ring);
 
     container.id = "input-container";
     ring.id = "input-viz-ring";

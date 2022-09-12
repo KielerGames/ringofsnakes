@@ -29,7 +29,7 @@ export function dialog(options: DialogOptions): Promise<string> {
 
 export function init(): void {
     dialogLayer.id = "dialogLayer";
-    document.body.appendChild(dialogLayer);
+    document.body.append(dialogLayer);
 }
 
 function showNextDialog() {

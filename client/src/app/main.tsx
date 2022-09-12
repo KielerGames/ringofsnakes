@@ -16,13 +16,13 @@ import "../styles/main.less";
 // initialize main canvas
 const canvas = document.createElement("canvas");
 canvas.id = "mainCanvas";
-document.body.appendChild(canvas);
+document.body.append(canvas);
 WebGLContextProvider.init(canvas);
 
 // text layer
 const textLayer = document.createElement("div");
 textLayer.id = "textLayer";
-document.body.appendChild(textLayer);
+document.body.append(textLayer);
 TextRenderer.init(textLayer);
 
 InputDirectionDisplay.appendTo(document.body);
@@ -30,7 +30,7 @@ InputDirectionDisplay.appendTo(document.body);
 // initialize UI container
 const uiRoot = document.createElement("div");
 uiRoot.id = "root";
-document.body.appendChild(uiRoot);
+document.body.append(uiRoot);
 UserInput.init(uiRoot);
 
 initDialogs();

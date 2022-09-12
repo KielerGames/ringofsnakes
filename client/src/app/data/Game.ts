@@ -32,16 +32,16 @@ export default class Game {
     statistics: GameStatisticsDTO = { leaderboard: [], numPlayers: 0, numBots: 0 };
     heatMap: Uint8Array;
 
-    private remote: Comlink.Remote<WorkerAPI>;
-    private _config: GameConfig;
-    private updateAvailable: boolean = false;
-    private targetSnakeId: number | undefined;
-    private _targetSnakeKills: number = 0;
-    private stopped: boolean = false;
+    #remote: Comlink.Remote<WorkerAPI>;
+    #config: GameConfig;
+    #updateAvailable: boolean = false;
+    #targetSnakeId: number | undefined;
+    #targetSnakeKills: number = 0;
+    #stopped: boolean = false;
 
     private constructor() {
-        this.remote = createRemote();
-        this.snakes = new ManagedMap((dto) => new Snake(dto, this._config));
+        this.#remote = createRemote();
+        this.snakes = new ManagedMap((dto) => new Snake(dto, this.#config));
         this.snakeChunks = new ManagedMap((dto) => {
             const snake = this.snakes.get(dto.snakeId);
             if (snake === undefined) {
@@ -52,14 +52,14 @@ export default class Game {
         this.foodChunks = new ManagedMap((dto) => new FoodChunk(dto));
 
         this.events.snakeDeath.addListener(({ deadSnakeId, killer }) => {
-            if (deadSnakeId === this.targetSnakeId) {
-                this.targetSnakeId = undefined;
+            if (deadSnakeId === this.#targetSnakeId) {
+                this.#targetSnakeId = undefined;
                 return;
             }
 
-            if (killer && killer.snakeId === this.targetSnakeId) {
+            if (killer && killer.snakeId === this.#targetSnakeId) {
                 // TODO: avoid client-side counting
-                this._targetSnakeKills++;
+                this.#targetSnakeKills++;
             }
         });
     }
@@ -67,28 +67,28 @@ export default class Game {
     static async joinAsPlayer(): Promise<[Game, Player]> {
         const clientConfig = await ClientConfig.get();
         const game = new Game();
-        const remote = game.remote;
+        const remote = game.#remote;
 
         const info = await remote.init(clientConfig).catch(async (e) => {
             await dialog({ title: "Error", content: `Failed to connect to the game server.` });
             return Promise.reject(e);
         });
-        game._config = info.config;
+        game.#config = info.config;
         game.camera.moveTo(Vector.fromObject(info.startPosition));
-        game.targetSnakeId = info.targetSnakeId;
+        game.#targetSnakeId = info.targetSnakeId;
         game.heatMap = new Uint8Array(info.config.chunks.rows * info.config.chunks.columns);
 
         remote.addEventListener(
             "serverUpdate",
             Comlink.proxy(() => {
-                game.updateAvailable = true;
+                game.#updateAvailable = true;
             })
         );
 
         remote.addEventListener(
             "disconnect",
             Comlink.proxy(() => {
-                game.stopped = true;
+                game.#stopped = true;
                 game.events.gameEnd.trigger({ reason: "disconnect" });
             })
         );
@@ -100,9 +100,9 @@ export default class Game {
                 const changeInfo = info as SpectatorChangeDTO;
 
                 if (changeInfo.followSnake) {
-                    game.targetSnakeId = changeInfo.targetSnakeId;
+                    game.#targetSnakeId = changeInfo.targetSnakeId;
                 } else {
-                    game.targetSnakeId = undefined;
+                    game.#targetSnakeId = undefined;
                     game.camera.moveTo(Vector.fromObject(changeInfo.position));
                 }
             })
@@ -121,12 +121,12 @@ export default class Game {
      * Get and apply the latest game updates from the worker thread.
      */
     async update(): Promise<void> {
-        if (!this.updateAvailable) {
+        if (!this.#updateAvailable) {
             return;
         }
 
-        const changes = await this.remote.getDataChanges();
-        this.updateAvailable = changes.moreUpdates;
+        const changes = await this.#remote.getDataChanges();
+        this.#updateAvailable = changes.moreUpdates;
         // TODO: handle congestion (?)
         const ticks = changes.ticksSinceLastUpdate;
 
@@ -143,8 +143,8 @@ export default class Game {
         this.foodChunks.addMultiple(changes.foodChunks);
 
         this.snakes.addMultiple(changes.snakes, ticks);
-        if (this.targetSnakeId !== undefined) {
-            this.snakes.runIfPresent(this.targetSnakeId, (snake) => (snake.target = true));
+        if (this.#targetSnakeId !== undefined) {
+            this.snakes.runIfPresent(this.#targetSnakeId, (snake) => (snake.target = true));
         }
 
         // update snake chunks AFTER snakes
@@ -182,12 +182,12 @@ export default class Game {
         if (changes.moreUpdates) {
             await this.update();
         } else {
-            this.removeJunk();
+            this.#removeJunk();
         }
     }
 
     predict(): void {
-        if (this.stopped) {
+        if (this.#stopped) {
             return;
         }
         for (const snake of this.snakes.values()) {
@@ -199,29 +199,29 @@ export default class Game {
     }
 
     quit(): void {
-        this.remote.quit();
-        this.stopped = true;
+        this.#remote.quit();
+        this.#stopped = true;
     }
 
     get config(): GameConfig {
-        return this._config;
+        return this.#config;
     }
 
     get targetSnake(): Snake | undefined {
-        if (this.targetSnakeId === undefined) {
+        if (this.#targetSnakeId === undefined) {
             return undefined;
         }
 
-        return this.snakes.get(this.targetSnakeId);
+        return this.snakes.get(this.#targetSnakeId);
     }
 
     get targetSnakeKills(): number {
-        return this._targetSnakeKills;
+        return this.#targetSnakeKills;
     }
 
-    private removeJunk() {
+    #removeJunk() {
         const camera = this.camera;
-        const safeDist = 2 * this._config.snakes.fastSpeed;
+        const safeDist = 2 * this.#config.snakes.fastSpeed;
 
         this.snakeChunks.removeIf(
             (chunk) =>
@@ -232,7 +232,7 @@ export default class Game {
 
         this.snakes.removeIf(
             (snake) =>
-                snake.id !== this.targetSnakeId &&
+                snake.id !== this.#targetSnakeId &&
                 !snake.hasChunks() &&
                 !snake.couldBeVisible(camera, safeDist)
         );

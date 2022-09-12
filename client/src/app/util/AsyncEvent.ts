@@ -1,27 +1,27 @@
 type PromiseResolver = () => void;
 
 export default class AsyncEvent {
-    private flag: boolean = false;
-    private promise: Promise<void> | undefined = undefined;
-    private resolver: PromiseResolver | undefined = undefined;
+    #flag: boolean = false;
+    #promise: Promise<void> | undefined = undefined;
+    #resolver: PromiseResolver | undefined = undefined;
 
     set(): void {
-        this.flag = true;
+        this.#flag = true;
 
-        if (this.resolver) {
-            const resolve = this.resolver;
-            this.resolver = undefined;
-            this.promise = undefined;
+        if (this.#resolver) {
+            const resolve = this.#resolver;
+            this.#resolver = undefined;
+            this.#promise = undefined;
             resolve();
         }
     }
 
     clear(): void {
-        this.flag = false;
+        this.#flag = false;
     }
 
     isSet(): boolean {
-        return this.flag;
+        return this.#flag;
     }
 
     /**
@@ -29,23 +29,23 @@ export default class AsyncEvent {
      * @param timeout Timeout in ms. Values <= 0 are ignored.
      */
     wait(timeout: number = 0): Promise<void> {
-        if (this.flag) {
+        if (this.#flag) {
             return Promise.resolve();
         }
 
-        if (this.promise === undefined) {
-            this.promise = new Promise((resolve) => (this.resolver = resolve));
+        if (this.#promise === undefined) {
+            this.#promise = new Promise((resolve) => (this.#resolver = resolve));
         }
 
         if (timeout > 0) {
             return Promise.race([
-                this.promise,
+                this.#promise,
                 new Promise<void>((_, reject) => {
                     window.setTimeout(reject, timeout);
                 })
             ]);
         }
 
-        return this.promise;
+        return this.#promise;
     }
 }

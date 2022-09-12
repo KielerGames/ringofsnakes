@@ -9,9 +9,14 @@ const snakeNameSize = 12;
 
 export function render(game: Readonly<Game>): void {
     const canvas = WebGLContextProvider.getContext().canvas;
+    const targetSnake = game.targetSnake;
 
     for (const snake of game.snakes.values()) {
-        if (snake.target || !snake.hasChunks() || !isVisible(game.camera, snake.position)) {
+        if (
+            snake === targetSnake ||
+            !snake.hasChunks() ||
+            !isVisible(game.camera, snake.position)
+        ) {
             continue;
         }
 

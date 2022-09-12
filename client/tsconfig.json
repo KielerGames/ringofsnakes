@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
         "outDir": "./public",
-        "target": "es2020",
-        "module": "es2020",
-        "lib": ["dom", "es2020"],
+        "target": "es2022",
+        "module": "es2022",
+        "lib": ["dom", "es2022"],
         "moduleResolution": "node",
         "sourceMap": true,
         "jsx": "react-jsx",

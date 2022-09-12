@@ -18,41 +18,40 @@ const CHUNK_ID_MASK = (1 << 16) - 1;
 export default class Snake implements ManagedObject<number, SnakeDTO, number> {
     readonly id: number;
     readonly skin: number;
-    target: boolean = false;
     headChunk: SnakeChunk | null = null;
 
-    private readonly gameConfig: GameConfig;
-    private readonly chunks: SnakeChunk[] = [];
-    private readonly chunkIds = new Set<SnakeChunk["id"]>();
-    private lastUpdateTime: number;
-    private lastPredictionTime: number;
-    private headChunkId: number;
-    private _length: number;
-    private _fast: boolean;
-    private _smoothedFastValue: number;
-    private _width: number;
-    private _name?: string;
-    private _paused: boolean = false;
+    readonly #gameConfig: GameConfig;
+    readonly #chunks: SnakeChunk[] = [];
+    readonly #chunkIds = new Set<SnakeChunk["id"]>();
+    #lastUpdateTime: number;
+    #lastPredictionTime: number;
+    #headChunkId: number;
+    #length: number;
+    #fast: boolean;
+    #smoothedFastValue: number;
+    #width: number;
+    #name?: string;
+    #paused: boolean = false;
 
     // head position & interpolation
-    private lastKnownHeadPosition: Vector;
-    private predictedHeadPosition: Vector;
+    #lastKnownHeadPosition: Vector;
+    #predictedHeadPosition: Vector;
 
     // head direction & interpolation
-    private lastKnownDirection: number;
-    private predictedDirection: number;
-    private targetDirection: number;
+    #lastKnownDirection: number;
+    #predictedDirection: number;
+    #targetDirection: number;
 
     constructor(dto: SnakeDTO, config: GameConfig) {
         this.id = dto.id;
         this.skin = dto.skin;
-        this.gameConfig = config;
-        this.lastPredictionTime = FrameTime.now();
+        this.#gameConfig = config;
+        this.#lastPredictionTime = FrameTime.now();
 
-        this.predictedHeadPosition = Vector.fromObject(dto.headPosition);
-        this.predictedDirection = dto.headDirection[0];
+        this.#predictedHeadPosition = Vector.fromObject(dto.headPosition);
+        this.#predictedDirection = dto.headDirection[0];
 
-        this._smoothedFastValue = dto.fast ? 1.0 : 0.0;
+        this.#smoothedFastValue = dto.fast ? 1.0 : 0.0;
 
         this.update(dto, 0);
     }
@@ -62,35 +61,35 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
      * @param dto Decoded update data.
      */
     update(dto: SnakeDTO, ticks: number): void {
-        this.lastUpdateTime = FrameTime.now();
-        this._length = dto.length;
-        this.headChunkId = dto.headChunkId;
-        this.lastKnownHeadPosition = Vector.fromObject(dto.headPosition);
-        this.lastKnownDirection = dto.headDirection[0];
-        this.targetDirection = dto.headDirection[1];
-        this._fast = dto.fast;
-        this._width = dto.width;
+        this.#lastUpdateTime = FrameTime.now();
+        this.#length = dto.length;
+        this.#headChunkId = dto.headChunkId;
+        this.#lastKnownHeadPosition = Vector.fromObject(dto.headPosition);
+        this.#lastKnownDirection = dto.headDirection[0];
+        this.#targetDirection = dto.headDirection[1];
+        this.#fast = dto.fast;
+        this.#width = dto.width;
         if (dto.name) {
-            this._name = dto.name;
+            this.#name = dto.name;
         }
 
-        if (this._paused) {
-            this.predictedHeadPosition = Vector.fromObject(dto.headPosition);
-            this.predictedDirection = dto.headDirection[0];
-            this.lastPredictionTime = FrameTime.now();
-            this._paused = false;
+        if (this.#paused) {
+            this.#predictedHeadPosition = Vector.fromObject(dto.headPosition);
+            this.#predictedDirection = dto.headDirection[0];
+            this.#lastPredictionTime = FrameTime.now();
+            this.#paused = false;
         }
 
-        this.updateChunkOffsets(ticks, dto.fastHistory);
+        this.#updateChunkOffsets(ticks, dto.fastHistory);
     }
 
     predict(): void {
         // predict snake head
-        this.predictPosition();
-        this.predictDirection();
+        this.#predictPosition();
+        this.#predictDirection();
 
         // predict body
-        for (const snakeChunk of this.chunks) {
+        for (const snakeChunk of this.#chunks) {
             snakeChunk.predict();
         }
 
@@ -99,21 +98,21 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             this.headChunk.connectMeshToHead();
         }
 
-        this.updateSmoothedFastValue();
+        this.#updateSmoothedFastValue();
 
-        this.lastPredictionTime = FrameTime.now();
+        this.#lastPredictionTime = FrameTime.now();
     }
 
     registerSnakeChunk(chunk: SnakeChunk): void {
-        if (this.chunkIds.has(chunk.id)) {
+        if (this.#chunkIds.has(chunk.id)) {
             return;
         }
 
-        this.chunkIds.add(chunk.id);
+        this.#chunkIds.add(chunk.id);
 
-        if (chunk.id === this.headChunkId) {
+        if (chunk.id === this.#headChunkId) {
             // As the latest chunk of the snake it should be the last element (rendering order)
-            this.chunks.push(chunk);
+            this.#chunks.push(chunk);
 
             if (this.headChunk !== null) {
                 // The mesh data of the head chunk will be changed so that
@@ -126,9 +125,9 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             return;
         }
 
-        if (this.chunks.length === 0) {
+        if (this.#chunks.length === 0) {
             // If this is the only chunk, order does not matter.
-            this.chunks.push(chunk);
+            this.#chunks.push(chunk);
             return;
         }
 
@@ -136,13 +135,13 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         // the correct position for insertion into the array. The unique chunk id is
         // the combination of snake id and chunk id, here we only need the latter.
         // eslint-disable-next-line no-bitwise
-        const offset = CHUNK_ID_MASK - (this.headChunkId & CHUNK_ID_MASK);
+        const offset = CHUNK_ID_MASK - (this.#headChunkId & CHUNK_ID_MASK);
         const newChunkId = getComparableChunkId(chunk, offset);
 
         // TODO: use Array.prototype.findLastIndex when its available in all modern browsers
-        let i = this.chunks.length - 1;
+        let i = this.#chunks.length - 1;
         for (; 0 <= i; i--) {
-            const cId = getComparableChunkId(this.chunks[i], offset);
+            const cId = getComparableChunkId(this.#chunks[i], offset);
             if (cId < newChunkId) {
                 // Insert the new chunk after this one.
                 break;
@@ -150,18 +149,18 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
         }
 
         // If no chunk with a smaller id was found (i==-1) the new chunk will be inserted at index 0.
-        this.chunks.splice(i + 1, 0, chunk);
+        this.#chunks.splice(i + 1, 0, chunk);
     }
 
     unregisterSnakeChunk(chunk: SnakeChunk): void {
-        const i = this.chunks.findIndex((c) => c === chunk);
+        const i = this.#chunks.findIndex((c) => c === chunk);
         if (i < 0) {
             throw new Error(
                 `Cannot unregister: Snake ${this.id} has no chunk with id ${chunk.id}.`
             );
         }
-        this.chunkIds.delete(chunk.id);
-        this.chunks.splice(i, 1);
+        this.#chunkIds.delete(chunk.id);
+        this.#chunks.splice(i, 1);
     }
 
     /**
@@ -170,15 +169,15 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
      * to be skipped.
      */
     getSnakeChunksIterator(): IterableIterator<SnakeChunk> {
-        return this.chunks.values();
+        return this.#chunks.values();
     }
 
     hasChunks(): boolean {
-        return this.chunks.length > 0;
+        return this.#chunks.length > 0;
     }
 
     toString(): string {
-        return `Snake ${this.id} with ${this.chunks.length} chunks`;
+        return `Snake ${this.id} with ${this.#chunks.length} chunks`;
     }
 
     /**
@@ -187,7 +186,7 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
      * false the snake cannot be visible.
      */
     couldBeVisible(camera: Camera, epsilon: number = 0.0): boolean {
-        for (const chunk of this.chunks) {
+        for (const chunk of this.#chunks) {
             if (chunk.couldBeVisible(camera, epsilon)) {
                 return true;
             }
@@ -201,8 +200,8 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
      * Checks if the bounding box of the snakes head is visible.
      */
     isHeadVisible(camera: Camera, epsilon: number = 0.0): boolean {
-        const size = 2 * 2.0 * 1.25 * this._width;
-        const headBox = Rectangle.createAt(this.predictedHeadPosition, size, size);
+        const size = 2 * 2.0 * 1.25 * this.#width;
+        const headBox = Rectangle.createAt(this.#predictedHeadPosition, size, size);
 
         return Rectangle.distance2(headBox, camera.viewBox) <= epsilon * epsilon;
     }
@@ -217,22 +216,22 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
      * Pause snake movement until the next server update.
      */
     pause() {
-        if (__DEBUG__ && !__TEST__ && !this._paused) {
+        if (__DEBUG__ && !__TEST__ && !this.#paused) {
             console.info(`Snake ${this.id} has been paused.`);
         }
-        this._paused = true;
+        this.#paused = true;
     }
 
     get name(): string | undefined {
         if (__DEBUG__) {
-            return this._name ?? `Snake ${this.id}`;
+            return this.#name ?? `Snake ${this.id}`;
         }
 
-        return this._name;
+        return this.#name;
     }
 
     get fast(): boolean {
-        return this._fast;
+        return this.#fast;
     }
 
     /**
@@ -240,22 +239,22 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
      * The value will not switch immediately but will be smoothly interpolated.
      */
     get smoothedFastValue(): number {
-        return this._smoothedFastValue;
+        return this.#smoothedFastValue;
     }
 
     get length(): number {
-        return this._length;
+        return this.#length;
     }
 
     /**
      * The current snake speed in units per seconds (not units per tick).
      */
     get speed(): number {
-        if (this._paused) {
+        if (this.#paused) {
             return 0.0;
         }
-        const config = this.gameConfig;
-        const tickSpeed = this._fast ? config.snakes.fastSpeed : config.snakes.speed;
+        const config = this.#gameConfig;
+        const tickSpeed = this.#fast ? config.snakes.fastSpeed : config.snakes.speed;
         return tickSpeed / config.tickDuration;
     }
 
@@ -263,76 +262,76 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
      * Get the last predicted position.
      */
     get position(): Vector {
-        return this.predictedHeadPosition;
+        return this.#predictedHeadPosition;
     }
 
     /**
      * Get the direction the snakes head is facing (in radians).
      */
     get direction(): number {
-        return this.predictedDirection;
+        return this.#predictedDirection;
     }
 
     /**
      * Get the maximum (tail gets thinner) width of the snake.
      */
     get width(): number {
-        return this._width;
+        return this.#width;
     }
 
-    private predictPosition() {
+    #predictPosition() {
         const speed = this.speed;
         const now = FrameTime.now();
 
-        const distance1 = (speed * (now - this.lastPredictionTime)) / 1000;
-        const distance2 = (speed * (now - this.lastUpdateTime)) / 1000;
+        const distance1 = (speed * (now - this.#lastPredictionTime)) / 1000;
+        const distance2 = (speed * (now - this.#lastUpdateTime)) / 1000;
 
         // predictions based on previous prediction (1) & last known data (2)
-        this.predictedHeadPosition.addPolar(this.predictedDirection, distance1);
-        const prediction2 = this.lastKnownHeadPosition.clone();
-        prediction2.addPolar(this.predictedDirection, distance2);
+        this.#predictedHeadPosition.addPolar(this.#predictedDirection, distance1);
+        const prediction2 = this.#lastKnownHeadPosition.clone();
+        prediction2.addPolar(this.#predictedDirection, distance2);
 
         // combine predictions
-        this.predictedHeadPosition = Vector.lerp(this.predictedHeadPosition, prediction2, 0.15);
+        this.#predictedHeadPosition = Vector.lerp(this.#predictedHeadPosition, prediction2, 0.15);
     }
 
-    private predictDirection() {
+    #predictDirection() {
         const now = FrameTime.now();
         const maxChangePerSecond =
-            this.gameConfig.snakes.maxTurnDelta / this.gameConfig.tickDuration;
+            this.#gameConfig.snakes.maxTurnDelta / this.#gameConfig.tickDuration;
 
-        const d1 = getMinDifference(this.predictedDirection, this.targetDirection);
-        const d2 = getMinDifference(this.lastKnownDirection, this.targetDirection);
+        const d1 = getMinDifference(this.#predictedDirection, this.#targetDirection);
+        const d2 = getMinDifference(this.#lastKnownDirection, this.#targetDirection);
 
-        const max1 = (maxChangePerSecond * (now - this.lastPredictionTime)) / 1000;
-        const max2 = (maxChangePerSecond * (now - this.lastUpdateTime)) / 1000;
+        const max1 = (maxChangePerSecond * (now - this.#lastPredictionTime)) / 1000;
+        const max2 = (maxChangePerSecond * (now - this.#lastUpdateTime)) / 1000;
 
-        const p1 = normalizeAngle(this.predictedDirection + clamp(-max1, d1, max1));
-        const p2 = normalizeAngle(this.lastKnownDirection + clamp(-max2, d2, max2));
+        const p1 = normalizeAngle(this.#predictedDirection + clamp(-max1, d1, max1));
+        const p2 = normalizeAngle(this.#lastKnownDirection + clamp(-max2, d2, max2));
 
         // combine predictions
-        this.predictedDirection = normalizeAngle(p1 + 0.15 * getMinDifference(p1, p2));
+        this.#predictedDirection = normalizeAngle(p1 + 0.15 * getMinDifference(p1, p2));
     }
 
-    private updateSmoothedFastValue() {
-        const delta = (FrameTime.now() - this.lastPredictionTime) / 1000; // in seconds
+    #updateSmoothedFastValue() {
+        const delta = (FrameTime.now() - this.#lastPredictionTime) / 1000; // in seconds
         const targetValue = this.fast ? 1.0 : 0.0;
         const x = clamp(0.0, 5.0 * delta, 1.0);
-        this._smoothedFastValue = x * targetValue + (1.0 - x) * this._smoothedFastValue;
+        this.#smoothedFastValue = x * targetValue + (1.0 - x) * this.#smoothedFastValue;
     }
 
     /**
      * @param ticks server ticks since the last chun offset update
      * @param fastHistory snake speed for the last 8 ticks
      */
-    private updateChunkOffsets(ticks: number, fastHistory: boolean[]) {
+    #updateChunkOffsets(ticks: number, fastHistory: boolean[]) {
         if (ticks === 0) {
             // No server time has passed since the last update.
             return;
         }
 
-        const fastSpeed = this.gameConfig.snakes.fastSpeed;
-        const slowSpeed = this.gameConfig.snakes.speed;
+        const fastSpeed = this.#gameConfig.snakes.fastSpeed;
+        const slowSpeed = this.#gameConfig.snakes.speed;
 
         // The offset of the snake chunks changes based on the distance the
         // snake has travelled since the last update.
@@ -349,8 +348,8 @@ export default class Snake implements ManagedObject<number, SnakeDTO, number> {
             distance += slowSpeed;
         }
 
-        for (const chunk of this.chunks) {
-            if (chunk.id === this.headChunkId) {
+        for (const chunk of this.#chunks) {
+            if (chunk.id === this.#headChunkId) {
                 // After an update the head chunk offset is always 0.
                 continue;
             }

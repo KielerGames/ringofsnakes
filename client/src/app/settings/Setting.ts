@@ -8,9 +8,9 @@ export default class Setting<T> {
     readonly defaultValue: T;
     readonly label: string;
 
-    private userValue: T | null;
-    private hasUserValue: boolean = false;
-    private listeners: Consumer<T>[] = [];
+    #userValue: T | null;
+    #hasUserValue: boolean = false;
+    #listeners: Consumer<T>[] = [];
 
     public constructor(id: string, defaultValue: T, label: string) {
         this.id = id;
@@ -28,13 +28,13 @@ export default class Setting<T> {
         }
 
         try {
-            const result = window.localStorage.getItem(this.storageKey);
+            const result = window.localStorage.getItem(this.#storageKey);
 
             if (result !== null) {
-                this.userValue = JSON.parse(result);
-                this.hasUserValue = true;
+                this.#userValue = JSON.parse(result);
+                this.#hasUserValue = true;
                 if (__DEBUG__ && !__TEST__) {
-                    console.info(`User setting loaded: ${id}:`, this.userValue);
+                    console.info(`User setting loaded: ${id}:`, this.#userValue);
                 }
             }
         } catch (e) {
@@ -46,34 +46,34 @@ export default class Setting<T> {
      * Set the setting to specific value. Notifies listeners about changes.
      */
     setValue(newValue: T): void {
-        const current = this.value;
+        const current = this.#value;
 
-        if (this.hasUserValue && current === newValue) {
+        if (this.#hasUserValue && current === newValue) {
             return;
         }
 
-        this.userValue = newValue;
-        this.hasUserValue = true;
+        this.#userValue = newValue;
+        this.#hasUserValue = true;
 
-        this.persist();
-        this.notifyListeners(newValue);
+        this.#persist();
+        this.#notifyListeners(newValue);
     }
 
     /**
      * Reset the setting to the default value.
      */
     resetValue(): void {
-        if (!this.hasUserValue) {
+        if (!this.#hasUserValue) {
             return;
         }
 
-        const oldValue = this.userValue;
-        this.userValue = null;
-        this.hasUserValue = false;
-        this.persist();
+        const oldValue = this.#userValue;
+        this.#userValue = null;
+        this.#hasUserValue = false;
+        this.#persist();
 
         if (oldValue !== this.defaultValue) {
-            this.notifyListeners(this.defaultValue);
+            this.#notifyListeners(this.defaultValue);
         }
     }
 
@@ -82,29 +82,29 @@ export default class Setting<T> {
      * The listener callback will be called immediately with the current value.
      */
     subscribe(listener: Consumer<T>): void {
-        this.listeners.push(listener);
-        listener(this.value);
+        this.#listeners.push(listener);
+        listener(this.#value);
     }
 
-    private get value(): T {
-        if (this.hasUserValue) {
-            return this.userValue!;
+    get #value(): T {
+        if (this.#hasUserValue) {
+            return this.#userValue!;
         }
         return this.defaultValue;
     }
 
-    private notifyListeners(value: T): void {
-        this.listeners.forEach((listener) => listener(value));
+    #notifyListeners(value: T): void {
+        this.#listeners.forEach((listener) => listener(value));
     }
 
-    private get storageKey(): string {
+    get #storageKey(): string {
         return prefix + "." + this.id;
     }
 
-    private persist(): void {
-        const key = this.storageKey;
-        if (this.hasUserValue) {
-            window.localStorage.setItem(key, JSON.stringify(this.value));
+    #persist(): void {
+        const key = this.#storageKey;
+        if (this.#hasUserValue) {
+            window.localStorage.setItem(key, JSON.stringify(this.#value));
         } else {
             window.localStorage.removeItem(key);
         }

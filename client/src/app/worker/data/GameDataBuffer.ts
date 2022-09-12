@@ -10,18 +10,18 @@ import { DataUpdateDTO } from "../../data/dto/DataUpdateDTO";
 export default class GameDataBuffer {
     config: GameConfig;
 
-    private updateQueue: QueuedUpdate[] = [];
-    private snakeNames = new Map<SnakeId, string>();
-    private serverUpdateEventTrigger?: () => void;
+    #updateQueue: QueuedUpdate[] = [];
+    #snakeNames = new Map<SnakeId, string>();
+    #serverUpdateEventTrigger?: () => void;
 
     constructor(trigger?: () => void) {
-        this.serverUpdateEventTrigger = trigger;
+        this.#serverUpdateEventTrigger = trigger;
     }
 
     init(gameInfo: GameInfo): void {
         this.config = gameInfo.gameConfig;
         if (gameInfo.snakeName) {
-            this.snakeNames.set(gameInfo.snakeId, gameInfo.snakeName);
+            this.#snakeNames.set(gameInfo.snakeId, gameInfo.snakeName);
         }
     }
 
@@ -30,12 +30,12 @@ export default class GameDataBuffer {
      * If the queue is empty an empty update (0 ticks) is returned.
      */
     nextUpdate(): DataUpdateDTO {
-        const queuedUpdate = this.updateQueue.shift();
-        const moreUpdates = this.updateQueue.length > 0;
+        const queuedUpdate = this.#updateQueue.shift();
+        const moreUpdates = this.#updateQueue.length > 0;
 
         if (queuedUpdate) {
             // set snake name field if that data is available
-            queuedUpdate.snakes.forEach((si) => (si.name = this.snakeNames.get(si.id)));
+            queuedUpdate.snakes.forEach((si) => (si.name = this.#snakeNames.get(si.id)));
         }
 
         return {
@@ -53,11 +53,11 @@ export default class GameDataBuffer {
         }
 
         const enhance =
-            this.updateQueue.length > 0 &&
-            this.updateQueue[this.updateQueue.length - 1].ticksSinceLastUpdate === 0;
+            this.#updateQueue.length > 0 &&
+            this.#updateQueue[this.#updateQueue.length - 1].ticksSinceLastUpdate === 0;
 
         const update = enhance
-            ? this.updateQueue[this.updateQueue.length - 1]
+            ? this.#updateQueue[this.#updateQueue.length - 1]
             : createEmptyUpdate();
 
         update.ticksSinceLastUpdate = data.ticksSinceLastUpdate;
@@ -70,14 +70,14 @@ export default class GameDataBuffer {
         }
 
         if (!enhance) {
-            this.updateQueue.push(update);
+            this.#updateQueue.push(update);
         }
 
         if (!__TEST__ && this.duration > 0.5) {
             console.warn(`Update congestion! Current delay: ${this.duration.toFixed(2)}s`);
         }
 
-        this.triggerUpdateEvent();
+        this.#triggerUpdateEvent();
     }
 
     addJSONUpdate(update: ServerToClientJSONMessage): void {
@@ -86,7 +86,7 @@ export default class GameDataBuffer {
                 if (!__TEST__) {
                     console.info(`Snake ${update.deadSnakeId} has died.`);
                 }
-                this.addInformation({
+                this.#addInformation({
                     snakeDeaths: [
                         {
                             deadSnakeId: update.deadSnakeId,
@@ -94,32 +94,32 @@ export default class GameDataBuffer {
                                 update.killerSnakeId !== undefined
                                     ? {
                                           snakeId: update.killerSnakeId,
-                                          name: this.getSnakeName(update.killerSnakeId)
+                                          name: this.#getSnakeName(update.killerSnakeId)
                                       }
                                     : undefined
                         }
                     ]
                 });
-                this.snakeNames.delete(update.deadSnakeId);
-                this.triggerUpdateEvent();
+                this.#snakeNames.delete(update.deadSnakeId);
+                this.#triggerUpdateEvent();
                 break;
             }
             case "GameStatistics": {
-                this.addInformation({
+                this.#addInformation({
                     /*eslint-disable */
                     // This code copies the update object but omits the tag key.
                     // Eslint does not like this because tag is unused.
                     leaderboard: (({ tag, ...rest }) => rest)(update)
                     /*eslint-enable */
                 });
-                update.leaderboard.forEach(({ id, name }) => this.snakeNames.set(id, name));
-                this.triggerUpdateEvent();
+                update.leaderboard.forEach(({ id, name }) => this.#snakeNames.set(id, name));
+                this.#triggerUpdateEvent();
                 break;
             }
             case "SnakeNameUpdate": {
                 for (const [strId, name] of Object.entries(update.names)) {
                     const id = parseInt(strId, 10);
-                    this.snakeNames.set(id, name);
+                    this.#snakeNames.set(id, name);
                 }
                 break;
             }
@@ -135,7 +135,7 @@ export default class GameDataBuffer {
     get duration(): number {
         return (
             this.config.tickDuration *
-            this.updateQueue.map((update) => update.ticksSinceLastUpdate).reduce((a, b) => a + b, 0)
+            this.#updateQueue.map((update) => update.ticksSinceLastUpdate).reduce((a, b) => a + b, 0)
         );
     }
 
@@ -143,14 +143,14 @@ export default class GameDataBuffer {
      * Adds information to the latest game update.
      * If the queue is empty it creates a new update with 0 ticks.
      */
-    private addInformation(data: Partial<QueuedUpdate>): void {
+    #addInformation(data: Partial<QueuedUpdate>): void {
         let update: QueuedUpdate;
 
-        if (this.updateQueue.length === 0) {
+        if (this.#updateQueue.length === 0) {
             update = createEmptyUpdate();
-            this.updateQueue.push(update);
+            this.#updateQueue.push(update);
         } else {
-            update = this.updateQueue[this.updateQueue.length - 1];
+            update = this.#updateQueue[this.#updateQueue.length - 1];
         }
 
         if (data.leaderboard) {
@@ -162,16 +162,16 @@ export default class GameDataBuffer {
         }
     }
 
-    private triggerUpdateEvent(): void {
-        if (!this.serverUpdateEventTrigger) {
+    #triggerUpdateEvent(): void {
+        if (!this.#serverUpdateEventTrigger) {
             return;
         }
 
-        this.serverUpdateEventTrigger();
+        this.#serverUpdateEventTrigger();
     }
 
-    private getSnakeName(snakeId: SnakeId): string {
-        return this.snakeNames.get(snakeId) ?? `Snake ${snakeId}`;
+    #getSnakeName(snakeId: SnakeId): string {
+        return this.#snakeNames.get(snakeId) ?? `Snake ${snakeId}`;
     }
 }
 

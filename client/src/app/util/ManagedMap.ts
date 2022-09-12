@@ -11,25 +11,25 @@ type WithId<T> = { id: T };
 type Factory<T, DTO> = (dto: DTO) => T;
 
 export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO, CI>, CI = void> {
-    private readonly data: Map<K, V> = new Map();
-    private readonly factory: Factory<V, DTO>;
+    readonly #data: Map<K, V> = new Map();
+    readonly #factory: Factory<V, DTO>;
 
     /**
      * @param factory A function to create values given a data transfer object.
      */
     constructor(factory: Factory<V, DTO>) {
-        this.factory = factory;
+        this.#factory = factory;
     }
 
     add(dto: DTO, info: CI): void {
-        const storedValue = this.data.get(dto.id);
+        const storedValue = this.#data.get(dto.id);
 
         if (storedValue) {
             storedValue.update(dto, info);
         } else {
-            const value = this.factory(dto);
+            const value = this.#factory(dto);
             assert(dto.id === value.id);
-            this.data.set(dto.id, value);
+            this.#data.set(dto.id, value);
         }
     }
 
@@ -40,15 +40,15 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
     }
 
     get(id: K): V | undefined {
-        return this.data.get(id);
+        return this.#data.get(id);
     }
 
     has(id: K): boolean {
-        return this.data.has(id);
+        return this.#data.has(id);
     }
 
     runIfPresent(id: K, consumer: Consumer<V>): boolean {
-        const value = this.data.get(id);
+        const value = this.#data.get(id);
         if (value) {
             consumer(value);
         }
@@ -61,10 +61,10 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
      * @returns The removed element or undefined if it does not exist.
      */
     remove(id: K): V | undefined {
-        const value = this.data.get(id);
+        const value = this.#data.get(id);
 
         if (value) {
-            this.data.delete(id);
+            this.#data.delete(id);
 
             if (value.destroy) {
                 value.destroy();
@@ -82,7 +82,7 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
     removeIf(isJunk: Predicate<V>): V[] {
         // collect junk
         const removeList: V[] = [];
-        for (const obj of this.data.values()) {
+        for (const obj of this.#data.values()) {
             if (isJunk(obj)) {
                 removeList.push(obj);
             }
@@ -93,29 +93,29 @@ export class ManagedMap<DTO extends WithId<K>, K, V extends ManagedObject<K, DTO
             if (obj.destroy) {
                 obj.destroy();
             }
-            this.data.delete(obj.id);
+            this.#data.delete(obj.id);
         }
 
         return removeList;
     }
 
     forEach(consumer: BiConsumer<V, K>): void {
-        this.data.forEach(consumer);
+        this.#data.forEach(consumer);
     }
 
     values(): IterableIterator<V> {
-        return this.data.values();
+        return this.#data.values();
     }
 
     entries(): IterableIterator<[K, V]> {
-        return this.data.entries();
+        return this.#data.entries();
     }
 
     clear(): void {
-        this.data.clear();
+        this.#data.clear();
     }
 
     get size(): number {
-        return this.data.size;
+        return this.#data.size;
     }
 }

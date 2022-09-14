@@ -135,7 +135,9 @@ export default class GameDataBuffer {
     get duration(): number {
         return (
             this.config.tickDuration *
-            this.#updateQueue.map((update) => update.ticksSinceLastUpdate).reduce((a, b) => a + b, 0)
+            this.#updateQueue
+                .map((update) => update.ticksSinceLastUpdate)
+                .reduce((a, b) => a + b, 0)
         );
     }
 

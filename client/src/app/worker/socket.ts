@@ -19,7 +19,7 @@ class SocketImpl implements Socket {
     onclose = noop;
     onJSONMessage: Consumer<ServerToClientJSONMessage> = noop;
     onBinaryMessage: Consumer<ArrayBuffer> = noop;
-    
+
     constructor(websocket: WebSocket) {
         this.#websocket = websocket;
         this.#websocket.onclose = (e: CloseEvent) => {

@@ -93,8 +93,7 @@ export default class Game {
             })
         );
 
-        remote.addEventListener(
-            "spectatorChange",
+        remote.onSpectatorChange(
             Comlink.proxy((info) => {
                 // TODO fix types
                 const changeInfo = info as SpectatorChangeDTO;

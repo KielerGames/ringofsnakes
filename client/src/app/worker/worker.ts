@@ -36,7 +36,7 @@ const events = {
 const data = new GameDataBuffer(triggerServerUpdateEvent);
 
 const api = {
-    init: async function init(cfg: Readonly<ClientConfig>): Promise<GameInfoDTO> {
+    async init(cfg: Readonly<ClientConfig>): Promise<GameInfoDTO> {
         if (socket !== null) {
             throw new Error("Worker is already initialized.");
         }
@@ -88,11 +88,7 @@ const api = {
         };
     },
 
-    sendUserInput: function sendUserInput(
-        alpha: number,
-        wantsFast: boolean,
-        viewBox: TransferableBox
-    ): void {
+    sendUserInput(alpha: number, wantsFast: boolean, viewBox: TransferableBox): void {
         userInputRateLimiter.setValue({
             targetAlpha: alpha,
             wantsToBeFast: wantsFast,
@@ -100,7 +96,7 @@ const api = {
         });
     },
 
-    getDataChanges: function getDataChanges(): DataUpdateDTO {
+    getDataChanges(): DataUpdateDTO {
         const update = data.nextUpdate();
 
         // avoid copying of ArrayBuffers
@@ -114,18 +110,26 @@ const api = {
         return Comlink.transfer(update, transferables);
     },
 
-    quit: function quit(): void {
+    quit(): void {
         if (socket) {
             socket.close();
         }
         self.close();
     },
 
-    addEventListener: function addEventListener<T>(
-        event: keyof typeof events,
-        callback: Consumer<T>
-    ): void {
-        events[event].addListener(callback as Consumer<unknown>);
+    addEventListener(eventName: EventWithoutPayloadName, listener: Consumer<void>): void {
+        events[eventName].addListener(listener);
+    },
+
+    // TS does not support method overloads with mapped types. Therefore Comlink cannot
+    // properly expose a properly typed addEventListener(event, listener) method.
+    // If the number of events increases we should consider auto-generating these methods:
+    onError(listener: Consumer<string>): void {
+        events.error.addListener(listener);
+    },
+
+    onSpectatorChange(listener: Consumer<SpectatorChangeDTO>): void {
+        events.spectatorChange.addListener(listener);
     }
 };
 
@@ -134,6 +138,11 @@ function triggerServerUpdateEvent() {
 }
 
 export type WorkerAPI = Readonly<typeof api>;
+
+type EventName = keyof typeof events;
+//type EventListener<E extends EventName> = Parameters<(typeof events)[E]["addListener"]>[0];
+//type EventPayload<E extends EventName> = Parameters<EventListener<E>>[0];
+type EventWithoutPayloadName = Exclude<EventName, "error" | "spectatorChange">; // TODO: auto generate
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 self.onerror = (event, source, lineno, colno, error) => {

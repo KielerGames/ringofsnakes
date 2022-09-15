@@ -72,7 +72,7 @@ export default class Game {
         // -- this is only temporary for testing
         const params = new URLSearchParams(document.location.search);
         const cfg = params.has("useSSL")
-            ? { server: { ...clientConfig.server, wss: true } }
+            ? { server: { ...clientConfig.server, wss: true, port: 443 } }
             : clientConfig;
         // -- TODO: remove this block
 

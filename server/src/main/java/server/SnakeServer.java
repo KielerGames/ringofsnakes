@@ -103,9 +103,16 @@ public class SnakeServer {
      *  - keystore
      */
     private static void addSecureConnector(Server server) {
+        final var env = System.getenv();
+
+        if (!env.containsKey("SNAKE_KEYSTORE_PATH") || !env.containsKey("SNAKE_KEYSTORE_PW")) {
+            System.err.println("Cannot create a secure connector without a keystore.");
+            return;
+        }
+
         final var sslContextFactory = new SslContextFactory.Server();
-        //sslContextFactory.setKeyStorePath("...");
-        //sslContextFactory.setKeyStorePassword("...");
+        sslContextFactory.setKeyStorePath(env.get("SNAKE_KEYSTORE_PATH"));
+        sslContextFactory.setKeyStorePassword(env.get("SNAKE_KEYSTORE_PW"));
 
         final var sslConnectionFactory = new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString());
         final var httpConfiguration = new HttpConfiguration();

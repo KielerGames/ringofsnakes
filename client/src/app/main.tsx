@@ -38,7 +38,8 @@ initDialogs();
 document.title = `Ring of Snakes ${__VERSION__}`;
 
 (async () => {
-    if (window.location.protocol === "https:") {
+    const skip = new URLSearchParams(document.location.search).has("useSSL"); // TODO remove
+    if (window.location.protocol === "https:" && !skip) {
         const { host, pathname } = window.location;
         const httpUrl = `http://${host}${pathname}`;
         await dialog({

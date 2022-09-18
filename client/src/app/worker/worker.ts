@@ -47,7 +47,7 @@ const api = {
         socket = await connect(url);
 
         const gameInfo: GameInfo = await new Promise((resolve, reject) => {
-            const timeoutId = setTimeout(() => reject(new Error("GameInfo timeout.")), 2000);
+            const timeoutId = setTimeout(() => reject(new Error("GameInfo timeout.")), 1500);
 
             socket!.onJSONMessage = (message) => {
                 if (message.tag === "GameInfo") {

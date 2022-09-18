@@ -28,7 +28,7 @@ const configPromise: Promise<ClientConfig> = loadJSON<ClientConfig>("client-conf
         return cfg;
     },
     (error) => {
-        console.warn("Loading client config failed: " + error);
+        console.error("Loading client config failed: " + error);
         return defaultConfig;
     }
 );

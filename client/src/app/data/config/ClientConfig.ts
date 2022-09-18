@@ -8,20 +8,30 @@ export type ClientConfig = {
     };
 };
 
+const HTTPS = window.location.protocol === "https:";
+
 const defaultConfig: ClientConfig = {
     server: {
-        wss: false,
+        wss: HTTPS,
         host: "127.0.0.1",
-        port: 8080
+        port: HTTPS ? 8443 : 8080
     }
 };
 
 const configPromise: Promise<ClientConfig> = loadJSON<ClientConfig>("client-config.json", {
     guard: isValidClientConfig
-}).catch((error) => {
-    console.warn("Loading client config failed: " + error);
-    return defaultConfig;
-});
+}).then(
+    (cfg) => {
+        if (HTTPS && !cfg.server.wss) {
+            throw new Error("Cannot use insecure websocket connection.");
+        }
+        return cfg;
+    },
+    (error) => {
+        console.warn("Loading client config failed: " + error);
+        return defaultConfig;
+    }
+);
 
 export function get(): Promise<Readonly<ClientConfig>> {
     return configPromise;

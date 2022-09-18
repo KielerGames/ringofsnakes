@@ -43,6 +43,7 @@ const api = {
 
         const protocol = cfg.server.wss ? "wss" : "ws";
         const url = `${protocol}://${cfg.server.host}:${cfg.server.port}/game`;
+        console.info(`Connecting to ${url}`);
         socket = await connect(url);
 
         const gameInfo: GameInfo = await new Promise((resolve, reject) => {

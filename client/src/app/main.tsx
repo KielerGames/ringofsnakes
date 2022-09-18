@@ -38,28 +38,6 @@ initDialogs();
 document.title = `Ring of Snakes ${__VERSION__}`;
 
 (async () => {
-    const skip = new URLSearchParams(document.location.search).has("useSSL"); // TODO remove
-    if (window.location.protocol === "https:" && !skip) {
-        const { host, pathname } = window.location;
-        const httpUrl = `http://${host}${pathname}`;
-        await dialog({
-            title: "Error",
-            content: (
-                <>
-                    Unfortunately <b>HTTPS</b> is not yet supported.{"\n"}Please use HTTP instead:{" "}
-                    <pre>{httpUrl}</pre>
-                </>
-            ),
-            buttons: [
-                {
-                    label: "Switch to HTTP",
-                    action: () => window.location.replace(httpUrl)
-                }
-            ]
-        });
-        return;
-    }
-
     FrameTime.update(performance.now());
 
     while (true) {

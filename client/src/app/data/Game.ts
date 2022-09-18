@@ -69,14 +69,7 @@ export default class Game {
         const game = new Game();
         const remote = game.#remote;
 
-        // -- this is only temporary for testing
-        const params = new URLSearchParams(document.location.search);
-        const cfg = params.has("useSSL")
-            ? { server: { ...clientConfig.server, wss: true, port: 443 } }
-            : clientConfig;
-        // -- TODO: remove this block
-
-        const info = await remote.init(cfg).catch(async (e) => {
+        const info = await remote.init(clientConfig).catch(async (e) => {
             await dialog({ title: "Error", content: `Failed to connect to the game server.` });
             return Promise.reject(e);
         });

@@ -20,15 +20,18 @@ const defaultConfig: ClientConfig = {
 
 const configPromise: Promise<ClientConfig> = loadJSON<ClientConfig>("client-config.json", {
     guard: isValidClientConfig
-}).then((cfg) => {
-    if (HTTPS && !cfg.server.wss) {
-        throw new Error("Cannot use insecure websocket connection.");
+}).then(
+    (cfg) => {
+        if (HTTPS && !cfg.server.wss) {
+            throw new Error("Cannot use insecure websocket connection.");
+        }
+        return cfg;
+    },
+    (error) => {
+        console.warn("Loading client config failed: " + error);
+        return defaultConfig;
     }
-    return cfg;
-}, (error) => {
-    console.warn("Loading client config failed: " + error);
-    return defaultConfig;
-});
+);
 
 export function get(): Promise<Readonly<ClientConfig>> {
     return configPromise;

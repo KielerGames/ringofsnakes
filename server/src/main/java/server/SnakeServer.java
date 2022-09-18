@@ -10,6 +10,8 @@ import server.clients.Client;
 import server.clients.Player;
 
 import javax.websocket.Session;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,17 +98,16 @@ public class SnakeServer {
         client.handleUserInput(alpha, fast);
     }
 
-    /**
-     * Based on <a href="https://stackoverflow.com/a/38026079/3315770">this SO answer</a>
-     * TODO #133:
-     *  - check if all of this is required
-     *  - keystore
-     */
     private static void addSecureConnector(Server server) {
         final var env = System.getenv();
 
         if (!env.containsKey("SNAKE_KEYSTORE_PATH") || !env.containsKey("SNAKE_KEYSTORE_PW")) {
-            System.err.println("Cannot create a secure connector without a keystore.");
+            System.err.println("Cannot create a secure connector without keystore configuration.");
+            return;
+        }
+
+        if (!Files.exists(Paths.get(env.get("SNAKE_KEYSTORE_PATH")))) {
+            System.err.println("Keystore file not found, skipping secure connector.");
             return;
         }
 

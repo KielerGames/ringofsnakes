@@ -7,6 +7,7 @@ const fs = require("node:fs");
 const crypto = require("node:crypto");
 const pkg = require("./package.json");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 const SHADER_HASH = (() => {
     const fileBuffer = fs.readFileSync(path.join("public", "shaders.json"));
@@ -61,6 +62,13 @@ module.exports = (env, argv) => {
                 __SHADER_HASH__: JSON.stringify(SHADER_HASH),
                 __DEBUG__: mode === "development" ? "true" : "false",
                 __TEST__: "false"
+            }),
+            new BundleAnalyzerPlugin({
+                analyzerMode: mode === "development" ? "disabled" : "static",
+                reportFilename: "bundle-report.html",
+                openAnalyzer: false,
+                generateStatsFile: mode !== "development",
+                statsFilename: "bundle-stats.json"
             })
         ],
         output: {

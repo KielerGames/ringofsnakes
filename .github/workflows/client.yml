@@ -54,7 +54,7 @@ jobs:
   compare:
     name: Compare with main
     runs-on: ubuntu-latest
-    # TODO: PR only
+    if: github.ref == "refs/heads/main"
 
     steps:
       - name: Download PR artifact

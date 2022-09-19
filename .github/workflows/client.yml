@@ -1,4 +1,5 @@
 name: Web-Client CI
+# TODO restrict permissions
 
 on:
   push:
@@ -49,3 +50,35 @@ jobs:
         with:
           name: client-files
           path: client/public/*
+
+  compare:
+    name: Compare with main
+    runs-on: ubuntu-latest
+    # TODO: PR only
+
+    steps:
+      - name: Download PR artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: client-files
+          path: temp/pr
+
+      - name: Download artifact from main
+        uses: benday-inc/download-latest-artifact@v2.1
+        with:
+          token: TODO # TODO!
+          repository_owner: KielerGames
+          repository_name: ringofsnakes
+          workflow_name: client
+          branch_name: main
+          artifact_name: client-files
+          download_path: "${{ github.workspace }}/temp"
+          download_filename: main-branch-client.zip
+
+      # TODO unzip artifact
+
+      - name: Compare bundle size
+        uses: NejcZdovc/bundle-size-diff@v1.1.0
+        with:
+          base_path: temp/main/bundle-stats.json
+          pr_path: temp/pr/bundle-stats.json

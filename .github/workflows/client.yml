@@ -77,9 +77,9 @@ jobs:
           download_filename: main-branch-client.zip
 
       - name: Unzip artifact
-        run: unzip temp/main-branch-client.zip -d main
-        # TODO: is this installed?
-        # sudo apt-get install unzip
+        run: |
+          mkdir temp/main
+          unzip temp/main-branch-client.zip -d temp/main
 
       - name: Compare bundle size
         uses: NejcZdovc/bundle-size-diff@v1.1.0

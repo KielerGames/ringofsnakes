@@ -92,7 +92,7 @@ jobs:
       - name: Add PR comment
         uses: NejcZdovc/comment-pr@v1.1.1
         with:
-          file: 'comment.md'
+          file: pr-client-size-comment.md
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           OLD: ${{steps.comparison.outputs.base_file_string}}

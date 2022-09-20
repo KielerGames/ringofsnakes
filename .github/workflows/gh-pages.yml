@@ -36,7 +36,7 @@ jobs:
         run: |
           rm client/public/bundle-report.html
           rm client/public/bundle-stats.json
-      
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3.8.0
         if: ${{ github.ref == 'refs/heads/main' }}

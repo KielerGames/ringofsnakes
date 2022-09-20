@@ -1,4 +1,4 @@
-## Client size difference
+Client size difference
 
 | Old size | New size | Diff                     |
 | -------- | -------- | ------------------------ |

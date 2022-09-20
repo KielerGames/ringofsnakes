@@ -66,16 +66,19 @@ jobs:
       - name: Download artifact from main
         uses: benday-inc/download-latest-artifact@v2.1
         with:
-          token: TODO # TODO!
+          token: ${{ secrets.GITHUB_TOKEN }}
           repository_owner: KielerGames
           repository_name: ringofsnakes
           workflow_name: client
           branch_name: main
           artifact_name: client-files
-          download_path: "${{ github.workspace }}/temp"
+          download_path: temp
           download_filename: main-branch-client.zip
 
-      # TODO unzip artifact
+      - name: Unzip artifact
+        run: unzip temp/main-branch-client.zip -d main
+        # TODO: is this installed?
+        # sudo apt-get install unzip
 
       - name: Compare bundle size
         uses: NejcZdovc/bundle-size-diff@v1.1.0

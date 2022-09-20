@@ -50,6 +50,7 @@ jobs:
         with:
           name: client-files
           path: client/public/*
+          retention-days: ${{ (github.ref == 'refs/heads/main') && 90 || 1 }} # 90 days on main branch, 1 for PRs
 
   compare:
     name: Compare with main

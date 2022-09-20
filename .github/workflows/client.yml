@@ -70,7 +70,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository_owner: KielerGames
           repository_name: ringofsnakes
-          workflow_name: client
+          workflow_name: "Web-Client CI"
           branch_name: main
           artifact_name: client-files
           download_path: temp

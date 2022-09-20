@@ -83,7 +83,19 @@ jobs:
           unzip temp/main-branch-client.zip -d temp/main
 
       - name: Compare bundle size
+        id: comparison
         uses: NejcZdovc/bundle-size-diff@v1.1.0
         with:
           base_path: temp/main/bundle-stats.json
           pr_path: temp/pr/bundle-stats.json
+
+      - name: Add PR comment
+        uses: NejcZdovc/comment-pr@v1.1.1
+        with:
+          file: 'comment.md'
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          OLD: ${{steps.comparison.outputs.base_file_string}}
+          NEW: ${{steps.comparison.outputs.pr_file_string}}
+          DIFF: ${{steps.comparison.outputs.diff_file_string}}
+          DIFF_PERCENT: ${{steps.comparison.outputs.percent}}

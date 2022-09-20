@@ -31,7 +31,12 @@ jobs:
       - name: Build client
         run: npm run build:production
         working-directory: client
-      
+
+      - name: Remove files not required for deployment
+        run: |
+          rm client/public/bundle-report.html
+          rm client/public/bundle-stats.json
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3.8.0
         if: ${{ github.ref == 'refs/heads/main' }}

@@ -59,7 +59,6 @@ jobs:
     needs: build
     if: github.ref != 'refs/heads/main'
     permissions:
-      id-token: write
       pull-requests: write
 
     steps:

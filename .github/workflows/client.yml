@@ -93,4 +93,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           current-stats-json-path: temp/pr/bundle-stats.json
           base-stats-json-path: temp/main/bundle-stats.json
-          title: Client bundle stats
+          title: Web client

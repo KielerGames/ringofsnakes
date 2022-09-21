@@ -9,10 +9,15 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions: {} # disable all
+
 jobs:
   build:
     name: Build+Deploy
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write # to verify the deployment originates from an appropriate source
 
     steps:
       - uses: actions/checkout@v3.0.2
@@ -38,7 +43,7 @@ jobs:
           rm client/public/bundle-stats.json
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3.8.0
+        uses: peaceiris/actions-gh-pages@v3.8.0 # TODO: consider using the official GitHub Pages Action when out of beta
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

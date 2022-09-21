@@ -59,7 +59,7 @@ jobs:
     needs: build
     if: github.ref != 'refs/heads/main'
     permissions:
-      pull-requests: write
+      pull-requests: read
 
     steps:
       - uses: actions/checkout@v3.0.2

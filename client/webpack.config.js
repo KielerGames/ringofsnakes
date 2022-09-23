@@ -8,6 +8,8 @@ const crypto = require("node:crypto");
 const pkg = require("./package.json");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const SHADER_HASH = (() => {
     const fileBuffer = fs.readFileSync(path.join("public", "shaders.json"));
@@ -43,9 +45,9 @@ module.exports = (env, argv) => {
                 {
                     test: /\.less$/i,
                     use: [
-                        { loader: "style-loader" }, //  creates style nodes from JS strings
-                        { loader: "css-loader" }, //    translates CSS into a JS module (CommonJS)
-                        { loader: "less-loader" } //   compiles Less to CSS
+                        MiniCssExtractPlugin.loader, // extract CSS into a separate file
+                        "css-loader", //                translates CSS into a JS module (CommonJS)
+                        "less-loader" //                compiles Less to CSS
                     ]
                 }
             ]
@@ -69,11 +71,20 @@ module.exports = (env, argv) => {
                 openAnalyzer: false,
                 generateStatsFile: mode !== "development",
                 statsFilename: "bundle-stats.json"
+            }),
+            new MiniCssExtractPlugin({
+                filename: "app.css"
             })
         ],
         output: {
             filename: "[name].bundle.js",
             path: path.resolve(__dirname, "public")
+        },
+        optimization: {
+            minimizer: [
+                `...`, // extend existing minimizers
+                new CssMinimizerPlugin()
+            ]
         }
     };
 };

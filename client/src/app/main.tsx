@@ -35,8 +35,6 @@ UserInput.init(uiRoot);
 
 initDialogs();
 
-document.title = `Ring of Snakes ${__VERSION__}`;
-
 (async () => {
     FrameTime.update(performance.now());
 

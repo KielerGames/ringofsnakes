@@ -21,6 +21,7 @@ const SHADER_HASH = (() => {
 
 module.exports = (env, argv) => {
     const mode = argv.mode ?? "development";
+    const versionString = pkg.version + (mode === "development" ? "-dev" : "");
 
     return {
         mode: mode ?? "development",
@@ -55,12 +56,12 @@ module.exports = (env, argv) => {
         plugins: [
             new HtmlWebpackPlugin({
                 chunks: ["main"], // exclude worker script
-                title: "Ring of Snakes",
+                title: "Ring of Snakes " + versionString,
                 minify: false,
                 hash: true // important for caching
             }),
             new webpack.DefinePlugin({
-                __VERSION__: JSON.stringify(pkg.version + (mode === "development" ? "-dev" : "")),
+                __VERSION__: JSON.stringify(versionString),
                 __SHADER_HASH__: JSON.stringify(SHADER_HASH),
                 __DEBUG__: mode === "development" ? "true" : "false",
                 __TEST__: "false"

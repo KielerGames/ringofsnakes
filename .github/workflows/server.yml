@@ -52,6 +52,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: build
+    concurrency: game-server # avoid multiple jobs of this kind to run at the same time
     steps:
       - name: Download jar from previous job
         uses: actions/download-artifact@v3.0.0

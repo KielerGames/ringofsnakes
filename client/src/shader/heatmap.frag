@@ -1,3 +1,5 @@
+#version 300 es
+
 precision mediump float;
 
 uniform vec2 uCameraPosition;
@@ -5,11 +7,13 @@ uniform sampler2D uHeatMapTexture1;
 uniform sampler2D uHeatMapTexture2;
 uniform float uTextureMix;
 
-varying vec2 vPosition;
+in vec2 vPosition;
 
 const float MARKER_SIZE = 0.015;
 const vec4 MARKER_COLOR = vec4(1.0, 1.0, 1.0, 1.0);
 const vec4 COOL_COLOR = vec4(0.4, 0.4, 0.4, 0.5);
+
+out vec4 outputColor;
 
 void main(void) {
 	// edge alpha falloff
@@ -19,8 +23,8 @@ void main(void) {
 
 	// heat map color
 	float heat = mix(
-		texture2D(uHeatMapTexture1, vPosition).r,
-		texture2D(uHeatMapTexture2, vPosition).r,
+		texture(uHeatMapTexture1, vPosition).r,
+		texture(uHeatMapTexture2, vPosition).r,
 		uTextureMix
 	);
 	vec4 hotColor = vec4(1.0, 0.4 * heat, max(0.0, 0.5 * heat - 0.4), 1.0);
@@ -29,5 +33,5 @@ void main(void) {
 
 	// camera position marker
 	float d = distance(vPosition, uCameraPosition);
-	gl_FragColor = d <= MARKER_SIZE ? MARKER_COLOR : color;
+	outputColor = d <= MARKER_SIZE ? MARKER_COLOR : color;
 }

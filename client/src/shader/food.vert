@@ -1,22 +1,24 @@
+#version 300 es
+
 precision mediump float;
 
-attribute vec2 aPosition;
-attribute vec2 aLocalPos;
-attribute float aColorIndex;
+in vec2 aPosition;
+in vec2 aLocalPos;
+in float aColorIndex;
 
 uniform mat3 uTransform;
 uniform sampler2D uColorSampler;
 uniform vec2 uAttractorPosition;
 
-varying vec2 varPos;
-varying lowp vec3 vColor;
-varying lowp float vOpacity;
+out vec2 vPos;
+out lowp vec3 vColor;
+out lowp float vOpacity;
 
 const float cMoveDist = 7.5;
 
 void main(void) {
-    varPos = aLocalPos;
-    vColor = texture2D(uColorSampler, vec2(aColorIndex, 0.75)).rgb;
+    vPos = aLocalPos;
+    vColor = texture(uColorSampler, vec2(aColorIndex, 0.75)).rgb;
 
     float d = distance(aPosition, uAttractorPosition);
     float s = min(1.0, d * 0.25);

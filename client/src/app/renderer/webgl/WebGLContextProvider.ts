@@ -13,7 +13,7 @@ const loaded = new AsyncEvent();
 let gl: WebGLRenderingContext | null = null;
 
 export function init(canvas: HTMLCanvasElement): void {
-    const ctx = canvas.getContext("webgl", options);
+    const ctx = canvas.getContext("webgl2", options);
 
     if (ctx === null) {
         throw new Error("Failed to create WebGL context.");

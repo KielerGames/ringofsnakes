@@ -1,6 +1,8 @@
+#version 300 es
+
 precision mediump float;
 
-attribute vec2 vRelPosition;
+in vec2 vRelPosition;
 
 uniform mat3 uTransform;
 uniform float uSnakeWidth;

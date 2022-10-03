@@ -10,7 +10,7 @@ const options: WebGLContextAttributes = {
 };
 
 const loaded = new AsyncEvent();
-let gl: WebGLRenderingContext | null = null;
+let gl: WebGL2RenderingContext | null = null;
 
 export function init(canvas: HTMLCanvasElement): void {
     const ctx = canvas.getContext("webgl2", options);
@@ -19,11 +19,11 @@ export function init(canvas: HTMLCanvasElement): void {
         throw new Error("Failed to create WebGL context.");
     }
 
-    ctx.disable(WebGLRenderingContext.DEPTH_TEST);
-    ctx.enable(WebGLRenderingContext.BLEND);
+    ctx.disable(WebGL2RenderingContext.DEPTH_TEST);
+    ctx.enable(WebGL2RenderingContext.BLEND);
 
     // https://webglfundamentals.org/webgl/lessons/webgl-data-textures.html
-    ctx.pixelStorei(WebGLRenderingContext.UNPACK_ALIGNMENT, 1);
+    ctx.pixelStorei(WebGL2RenderingContext.UNPACK_ALIGNMENT, 1);
 
     canvas.addEventListener("webglcontextlost", (e) => {
         console.error("WebGL context lost.", e);
@@ -47,7 +47,7 @@ export function init(canvas: HTMLCanvasElement): void {
     loaded.set();
 }
 
-export function getContext(): WebGLRenderingContext {
+export function getContext(): WebGL2RenderingContext {
     if (!gl) {
         throw new Error("No WebGL context available");
     }
@@ -55,7 +55,7 @@ export function getContext(): WebGLRenderingContext {
     return gl;
 }
 
-export async function waitForContext(): Promise<WebGLRenderingContext> {
+export async function waitForContext(): Promise<WebGL2RenderingContext> {
     if (!loaded.isSet()) {
         await loaded.wait();
     }

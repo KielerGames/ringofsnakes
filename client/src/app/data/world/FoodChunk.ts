@@ -46,7 +46,7 @@ export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
         BufferManager.free(this.#gpuBuffer);
     }
 
-    useBuffer(gl: WebGLRenderingContext): void {
+    useBuffer(gl: WebGL2RenderingContext): void {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.#gpuBuffer);
 
         if (this.#gpuData) {

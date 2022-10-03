@@ -62,7 +62,7 @@ export async function render(game: Readonly<Game>): Promise<void> {
     shaderProgram.run(4, { mode: gl.TRIANGLE_STRIP });
 }
 
-function updateTransformMatrix(gl: WebGLRenderingContext): void {
+function updateTransformMatrix(gl: WebGL2RenderingContext): void {
     const { width: cw, height: ch } = gl.canvas;
     const sx = 2.0 / cw;
     const sy = 2.0 / ch;
@@ -81,7 +81,7 @@ function worldToMapCoordinates(game: Readonly<Game>, worldPosition: Vector): [nu
     return [(0.5 * width + worldPosition.x) / width, (0.5 * height + worldPosition.y) / height];
 }
 
-function createTexture(gl: WebGLRenderingContext): WebGLTexture {
+function createTexture(gl: WebGL2RenderingContext): WebGLTexture {
     const texture = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -92,7 +92,7 @@ function createTexture(gl: WebGLRenderingContext): WebGLTexture {
     return texture;
 }
 
-function manageData(gl: WebGLRenderingContext, game: Readonly<Game>): void {
+function manageData(gl: WebGL2RenderingContext, game: Readonly<Game>): void {
     const { columns: width, rows: height } = game.config.chunks;
 
     const targetMix = texture1IsCurrent ? 0.0 : 1.0;
@@ -103,9 +103,9 @@ function manageData(gl: WebGLRenderingContext, game: Readonly<Game>): void {
     }
 
     if (!texture1IsCurrent || lastTextureData === null) {
-        gl.activeTexture(WebGLRenderingContext.TEXTURE2);
+        gl.activeTexture(WebGL2RenderingContext.TEXTURE2);
     } else {
-        gl.activeTexture(WebGLRenderingContext.TEXTURE3);
+        gl.activeTexture(WebGL2RenderingContext.TEXTURE3);
     }
 
     if (texture1IsCurrent) {

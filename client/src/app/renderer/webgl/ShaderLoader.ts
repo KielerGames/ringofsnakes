@@ -65,7 +65,7 @@ async function getShaderSource(filename: Filename): Promise<ShaderSource> {
  *  - src/shader/${name}.frag (fragment shader)
  */
 export async function compileShader(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     name: string,
     attribOrder?: string[]
 ): Promise<WebGLShaderProgram> {

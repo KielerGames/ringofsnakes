@@ -4,7 +4,7 @@ type ShaderVarValue = number | number[] | Float32Array;
 type WebGLAttributeLocation = number;
 
 export default class WebGLShaderProgram {
-    readonly #gl: WebGLRenderingContext;
+    readonly #gl: WebGL2RenderingContext;
     readonly #program: WebGLProgram;
     readonly #uniforms: Map<string, ShaderVar<WebGLUniformLocation>> = new Map();
     readonly #attribs: Map<string, ShaderVar<WebGLAttributeLocation>> = new Map();
@@ -12,7 +12,7 @@ export default class WebGLShaderProgram {
     #autoStride: number = 0;
 
     constructor(
-        gl: WebGLRenderingContext,
+        gl: WebGL2RenderingContext,
         vertex: string,
         fragment: string,
         vertexBufferLayout?: string[]
@@ -222,7 +222,7 @@ class ShaderVar<L> {
     }
 }
 
-function compileShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {
+function compileShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
     const shader: WebGLShader = gl.createShader(type)!;
 
     // set the source code
@@ -240,10 +240,10 @@ function compileShader(gl: WebGLRenderingContext, type: number, source: string):
 }
 
 const SIZES = new Map([
-    [WebGLRenderingContext.FLOAT, 1],
-    [WebGLRenderingContext.FLOAT_VEC2, 2],
-    [WebGLRenderingContext.FLOAT_VEC3, 3],
-    [WebGLRenderingContext.FLOAT_VEC4, 4],
-    [WebGLRenderingContext.FLOAT_MAT3, 3 * 3],
-    [WebGLRenderingContext.FLOAT_MAT4, 4 * 4]
+    [WebGL2RenderingContext.FLOAT, 1],
+    [WebGL2RenderingContext.FLOAT_VEC2, 2],
+    [WebGL2RenderingContext.FLOAT_VEC3, 3],
+    [WebGL2RenderingContext.FLOAT_VEC4, 4],
+    [WebGL2RenderingContext.FLOAT_MAT3, 3 * 3],
+    [WebGL2RenderingContext.FLOAT_MAT4, 4 * 4]
 ]);

@@ -6,7 +6,8 @@ const options: WebGLContextAttributes = {
     depth: false,
     antialias: true,
     preserveDrawingBuffer: false,
-    premultipliedAlpha: false
+    premultipliedAlpha: false,
+    powerPreference: "high-performance"
 };
 
 const loaded = new AsyncEvent();

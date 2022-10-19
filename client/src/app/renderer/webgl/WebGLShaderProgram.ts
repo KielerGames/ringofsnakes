@@ -209,12 +209,13 @@ export default class WebGLShaderProgram {
 }
 
 class ShaderVar<L> {
-    public readonly name: string;
-    public readonly type: number;
-    public readonly location: L;
-    public readonly size: number;
-    public value: ShaderVarValue | null = null;
-    public constructor(info: WebGLActiveInfo, location: L) {
+    readonly name: string;
+    readonly type: number;
+    readonly location: L;
+    readonly size: number;
+    value: ShaderVarValue | null = null;
+    
+    constructor(info: WebGLActiveInfo, location: L) {
         this.name = info.name;
         this.type = info.type;
         this.size = SIZES.get(info.type)! * info.size; // TODO?

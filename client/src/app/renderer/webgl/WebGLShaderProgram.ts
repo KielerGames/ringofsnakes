@@ -113,28 +113,36 @@ export default class WebGLShaderProgram {
     ): void {
         const gl = this.#gl;
 
-        const { mode, start, stride } = Object.assign(
-            {
-                mode: this.#gl.TRIANGLES,
-                start: 0,
-                stride: this.#autoStride
-            },
-            options
-        );
+        const { mode, start, stride } = {
+            mode: this.#gl.TRIANGLES,
+            start: 0,
+            stride: this.#autoStride,
+            ...options
+        };
 
         let offset = 0;
         for (const name of this.#attribOrder) {
             const attrib = this.#attribs.get(name)!; // TODO?
             if (attrib.value === null) {
                 gl.enableVertexAttribArray(attrib.location);
-                gl.vertexAttribPointer(
-                    attrib.location,
-                    attrib.size,
-                    gl.FLOAT,
-                    false,
-                    stride,
-                    offset * Float32Array.BYTES_PER_ELEMENT
-                );
+                if (attrib.type === gl.INT) {
+                    gl.vertexAttribIPointer(
+                        attrib.location,
+                        attrib.size,
+                        gl.INT,
+                        stride,
+                        offset * Int32Array.BYTES_PER_ELEMENT
+                    );
+                } else {
+                    gl.vertexAttribPointer(
+                        attrib.location,
+                        attrib.size,
+                        gl.FLOAT,
+                        false,
+                        stride,
+                        offset * Float32Array.BYTES_PER_ELEMENT
+                    );
+                }
                 offset += attrib.size;
             } else {
                 // eslint-disable-next-line no-lonely-if
@@ -165,6 +173,8 @@ export default class WebGLShaderProgram {
                     gl.uniformMatrix3fv(uniform.location, false, uniform.value as number[]);
                 } else if (uniform.type === gl.FLOAT_MAT4) {
                     gl.uniformMatrix4fv(uniform.location, false, uniform.value as number[]);
+                } else if (uniform.type === gl.INT) {
+                    gl.uniform1i(uniform.location, uniform.value as number);
                 } else {
                     throw new Error(`Uniform type ${uniform.type} not implemented.`);
                 }
@@ -214,11 +224,14 @@ class ShaderVar<L> {
     readonly location: L;
     readonly size: number;
     value: ShaderVarValue | null = null;
-    
+
     constructor(info: WebGLActiveInfo, location: L) {
         this.name = info.name;
         this.type = info.type;
-        this.size = SIZES.get(info.type)! * info.size; // TODO?
+        if (!SIZES.has(info.type)) {
+            throw new Error(`Size for type ${info.type} not known.`);
+        }
+        this.size = SIZES.get(info.type)! * info.size;
         this.location = location;
     }
 }
@@ -246,5 +259,7 @@ const SIZES = new Map([
     [WebGL2RenderingContext.FLOAT_VEC3, 3],
     [WebGL2RenderingContext.FLOAT_VEC4, 4],
     [WebGL2RenderingContext.FLOAT_MAT3, 3 * 3],
-    [WebGL2RenderingContext.FLOAT_MAT4, 4 * 4]
+    [WebGL2RenderingContext.FLOAT_MAT4, 4 * 4],
+    [WebGL2RenderingContext.INT, 1],
+    [WebGL2RenderingContext.SAMPLER_2D, 1]
 ]);

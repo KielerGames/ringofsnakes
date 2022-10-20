@@ -11,7 +11,7 @@ uniform sampler2D uColorSampler;
 uniform vec2 uAttractorPosition;
 
 out vec2 vPos;
-out lowp vec3 vColor;
+flat out lowp vec3 vColor;
 out lowp float vOpacity;
 
 const float cMoveDist = 7.5;

@@ -3,7 +3,7 @@
 precision mediump float;
 
 in vec2 vPos;
-in lowp vec3 vColor;
+flat in lowp vec3 vColor;
 in lowp float vOpacity;
 
 const vec3 centerColor = vec3(1.0, 1.0, 1.0);

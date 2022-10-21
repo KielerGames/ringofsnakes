@@ -93,10 +93,9 @@ export default class WebGLShaderProgram {
     }
 
     private computeStride() {
-        const sum = Array.from(this.#attribs.values())
+        this.#autoStride = Array.from(this.#attribs.values())
             .filter((attrib) => attrib.value === null)
-            .reduce((s, attrib) => s + attrib.size, 0);
-        this.#autoStride = sum * Float32Array.BYTES_PER_ELEMENT;
+            .reduce((sum, attrib) => sum + attrib.byteSize, 0);
     }
 
     public use(): void {
@@ -120,7 +119,7 @@ export default class WebGLShaderProgram {
             ...options
         };
 
-        let offset = 0;
+        let byteOffset = 0;
         for (const name of this.#attribOrder) {
             const attrib = this.#attribs.get(name)!; // TODO?
             if (attrib.value === null) {
@@ -128,22 +127,22 @@ export default class WebGLShaderProgram {
                 if (attrib.type === gl.INT) {
                     gl.vertexAttribIPointer(
                         attrib.location,
-                        attrib.size,
+                        attrib.components,
                         gl.INT,
                         stride,
-                        offset * Int32Array.BYTES_PER_ELEMENT
+                        byteOffset
                     );
                 } else {
                     gl.vertexAttribPointer(
                         attrib.location,
-                        attrib.size,
+                        attrib.components,
                         gl.FLOAT,
                         false,
                         stride,
-                        offset * Float32Array.BYTES_PER_ELEMENT
+                        byteOffset
                     );
                 }
-                offset += attrib.size;
+                byteOffset += attrib.byteSize;
             } else {
                 // eslint-disable-next-line no-lonely-if
                 if (attrib.type === gl.FLOAT) {
@@ -222,16 +221,19 @@ class ShaderVar<L> {
     readonly name: string;
     readonly type: number;
     readonly location: L;
-    readonly size: number;
+    readonly components: number;
+    readonly byteSize: number;
     value: ShaderVarValue | null = null;
 
     constructor(info: WebGLActiveInfo, location: L) {
         this.name = info.name;
         this.type = info.type;
-        if (!SIZES.has(info.type)) {
-            throw new Error(`Size for type ${info.type} not known.`);
+        if (!COMPONENTS.has(info.type)) {
+            throw new Error(`Type ${info.type} not implemented.`);
         }
-        this.size = SIZES.get(info.type)! * info.size;
+        this.components = COMPONENTS.get(info.type)! * info.size;
+        // A component is usually a 32bit float or 32bit integer:
+        this.byteSize = 4 * this.components;
         this.location = location;
     }
 }
@@ -253,7 +255,7 @@ function compileShader(gl: WebGL2RenderingContext, type: number, source: string)
     return shader;
 }
 
-const SIZES = new Map([
+const COMPONENTS = new Map([
     [WebGL2RenderingContext.FLOAT, 1],
     [WebGL2RenderingContext.FLOAT_VEC2, 2],
     [WebGL2RenderingContext.FLOAT_VEC3, 3],

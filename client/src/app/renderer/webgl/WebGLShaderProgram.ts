@@ -1,13 +1,15 @@
 /* eslint-disable max-classes-per-file */
 
+import { Consumer } from "../../util/FunctionTypes";
+
 type ShaderVarValue = number | number[] | Float32Array;
 type WebGLAttributeLocation = number;
 
 export default class WebGLShaderProgram {
     readonly #gl: WebGL2RenderingContext;
     readonly #program: WebGLProgram;
-    readonly #uniforms: Map<string, ShaderVar<WebGLUniformLocation>> = new Map();
-    readonly #attribs: Map<string, ShaderVar<WebGLAttributeLocation>> = new Map();
+    readonly #uniforms: Map<string, WebGLUniform> = new Map();
+    readonly #attribs: Map<string, WebGLAttribute> = new Map();
     #attribOrder: string[];
     #autoStride: number = 0;
 
@@ -53,7 +55,7 @@ export default class WebGLShaderProgram {
         for (let i = 0; i < numberOfAttributes; i++) {
             const info = gl.getActiveAttrib(program, i)!;
             const location = gl.getAttribLocation(program, info.name);
-            this.#attribs.set(info.name, new ShaderVar(info, location));
+            this.#attribs.set(info.name, new WebGLAttribute(info, location));
             attribOrder.push(info.name);
         }
 
@@ -88,7 +90,7 @@ export default class WebGLShaderProgram {
         for (let i = 0; i < numberOfUniforms; i++) {
             const info = gl.getActiveUniform(program, i)!;
             const location = gl.getUniformLocation(program, info.name)!;
-            this.#uniforms.set(info.name, new ShaderVar(info, location));
+            this.#uniforms.set(info.name, new WebGLUniform(gl, info, location));
         }
     }
 
@@ -157,27 +159,7 @@ export default class WebGLShaderProgram {
         }
 
         this.#uniforms.forEach((uniform) => {
-            if (uniform.value !== null) {
-                if (uniform.type === gl.FLOAT) {
-                    gl.uniform1f(uniform.location, uniform.value as number);
-                } else if (uniform.type === gl.SAMPLER_2D) {
-                    gl.uniform1i(uniform.location, uniform.value as number);
-                } else if (uniform.type === gl.FLOAT_VEC2) {
-                    gl.uniform2fv(uniform.location, uniform.value as number[]);
-                } else if (uniform.type === gl.FLOAT_VEC3) {
-                    gl.uniform3fv(uniform.location, uniform.value as number[]);
-                } else if (uniform.type === gl.FLOAT_VEC4) {
-                    gl.uniform4fv(uniform.location, uniform.value as number[]);
-                } else if (uniform.type === gl.FLOAT_MAT3) {
-                    gl.uniformMatrix3fv(uniform.location, false, uniform.value as number[]);
-                } else if (uniform.type === gl.FLOAT_MAT4) {
-                    gl.uniformMatrix4fv(uniform.location, false, uniform.value as number[]);
-                } else if (uniform.type === gl.INT) {
-                    gl.uniform1i(uniform.location, uniform.value as number);
-                } else {
-                    throw new Error(`Uniform type ${uniform.type} not implemented.`);
-                }
-            }
+            uniform.apply();
         });
 
         gl.drawArrays(mode, start, numVertices);
@@ -217,24 +199,74 @@ export default class WebGLShaderProgram {
     }
 }
 
-class ShaderVar<L> {
+abstract class ShaderVar<Location> {
     readonly name: string;
     readonly type: number;
-    readonly location: L;
+    readonly location: Location;
     readonly components: number;
-    readonly byteSize: number;
+
     value: ShaderVarValue | null = null;
 
-    constructor(info: WebGLActiveInfo, location: L) {
+    constructor(info: WebGLActiveInfo, location: Location) {
         this.name = info.name;
         this.type = info.type;
         if (!COMPONENTS.has(info.type)) {
             throw new Error(`Type ${info.type} not implemented.`);
         }
         this.components = COMPONENTS.get(info.type)! * info.size;
+        this.location = location;
+    }
+}
+
+class WebGLUniform extends ShaderVar<WebGLUniformLocation> {
+    static readonly #methods = ((gl) =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        new Map<number, any>([
+            [gl.FLOAT, gl.prototype.uniform1f],
+            [gl.SAMPLER_2D, gl.prototype.uniform1i],
+            [gl.FLOAT_VEC2, gl.prototype.uniform2fv],
+            [gl.FLOAT_VEC3, gl.prototype.uniform3fv],
+            [gl.FLOAT_VEC4, gl.prototype.uniform4fv],
+            [gl.INT, gl.prototype.uniform1i],
+            [gl.UNSIGNED_INT, gl.prototype.uniform1ui]
+        ]))(WebGL2RenderingContext);
+
+    readonly #uniformSetter: Consumer<number> | Consumer<number[]> | Consumer<Float32Array>;
+
+    constructor(gl: WebGL2RenderingContext, info: WebGLActiveInfo, location: WebGLUniformLocation) {
+        super(info, location);
+        if (info.type === gl.FLOAT_MAT3) {
+            this.#uniformSetter = (v: number[]) => gl.uniformMatrix3fv(location, false, v);
+        } else if (info.type === gl.FLOAT_MAT4) {
+            this.#uniformSetter = (v: number[]) => gl.uniformMatrix4fv(location, false, v);
+        } else {
+            const method = WebGLUniform.#methods.get(info.type);
+            if (method === undefined) {
+                throw new Error(`Uniform type ${info.type} (${info.name}) not implemented.`);
+            }
+            this.#uniformSetter = (v: number | number[]) => method.call(gl, location, v);
+        }
+    }
+
+    apply(): void {
+        if (this.value === null) {
+            return; // TODO
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.#uniformSetter(this.value as any);
+    }
+}
+
+class WebGLAttribute extends ShaderVar<WebGLAttributeLocation> {
+    readonly byteSize: number;
+
+    constructor(info: WebGLActiveInfo, location: WebGLAttributeLocation) {
+        super(info, location);
+        if (info.type === WebGL2RenderingContext.SAMPLER_2D) {
+            throw new Error(); // TODO
+        }
         // A component is usually a 32bit float or 32bit integer:
         this.byteSize = 4 * this.components;
-        this.location = location;
     }
 }
 

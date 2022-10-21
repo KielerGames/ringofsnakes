@@ -70,7 +70,7 @@ export function setColor(shader: WebGLShaderProgram, uniform: string, skinId: nu
 
 export function getColorPosition(skinId: number): number {
     const skins = Skins.getAllSkins();
-    return ((skinId % skins.length) + 0.5) / skins.length;
+    return skinId % skins.length;
 }
 
 export function getFloatColor(skinId: number, alpha: number): [number, number, number, number] {

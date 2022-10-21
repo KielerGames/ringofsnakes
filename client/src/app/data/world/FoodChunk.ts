@@ -19,13 +19,16 @@ const boxCoords = [
 
 // TODO: move webgl stuff out of here
 export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
-    static readonly FOOD_VERTEX_SIZE = 2 + 2 + 1; // x,y, u,v, c
+    static readonly VERTEX_BYTE_SIZE =
+        2 * Float32Array.BYTES_PER_ELEMENT + // x,y
+        2 * Float32Array.BYTES_PER_ELEMENT + // u,v
+        Int32Array.BYTES_PER_ELEMENT; // c
 
     readonly id: number;
     readonly box: Rectangle;
 
     #gpuBuffer: WebGLBuffer;
-    #gpuData: Float32Array | undefined = new Float32Array(32 * boxCoords.length);
+    #gpuData: ArrayBuffer | undefined;
     #numFoodItems: number;
     #lastUpdateTime: number;
 
@@ -71,31 +74,40 @@ export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
     }
 }
 
-function createGPUData(items: FoodItemDTO[], gpuData: Float32Array | undefined): Float32Array {
-    const floatsPerFood = FoodChunk.FOOD_VERTEX_SIZE * boxCoords.length;
-    const n = items.length * floatsPerFood;
-    const fvs = FoodChunk.FOOD_VERTEX_SIZE;
+// TODO: consider moving to worker
+function createGPUData(items: FoodItemDTO[], gpuData: ArrayBuffer | undefined): ArrayBuffer {
+    const bytesPerFood = FoodChunk.VERTEX_BYTE_SIZE * boxCoords.length;
+    const indicesPerFood = bytesPerFood / 4; // 32bit = 4 bytes
+    const indicesPerVertex = FoodChunk.VERTEX_BYTE_SIZE / 4;
 
-    if (gpuData === undefined || gpuData.length < n) {
-        gpuData = new Float32Array(n);
+    if (gpuData === undefined || items.length * bytesPerFood) {
+        gpuData = new ArrayBuffer(items.length * bytesPerFood);
     }
 
+    const floatView = new Float32Array(gpuData);
+    const intView = new Int32Array(gpuData);
+
+    // Iterate over food items.
     for (let fi = 0; fi < items.length; fi++) {
         const f = items[fi];
-        const offset = fi * floatsPerFood;
+        const offset = fi * indicesPerFood;
         const color = SkinLoader.getColorPosition(f.color);
 
+        // Iterate over vertices of each food item.
         for (let bi = 0; bi < boxCoords.length; bi++) {
             const [u, v] = boxCoords[bi];
+            const boxVertexOffset = offset + indicesPerVertex * bi;
 
-            // [x,y, u,v, c]
-            gpuData[offset + fvs * bi + 0] = f.size * u + f.x;
-            gpuData[offset + fvs * bi + 1] = f.size * v + f.y;
+            // absolute position [x,y]
+            floatView[boxVertexOffset + 0] = f.x + f.size * u;
+            floatView[boxVertexOffset + 1] = f.y + f.size * v;
 
-            gpuData[offset + fvs * bi + 2] = u;
-            gpuData[offset + fvs * bi + 3] = v;
+            // relative position [u,v]
+            floatView[boxVertexOffset + 2] = u;
+            floatView[boxVertexOffset + 3] = v;
 
-            gpuData[offset + fvs * bi + 4] = color;
+            // color
+            intView[boxVertexOffset + 4] = color;
         }
     }
 

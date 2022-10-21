@@ -9,7 +9,6 @@ import { compileShader } from "../webgl/ShaderLoader";
 
 let shader: WebGLShaderProgram;
 
-const FOOD_VERTEX_SIZE = FoodChunk.FOOD_VERTEX_SIZE;
 const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
 
 (async () => {
@@ -39,7 +38,7 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix) {
         chunk.useBuffer(gl);
 
         shader.run(chunk.numberOfVertices, {
-            stride: FOOD_VERTEX_SIZE * Float32Array.BYTES_PER_ELEMENT
+            stride: FoodChunk.VERTEX_BYTE_SIZE
         });
 
         if (__DEBUG__) {

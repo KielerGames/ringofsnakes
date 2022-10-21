@@ -3,7 +3,7 @@
 precision mediump float;
 
 uniform sampler2D uColorSampler;
-uniform lowp float uSkin;
+uniform lowp int uSkin;
 uniform highp float uSnakeLength;
 uniform lowp float uSnakeFast;
 
@@ -16,7 +16,7 @@ const vec3 fastColorBoost = vec3(0.175, 0.175, 0.175);
 out vec4 outputColor;
 
 void main(void) {
-	vec3 skinColor = texture(uColorSampler, vec2(uSkin, 0.25)).rgb;
+	vec3 skinColor = texelFetch(uColorSampler, ivec2(uSkin, 0), 0).rgb;
 	vec3 darkColor = mix(skinColor, darkGrey, 0.5);
 
 	float co = abs(vNormalOffset);

@@ -94,6 +94,9 @@ export default class WebGLShaderProgram {
         this.#vertexArray = requireNonNull(gl.createVertexArray());
     }
 
+    /**
+     * Must be called before calling run().
+     */
     use(): void {
         const gl = this.#gl;
         gl.useProgram(this.#program);

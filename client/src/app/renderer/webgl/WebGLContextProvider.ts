@@ -1,5 +1,6 @@
 import { dialog } from "../../ui/Dialogs";
 import AsyncEvent from "../../util/AsyncEvent";
+import requireNonNull from "../../util/requireNonNull";
 
 const options: WebGLContextAttributes = {
     alpha: true, // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices#avoid_alphafalse_which_can_be_expensive
@@ -14,23 +15,22 @@ const loaded = new AsyncEvent();
 let gl: WebGL2RenderingContext | null = null;
 
 export function init(canvas: HTMLCanvasElement): void {
-    const ctx = canvas.getContext("webgl2", options);
+    const ctx = requireNonNull(
+        canvas.getContext("webgl2", options),
+        "Failed to create WebGL context."
+    );
 
-    if (ctx === null) {
-        throw new Error("Failed to create WebGL context.");
-    }
-
-    ctx.disable(WebGL2RenderingContext.DEPTH_TEST);
-    ctx.enable(WebGL2RenderingContext.BLEND);
+    ctx.disable(ctx.DEPTH_TEST);
+    ctx.enable(ctx.BLEND);
 
     // https://webglfundamentals.org/webgl/lessons/webgl-data-textures.html
-    ctx.pixelStorei(WebGL2RenderingContext.UNPACK_ALIGNMENT, 1);
+    ctx.pixelStorei(ctx.UNPACK_ALIGNMENT, 1);
 
     canvas.addEventListener("webglcontextlost", (e) => {
         console.error("WebGL context lost.", e);
         dialog({
             title: "Error",
-            content: "The WebGL context has been lost. Reload the page should fix the issue.",
+            content: "The WebGL context has been lost. Reloading the page should fix the issue.",
             buttons: [
                 {
                     label: "Reload",

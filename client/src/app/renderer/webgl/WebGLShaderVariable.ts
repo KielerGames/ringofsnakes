@@ -1,9 +1,7 @@
 /* eslint-disable max-classes-per-file */
 
-import { Consumer } from "../../util/FunctionTypes";
-
+import type { Consumer } from "../../util/FunctionTypes";
 type WebGLAttributeLocation = number;
-
 export type ShaderVarValue = number | number[] | Float32Array;
 
 abstract class ShaderVar<Location> {

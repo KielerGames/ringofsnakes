@@ -1,11 +1,13 @@
 import { WebGLUniform, WebGLAttribute } from "./WebGLShaderVariable";
 import type { ShaderVarValue } from "./WebGLShaderVariable";
+import requireNonNull from "../../util/requireNonNull";
 
 export default class WebGLShaderProgram {
     readonly #gl: WebGL2RenderingContext;
     readonly #program: WebGLProgram;
     readonly #uniforms: Map<string, WebGLUniform> = new Map();
     readonly #attribs: Map<string, WebGLAttribute> = new Map();
+    readonly #vertexArray: WebGLVertexArrayObject;
     #attribOrder: string[];
     #autoStride: number = 0;
 
@@ -77,7 +79,7 @@ export default class WebGLShaderProgram {
             this.#attribOrder = attribOrder;
         }
 
-        this.computeStride();
+        this.#computeStride();
 
         // uniforms
 
@@ -88,32 +90,29 @@ export default class WebGLShaderProgram {
             const location = gl.getUniformLocation(program, info.name)!;
             this.#uniforms.set(info.name, new WebGLUniform(gl, info, location));
         }
+
+        this.#vertexArray = requireNonNull(gl.createVertexArray());
     }
 
-    private computeStride() {
-        this.#autoStride = Array.from(this.#attribs.values())
-            .filter((attrib) => attrib.value === null)
-            .reduce((sum, attrib) => sum + attrib.byteSize, 0);
+    use(): void {
+        const gl = this.#gl;
+        gl.useProgram(this.#program);
+        gl.bindVertexArray(this.#vertexArray);
     }
 
-    public use(): void {
-        this.#gl.useProgram(this.#program);
-    }
-
-    public run(
+    run(
         numVertices: number,
         options?: {
             mode?: number;
             start?: number;
-            stride?: number;
         }
     ): void {
         const gl = this.#gl;
+        const stride = this.#autoStride;
 
-        const { mode, start, stride } = {
+        const { mode, start } = {
             mode: this.#gl.TRIANGLES,
             start: 0,
-            stride: this.#autoStride,
             ...options
         };
 
@@ -161,16 +160,12 @@ export default class WebGLShaderProgram {
         gl.drawArrays(mode, start, numVertices);
     }
 
-    public get context() {
-        return this.#gl;
-    }
-
     /**
      * Set the attribute to a constant value or enable VertexAttribArray.
      * @param name attribute name
      * @param value use null to enable VertexAttribArray
      */
-    public setAttribute(name: string, value: ShaderVarValue | null): void {
+    setAttribute(name: string, value: ShaderVarValue | null): void {
         const attrib = this.#attribs.get(name);
 
         if (attrib === undefined) {
@@ -180,18 +175,28 @@ export default class WebGLShaderProgram {
         const stateChanged = (attrib.value === null) !== (value === null);
         attrib.value = value;
         if (stateChanged) {
-            this.computeStride();
+            this.#computeStride();
         }
     }
 
-    public setUniform(name: string, value: ShaderVarValue): void {
+    setUniform(name: string, value: ShaderVarValue): void {
         const uniform = this.#uniforms.get(name);
 
-        if (uniform === undefined) {
+        if (__DEBUG__ && uniform === undefined) {
             throw new Error(`Uniform ${name} does not exist.`);
         }
 
-        uniform.value = value;
+        uniform!.value = value;
+    }
+
+    get stride(): number {
+        return this.#autoStride;
+    }
+
+    #computeStride() {
+        this.#autoStride = Array.from(this.#attribs.values())
+            .filter((attrib) => attrib.value === null)
+            .reduce((sum, attrib) => sum + attrib.byteSize, 0);
     }
 }
 

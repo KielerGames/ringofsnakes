@@ -103,9 +103,9 @@ function manageData(gl: WebGL2RenderingContext, game: Readonly<Game>): void {
     }
 
     if (!texture1IsCurrent || lastTextureData === null) {
-        gl.activeTexture(WebGL2RenderingContext.TEXTURE2);
+        gl.activeTexture(gl.TEXTURE2);
     } else {
-        gl.activeTexture(WebGL2RenderingContext.TEXTURE3);
+        gl.activeTexture(gl.TEXTURE3);
     }
 
     if (texture1IsCurrent) {

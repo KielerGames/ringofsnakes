@@ -15,7 +15,7 @@ const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
     shader = await compileShader(gl, "food", ["aPosition", "aLocalPos", "aColorIndex"]);
-    assert(shader.stride === FoodChunk.VERTEX_BYTE_SIZE);
+    assert(shader.attributeStride === FoodChunk.VERTEX_BYTE_SIZE);
 })();
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix) {

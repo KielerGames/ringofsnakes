@@ -7,9 +7,9 @@ export default class WebGLShaderProgram {
     readonly #program: WebGLProgram;
     readonly #uniforms: Map<string, WebGLUniform> = new Map();
     readonly #attribs: Map<string, WebGLAttribute> = new Map();
-    readonly #vertexArray: WebGLVertexArrayObject;
+    readonly #stride: number = 0;
+    #vertexArray: WebGLVertexArrayObject | null = null;
     #attribOrder: string[];
-    #stride: number = 0;
 
     constructor(
         gl: WebGL2RenderingContext,
@@ -20,9 +20,8 @@ export default class WebGLShaderProgram {
         this.#gl = gl;
         this.#program = compile(gl, vertex, fragment);
         this.#findAttributes(vertexBufferLayout);
+        this.#stride = this.#computeStride();
         this.#findUniforms();
-
-        this.#vertexArray = requireNonNull(gl.createVertexArray());
     }
 
     /**
@@ -42,7 +41,6 @@ export default class WebGLShaderProgram {
         }
     ): void {
         const gl = this.#gl;
-        const stride = this.#stride;
 
         const { mode, start } = {
             mode: this.#gl.TRIANGLES,
@@ -50,41 +48,8 @@ export default class WebGLShaderProgram {
             ...options
         };
 
-        let byteOffset = 0;
-        for (const name of this.#attribOrder) {
-            const attrib = this.#attribs.get(name)!; // TODO?
-            if (attrib.value === null) {
-                gl.enableVertexAttribArray(attrib.location);
-                if (attrib.type === gl.INT) {
-                    gl.vertexAttribIPointer(
-                        attrib.location,
-                        attrib.components,
-                        gl.INT,
-                        stride,
-                        byteOffset
-                    );
-                } else {
-                    gl.vertexAttribPointer(
-                        attrib.location,
-                        attrib.components,
-                        gl.FLOAT,
-                        false,
-                        stride,
-                        byteOffset
-                    );
-                }
-                byteOffset += attrib.byteSize;
-            } else {
-                // eslint-disable-next-line no-lonely-if
-                if (attrib.type === gl.FLOAT) {
-                    gl.vertexAttrib1f(attrib.location, attrib.value as number);
-                } else {
-                    // TODO
-                    // gl.vertexAttrib[1234]f[v]()
-                    // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttrib
-                    throw new Error("Constant values for attributes not yet implemented!");
-                }
-            }
+        if (this.#vertexArray === null) {
+            this.#initializeVertexAttributes();
         }
 
         this.#uniforms.forEach((uniform) => {
@@ -92,6 +57,21 @@ export default class WebGLShaderProgram {
         });
 
         gl.drawArrays(mode, start, numVertices);
+    }
+
+    /**
+     * This program will only use a single vertex buffer.
+     * Allows internal use of vertex array objects.
+     * @param buffer
+     * @returns The instance it was called on.
+     */
+    withFixedBuffer(buffer: WebGLBuffer): WebGLShaderProgram {
+        const gl = this.#gl;
+        this.#vertexArray = requireNonNull(gl.createVertexArray());
+        this.use();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        this.#initializeVertexAttributes();
+        return this;
     }
 
     /**
@@ -123,7 +103,7 @@ export default class WebGLShaderProgram {
         uniform!.value = value;
     }
 
-    get stride(): number {
+    get attributeStride(): number {
         return this.#stride;
     }
 
@@ -180,10 +160,55 @@ export default class WebGLShaderProgram {
         }
     }
 
-    #computeStride() {
-        this.#stride = Array.from(this.#attribs.values())
+    #computeStride(): number {
+        return Array.from(this.#attribs.values())
             .filter((attrib) => attrib.value === null)
             .reduce((sum, attrib) => sum + attrib.byteSize, 0);
+    }
+
+    #initializeVertexAttributes(): void {
+        const gl = this.#gl;
+        const stride = this.#stride;
+
+        let byteOffset = 0;
+        for (const name of this.#attribOrder) {
+            const attrib = this.#attribs.get(name)!; // TODO: verify in setter
+            if (attrib.value === null) {
+                gl.enableVertexAttribArray(attrib.location);
+                if (attrib.type === gl.INT) {
+                    gl.vertexAttribIPointer(
+                        attrib.location,
+                        attrib.components,
+                        gl.INT,
+                        stride,
+                        byteOffset
+                    );
+                } else {
+                    gl.vertexAttribPointer(
+                        attrib.location,
+                        attrib.components,
+                        gl.FLOAT,
+                        false,
+                        stride,
+                        byteOffset
+                    );
+                }
+                byteOffset += attrib.byteSize;
+            } else {
+                if (__DEBUG__ && this.#vertexArray !== null) {
+                    throw new Error("Unsupported operation.");
+                }
+                // eslint-disable-next-line no-lonely-if
+                if (attrib.type === gl.FLOAT) {
+                    gl.vertexAttrib1f(attrib.location, attrib.value as number);
+                } else {
+                    // TODO
+                    // gl.vertexAttrib[1234]f[v]()
+                    // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttrib
+                    throw new Error("Constant values for attributes not yet implemented!");
+                }
+            }
+        }
     }
 }
 

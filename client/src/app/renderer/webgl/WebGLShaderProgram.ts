@@ -9,7 +9,7 @@ export default class WebGLShaderProgram {
     readonly #attribs: Map<string, WebGLAttribute> = new Map();
     readonly #vertexArray: WebGLVertexArrayObject;
     #attribOrder: string[];
-    #autoStride: number = 0;
+    #stride: number = 0;
 
     constructor(
         gl: WebGL2RenderingContext,
@@ -18,78 +18,9 @@ export default class WebGLShaderProgram {
         vertexBufferLayout?: string[]
     ) {
         this.#gl = gl;
-
-        // compile & link shader program
-        const vs = compileShader(gl, gl.VERTEX_SHADER, vertex);
-        const fs = compileShader(gl, gl.FRAGMENT_SHADER, fragment);
-
-        const program: WebGLProgram = gl.createProgram()!;
-        gl.attachShader(program, vs);
-        gl.attachShader(program, fs);
-        gl.linkProgram(program);
-
-        // check for errors
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            throw new Error("Shader linking failed: " + gl.getProgramInfoLog(program));
-        }
-
-        if (__DEBUG__) {
-            gl.validateProgram(program);
-
-            if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-                console.error("WebGL program info log", gl.getProgramInfoLog(program));
-                throw new Error("Shader program validation failed.");
-            }
-        }
-
-        this.#program = program;
-
-        // get shader attributes & uniforms
-        // attributes & uniforms are "active" after linking
-        const numberOfAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
-
-        const attribOrder = [];
-
-        for (let i = 0; i < numberOfAttributes; i++) {
-            const info = gl.getActiveAttrib(program, i)!;
-            const location = gl.getAttribLocation(program, info.name);
-            this.#attribs.set(info.name, new WebGLAttribute(info, location));
-            attribOrder.push(info.name);
-        }
-
-        if (vertexBufferLayout !== undefined) {
-            if (__DEBUG__) {
-                // validate custom vertex buffer layout
-
-                if (vertexBufferLayout.length === 0) {
-                    throw new Error("Custom buffer layout may not be empty.");
-                }
-
-                for (const attribName of vertexBufferLayout) {
-                    if (!this.#attribs.has(attribName)) {
-                        throw new Error(
-                            `Attribute "${attribName}" not found. Unused attributes get removed by the compiler.`
-                        );
-                    }
-                }
-            }
-
-            this.#attribOrder = [...vertexBufferLayout];
-        } else {
-            this.#attribOrder = attribOrder;
-        }
-
-        this.#computeStride();
-
-        // uniforms
-
-        const numberOfUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-
-        for (let i = 0; i < numberOfUniforms; i++) {
-            const info = gl.getActiveUniform(program, i)!;
-            const location = gl.getUniformLocation(program, info.name)!;
-            this.#uniforms.set(info.name, new WebGLUniform(gl, info, location));
-        }
+        this.#program = compile(gl, vertex, fragment);
+        this.#findAttributes(vertexBufferLayout);
+        this.#findUniforms();
 
         this.#vertexArray = requireNonNull(gl.createVertexArray());
     }
@@ -111,7 +42,7 @@ export default class WebGLShaderProgram {
         }
     ): void {
         const gl = this.#gl;
-        const stride = this.#autoStride;
+        const stride = this.#stride;
 
         const { mode, start } = {
             mode: this.#gl.TRIANGLES,
@@ -193,29 +124,115 @@ export default class WebGLShaderProgram {
     }
 
     get stride(): number {
-        return this.#autoStride;
+        return this.#stride;
+    }
+
+    #findAttributes(vertexBufferLayout?: string[]): void {
+        const gl = this.#gl;
+
+        // attributes are "active" after linking
+        const numberOfAttributes = gl.getProgramParameter(this.#program, gl.ACTIVE_ATTRIBUTES);
+
+        const attribOrder = [];
+
+        for (let i = 0; i < numberOfAttributes; i++) {
+            const info = gl.getActiveAttrib(this.#program, i)!;
+            const location = gl.getAttribLocation(this.#program, info.name);
+            this.#attribs.set(info.name, new WebGLAttribute(info, location));
+            attribOrder.push(info.name);
+        }
+
+        if (vertexBufferLayout !== undefined) {
+            if (__DEBUG__) {
+                // validate custom vertex buffer layout
+
+                if (vertexBufferLayout.length === 0) {
+                    throw new Error("Custom buffer layout may not be empty.");
+                }
+
+                for (const attribName of vertexBufferLayout) {
+                    if (!this.#attribs.has(attribName)) {
+                        throw new Error(
+                            `Attribute "${attribName}" not found. Unused attributes get removed by the compiler.`
+                        );
+                    }
+                }
+            }
+
+            this.#attribOrder = [...vertexBufferLayout];
+        } else {
+            this.#attribOrder = attribOrder;
+        }
+
+        this.#computeStride();
+    }
+
+    #findUniforms(): void {
+        const gl = this.#gl;
+
+        // uniforms are "active" after linking
+        const numberOfUniforms = gl.getProgramParameter(this.#program, gl.ACTIVE_UNIFORMS);
+
+        for (let i = 0; i < numberOfUniforms; i++) {
+            const info = gl.getActiveUniform(this.#program, i)!;
+            const location = gl.getUniformLocation(this.#program, info.name)!;
+            this.#uniforms.set(info.name, new WebGLUniform(gl, info, location));
+        }
     }
 
     #computeStride() {
-        this.#autoStride = Array.from(this.#attribs.values())
+        this.#stride = Array.from(this.#attribs.values())
             .filter((attrib) => attrib.value === null)
             .reduce((sum, attrib) => sum + attrib.byteSize, 0);
     }
 }
 
-function compileShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
-    const shader: WebGLShader = gl.createShader(type)!;
+/**
+ * Compile and link vertex and fragment shader into a single program.
+ * @param gl WebGL2 context (obtained from canvas)
+ * @param vertex Vertex shader source code.
+ * @param fragment Fragment shader source code.
+ * @returns Compiled and linked WebGLProgram
+ */
+function compile(gl: WebGL2RenderingContext, vertex: string, fragment: string): WebGLProgram {
+    /**
+     * Compiles a vertex or fragment shader.
+     */
+    function compileShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
+        const shader: WebGLShader = gl.createShader(type)!;
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
 
-    // set the source code
-    gl.shaderSource(shader, source);
+        // check if it compiled successfully
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            throw new Error("Shader compile error " + gl.getShaderInfoLog(shader));
+        }
 
-    // compile the shader program
-    gl.compileShader(shader);
-
-    // see if it compiled successfully
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw new Error("Shader compile error " + gl.getShaderInfoLog(shader));
+        return shader;
     }
 
-    return shader;
+    // compile & link shader program
+    const vs = compileShader(gl, gl.VERTEX_SHADER, vertex);
+    const fs = compileShader(gl, gl.FRAGMENT_SHADER, fragment);
+
+    const program: WebGLProgram = requireNonNull(gl.createProgram());
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+
+    // check for errors
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        throw new Error("Shader linking failed: " + gl.getProgramInfoLog(program));
+    }
+
+    if (__DEBUG__) {
+        gl.validateProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
+            console.error("WebGL program info log", gl.getProgramInfoLog(program));
+            throw new Error("Shader program validation failed.");
+        }
+    }
+
+    return program;
 }

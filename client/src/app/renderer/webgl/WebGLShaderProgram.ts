@@ -1,13 +1,14 @@
 import { WebGLUniform, WebGLAttribute } from "./WebGLShaderVariable";
 import type { ShaderVarValue } from "./WebGLShaderVariable";
 import requireNonNull from "../../util/requireNonNull";
+import assert from "../../util/assert";
 
 export default class WebGLShaderProgram {
     readonly #gl: WebGL2RenderingContext;
     readonly #program: WebGLProgram;
     readonly #uniforms: Map<string, WebGLUniform> = new Map();
     readonly #attribs: Map<string, WebGLAttribute> = new Map();
-    readonly #stride: number = 0;
+    #stride: number = 0;
     #vertexArray: WebGLVertexArrayObject | null = null;
     #attribOrder: string[];
 
@@ -20,7 +21,7 @@ export default class WebGLShaderProgram {
         this.#gl = gl;
         this.#program = compile(gl, vertex, fragment);
         this.#findAttributes(vertexBufferLayout);
-        this.#stride = this.#computeStride();
+        this.#stride = this.#computeAttributeStride();
         this.#findUniforms();
     }
 
@@ -62,16 +63,22 @@ export default class WebGLShaderProgram {
     /**
      * This program will only use a single vertex buffer.
      * Allows internal use of vertex array objects.
-     * @param buffer
-     * @returns The instance it was called on.
      */
-    withFixedBuffer(buffer: WebGLBuffer): WebGLShaderProgram {
+    setFixedBuffer(data: ArrayBuffer): void {
         const gl = this.#gl;
+
+        assert(this.#vertexArray === null);
+
         this.#vertexArray = requireNonNull(gl.createVertexArray());
         this.use();
+
+        const buffer = requireNonNull(gl.createBuffer());
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+        // send data to GPU (once)
+        gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+
         this.#initializeVertexAttributes();
-        return this;
     }
 
     /**
@@ -89,7 +96,7 @@ export default class WebGLShaderProgram {
         const stateChanged = (attrib.value === null) !== (value === null);
         attrib.value = value;
         if (stateChanged) {
-            this.#computeStride();
+            this.#stride = this.#computeAttributeStride();
         }
     }
 
@@ -143,8 +150,6 @@ export default class WebGLShaderProgram {
         } else {
             this.#attribOrder = attribOrder;
         }
-
-        this.#computeStride();
     }
 
     #findUniforms(): void {
@@ -160,7 +165,7 @@ export default class WebGLShaderProgram {
         }
     }
 
-    #computeStride(): number {
+    #computeAttributeStride(): number {
         return Array.from(this.#attribs.values())
             .filter((attrib) => attrib.value === null)
             .reduce((sum, attrib) => sum + attrib.byteSize, 0);

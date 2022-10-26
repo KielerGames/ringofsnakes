@@ -1,14 +1,12 @@
 import Game from "../../data/Game";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
-import assert from "../../util/assert";
 import Vector from "../../math/Vector";
 import Matrix from "../../math/Matrix";
 import { compileShader } from "../webgl/ShaderLoader";
 
 const transform = new Matrix(true);
 let shaderProgram: WebGLShaderProgram;
-let buffer: WebGLBuffer;
 let texture1: WebGLTexture;
 let texture2: WebGLTexture;
 let textureMix = 0.0;
@@ -29,11 +27,7 @@ const heatMapSize = 128;
     const gl = await WebGLContextProvider.waitForContext();
 
     shaderProgram = await compileShader(gl, "heatmap");
-
-    buffer = gl.createBuffer()!;
-    assert(buffer !== null);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, boxCoords.buffer, gl.STATIC_DRAW);
+    shaderProgram.setFixedBuffer(boxCoords.buffer);
 
     texture1 = createTexture(gl);
     texture2 = createTexture(gl);
@@ -47,7 +41,6 @@ export async function render(game: Readonly<Game>): Promise<void> {
     const gl = await WebGLContextProvider.waitForContext();
     shaderProgram.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
     updateTransformMatrix(gl);
     const position = game.camera.position;

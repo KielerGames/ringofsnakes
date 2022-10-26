@@ -2,11 +2,9 @@ import { ReadonlyMatrix } from "../../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as SkinManager from "../SkinLoader";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
-import assert from "../../util/assert";
 import Game from "../../data/Game";
 import { compileShader } from "../webgl/ShaderLoader";
 
-let buffer: WebGLBuffer;
 let shader: WebGLShaderProgram;
 
 const VERTEX_SIZE = 2;
@@ -19,16 +17,8 @@ const rotOffset = -0.5 * Math.PI;
 
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
-
-    buffer = gl.createBuffer()!;
-    assert(buffer !== null);
-
     shader = await compileShader(gl, "head");
-
-    // send data to GPU (once)
-    shader.use();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+    shader.setFixedBuffer(vertexData);
 })();
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
@@ -36,7 +26,6 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
 
     shader.use();
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     shader.setUniform("uTransform", transform.data);
 
     for (const snake of game.snakes.values()) {

@@ -37,21 +37,20 @@ const heatMapSize = 128;
     }
 })();
 
-export async function render(game: Readonly<Game>): Promise<void> {
-    const gl = await WebGLContextProvider.waitForContext();
-    shaderProgram.use();
+export function render(game: Readonly<Game>): void {
+    shaderProgram.use((gl) => {
+        updateTransformMatrix(gl);
+        const position = game.camera.position;
+        manageData(gl, game);
 
-    updateTransformMatrix(gl);
-    const position = game.camera.position;
-    manageData(gl, game);
+        shaderProgram.setUniform("uHeatMapTexture1", 2);
+        shaderProgram.setUniform("uHeatMapTexture2", 3);
+        shaderProgram.setUniform("uTextureMix", textureMix);
+        shaderProgram.setUniform("uCameraPosition", worldToMapCoordinates(game, position));
+        shaderProgram.setUniform("uTransform", transform.data);
 
-    shaderProgram.setUniform("uHeatMapTexture1", 2);
-    shaderProgram.setUniform("uHeatMapTexture2", 3);
-    shaderProgram.setUniform("uTextureMix", textureMix);
-    shaderProgram.setUniform("uCameraPosition", worldToMapCoordinates(game, position));
-    shaderProgram.setUniform("uTransform", transform.data);
-
-    shaderProgram.run(4, { mode: gl.TRIANGLE_STRIP });
+        shaderProgram.run(4, { mode: gl.TRIANGLE_STRIP });
+    });
 }
 
 function updateTransformMatrix(gl: WebGL2RenderingContext): void {

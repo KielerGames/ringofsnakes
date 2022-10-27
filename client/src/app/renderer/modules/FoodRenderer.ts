@@ -19,30 +19,27 @@ const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
     shader.setBlendFunction(gl.SRC_ALPHA, gl.ONE);
 })();
 
-export function render(game: Readonly<Game>, transform: ReadonlyMatrix) {
-    const gl = WebGLContextProvider.getContext();
-
+export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
     const targetSnake = game.targetSnake;
-
-    shader.use();
-
-    shader.setUniform("uColorSampler", 0);
-    shader.setUniform("uTransform", transform.data);
-
     const attractor = targetSnake ? targetSnake.position : FAR_AWAY;
-    shader.setUniform("uAttractorPosition", [attractor.x, attractor.y]);
 
-    for (const chunk of game.foodChunks.values()) {
-        if (!chunk.isVisible(game.camera)) {
-            continue;
+    shader.use((gl) => {
+        shader.setUniform("uColorSampler", 0);
+        shader.setUniform("uTransform", transform.data);
+        shader.setUniform("uAttractorPosition", [attractor.x, attractor.y]);
+
+        for (const chunk of game.foodChunks.values()) {
+            if (!chunk.isVisible(game.camera)) {
+                continue;
+            }
+
+            chunk.useBuffer(gl);
+
+            shader.run(chunk.numberOfVertices);
+
+            if (__DEBUG__) {
+                BoxRenderer.addBox(chunk.box, [0.1, 0.5, 1, 0.333]);
+            }
         }
-
-        chunk.useBuffer(gl);
-
-        shader.run(chunk.numberOfVertices);
-
-        if (__DEBUG__) {
-            BoxRenderer.addBox(chunk.box, [0.1, 0.5, 1, 0.333]);
-        }
-    }
+    });
 }

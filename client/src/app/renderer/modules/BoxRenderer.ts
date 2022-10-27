@@ -24,29 +24,27 @@ export function addBox(box: TransferableBox, color: RGBAColor): void {
 }
 
 export function renderAll(transform: ReadonlyMatrix): void {
-    const gl = WebGLContextProvider.getContext();
+    shader.use((gl) => {
+        shader.setUniform("uTransform", transform.data);
 
-    shader.use();
+        for (const { box, color } of boxesToDraw) {
+            shader.setUniform("uColor", color);
 
-    shader.setUniform("uTransform", transform.data);
+            vertexData[0] = box.minX;
+            vertexData[1] = box.minY;
+            vertexData[2] = box.maxX;
+            vertexData[3] = box.minY;
+            vertexData[4] = box.maxX;
+            vertexData[5] = box.maxY;
+            vertexData[6] = box.minX;
+            vertexData[7] = box.maxY;
 
-    for (const { box, color } of boxesToDraw) {
-        shader.setUniform("uColor", color);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STREAM_DRAW);
 
-        vertexData[0] = box.minX;
-        vertexData[1] = box.minY;
-        vertexData[2] = box.maxX;
-        vertexData[3] = box.minY;
-        vertexData[4] = box.maxX;
-        vertexData[5] = box.maxY;
-        vertexData[6] = box.minX;
-        vertexData[7] = box.maxY;
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STREAM_DRAW);
-
-        shader.run(4, { mode: gl.LINE_LOOP });
-    }
+            shader.run(4, { mode: gl.LINE_LOOP });
+        }
+    });
 
     boxesToDraw.length = 0;
 }

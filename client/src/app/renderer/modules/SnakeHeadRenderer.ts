@@ -22,27 +22,26 @@ const rotOffset = -0.5 * Math.PI;
 })();
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
-    const gl = WebGLContextProvider.getContext();
+    shader.use((gl) => {
+        shader.setUniform("uTransform", transform.data);
 
-    shader.use();
-    shader.setUniform("uTransform", transform.data);
+        for (const snake of game.snakes.values()) {
+            if (!snake.hasChunks() || !snake.isHeadVisible(game.camera)) {
+                continue;
+            }
 
-    for (const snake of game.snakes.values()) {
-        if (!snake.hasChunks() || !snake.isHeadVisible(game.camera)) {
-            continue;
+            const { x, y } = snake.position;
+            shader.setUniform("uSnakeWidth", 1.25 * snake.width);
+            shader.setUniform("uHeadPosition", [x, y]);
+            shader.setUniform("uHeadRotation", snake.direction + rotOffset);
+            shader.setUniform("uSnakeFast", snake.smoothedFastValue);
+            SkinManager.setColor(shader, "uSkin", snake.skin);
+
+            shader.run(vertexData.length / VERTEX_SIZE, {
+                mode: gl.TRIANGLE_STRIP
+            });
         }
-
-        const { x, y } = snake.position;
-        shader.setUniform("uSnakeWidth", 1.25 * snake.width);
-        shader.setUniform("uHeadPosition", [x, y]);
-        shader.setUniform("uHeadRotation", snake.direction + rotOffset);
-        shader.setUniform("uSnakeFast", snake.smoothedFastValue);
-        SkinManager.setColor(shader, "uSkin", snake.skin);
-
-        shader.run(vertexData.length / VERTEX_SIZE, {
-            mode: gl.TRIANGLE_STRIP
-        });
-    }
+    });
 }
 
 function mirror(points: [number, number][]): Float32Array {

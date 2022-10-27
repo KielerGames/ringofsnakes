@@ -2,6 +2,7 @@ import { WebGLUniform, WebGLAttribute } from "./WebGLShaderVariable";
 import type { ShaderVarValue } from "./WebGLShaderVariable";
 import requireNonNull from "../../util/requireNonNull";
 import assert from "../../util/assert";
+import type { Consumer } from "../../util/FunctionTypes";
 
 const GL2 = WebGL2RenderingContext;
 
@@ -14,6 +15,7 @@ export default class WebGLShaderProgram {
     #vertexArray: WebGLVertexArrayObject | null = null;
     #attribOrder: string[];
     #blendFunction: [number, number] = [GL2.SRC_ALPHA, GL2.ONE_MINUS_SRC_ALPHA];
+    #inUse = false;
 
     constructor(
         gl: WebGL2RenderingContext,
@@ -29,13 +31,17 @@ export default class WebGLShaderProgram {
     }
 
     /**
-     * Must be called before calling run().
+     * Run the given function with the WebGL context already set up.
      */
-    use(): void {
+     use(contextFn: Consumer<WebGL2RenderingContext>): void {
         const gl = this.#gl;
         gl.useProgram(this.#program);
         gl.blendFunc(...this.#blendFunction);
         gl.bindVertexArray(this.#vertexArray);
+        this.#inUse = true;
+        contextFn(gl);
+        this.#inUse = false;
+        gl.bindVertexArray(null);
     }
 
     run(
@@ -45,6 +51,7 @@ export default class WebGLShaderProgram {
             start?: number;
         }
     ): void {
+        assert(this.#inUse);
         const gl = this.#gl;
 
         const { mode, start } = {
@@ -69,12 +76,12 @@ export default class WebGLShaderProgram {
      * Allows internal use of vertex array objects.
      */
     setFixedBuffer(data: ArrayBuffer): void {
-        const gl = this.#gl;
-
         assert(this.#vertexArray === null);
 
+        const gl = this.#gl;
+        gl.useProgram(this.#program);
         this.#vertexArray = requireNonNull(gl.createVertexArray());
-        this.use();
+        gl.bindVertexArray(this.#vertexArray);
 
         const buffer = requireNonNull(gl.createBuffer());
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);

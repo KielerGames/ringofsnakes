@@ -14,9 +14,7 @@ const growingChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
 let basicMaterialShader: WebGLShaderProgram;
 
 (async () => {
-    const gl = await WebGLContextProvider.waitForContext();
-
-    basicMaterialShader = await compileShader(gl, "snake", [
+    basicMaterialShader = await compileShader("snake", [
         "aPosition",
         "aNormal",
         "aNormalOffset",

@@ -4,7 +4,6 @@ import type { ReadonlyMatrix } from "../../math/Matrix";
 import Vector from "../../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as BoxRenderer from "./BoxRenderer";
-import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import { compileShader } from "../webgl/ShaderLoader";
 import assert from "../../util/assert";
 
@@ -13,10 +12,10 @@ let shader: WebGLShaderProgram;
 const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
 
 (async () => {
-    const gl = await WebGLContextProvider.waitForContext();
-    shader = await compileShader(gl, "food", ["aPosition", "aLocalPos", "aColorIndex"]);
+    const GL2 = WebGL2RenderingContext;
+    shader = await compileShader("food", ["aPosition", "aLocalPos", "aColorIndex"]);
     assert(shader.attributeStride === FoodChunk.VERTEX_BYTE_SIZE);
-    shader.setBlendFunction(gl.SRC_ALPHA, gl.ONE);
+    shader.setBlendFunction(GL2.SRC_ALPHA, GL2.ONE);
 })();
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {

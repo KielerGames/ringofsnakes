@@ -1,9 +1,9 @@
 import { ReadonlyMatrix } from "../../math/Matrix";
 import { TransferableBox } from "../../math/Rectangle";
-import assert from "../../util/assert";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import { compileShader } from "../webgl/ShaderLoader";
+import requireNonNull from "../../util/requireNonNull";
 
 let shader: WebGLShaderProgram;
 let buffer: WebGLBuffer;
@@ -12,11 +12,9 @@ const boxesToDraw: { box: TransferableBox; color: RGBAColor }[] = [];
 
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
+    shader = await compileShader("solidcolor");
 
-    shader = await compileShader(gl, "solidcolor");
-
-    buffer = gl.createBuffer()!;
-    assert(buffer !== null);
+    buffer = requireNonNull(gl.createBuffer());
 })();
 
 export function addBox(box: TransferableBox, color: RGBAColor): void {

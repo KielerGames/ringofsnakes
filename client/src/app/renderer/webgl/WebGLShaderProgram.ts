@@ -33,7 +33,7 @@ export default class WebGLShaderProgram {
     /**
      * Run the given function with the WebGL context already set up.
      */
-     use(contextFn: Consumer<WebGL2RenderingContext>): void {
+    use(contextFn: Consumer<WebGL2RenderingContext>): void {
         const gl = this.#gl;
         gl.useProgram(this.#program);
         gl.blendFunc(...this.#blendFunction);

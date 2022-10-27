@@ -2,6 +2,7 @@ import { dialog } from "../../ui/Dialogs";
 import AsyncEvent from "../../util/AsyncEvent";
 import { loadJSON } from "../../util/JSONLoader";
 import WebGLShaderProgram from "./WebGLShaderProgram";
+import * as WebGLContextProvider from "./WebGLContextProvider";
 
 type Filename = string;
 type ShaderSource = string;
@@ -65,12 +66,12 @@ async function getShaderSource(filename: Filename): Promise<ShaderSource> {
  *  - src/shader/${name}.frag (fragment shader)
  */
 export async function compileShader(
-    gl: WebGL2RenderingContext,
     name: string,
     attribOrder?: string[]
 ): Promise<WebGLShaderProgram> {
     const vertexShader = await getShaderSource(name + ".vert");
     const fragmentShader = await getShaderSource(name + ".frag");
+    const gl = await WebGLContextProvider.waitForContext();
 
     try {
         return new WebGLShaderProgram(gl, vertexShader, fragmentShader, attribOrder);

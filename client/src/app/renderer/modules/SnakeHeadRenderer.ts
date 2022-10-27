@@ -1,7 +1,6 @@
 import { ReadonlyMatrix } from "../../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as SkinManager from "../SkinLoader";
-import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import Game from "../../data/Game";
 import { compileShader } from "../webgl/ShaderLoader";
 
@@ -16,8 +15,7 @@ const vertexData = mirror([
 const rotOffset = -0.5 * Math.PI;
 
 (async () => {
-    const gl = await WebGLContextProvider.waitForContext();
-    shader = await compileShader(gl, "head");
+    shader = await compileShader("head");
     shader.setFixedBuffer(vertexData);
 })();
 

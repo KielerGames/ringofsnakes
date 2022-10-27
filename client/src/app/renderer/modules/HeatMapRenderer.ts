@@ -26,7 +26,7 @@ const heatMapSize = 128;
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
 
-    shaderProgram = await compileShader(gl, "heatmap");
+    shaderProgram = await compileShader("heatmap");
     shaderProgram.setFixedBuffer(boxCoords.buffer);
 
     texture1 = createTexture(gl);

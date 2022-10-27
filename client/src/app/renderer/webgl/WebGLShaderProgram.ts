@@ -64,10 +64,6 @@ export default class WebGLShaderProgram {
             this.#initializeVertexAttributes();
         }
 
-        this.#uniforms.forEach((uniform) => {
-            uniform.apply();
-        });
-
         gl.drawArrays(mode, start, numVertices);
     }
 
@@ -118,14 +114,15 @@ export default class WebGLShaderProgram {
         }
     }
 
+    /**
+     * Set a uniform to a value. Must be called while the program is in use.
+     */
     setUniform(name: string, value: ShaderVarValue): void {
-        const uniform = this.#uniforms.get(name);
+        assert(this.#inUse);
+        const uniform = this.#uniforms.get(name)!;
+        assert(uniform !== undefined, `Uniform ${name} does not exist.`);
 
-        if (__DEBUG__ && uniform === undefined) {
-            throw new Error(`Uniform ${name} does not exist.`);
-        }
-
-        uniform!.value = value;
+        uniform.apply(value);
     }
 
     get attributeStride(): number {

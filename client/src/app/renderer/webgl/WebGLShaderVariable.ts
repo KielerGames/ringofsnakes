@@ -23,8 +23,6 @@ abstract class ShaderVar<Location> {
     readonly location: Location;
     readonly components: number;
 
-    value: ShaderVarValue | null = null;
-
     constructor(info: WebGLActiveInfo, location: Location) {
         this.name = info.name;
         this.type = info.type;
@@ -66,17 +64,15 @@ export class WebGLUniform extends ShaderVar<WebGLUniformLocation> {
         }
     }
 
-    apply(): void {
-        if (this.value === null) {
-            return; // TODO
-        }
+    apply(value: ShaderVarValue): void {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.#uniformSetter(this.value as any);
+        this.#uniformSetter(value as any);
     }
 }
 
 export class WebGLAttribute extends ShaderVar<WebGLAttributeLocation> {
     readonly byteSize: number;
+    value: ShaderVarValue | null = null;
 
     constructor(info: WebGLActiveInfo, location: WebGLAttributeLocation) {
         super(info, location);

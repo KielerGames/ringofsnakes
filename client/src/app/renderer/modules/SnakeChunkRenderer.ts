@@ -30,7 +30,7 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
 
     const shader = basicMaterialShader;
     shader.use();
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
     shader.setUniform("uTransform", transform.data);
     shader.setUniform("uColorSampler", 0);
 

@@ -16,6 +16,7 @@ const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
     const gl = await WebGLContextProvider.waitForContext();
     shader = await compileShader(gl, "food", ["aPosition", "aLocalPos", "aColorIndex"]);
     assert(shader.attributeStride === FoodChunk.VERTEX_BYTE_SIZE);
+    shader.setBlendFunction(gl.SRC_ALPHA, gl.ONE);
 })();
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix) {
@@ -24,7 +25,6 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix) {
     const targetSnake = game.targetSnake;
 
     shader.use();
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
     shader.setUniform("uColorSampler", 0);
     shader.setUniform("uTransform", transform.data);

@@ -4,18 +4,19 @@ import type { Consumer } from "../../util/FunctionTypes";
 type WebGLAttributeLocation = number;
 export type ShaderVarValue = number | number[] | Float32Array;
 
+const GL2 = WebGL2RenderingContext;
+
 abstract class ShaderVar<Location> {
-    static readonly #NUM_COMPONENTS = ((gl) =>
-        new Map([
-            [gl.FLOAT, 1],
-            [gl.FLOAT_VEC2, 2],
-            [gl.FLOAT_VEC3, 3],
-            [gl.FLOAT_VEC4, 4],
-            [gl.FLOAT_MAT3, 3 * 3],
-            [gl.FLOAT_MAT4, 4 * 4],
-            [gl.INT, 1],
-            [gl.SAMPLER_2D, 1]
-        ]))(WebGL2RenderingContext);
+    static readonly #NUM_COMPONENTS = new Map([
+        [GL2.FLOAT, 1],
+        [GL2.FLOAT_VEC2, 2],
+        [GL2.FLOAT_VEC3, 3],
+        [GL2.FLOAT_VEC4, 4],
+        [GL2.FLOAT_MAT3, 3 * 3],
+        [GL2.FLOAT_MAT4, 4 * 4],
+        [GL2.INT, 1],
+        [GL2.SAMPLER_2D, 1]
+    ]);
 
     readonly name: string;
     readonly type: number;
@@ -36,17 +37,17 @@ abstract class ShaderVar<Location> {
 }
 
 export class WebGLUniform extends ShaderVar<WebGLUniformLocation> {
-    static readonly #methods = ((gl) =>
+    static readonly #methods =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         new Map<number, any>([
-            [gl.FLOAT, gl.prototype.uniform1f],
-            [gl.SAMPLER_2D, gl.prototype.uniform1i],
-            [gl.FLOAT_VEC2, gl.prototype.uniform2fv],
-            [gl.FLOAT_VEC3, gl.prototype.uniform3fv],
-            [gl.FLOAT_VEC4, gl.prototype.uniform4fv],
-            [gl.INT, gl.prototype.uniform1i],
-            [gl.UNSIGNED_INT, gl.prototype.uniform1ui]
-        ]))(WebGL2RenderingContext);
+            [GL2.FLOAT, GL2.prototype.uniform1f],
+            [GL2.SAMPLER_2D, GL2.prototype.uniform1i],
+            [GL2.FLOAT_VEC2, GL2.prototype.uniform2fv],
+            [GL2.FLOAT_VEC3, GL2.prototype.uniform3fv],
+            [GL2.FLOAT_VEC4, GL2.prototype.uniform4fv],
+            [GL2.INT, GL2.prototype.uniform1i],
+            [GL2.UNSIGNED_INT, GL2.prototype.uniform1ui]
+        ]);
 
     readonly #uniformSetter: Consumer<number> | Consumer<number[]> | Consumer<Float32Array>;
 

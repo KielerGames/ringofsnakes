@@ -40,7 +40,6 @@ const heatMapSize = 128;
 export async function render(game: Readonly<Game>): Promise<void> {
     const gl = await WebGLContextProvider.waitForContext();
     shaderProgram.use();
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     updateTransformMatrix(gl);
     const position = game.camera.position;

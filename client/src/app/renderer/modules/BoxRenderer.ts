@@ -27,7 +27,6 @@ export function renderAll(transform: ReadonlyMatrix): void {
     const gl = WebGLContextProvider.getContext();
 
     shader.use();
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     shader.setUniform("uTransform", transform.data);
 

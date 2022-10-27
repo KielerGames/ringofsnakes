@@ -3,6 +3,8 @@ import type { ShaderVarValue } from "./WebGLShaderVariable";
 import requireNonNull from "../../util/requireNonNull";
 import assert from "../../util/assert";
 
+const GL2 = WebGL2RenderingContext;
+
 export default class WebGLShaderProgram {
     readonly #gl: WebGL2RenderingContext;
     readonly #program: WebGLProgram;
@@ -11,6 +13,7 @@ export default class WebGLShaderProgram {
     #stride: number = 0;
     #vertexArray: WebGLVertexArrayObject | null = null;
     #attribOrder: string[];
+    #blendFunction: [number, number] = [GL2.SRC_ALPHA, GL2.ONE_MINUS_SRC_ALPHA];
 
     constructor(
         gl: WebGL2RenderingContext,
@@ -31,6 +34,7 @@ export default class WebGLShaderProgram {
     use(): void {
         const gl = this.#gl;
         gl.useProgram(this.#program);
+        gl.blendFunc(...this.#blendFunction);
         gl.bindVertexArray(this.#vertexArray);
     }
 
@@ -79,6 +83,13 @@ export default class WebGLShaderProgram {
         gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
 
         this.#initializeVertexAttributes();
+    }
+
+    /**
+     * Set the blending function for this program.
+     */
+    setBlendFunction(sourceFactor: number, destFactor: number): void {
+        this.#blendFunction = [sourceFactor, destFactor];
     }
 
     /**

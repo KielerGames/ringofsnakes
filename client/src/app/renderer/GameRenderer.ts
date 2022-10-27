@@ -24,9 +24,6 @@ export function render(game: Readonly<Game>): void {
     // compute transform matrix once
     const transform = game.camera.transformMatrix;
 
-    // reset state
-    gl.bindVertexArray(null);
-
     SkinLoader.setSkinTexture();
 
     // render parts

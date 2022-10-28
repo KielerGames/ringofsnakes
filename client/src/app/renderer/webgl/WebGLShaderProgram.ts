@@ -13,20 +13,21 @@ export default class WebGLShaderProgram {
     readonly #attribs: Map<string, WebGLAttribute> = new Map();
     #stride: number = 0;
     #vertexArray: WebGLVertexArrayObject | null = null;
-    #attribOrder: string[];
+    #modelAttributes: string[];
     #blendFunction: [number, number] = [GL2.SRC_ALPHA, GL2.ONE_MINUS_SRC_ALPHA];
     #inUse = false;
+    #instanced = false;
 
     constructor(
         gl: WebGL2RenderingContext,
         vertex: string,
         fragment: string,
-        vertexBufferLayout?: string[]
+        modelVertexAttributes?: string[]
     ) {
         this.#gl = gl;
         this.#program = compile(gl, vertex, fragment);
-        this.#findAttributes(vertexBufferLayout);
-        this.#stride = this.#computeAttributeStride();
+        this.#findAttributes(modelVertexAttributes);
+        this.#stride = this.computeAttributeStride(this.#modelAttributes);
         this.#findUniforms();
     }
 
@@ -49,10 +50,14 @@ export default class WebGLShaderProgram {
         options?: {
             mode?: number;
             start?: number;
+            instances?: number;
         }
     ): void {
         assert(this.#inUse);
         const gl = this.#gl;
+
+        // in instanced mode the instanced field must be set
+        assert(this.#instanced === (options?.instances !== undefined));
 
         const { mode, start } = {
             mode: this.#gl.TRIANGLES,
@@ -61,17 +66,21 @@ export default class WebGLShaderProgram {
         };
 
         if (this.#vertexArray === null) {
-            this.#initializeVertexAttributes();
+            this.#initializeVertexAttributes(this.#modelAttributes, this.#stride);
         }
 
-        gl.drawArrays(mode, start, numVertices);
+        if (this.#instanced) {
+            gl.drawArraysInstanced(mode, start, numVertices, options!.instances!);
+        } else {
+            gl.drawArrays(mode, start, numVertices);
+        }
     }
 
     /**
      * This program will only use a single vertex buffer.
      * Allows internal use of vertex array objects.
      */
-    setFixedBuffer(data: ArrayBuffer): void {
+    setFixedBuffer(data: ArrayBuffer, modelVertexAttributes?: string[]): void {
         assert(this.#vertexArray === null);
 
         const gl = this.#gl;
@@ -85,7 +94,29 @@ export default class WebGLShaderProgram {
         // send data to GPU (once)
         gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
 
-        this.#initializeVertexAttributes();
+        if (modelVertexAttributes !== undefined) {
+            this.#validateCustomVertexBufferLayout(modelVertexAttributes);
+            this.#modelAttributes = [...modelVertexAttributes];
+            this.#stride = this.computeAttributeStride(modelVertexAttributes);
+        }
+
+        this.#initializeVertexAttributes(this.#modelAttributes, this.#stride);
+    }
+
+    useAttributesForInstancedDrawing(attributes: string[], instances: number): void {
+        assert(this.#inUse);
+        assert(attributes.length > 0);
+        this.#validateCustomVertexBufferLayout(attributes);
+
+        const stride = this.computeAttributeStride(attributes);
+        this.#initializeVertexAttributes(attributes, stride);
+
+        for (const name of attributes) {
+            const attrib = this.#attribs.get(name)!;
+            this.#gl.vertexAttribDivisor(attrib.location, instances);
+        }
+
+        this.#instanced = true;
     }
 
     /**
@@ -110,7 +141,7 @@ export default class WebGLShaderProgram {
         const stateChanged = (attrib.value === null) !== (value === null);
         attrib.value = value;
         if (stateChanged) {
-            this.#stride = this.#computeAttributeStride();
+            this.#stride = this.computeAttributeStride(this.#modelAttributes);
         }
     }
 
@@ -123,6 +154,13 @@ export default class WebGLShaderProgram {
         assert(uniform !== undefined, `Uniform ${name} does not exist.`);
 
         uniform.apply(value);
+    }
+
+    computeAttributeStride(attributes: string[]): number {
+        return attributes
+            .map((name) => this.#attribs.get(name)!)
+            .filter((attrib) => attrib.value === null)
+            .reduce((sum, attrib) => sum + attrib.byteSize, 0);
     }
 
     get attributeStride(): number {
@@ -145,25 +183,27 @@ export default class WebGLShaderProgram {
         }
 
         if (vertexBufferLayout !== undefined) {
-            if (__DEBUG__) {
-                // validate custom vertex buffer layout
+            this.#validateCustomVertexBufferLayout(vertexBufferLayout);
 
-                if (vertexBufferLayout.length === 0) {
-                    throw new Error("Custom buffer layout may not be empty.");
-                }
-
-                for (const attribName of vertexBufferLayout) {
-                    if (!this.#attribs.has(attribName)) {
-                        throw new Error(
-                            `Attribute "${attribName}" not found. Unused attributes get removed by the compiler.`
-                        );
-                    }
-                }
-            }
-
-            this.#attribOrder = [...vertexBufferLayout];
+            // copy array to avoid outside manipulation
+            this.#modelAttributes = [...vertexBufferLayout];
         } else {
-            this.#attribOrder = attribOrder;
+            this.#modelAttributes = attribOrder;
+        }
+    }
+
+    #validateCustomVertexBufferLayout(vertexBufferLayout: string[]) {
+        if (!__DEBUG__) {
+            return;
+        }
+
+        assert(vertexBufferLayout.length > 0);
+
+        for (const attribName of vertexBufferLayout) {
+            if (!this.#attribs.has(attribName)) {
+                // Note: Unused attributes get removed by the compiler.
+                throw new Error(`Attribute "${attribName}" not found.`);
+            }
         }
     }
 
@@ -180,19 +220,12 @@ export default class WebGLShaderProgram {
         }
     }
 
-    #computeAttributeStride(): number {
-        return Array.from(this.#attribs.values())
-            .filter((attrib) => attrib.value === null)
-            .reduce((sum, attrib) => sum + attrib.byteSize, 0);
-    }
-
-    #initializeVertexAttributes(): void {
+    #initializeVertexAttributes(attributes: string[], stride: number): void {
         const gl = this.#gl;
-        const stride = this.#stride;
 
         let byteOffset = 0;
-        for (const name of this.#attribOrder) {
-            const attrib = this.#attribs.get(name)!; // TODO: verify in setter
+        for (const name of attributes) {
+            const attrib = this.#attribs.get(name)!;
             if (attrib.value === null) {
                 gl.enableVertexAttribArray(attrib.location);
                 if (attrib.type === gl.INT) {

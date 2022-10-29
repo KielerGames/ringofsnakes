@@ -12,13 +12,13 @@ const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
 // prettier-ignore
 const BOX_COORDS = new Float32Array([
     // triangle 1
-    -1.0, 1.0, // top-left
-    1.0, 1.0, // top-right
-    -1.0, -1.0, // bottom-left
+    -1,  1, // top-left
+     1,  1, // top-right
+    -1, -1, // bottom-left
     // triangle 2
-    -1.0, -1.0, // bottom-left
-    1.0, 1.0, // top-right
-    1.0, -1.0 // bottom-right
+    -1, -1, // bottom-left
+     1,  1, // top-right
+     1, -1  // bottom-right
 ]);
 
 (async () => {

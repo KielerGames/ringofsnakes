@@ -1,14 +1,12 @@
 import Game from "../../data/Game";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
-import assert from "../../util/assert";
 import Vector from "../../math/Vector";
 import Matrix from "../../math/Matrix";
 import { compileShader } from "../webgl/ShaderLoader";
 
 const transform = new Matrix(true);
 let shaderProgram: WebGLShaderProgram;
-let buffer: WebGLBuffer;
 let texture1: WebGLTexture;
 let texture2: WebGLTexture;
 let textureMix = 0.0;
@@ -28,12 +26,8 @@ const heatMapSize = 128;
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
 
-    shaderProgram = await compileShader(gl, "heatmap");
-
-    buffer = gl.createBuffer()!;
-    assert(buffer !== null);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, boxCoords.buffer, gl.STATIC_DRAW);
+    shaderProgram = await compileShader("heatmap");
+    shaderProgram.setFixedBuffer(boxCoords.buffer);
 
     texture1 = createTexture(gl);
     texture2 = createTexture(gl);
@@ -43,26 +37,23 @@ const heatMapSize = 128;
     }
 })();
 
-export async function render(game: Readonly<Game>): Promise<void> {
-    const gl = await WebGLContextProvider.waitForContext();
-    shaderProgram.use();
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+export function render(game: Readonly<Game>): void {
+    shaderProgram.use((gl) => {
+        updateTransformMatrix(gl);
+        const position = game.camera.position;
+        manageData(gl, game);
 
-    updateTransformMatrix(gl);
-    const position = game.camera.position;
-    manageData(gl, game);
+        shaderProgram.setUniform("uHeatMapTexture1", 2);
+        shaderProgram.setUniform("uHeatMapTexture2", 3);
+        shaderProgram.setUniform("uTextureMix", textureMix);
+        shaderProgram.setUniform("uCameraPosition", worldToMapCoordinates(game, position));
+        shaderProgram.setUniform("uTransform", transform.data);
 
-    shaderProgram.setUniform("uHeatMapTexture1", 2);
-    shaderProgram.setUniform("uHeatMapTexture2", 3);
-    shaderProgram.setUniform("uTextureMix", textureMix);
-    shaderProgram.setUniform("uCameraPosition", worldToMapCoordinates(game, position));
-    shaderProgram.setUniform("uTransform", transform.data);
-
-    shaderProgram.run(4, { mode: gl.TRIANGLE_STRIP });
+        shaderProgram.run(4, { mode: gl.TRIANGLE_STRIP });
+    });
 }
 
-function updateTransformMatrix(gl: WebGLRenderingContext): void {
+function updateTransformMatrix(gl: WebGL2RenderingContext): void {
     const { width: cw, height: ch } = gl.canvas;
     const sx = 2.0 / cw;
     const sy = 2.0 / ch;
@@ -81,7 +72,7 @@ function worldToMapCoordinates(game: Readonly<Game>, worldPosition: Vector): [nu
     return [(0.5 * width + worldPosition.x) / width, (0.5 * height + worldPosition.y) / height];
 }
 
-function createTexture(gl: WebGLRenderingContext): WebGLTexture {
+function createTexture(gl: WebGL2RenderingContext): WebGLTexture {
     const texture = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -92,7 +83,7 @@ function createTexture(gl: WebGLRenderingContext): WebGLTexture {
     return texture;
 }
 
-function manageData(gl: WebGLRenderingContext, game: Readonly<Game>): void {
+function manageData(gl: WebGL2RenderingContext, game: Readonly<Game>): void {
     const { columns: width, rows: height } = game.config.chunks;
 
     const targetMix = texture1IsCurrent ? 0.0 : 1.0;
@@ -103,9 +94,9 @@ function manageData(gl: WebGLRenderingContext, game: Readonly<Game>): void {
     }
 
     if (!texture1IsCurrent || lastTextureData === null) {
-        gl.activeTexture(WebGLRenderingContext.TEXTURE2);
+        gl.activeTexture(gl.TEXTURE2);
     } else {
-        gl.activeTexture(WebGLRenderingContext.TEXTURE3);
+        gl.activeTexture(gl.TEXTURE3);
     }
 
     if (texture1IsCurrent) {

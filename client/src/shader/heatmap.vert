@@ -1,10 +1,12 @@
+#version 300 es
+
 precision mediump float;
 
-attribute vec2 aRelPosition;
+in vec2 aRelPosition;
 
 uniform mat3 uTransform;
 
-varying vec2 vPosition;
+out vec2 vPosition;
 
 void main(void) {
     vPosition = aRelPosition;

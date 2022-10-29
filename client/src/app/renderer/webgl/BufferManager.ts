@@ -31,7 +31,7 @@ export function free(buffer: WebGLBuffer): void {
     }
 }
 
-function createBuffer(gl: WebGLRenderingContext): WebGLBuffer {
+function createBuffer(gl: WebGL2RenderingContext): WebGLBuffer {
     const buffer = gl.createBuffer();
 
     if (buffer === null) {

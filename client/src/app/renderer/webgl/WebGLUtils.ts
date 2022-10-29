@@ -3,7 +3,7 @@
  * Does not resize the canvas if it has the target resolution.
  * @param gl the associated WebGL rendering context
  */
-export function updateCanvasSize(gl: WebGLRenderingContext) {
+export function updateCanvasSize(gl: WebGL2RenderingContext) {
     const canvas = gl.canvas as HTMLCanvasElement;
 
     // get current canvas size in CSS pixels

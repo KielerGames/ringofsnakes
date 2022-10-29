@@ -1,9 +1,11 @@
+#version 300 es
+
 precision mediump float;
 
-attribute vec2 aPosition;
-attribute vec2 aNormal;
-attribute float aNormalOffset;
-attribute float aRelativePathOffset;
+in vec2 aPosition;
+in vec2 aNormal;
+in float aNormalOffset;
+in float aRelativePathOffset;
 
 uniform mat3 uTransform;
 uniform highp float uSnakeMaxWidth;
@@ -11,8 +13,8 @@ uniform highp float uChunkPathOffset;
 uniform highp float uSnakeLength;
 uniform highp float uSnakeThinningStart;
 
-varying highp float vPathOffset;
-varying float vNormalOffset;
+out highp float vPathOffset;
+out float vNormalOffset;
 
 void main(void) {
     vNormalOffset = aNormalOffset;

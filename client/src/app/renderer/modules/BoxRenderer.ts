@@ -1,9 +1,9 @@
 import { ReadonlyMatrix } from "../../math/Matrix";
 import { TransferableBox } from "../../math/Rectangle";
-import assert from "../../util/assert";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import { compileShader } from "../webgl/ShaderLoader";
+import requireNonNull from "../../util/requireNonNull";
 
 let shader: WebGLShaderProgram;
 let buffer: WebGLBuffer;
@@ -12,11 +12,9 @@ const boxesToDraw: { box: TransferableBox; color: RGBAColor }[] = [];
 
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
+    shader = await compileShader("solidcolor");
 
-    shader = await compileShader(gl, "solidcolor");
-
-    buffer = gl.createBuffer()!;
-    assert(buffer !== null);
+    buffer = requireNonNull(gl.createBuffer());
 })();
 
 export function addBox(box: TransferableBox, color: RGBAColor): void {
@@ -24,30 +22,27 @@ export function addBox(box: TransferableBox, color: RGBAColor): void {
 }
 
 export function renderAll(transform: ReadonlyMatrix): void {
-    const gl = WebGLContextProvider.getContext();
+    shader.use((gl) => {
+        shader.setUniform("uTransform", transform.data);
 
-    shader.use();
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        for (const { box, color } of boxesToDraw) {
+            shader.setUniform("uColor", color);
 
-    shader.setUniform("uTransform", transform.data);
+            vertexData[0] = box.minX;
+            vertexData[1] = box.minY;
+            vertexData[2] = box.maxX;
+            vertexData[3] = box.minY;
+            vertexData[4] = box.maxX;
+            vertexData[5] = box.maxY;
+            vertexData[6] = box.minX;
+            vertexData[7] = box.maxY;
 
-    for (const { box, color } of boxesToDraw) {
-        shader.setUniform("uColor", color);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STREAM_DRAW);
 
-        vertexData[0] = box.minX;
-        vertexData[1] = box.minY;
-        vertexData[2] = box.maxX;
-        vertexData[3] = box.minY;
-        vertexData[4] = box.maxX;
-        vertexData[5] = box.maxY;
-        vertexData[6] = box.minX;
-        vertexData[7] = box.maxY;
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STREAM_DRAW);
-
-        shader.run(4, { mode: gl.LINE_LOOP });
-    }
+            shader.run(4, { mode: gl.LINE_LOOP });
+        }
+    });
 
     boxesToDraw.length = 0;
 }

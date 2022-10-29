@@ -25,6 +25,9 @@ const shaders = fs
         console.log(" --> " + filename);
 
         const rawContent = fs.readFileSync(SHADER_DIR + "/" + filename, "utf8").trim();
+        if (!rawContent.startsWith("#version 300 es")) {
+            console.warn("     " + "WARNING: GLSL 100 shader code (use GLSL 300 instead)");
+        }
         shaders[filename] = args.has("minify") ? minifyShaderCode(rawContent) : rawContent;
 
         return shaders;

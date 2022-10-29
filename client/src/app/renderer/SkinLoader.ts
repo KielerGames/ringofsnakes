@@ -59,7 +59,7 @@ let texture: WebGLTexture;
 
 export function setSkinTexture(): void {
     const gl = WebGLContextProvider.getContext();
-    const slot = WebGLRenderingContext.TEXTURE0;
+    const slot = WebGL2RenderingContext.TEXTURE0;
     gl.activeTexture(slot);
     gl.bindTexture(gl.TEXTURE_2D, texture);
 }
@@ -70,7 +70,7 @@ export function setColor(shader: WebGLShaderProgram, uniform: string, skinId: nu
 
 export function getColorPosition(skinId: number): number {
     const skins = Skins.getAllSkins();
-    return ((skinId % skins.length) + 0.5) / skins.length;
+    return skinId % skins.length;
 }
 
 export function getFloatColor(skinId: number, alpha: number): [number, number, number, number] {

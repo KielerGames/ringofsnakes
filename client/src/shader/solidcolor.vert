@@ -1,6 +1,8 @@
+#version 300 es
+
 precision mediump float;
 
-attribute vec2 vPosition;
+in vec2 vPosition;
 
 uniform mediump mat3 uTransform;
 

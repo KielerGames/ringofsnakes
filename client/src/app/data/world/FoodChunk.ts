@@ -6,26 +6,17 @@ import Camera from "../camera/Camera";
 import * as FrameTime from "../../util/FrameTime";
 import { ManagedObject } from "../../util/ManagedMap";
 
-const boxCoords = [
-    // triangle 1
-    [-1.0, 1.0], // top-left
-    [1.0, 1.0], // top-right
-    [-1.0, -1.0], // bottom-left
-    // triangle 2
-    [-1.0, -1.0], // bottom-left
-    [1.0, 1.0], // top-right
-    [1.0, -1.0] // bottom-right
-];
-
 // TODO: move webgl stuff out of here
 export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
-    static readonly FOOD_VERTEX_SIZE = 2 + 2 + 1; // x,y, u,v, c
+    static readonly INSTANCE_BYTE_SIZE =
+        2 * Float32Array.BYTES_PER_ELEMENT + // x,y
+        Int32Array.BYTES_PER_ELEMENT; // c
 
     readonly id: number;
     readonly box: Rectangle;
 
     #gpuBuffer: WebGLBuffer;
-    #gpuData: Float32Array | undefined = new Float32Array(32 * boxCoords.length);
+    #gpuData: ArrayBuffer | undefined;
     #numFoodItems: number;
     #lastUpdateTime: number;
 
@@ -46,7 +37,7 @@ export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
         BufferManager.free(this.#gpuBuffer);
     }
 
-    useBuffer(gl: WebGLRenderingContext): void {
+    useBuffer(gl: WebGL2RenderingContext): void {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.#gpuBuffer);
 
         if (this.#gpuData) {
@@ -59,8 +50,8 @@ export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
         return Rectangle.distance2(this.box, camera.viewBox) <= eps * eps;
     }
 
-    get numberOfVertices(): number {
-        return this.#numFoodItems * boxCoords.length;
+    get length(): number {
+        return this.#numFoodItems;
     }
 
     /**
@@ -71,32 +62,25 @@ export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
     }
 }
 
-function createGPUData(items: FoodItemDTO[], gpuData: Float32Array | undefined): Float32Array {
-    const floatsPerFood = FoodChunk.FOOD_VERTEX_SIZE * boxCoords.length;
-    const n = items.length * floatsPerFood;
-    const fvs = FoodChunk.FOOD_VERTEX_SIZE;
+// TODO: consider moving to worker
+function createGPUData(items: FoodItemDTO[], gpuData: ArrayBuffer | undefined): ArrayBuffer {
+    const indicesPerItem = FoodChunk.INSTANCE_BYTE_SIZE / 4;
 
-    if (gpuData === undefined || gpuData.length < n) {
-        gpuData = new Float32Array(n);
+    if (gpuData === undefined || items.length * FoodChunk.INSTANCE_BYTE_SIZE) {
+        gpuData = new ArrayBuffer(items.length * FoodChunk.INSTANCE_BYTE_SIZE);
     }
+
+    const floatView = new Float32Array(gpuData);
+    const intView = new Int32Array(gpuData);
 
     for (let fi = 0; fi < items.length; fi++) {
         const f = items[fi];
-        const offset = fi * floatsPerFood;
+        const offset = indicesPerItem * fi;
         const color = SkinLoader.getColorPosition(f.color);
 
-        for (let bi = 0; bi < boxCoords.length; bi++) {
-            const [u, v] = boxCoords[bi];
-
-            // [x,y, u,v, c]
-            gpuData[offset + fvs * bi + 0] = f.size * u + f.x;
-            gpuData[offset + fvs * bi + 1] = f.size * v + f.y;
-
-            gpuData[offset + fvs * bi + 2] = u;
-            gpuData[offset + fvs * bi + 3] = v;
-
-            gpuData[offset + fvs * bi + 4] = color;
-        }
+        floatView[offset + 0] = f.x;
+        floatView[offset + 1] = f.y;
+        intView[offset + 2] = color;
     }
 
     return gpuData;

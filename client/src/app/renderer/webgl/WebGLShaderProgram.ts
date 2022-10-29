@@ -103,7 +103,7 @@ export default class WebGLShaderProgram {
         this.#initializeVertexAttributes(this.#modelAttributes, this.#stride);
     }
 
-    useAttributesForInstancedDrawing(attributes: string[], instances: number): void {
+    useAttributesForInstancedDrawing(attributes: string[], repeats: number): void {
         assert(this.#inUse);
         assert(attributes.length > 0);
         this.#validateCustomVertexBufferLayout(attributes);
@@ -113,7 +113,7 @@ export default class WebGLShaderProgram {
 
         for (const name of attributes) {
             const attrib = this.#attribs.get(name)!;
-            this.#gl.vertexAttribDivisor(attrib.location, instances);
+            this.#gl.vertexAttribDivisor(attrib.location, repeats);
         }
 
         this.#instanced = true;
@@ -161,10 +161,6 @@ export default class WebGLShaderProgram {
             .map((name) => this.#attribs.get(name)!)
             .filter((attrib) => attrib.value === null)
             .reduce((sum, attrib) => sum + attrib.byteSize, 0);
-    }
-
-    get attributeStride(): number {
-        return this.#stride;
     }
 
     #findAttributes(vertexBufferLayout?: string[]): void {

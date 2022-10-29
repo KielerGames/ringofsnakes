@@ -18,13 +18,14 @@ const float cMoveDist = 7.5;
 
 void main(void) {
     vPos = aLocalPos;
+    vec2 worldPosition = aPosition + aLocalPos;
     vColor = texelFetch(uColorSampler, ivec2(aColorIndex, 1), 0).rgb;
 
-    float d = distance(aPosition, uAttractorPosition);
+    float d = distance(worldPosition, uAttractorPosition);
     float s = min(1.0, d * 0.25);
     vOpacity = min(1.0, d * 0.375);
 
-    vec2 pos = (d < cMoveDist) ? mix(aPosition, uAttractorPosition, 1.0 - s) : aPosition;
+    vec2 pos = (d < cMoveDist) ? mix(worldPosition, uAttractorPosition, 1.0 - s) : worldPosition;
 
     gl_Position = vec4(uTransform * vec3(pos, 1.0), 1.0);
 }

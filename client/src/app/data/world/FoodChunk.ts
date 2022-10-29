@@ -6,22 +6,10 @@ import Camera from "../camera/Camera";
 import * as FrameTime from "../../util/FrameTime";
 import { ManagedObject } from "../../util/ManagedMap";
 
-const boxCoords = [
-    // triangle 1
-    [-1.0, 1.0], // top-left
-    [1.0, 1.0], // top-right
-    [-1.0, -1.0], // bottom-left
-    // triangle 2
-    [-1.0, -1.0], // bottom-left
-    [1.0, 1.0], // top-right
-    [1.0, -1.0] // bottom-right
-];
-
 // TODO: move webgl stuff out of here
 export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
-    static readonly VERTEX_BYTE_SIZE =
+    static readonly INSTANCE_BYTE_SIZE =
         2 * Float32Array.BYTES_PER_ELEMENT + // x,y
-        2 * Float32Array.BYTES_PER_ELEMENT + // u,v
         Int32Array.BYTES_PER_ELEMENT; // c
 
     readonly id: number;
@@ -62,8 +50,8 @@ export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
         return Rectangle.distance2(this.box, camera.viewBox) <= eps * eps;
     }
 
-    get numberOfVertices(): number {
-        return this.#numFoodItems * boxCoords.length;
+    get length(): number {
+        return this.#numFoodItems;
     }
 
     /**
@@ -76,39 +64,23 @@ export default class FoodChunk implements ManagedObject<number, FoodChunkDTO> {
 
 // TODO: consider moving to worker
 function createGPUData(items: FoodItemDTO[], gpuData: ArrayBuffer | undefined): ArrayBuffer {
-    const bytesPerFood = FoodChunk.VERTEX_BYTE_SIZE * boxCoords.length;
-    const indicesPerFood = bytesPerFood / 4; // 32bit = 4 bytes
-    const indicesPerVertex = FoodChunk.VERTEX_BYTE_SIZE / 4;
+    const indicesPerItem = FoodChunk.INSTANCE_BYTE_SIZE / 4;
 
-    if (gpuData === undefined || items.length * bytesPerFood) {
-        gpuData = new ArrayBuffer(items.length * bytesPerFood);
+    if (gpuData === undefined || items.length * FoodChunk.INSTANCE_BYTE_SIZE) {
+        gpuData = new ArrayBuffer(items.length * FoodChunk.INSTANCE_BYTE_SIZE);
     }
 
     const floatView = new Float32Array(gpuData);
     const intView = new Int32Array(gpuData);
 
-    // Iterate over food items.
     for (let fi = 0; fi < items.length; fi++) {
         const f = items[fi];
-        const offset = fi * indicesPerFood;
+        const offset = indicesPerItem * fi;
         const color = SkinLoader.getColorPosition(f.color);
 
-        // Iterate over vertices of each food item.
-        for (let bi = 0; bi < boxCoords.length; bi++) {
-            const [u, v] = boxCoords[bi];
-            const boxVertexOffset = offset + indicesPerVertex * bi;
-
-            // absolute position [x,y]
-            floatView[boxVertexOffset + 0] = f.x + f.size * u;
-            floatView[boxVertexOffset + 1] = f.y + f.size * v;
-
-            // relative position [u,v]
-            floatView[boxVertexOffset + 2] = u;
-            floatView[boxVertexOffset + 3] = v;
-
-            // color
-            intView[boxVertexOffset + 4] = color;
-        }
+        floatView[offset + 0] = f.x;
+        floatView[offset + 1] = f.y;
+        intView[offset + 2] = color;
     }
 
     return gpuData;

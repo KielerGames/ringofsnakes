@@ -1,38 +1,45 @@
 /*eslint no-bitwise: "off"*/
 
-import { GameConfig } from "../../data/config/GameConfig";
-import { FoodChunkDTO, FoodItemDTO } from "../../data/dto/FoodChunkDTO";
-import { DecodeResult } from "./DecodeResult";
+import type { GameConfig } from "../../data/config/GameConfig";
+import type { FoodChunkDTO } from "../../data/dto/FoodChunkDTO";
+import type { DecodeResult } from "./DecodeResult";
+import { getNumberOfSkins } from "../../data/misc/Skins";
 
 const FOOD_SIZE = 3;
 const FOOD_CHUNK_HEADER_SIZE = 4;
 const SIZE_BIT_OFFSET = 6;
 const COLOR_BIT_MASK = (1 << SIZE_BIT_OFFSET) - 1;
 const FOOD_SIZES = [0.64, 1.0, 1.5];
+const NUM_SKINS = getNumberOfSkins();
+const VERTEX_BYTE_SIZE =
+    3 * Float32Array.BYTES_PER_ELEMENT + // x,y, size
+    Int32Array.BYTES_PER_ELEMENT; // color
 
 export function decode(
     buffer: ArrayBuffer,
     offset: number,
     config: GameConfig
 ): DecodeResult<FoodChunkDTO> {
-    const view = new DataView(buffer, offset);
+    const decView = new DataView(buffer, offset);
     const chunkSize = config.chunks.size;
 
-    const column = view.getUint8(0);
-    const row = view.getUint8(1);
-    const n = view.getUint16(2, false);
-    const chunkId = view.getUint16(0, false);
+    const column = decView.getUint8(0);
+    const row = decView.getUint8(1);
+    const n = decView.getUint16(2, false);
+    const chunkId = decView.getUint16(0, false);
 
     const xOffset = (column - 0.5 * config.chunks.columns) * chunkSize;
     const yOffset = (row - 0.5 * config.chunks.rows) * chunkSize;
 
-    const foodItems: FoodItemDTO[] = new Array(n);
+    const vertexBuffer = new ArrayBuffer(n * VERTEX_BYTE_SIZE);
+    const encView = new DataView(vertexBuffer);
 
     for (let i = 0; i < n; i++) {
+        // decode
         const foodOffset = FOOD_CHUNK_HEADER_SIZE + i * FOOD_SIZE;
-        const bx = view.getInt8(foodOffset + 0) + 128;
-        const by = view.getInt8(foodOffset + 1) + 128;
-        const colorAndSize = view.getUint8(foodOffset + 2);
+        const bx = decView.getInt8(foodOffset + 0) + 128;
+        const by = decView.getInt8(foodOffset + 1) + 128;
+        const colorAndSize = decView.getUint8(foodOffset + 2);
 
         const size = FOOD_SIZES[colorAndSize >> SIZE_BIT_OFFSET];
         const color = colorAndSize & COLOR_BIT_MASK;
@@ -40,13 +47,19 @@ export function decode(
         const x = xOffset + (bx / 256) * chunkSize;
         const y = yOffset + (by / 256) * chunkSize;
 
-        foodItems[i] = { x, y, size, color };
+        // encode vertex buffer
+        const vbOffset = i * VERTEX_BYTE_SIZE;
+        encView.setFloat32(vbOffset + 0, x, true);
+        encView.setFloat32(vbOffset + 4, y, true);
+        encView.setFloat32(vbOffset + 8, size, true);
+        encView.setInt32(vbOffset + 12, color % NUM_SKINS, true);
     }
 
     return {
         data: {
             id: chunkId,
-            items: foodItems,
+            vertexBuffer,
+            count: n,
             bounds: {
                 minX: xOffset,
                 maxX: xOffset + chunkSize,

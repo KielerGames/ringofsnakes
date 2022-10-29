@@ -1,11 +1,11 @@
-import Game from "../../data/Game";
 import type { ReadonlyMatrix } from "../../math/Matrix";
+import type FoodChunk from "../../data/world/FoodChunk";
+import Game from "../../data/Game";
 import Vector from "../../math/Vector";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as BoxRenderer from "./BoxRenderer";
 import { compileShader } from "../webgl/ShaderLoader";
-
-let shader: WebGLShaderProgram;
+import requireNonNull from "../../util/requireNonNull";
 
 const FAR_AWAY = new Vector(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
 
@@ -20,6 +20,9 @@ const BOX_COORDS = new Float32Array([
      1,  1, // top-right
      1, -1  // bottom-right
 ]);
+
+let shader: WebGLShaderProgram;
+const buffers = new WeakMap<FoodChunk, WebGLBuffer>();
 
 (async () => {
     const GL2 = WebGL2RenderingContext;
@@ -42,8 +45,8 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
                 continue;
             }
 
-            chunk.useBuffer(gl);
-            shader.useAttributesForInstancedDrawing(["aPosition", "aColorIndex"], 1);
+            setupChunkBuffer(gl, chunk);
+            shader.useAttributesForInstancedDrawing(["aPosition", "aSize", "aColorIndex"], 1);
 
             shader.run(BOX_COORDS.length / 2, {
                 instances: chunk.length
@@ -54,4 +57,20 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
             }
         }
     });
+}
+
+function setupChunkBuffer(gl: WebGL2RenderingContext, chunk: FoodChunk): void {
+    // Re-use previous buffer if possible.
+    let buffer = buffers.get(chunk);
+
+    if (buffer === undefined) {
+        // Create new buffer.
+        buffer = requireNonNull(gl.createBuffer());
+        buffers.set(chunk, buffer);
+    }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+    // If there is new data move it to the GPU.
+    chunk.moveVertexData((data) => gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW));
 }

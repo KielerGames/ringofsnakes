@@ -4,7 +4,8 @@ precision mediump float;
 
 in vec2 aPosition;
 in vec2 aLocalPos;
-in lowp int aColorIndex;
+in int aColorIndex;
+in float aSize;
 
 uniform mat3 uTransform;
 uniform sampler2D uColorSampler;
@@ -18,7 +19,7 @@ const float cMoveDist = 7.5;
 
 void main(void) {
     vPos = aLocalPos;
-    vec2 worldPosition = aPosition + aLocalPos;
+    vec2 worldPosition = aPosition + aSize * aLocalPos;
     vColor = texelFetch(uColorSampler, ivec2(aColorIndex, 1), 0).rgb;
 
     float d = distance(worldPosition, uAttractorPosition);

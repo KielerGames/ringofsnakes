@@ -9,7 +9,8 @@ export type FoodChunkId = number;
 
 export type FoodChunkDTO = {
     id: FoodChunkId;
-    items: FoodItemDTO[];
+    vertexBuffer: ArrayBuffer;
+    count: number;
     bounds: {
         minX: number;
         maxX: number;

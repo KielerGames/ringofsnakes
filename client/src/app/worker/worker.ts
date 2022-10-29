@@ -102,7 +102,10 @@ const api = {
 
         // avoid copying of ArrayBuffers
         // instead move/transfer them to the main thread
-        const transferables: ArrayBuffer[] = update.snakeChunks.map((chunk) => chunk.data.buffer);
+        const transferables: ArrayBuffer[] = [
+            ...update.snakeChunks.map((chunk) => chunk.data.buffer),
+            ...update.foodChunks.map((chunk) => chunk.vertexBuffer)
+        ];
 
         if (update.heatMap) {
             transferables.push(update.heatMap.buffer);

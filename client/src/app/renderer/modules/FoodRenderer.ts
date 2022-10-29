@@ -43,7 +43,7 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
             }
 
             chunk.useBuffer(gl);
-            shader.useAttributesForInstancedDrawing(["aPosition", "aColorIndex"], 1);
+            shader.useAttributesForInstancedDrawing(["aPosition", "aSize", "aColorIndex"], 1);
 
             shader.run(BOX_COORDS.length / 2, {
                 instances: chunk.length

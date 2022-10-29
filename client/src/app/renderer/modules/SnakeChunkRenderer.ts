@@ -1,4 +1,4 @@
-import { ReadonlyMatrix } from "../../math/Matrix";
+import type { ReadonlyMatrix } from "../../math/Matrix";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import * as BoxRenderer from "./BoxRenderer";
@@ -7,7 +7,7 @@ import * as SkinLoader from "../SkinLoader";
 import Game from "../../data/Game";
 import Vector from "../../math/Vector";
 import { compileShader } from "../webgl/ShaderLoader";
-import SnakeChunk from "../../data/snake/SnakeChunk";
+import type SnakeChunk from "../../data/snake/SnakeChunk";
 
 const finalChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
 const growingChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
@@ -79,6 +79,7 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
                     // we have to copy the data to the GPU once per frame (STREAM_DRAW).
                     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
                     gl.bufferData(gl.ARRAY_BUFFER, data.buffer, gl.STREAM_DRAW);
+                    // TODO: this could be improved by using bufferSubData
                 }
 
                 // Draw the snake chunk

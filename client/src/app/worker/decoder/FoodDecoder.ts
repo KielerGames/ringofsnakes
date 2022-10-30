@@ -3,14 +3,13 @@
 import type { GameConfig } from "../../data/config/GameConfig";
 import type { FoodChunkDTO } from "../../data/dto/FoodChunkDTO";
 import type { DecodeResult } from "./DecodeResult";
-import { getNumberOfSkins } from "../../data/misc/Skins";
 
-const FOOD_SIZE = 3;
+export const NUM_SKINS = 7;
+const FOOD_BYTE_SIZE = 3;
 const FOOD_CHUNK_HEADER_SIZE = 4;
 const SIZE_BIT_OFFSET = 6;
 const COLOR_BIT_MASK = (1 << SIZE_BIT_OFFSET) - 1;
 const FOOD_SIZES = [0.64, 1.0, 1.5];
-const NUM_SKINS = getNumberOfSkins();
 const VERTEX_BYTE_SIZE =
     3 * Float32Array.BYTES_PER_ELEMENT + // x,y, size
     Int32Array.BYTES_PER_ELEMENT; // color
@@ -36,7 +35,7 @@ export function decode(
 
     for (let i = 0; i < n; i++) {
         // decode
-        const foodOffset = FOOD_CHUNK_HEADER_SIZE + i * FOOD_SIZE;
+        const foodOffset = FOOD_CHUNK_HEADER_SIZE + i * FOOD_BYTE_SIZE;
         const bx = decView.getInt8(foodOffset + 0) + 128;
         const by = decView.getInt8(foodOffset + 1) + 128;
         const colorAndSize = decView.getUint8(foodOffset + 2);
@@ -67,6 +66,6 @@ export function decode(
                 maxY: yOffset + chunkSize
             }
         },
-        nextByteOffset: offset + FOOD_CHUNK_HEADER_SIZE + n * FOOD_SIZE
+        nextByteOffset: offset + FOOD_CHUNK_HEADER_SIZE + n * FOOD_BYTE_SIZE
     };
 }

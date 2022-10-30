@@ -18,7 +18,7 @@ flat out lowp vec3 vColor;
 out lowp float vOpacity;
 
 const float cMoveDist = 7.5;
-const float cWS = 0.8; // wiggle base speed
+const float cWS = 1.3; // wiggle base speed
 
 void main(void) {
     vPos = aLocalPos;

@@ -2,7 +2,6 @@
 
 import type { GameConfig } from "../../data/config/GameConfig";
 import type { FoodChunkDTO } from "../../data/dto/FoodChunkDTO";
-import assert from "../../util/assert";
 import type { DecodeResult } from "./DecodeResult";
 
 export const NUM_SKINS = 7;
@@ -88,12 +87,14 @@ export function decode(
 
 function wiggleSpeed(seed: number): number {
     const sign = 2 * (Math.clz32(seed) & 1) - 1;
-    assert(Math.abs(sign) === 1.0);
     const epsilon = 0.3 * (seed / 256);
     return sign * (1.0 + epsilon);
 }
 
-function rotateBits(bits: number, d: number): number {
-    d = d & 7;
-    return (bits << d) | (bits >> (8-d));
+/**
+ * Rotate bits of byte by digits.
+ */
+function rotateBits(byte: number, digits: number): number {
+    digits = digits & 7;
+    return ((byte << digits) | (byte >> (8 - digits))) & 255;
 }

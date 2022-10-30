@@ -87,7 +87,7 @@ export function decode(
 
 function wiggleSpeed(seed: number): number {
     const sign = 2 * (Math.clz32(seed) & 1) - 1;
-    const epsilon = 0.3 * (seed / 256);
+    const epsilon = 0.75 * (seed / 256);
     return sign * (1.0 + epsilon);
 }
 

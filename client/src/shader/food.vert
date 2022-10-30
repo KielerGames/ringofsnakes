@@ -18,7 +18,6 @@ flat out lowp vec3 vColor;
 out lowp float vOpacity;
 
 const float cMoveDist = 7.5;
-const float cWS = 1.3; // wiggle base speed
 
 void main(void) {
     vPos = aLocalPos;
@@ -30,7 +29,7 @@ void main(void) {
     vOpacity = min(1.0, d * 0.375);
 
     float t0 = 10.0 * fract(0.23 * aPosition.x + 0.21 * aPosition.y);
-    vec2 wiggle = 0.3 * s * vec2(cos(aWiggleParams.x * cWS * uTime + t0), sin(aWiggleParams.y * cWS * uTime + t0));
+    vec2 wiggle = 0.3 * s * vec2(cos(aWiggleParams.x * uTime + t0), sin(aWiggleParams.y * uTime + t0));
 
     vec2 pos = (d < cMoveDist) ? mix(worldPosition, uAttractorPosition, 1.0 - s) : worldPosition;
 

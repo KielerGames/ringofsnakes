@@ -3,6 +3,7 @@
 import type { GameConfig } from "../../data/config/GameConfig";
 import type { FoodChunkDTO } from "../../data/dto/FoodChunkDTO";
 import type { DecodeResult } from "./DecodeResult";
+import Random from "java-random";
 
 export const NUM_SKINS = 7;
 const FOOD_BYTE_SIZE = 3;
@@ -15,6 +16,8 @@ const VERTEX_BYTE_SIZE =
     2 * Float32Array.BYTES_PER_ELEMENT + // wiggle parameters,
     Float32Array.BYTES_PER_ELEMENT + // size,
     Int32Array.BYTES_PER_ELEMENT; // color
+
+const random = new Random();
 
 export function decode(
     buffer: ArrayBuffer,
@@ -54,17 +57,16 @@ export function decode(
         const x = xOffset + (bx / 256) * chunkSize;
         const y = yOffset + (by / 256) * chunkSize;
 
-        // Create seeds for random float generation based on the given
+        // Create a seed for random float generation based on the given
         // bits s.t. they are consistent (same input => same output).
-        const seedA = bx ^ by ^ colorAndSize;
-        const seedB = rotateBits(seedA, 4);
+        random.setSeed((decView.getUint16(foodOffset) << 8) | colorAndSize);
 
         // Encode data for vertex buffer.
         const vbOffset = i * VERTEX_BYTE_SIZE;
         encView.setFloat32(vbOffset + 0, x, true);
         encView.setFloat32(vbOffset + 4, y, true);
-        encView.setFloat32(vbOffset + 8, wiggleSpeed(seedA), true);
-        encView.setFloat32(vbOffset + 12, wiggleSpeed(seedB), true);
+        encView.setFloat32(vbOffset + 8, randomWiggleSpeed(), true);
+        encView.setFloat32(vbOffset + 12, randomWiggleSpeed(), true);
         encView.setFloat32(vbOffset + 16, size, true);
         encView.setInt32(vbOffset + 20, color % NUM_SKINS, true);
     }
@@ -85,16 +87,8 @@ export function decode(
     };
 }
 
-function wiggleSpeed(seed: number): number {
-    const sign = 2 * (Math.clz32(seed) & 1) - 1;
-    const epsilon = 0.75 * (seed / 256);
-    return sign * (1.0 + epsilon);
-}
-
-/**
- * Rotate bits of byte by digits.
- */
-function rotateBits(byte: number, digits: number): number {
-    digits = digits & 7;
-    return ((byte << digits) | (byte >> (8 - digits))) & 255;
+function randomWiggleSpeed(): number {
+    const sign = random.nextBoolean() ? 1 : -1;
+    const rand = random.nextFloat();
+    return sign * (0.7 + 0.8 * rand * rand);
 }

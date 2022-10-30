@@ -28,9 +28,11 @@ void main(void) {
     float s = min(1.0, d * 0.25);
     vOpacity = min(1.0, d * 0.375);
 
+    // wiggle
     float t0 = 10.0 * fract(0.23 * aPosition.x + 0.21 * aPosition.y);
     vec2 wiggle = 0.3 * s * vec2(cos(aWiggleParams.x * uTime + t0), sin(aWiggleParams.y * uTime + t0));
 
+    // position with attraction effect applied
     vec2 pos = (d < cMoveDist) ? mix(worldPosition, uAttractorPosition, 1.0 - s) : worldPosition;
 
     gl_Position = vec4(uTransform * vec3(pos + wiggle, 1.0), 1.0);

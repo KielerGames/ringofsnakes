@@ -3,7 +3,7 @@
 import type { GameConfig } from "../../data/config/GameConfig";
 import type { FoodChunkDTO } from "../../data/dto/FoodChunkDTO";
 import type { DecodeResult } from "./DecodeResult";
-import Random from "java-random";
+import Random from "../../util/Random";
 
 export const NUM_SKINS = 7;
 const FOOD_BYTE_SIZE = 3;

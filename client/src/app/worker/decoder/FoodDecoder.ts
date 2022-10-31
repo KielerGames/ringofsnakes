@@ -90,5 +90,5 @@ export function decode(
 function randomWiggleSpeed(): number {
     const sign = random.nextBoolean() ? 1 : -1;
     const rand = random.nextFloat();
-    return sign * (0.7 + 0.8 * rand * rand);
+    return sign * (0.75 + 0.85 * rand * rand);
 }

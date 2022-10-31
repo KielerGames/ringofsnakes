@@ -1,11 +1,6 @@
 /* eslint-disable no-bitwise */
-// Copied and adapted from https://github.com/raybellis/java-random.
-//
-// An almost complete implementation in JS of the `java.util.Random`
-// class from J2SE, designed to so far as possible produce the same
-// output sequences as the Java original when supplied with the same
-// seed.
-//
+// Copied and adapted from https://github.com/raybellis/java-random
+// which is based on Javas Random.
 
 const p2_16 = 0x0000000010000;
 const p2_24 = 0x0000001000000;
@@ -34,15 +29,15 @@ export default class Random {
         this.setSeed(seedval);
     }
 
-    nextBoolean() {
+    nextBoolean(): boolean {
         return this.#next(1) != 0;
     }
 
-    nextFloat() {
+    nextFloat(): number {
         return this.#next(24) / p2_24;
     }
 
-    nextDouble() {
+    nextDouble(): number {
         return (p2_27 * this.#next(26) + this.#next(27)) / p2_53;
     }
 
@@ -50,7 +45,7 @@ export default class Random {
      * 53-bit safe version of
      * seed = (seed * 0x5DEECE66DL + 0xBL) & ((1L << 48) - 1)
      */
-    #nextSeed() {
+    #nextSeed(): number {
         let carry = 0xb;
 
         let r0 = this.#s0 * c0 + carry;
@@ -73,10 +68,6 @@ export default class Random {
         return this.#nextSeed() >>> (32 - bits);
     }
 
-    #next_signed(bits: number) {
-        return this.#nextSeed() >> (32 - bits);
-    }
-
     /**
      * 53-bit safe version of
      * seed = (seed ^ 0x5DEECE66DL) & ((1L << 48) - 1)
@@ -88,7 +79,7 @@ export default class Random {
         this.#s2 = ((n / p2_32) & m2_16) ^ c2;
     }
 
-    #checkIsPositiveInt(n: number, r = Number.MAX_SAFE_INTEGER) {
+    #checkIsPositiveInt(n: number, r = Number.MAX_SAFE_INTEGER): void {
         if (n < 0 || n > r) {
             throw RangeError();
         }

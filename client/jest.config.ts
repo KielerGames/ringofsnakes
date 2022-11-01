@@ -1,7 +1,9 @@
-/** @type {import("ts-jest/dist/types").InitialOptionsTsJest} */
-module.exports = {
+import type { JestConfigWithTsJest } from "ts-jest";
+
+const config: JestConfigWithTsJest = {
     preset: "ts-jest",
     testEnvironment: "jsdom",
+    verbose: true,
     testMatch: ["**/test/**/*.test.ts"],
     testTimeout: 1000,
     clearMocks: true,
@@ -10,10 +12,8 @@ module.exports = {
         __TEST__: true,
         __VERSION__: "TEST VERSION"
     },
-    collectCoverageFrom: [
-        "**/src/app/**/*.{ts,tsx}",
-        "!**/test/**",
-        "!**/node_modules/**"
-    ],
+    collectCoverageFrom: ["**/src/app/**/*.{ts,tsx}", "!**/test/**", "!**/node_modules/**"],
     errorOnDeprecated: true
 };
+
+export default config;

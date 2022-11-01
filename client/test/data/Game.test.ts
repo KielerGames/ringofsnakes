@@ -17,6 +17,9 @@ jest.mock("comlink", () => ({
     proxy: (callback: () => void) => callback
 }));
 
+// jest >27 somehow fails to import/parse preact
+jest.mock("../../src/app/ui/Dialogs", () => ({}));
+
 async function updateGame(game: Game, dto: DataUpdateDTO): Promise<void> {
     const mock = RemoteMock.addEventListener.mock;
     expect(mock.calls[0][0]).toBe("serverUpdate");

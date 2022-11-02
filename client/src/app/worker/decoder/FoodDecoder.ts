@@ -6,8 +6,8 @@ import type { DecodeResult } from "./DecodeResult";
 import Random from "../../util/Random";
 
 export const NUM_SKINS = 7;
-const FOOD_BYTE_SIZE = 3;
-const FOOD_CHUNK_HEADER_SIZE = 4;
+export const FOOD_CHUNK_HEADER_SIZE = 4;
+export const FOOD_BYTE_SIZE = 3;
 const SIZE_BIT_OFFSET = 6;
 const COLOR_BIT_MASK = (1 << SIZE_BIT_OFFSET) - 1;
 const FOOD_SIZES = [0.64, 1.0, 1.5];

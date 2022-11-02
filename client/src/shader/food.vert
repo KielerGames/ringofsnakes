@@ -4,7 +4,7 @@ precision mediump float;
 
 in vec2 aPosition;
 in vec2 aLocalPos;
-in vec2 aWiggleParams;
+in vec3 aWiggleParams;
 in int aColorIndex;
 in float aSize;
 
@@ -28,14 +28,14 @@ void main(void) {
 
     // wiggle
     float t0 = 10.0 * fract(0.23 * aPosition.x + 0.21 * aPosition.y);
-    vec2 wiggle = 0.3 * s * vec2(cos(aWiggleParams.x * uTime + t0), sin(aWiggleParams.y * uTime + t0));
-    float wa = 2.5 * dot(wiggle, wiggle);
+    vec2 wiggle = 0.275 * s * vec2(cos(aWiggleParams.x * uTime + t0), sin(aWiggleParams.y * uTime + t0));
 
     // change opacity based on distance to attractor
     vOpacity = min(1.0, d * 0.375);
 
     // position with scale based on wiggle amount
-    vec2 pos = aPosition + (1.0 - wa * wa) * aSize * aLocalPos;
+    float ws = 1.0 + 0.11 * s * cos(1.75 * aWiggleParams.z * uTime + t0);
+    vec2 pos = aPosition + ws * aSize * aLocalPos;
 
     // apply attraction effect
     pos = (d < 7.5) ? mix(pos, uAttractorPosition, 1.0 - s) : pos;

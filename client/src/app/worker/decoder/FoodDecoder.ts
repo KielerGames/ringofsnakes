@@ -13,7 +13,7 @@ const COLOR_BIT_MASK = (1 << SIZE_BIT_OFFSET) - 1;
 const FOOD_SIZES = [0.64, 1.0, 1.5];
 const VERTEX_BYTE_SIZE =
     2 * Float32Array.BYTES_PER_ELEMENT + // position (x,y),
-    2 * Float32Array.BYTES_PER_ELEMENT + // wiggle parameters,
+    3 * Float32Array.BYTES_PER_ELEMENT + // wiggle parameters,
     Float32Array.BYTES_PER_ELEMENT + // size,
     Int32Array.BYTES_PER_ELEMENT; // color
 
@@ -67,8 +67,9 @@ export function decode(
         encView.setFloat32(vbOffset + 4, y, true);
         encView.setFloat32(vbOffset + 8, randomWiggleSpeed(), true);
         encView.setFloat32(vbOffset + 12, randomWiggleSpeed(), true);
-        encView.setFloat32(vbOffset + 16, size, true);
-        encView.setInt32(vbOffset + 20, color % NUM_SKINS, true);
+        encView.setFloat32(vbOffset + 16, randomWiggleSpeed(), true);
+        encView.setFloat32(vbOffset + 20, size, true);
+        encView.setInt32(vbOffset + 24, color % NUM_SKINS, true);
     }
 
     return {

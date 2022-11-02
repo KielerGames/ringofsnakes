@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v3.0.2
 
       - name: Set up JDK
-        uses: actions/setup-java@v3.5.1
+        uses: actions/setup-java@v3.6.0
         with:
           java-version: 17
           distribution: temurin
@@ -42,7 +42,7 @@ jobs:
         working-directory: server
 
       - name: Upload Uber Jar
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: server-uber-jar
           path: server/snake-server-*.jar
@@ -63,7 +63,7 @@ jobs:
         run: mv snake-server-*.jar snake-server.jar
 
       - name: Initialize SSH
-        uses: kielabokkie/ssh-key-and-known-hosts-action@v1.3.0
+        uses: kielabokkie/ssh-key-and-known-hosts-action@v1.3.5
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
           ssh-host: ${{ secrets.DEPLOY_SERVER }}

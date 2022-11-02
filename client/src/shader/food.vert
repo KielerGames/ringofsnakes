@@ -17,23 +17,28 @@ out vec2 vPos;
 flat out lowp vec3 vColor;
 out lowp float vOpacity;
 
-const float cMoveDist = 7.5;
-
 void main(void) {
     vPos = aLocalPos;
     vec2 worldPosition = aPosition + aSize * aLocalPos;
     vColor = texelFetch(uColorSampler, ivec2(aColorIndex, 1), 0).rgb;
 
+    // distance factors
     float d = distance(worldPosition, uAttractorPosition);
     float s = min(1.0, d * 0.25);
-    vOpacity = min(1.0, d * 0.375);
 
     // wiggle
     float t0 = 10.0 * fract(0.23 * aPosition.x + 0.21 * aPosition.y);
     vec2 wiggle = 0.3 * s * vec2(cos(aWiggleParams.x * uTime + t0), sin(aWiggleParams.y * uTime + t0));
+    float wa = 2.5 * dot(wiggle, wiggle);
 
-    // position with attraction effect applied
-    vec2 pos = (d < cMoveDist) ? mix(worldPosition, uAttractorPosition, 1.0 - s) : worldPosition;
+    // change opacity based on distance to attractor
+    vOpacity = min(1.0, d * 0.375);
+
+    // position with scale based on wiggle amount
+    vec2 pos = aPosition + (1.0 - wa * wa) * aSize * aLocalPos;
+
+    // apply attraction effect
+    pos = (d < 7.5) ? mix(pos, uAttractorPosition, 1.0 - s) : pos;
 
     gl_Position = vec4(uTransform * vec3(pos + wiggle, 1.0), 1.0);
 }

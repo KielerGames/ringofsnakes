@@ -8,7 +8,7 @@ export function initTexture(
     slot: number,
     options: Partial<TextureOptions>,
     initializer?: TextureInitializer
-): TextureInfo {
+): WebGLTexture {
     assert(slot >= 0);
     const gl = WebGLContextProvider.getContext();
 
@@ -38,10 +38,7 @@ export function initTexture(
     gl.activeTexture(WebGL2RenderingContext.TEXTURE0 + slot);
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    return {
-        slot,
-        texture
-    };
+    return texture;
 }
 
 export function bindAllTextures(): void {
@@ -67,11 +64,6 @@ type TextureOptions = {
     wrap: number;
     minFilter: number;
     magFilter: number;
-};
-
-type TextureInfo = {
-    slot: number;
-    texture: WebGLTexture;
 };
 
 type TextureInitializer = (gl: WebGL2RenderingContext, texture: WebGLTexture, slot: number) => void;

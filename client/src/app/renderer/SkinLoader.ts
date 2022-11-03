@@ -2,7 +2,7 @@ import WebGLShaderProgram from "./webgl/WebGLShaderProgram";
 import * as Skins from "../data/misc/Skins";
 import * as WebGLContextProvider from "./webgl/WebGLContextProvider";
 import { rgb2rgbaf } from "../util/ColorUtils";
-import { initTextureSlot } from "./webgl/TextureManager";
+import * as TextureManager from "./webgl/TextureManager";
 
 const skinTextureData: Uint8Array = (() => {
     const skins = Skins.getAllSkins();
@@ -29,7 +29,7 @@ const skinTextureData: Uint8Array = (() => {
 export async function init(): Promise<void> {
     const gl = await WebGLContextProvider.waitForContext();
 
-    await initTextureSlot(
+    TextureManager.initTexture(
         0,
         {
             wrap: gl.CLAMP_TO_EDGE,

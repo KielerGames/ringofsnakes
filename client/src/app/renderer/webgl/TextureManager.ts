@@ -4,11 +4,11 @@ import * as WebGLContextProvider from "./WebGLContextProvider";
 
 const textures: Map<number, WebGLTexture> = new Map();
 
-export async function initTextureSlot(
+export function initTexture(
     slot: number,
     options: Partial<TextureOptions>,
     initializer?: TextureInitializer
-): Promise<TextureInfo> {
+): TextureInfo {
     assert(slot >= 0);
     const gl = WebGLContextProvider.getContext();
 
@@ -32,7 +32,7 @@ export async function initTextureSlot(
     }
 
     if (initializer) {
-        await initializer(gl, texture, slot);
+        initializer(gl, texture, slot);
     }
 
     gl.activeTexture(WebGL2RenderingContext.TEXTURE0 + slot);
@@ -74,8 +74,4 @@ type TextureInfo = {
     texture: WebGLTexture;
 };
 
-type TextureInitializer = (
-    gl: WebGL2RenderingContext,
-    texture: WebGLTexture,
-    slot: number
-) => Promise<void> | void;
+type TextureInitializer = (gl: WebGL2RenderingContext, texture: WebGLTexture, slot: number) => void;

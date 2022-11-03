@@ -21,15 +21,14 @@ let basicMaterialShader: WebGLShaderProgram;
         "aNormalOffset",
         "aRelativePathOffset"
     ]);
-    await TextureManager.initTextureSlot(
+    const image = await TextureManager.loadImage("assets/scales.svg", 256, 256);
+    TextureManager.initTexture(
         1,
         {
             wrap: WebGL2RenderingContext.REPEAT,
             minFilter: WebGL2RenderingContext.LINEAR
         },
-        async (gl, texture) => {
-            const image = await TextureManager.loadImage("assets/scales.svg", 256, 256);
-            gl.bindTexture(gl.TEXTURE_2D, texture);
+        (gl) => {
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
             gl.generateMipmap(gl.TEXTURE_2D);
         }
@@ -43,7 +42,7 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
     shader.use((gl) => {
         shader.setUniform("uTransform", transform.data);
         shader.setUniform("uColorSampler", 0);
-        shader.setUniform("uScalesTexture", 1)
+        shader.setUniform("uScalesTexture", 1);
 
         for (const snake of game.snakes.values()) {
             if (!snake.hasChunks()) {

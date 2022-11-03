@@ -20,14 +20,15 @@ out vec4 outputColor;
 void main(void) {
 	vec3 skinColor = texelFetch(uColorSampler, ivec2(uSkin, 0), 0).rgb;
 	vec3 darkColor = mix(skinColor, darkGrey, 0.5);
-	float texColor = texture(uScalesTexture, 0.5 * vec2(vScaleSize * vNormalOffset, 0.9 * vPathOffset)).r;
+	float texColor = texture(uScalesTexture, vScaleSize * vec2(vNormalOffset, vPathOffset)).r;
 
-	float co = abs(vNormalOffset);
-	co = co * co;
-
+	skinColor = skinColor + uSnakeFast * fastColorBoost;
 	skinColor = (0.3 + 0.7 * texColor) * skinColor;
 
-	vec3 color = mix(skinColor + uSnakeFast * fastColorBoost, darkColor, co);
+	// brightness falloff towards the edge
+	float co = abs(vNormalOffset);
+	co = co * co;
+	vec3 color = mix(skinColor, darkColor, co);
 
 	outputColor = vec4(color, vPathOffset < uSnakeLength ? 1.0 : 0.0);
 }

@@ -9,8 +9,8 @@
     "private": true,
     "scripts": {
         "test": "jest --maxWorkers=1",
-        "pack:shaders:dev": "node pack-shaders.js",
-        "pack:shaders": "node pack-shaders.js --minify",
+        "pack:shaders:dev": "node scripts/pack-shaders.js",
+        "pack:shaders": "node scripts/pack-shaders.js --minify",
         "build:js": "webpack --progress",
         "build:js:watch": "webpack --watch",
         "build": "npm run pack:shaders:dev && npm run build:js",

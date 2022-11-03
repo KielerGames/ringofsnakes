@@ -43,5 +43,6 @@ function minifyShaderCode(shaderCode) {
         .replace(/\/\*[\s\S]*?\*\//g, "") // Remove multiline comments
         .replace(/\/\/[^\n]*/g, "\n") // Remove single line comments
         .replace(/;[\s\n]+/g, ";") // Remove unnecessary whitespaces and line breaks
-        .replace(/\{[\s\n]+/g, "{"); // Remove unnecessary whitespaces and line breaks
+        .replace(/\{[\s\n]+/g, "{") // Remove unnecessary whitespaces and line breaks
+        .replace(/\n+/g, "\n"); // Collapse multiple new lines
 }

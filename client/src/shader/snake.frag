@@ -3,6 +3,7 @@
 precision mediump float;
 
 uniform sampler2D uColorSampler;
+uniform sampler2D uScalesTexture;
 uniform lowp int uSkin;
 uniform highp float uSnakeLength;
 uniform lowp float uSnakeFast;
@@ -18,10 +19,10 @@ out vec4 outputColor;
 void main(void) {
 	vec3 skinColor = texelFetch(uColorSampler, ivec2(uSkin, 0), 0).rgb;
 	vec3 darkColor = mix(skinColor, darkGrey, 0.5);
+	float textureColor = texture(uScalesTexture, vec2(4.0 * vNormalOffset, vPathOffset)).b;
 
 	float co = abs(vNormalOffset);
-	co = co * co;
-	co = co * (1.0 + 0.25*sin(2.0*vPathOffset));
+	co = co * co * clamp(textureColor, 0.9, 1.0);
 
 	vec3 color = mix(skinColor + uSnakeFast * fastColorBoost, darkColor, co);
 

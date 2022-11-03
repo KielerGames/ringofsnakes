@@ -18,7 +18,8 @@
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\"",
         "lint": "eslint ./src/app --ext .ts,.tsx",
         "check:format": "prettier --check --no-color \"src/**/*.ts\" \"src/**/*.tsx\"",
-        "coverage": "jest --maxWorkers=1 --coverage"
+        "coverage": "jest --maxWorkers=1 --coverage",
+        "copy:assets": "node scripts/copy-assets.mjs"
     },
     "author": "KielerGames",
     "devDependencies": {

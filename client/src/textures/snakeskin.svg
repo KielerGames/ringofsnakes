@@ -15,8 +15,6 @@
         </g>
     </defs>
 
-    <rect width="100%" height="100%" fill="pink" />
-
     <use href="#scales-row" x="-10" y="60"/>
     <use href="#scales-row" x="0" y="40"/>
     <use href="#scales-row" x="-10" y="20"/>

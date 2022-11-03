@@ -20,14 +20,14 @@ export async function initTextureSlot(
     textures.set(slot, texture);
 
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    if (options.wrap) {
+    if (options.wrap !== undefined) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, options.wrap);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, options.wrap);
     }
-    if (options.minFilter) {
+    if (options.minFilter !== undefined) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, options.minFilter);
     }
-    if (options.magFilter) {
+    if (options.magFilter !== undefined) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, options.magFilter);
     }
 

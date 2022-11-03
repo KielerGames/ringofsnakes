@@ -15,6 +15,7 @@ uniform highp float uSnakeThinningStart;
 
 out highp float vPathOffset;
 out float vNormalOffset;
+flat out float vScaleSize;
 
 void main(void) {
     vNormalOffset = aNormalOffset;
@@ -25,6 +26,8 @@ void main(void) {
     // thinning parameter t: 0 -> full width, 1 -> zero width
     float t = min(1.0, max(0.0, vPathOffset - uSnakeThinningStart) / (uSnakeLength - uSnakeThinningStart));
     float u = (aRelativePathOffset < 0.0) ? 0.9 : 1.0 - (t * t * t);
+
+    vScaleSize = sqrt(uSnakeMaxWidth);
 
     float size = 0.5 * u * uSnakeMaxWidth;
     vec2 position = aPosition + (aNormalOffset * size) * aNormal;

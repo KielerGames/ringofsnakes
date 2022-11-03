@@ -27,7 +27,7 @@ void main(void) {
     float t = min(1.0, max(0.0, vPathOffset - uSnakeThinningStart) / (uSnakeLength - uSnakeThinningStart));
     float u = (aRelativePathOffset < 0.0) ? 0.9 : 1.0 - (t * t * t);
 
-    vScaleSize = 0.64 * sqrt(uSnakeMaxWidth);
+    vScaleSize = 0.6 * sqrt(uSnakeMaxWidth);
 
     float size = 0.5 * u * uSnakeMaxWidth;
     vec2 position = aPosition + (aNormalOffset * size) * aNormal;

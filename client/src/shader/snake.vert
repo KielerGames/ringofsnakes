@@ -15,7 +15,7 @@ uniform highp float uSnakeThinningStart;
 
 out highp float vPathOffset;
 out float vNormalOffset;
-flat out float vScaleSize;
+flat out float vInvTexScale;
 
 void main(void) {
     vNormalOffset = aNormalOffset;
@@ -27,7 +27,8 @@ void main(void) {
     float t = min(1.0, max(0.0, vPathOffset - uSnakeThinningStart) / (uSnakeLength - uSnakeThinningStart));
     float u = (aRelativePathOffset < 0.0) ? 0.9 : 1.0 - (t * t * t);
 
-    vScaleSize = 0.6 * sqrt(uSnakeMaxWidth);
+    vInvTexScale = 0.7928 - uSnakeMaxWidth * 0.0428;
+    // maps 1.0 -> 0.75, 8.0 -> 0.45 (found by trying different values)
 
     float size = 0.5 * u * uSnakeMaxWidth;
     vec2 position = aPosition + (aNormalOffset * size) * aNormal;

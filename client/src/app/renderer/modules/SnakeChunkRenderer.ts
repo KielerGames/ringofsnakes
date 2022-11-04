@@ -21,7 +21,7 @@ let basicMaterialShader: WebGLShaderProgram;
         "aNormalOffset",
         "aRelativePathOffset"
     ]);
-    const image = await TextureManager.loadImage("assets/scales.svg", 256, 256);
+    const image = await TextureManager.loadImage("assets/scales.svg", 128, 128);
     TextureManager.initTexture(
         1,
         {

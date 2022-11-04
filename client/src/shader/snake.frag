@@ -25,7 +25,6 @@ void main(void) {
 	vec2 uv = vInvTexScale * vec2(vNormalOffset * uSnakeMaxWidth, vPathOffset);
 	vec3 texData = texture(uScalesTexture, uv).rgb;
 
-	// TODO: clamp skinColor vector components
 	skinColor = skinColor + uSnakeFast * fastColorBoost;
 	skinColor = (0.25 + 0.75 * texData.r) * skinColor + 0.85 * (1.0 - abs(vNormalOffset)) * texData.b;
 

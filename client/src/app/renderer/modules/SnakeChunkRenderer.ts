@@ -21,12 +21,14 @@ let basicMaterialShader: WebGLShaderProgram;
         "aNormalOffset",
         "aRelativePathOffset"
     ]);
+
+    const GL2 = WebGL2RenderingContext;
     const image = await TextureManager.loadImage("assets/scales.svg", 128, 128);
     TextureManager.initTexture(
         1,
         {
-            wrap: WebGL2RenderingContext.REPEAT,
-            minFilter: WebGL2RenderingContext.LINEAR_MIPMAP_LINEAR
+            wrap: GL2.REPEAT,
+            minFilter: GL2.LINEAR_MIPMAP_LINEAR
         },
         (gl) => {
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);

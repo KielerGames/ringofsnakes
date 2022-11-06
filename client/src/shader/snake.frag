@@ -22,7 +22,7 @@ void main(void) {
 	vec3 skinColor = texelFetch(uColorSampler, ivec2(uSkin, 0), 0).rgb;
 	vec3 darkColor = mix(skinColor, darkGrey, 0.64);
 	
-	vec2 uv = vInvTexScale * vec2(vNormalOffset * uSnakeMaxWidth, vPathOffset);
+	vec2 uv = vInvTexScale * vec2(vNormalOffset * uSnakeMaxWidth, 1.25 * vPathOffset);
 	vec3 texData = texture(uScalesTexture, uv).rgb;
 
 	// brighten skin color if snake is boosting

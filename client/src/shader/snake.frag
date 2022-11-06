@@ -25,8 +25,12 @@ void main(void) {
 	vec2 uv = vInvTexScale * vec2(vNormalOffset * uSnakeMaxWidth, vPathOffset);
 	vec3 texData = texture(uScalesTexture, uv).rgb;
 
+	// brighten skin color if snake is boosting
 	skinColor = skinColor + uSnakeFast * fastColorBoost;
-	skinColor = (0.25 + 0.75 * texData.r) * skinColor + 0.85 * (1.0 - abs(vNormalOffset)) * texData.b;
+	// darken skin color using the red channel
+	skinColor = (0.25 + 0.75 * texData.r) * skinColor;
+	// brighten skin color using the blue channel
+	skinColor = skinColor + 0.85 * (1.0 - abs(vNormalOffset)) * texData.b;
 
 	// brightness falloff towards the edge
 	float co = vNormalOffset * vNormalOffset;

@@ -45,8 +45,13 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
                 continue;
             }
 
+            shader.setUniform("uTime", chunk.age);
+
             setupChunkBuffer(gl, chunk);
-            shader.useAttributesForInstancedDrawing(["aPosition", "aSize", "aColorIndex"], 1);
+            shader.useAttributesForInstancedDrawing(
+                ["aPosition", "aWiggleParams", "aSize", "aColorIndex"],
+                1
+            );
 
             shader.run(BOX_COORDS.length / 2, {
                 instances: chunk.length

@@ -1,13 +1,14 @@
 import type { ReadonlyMatrix } from "../../math/Matrix";
+import type SnakeChunk from "../../data/snake/SnakeChunk";
+import type Game from "../../data/Game";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import * as BoxRenderer from "./BoxRenderer";
 import * as TextRenderer from "./TextRenderer";
 import * as SkinLoader from "../SkinLoader";
-import Game from "../../data/Game";
 import Vector from "../../math/Vector";
 import { compileShader } from "../webgl/ShaderLoader";
-import type SnakeChunk from "../../data/snake/SnakeChunk";
+import * as TextureManager from "../webgl/TextureManager";
 
 const finalChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
 const growingChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
@@ -20,6 +21,20 @@ let basicMaterialShader: WebGLShaderProgram;
         "aNormalOffset",
         "aRelativePathOffset"
     ]);
+
+    const GL2 = WebGL2RenderingContext;
+    const image = await TextureManager.loadImage("assets/scales.svg", 128, 128);
+    TextureManager.initTexture(
+        1,
+        {
+            wrap: GL2.REPEAT,
+            minFilter: GL2.LINEAR_MIPMAP_LINEAR
+        },
+        (gl) => {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+            gl.generateMipmap(gl.TEXTURE_2D);
+        }
+    );
 })();
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
@@ -29,6 +44,7 @@ export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
     shader.use((gl) => {
         shader.setUniform("uTransform", transform.data);
         shader.setUniform("uColorSampler", 0);
+        shader.setUniform("uScalesTexture", 1);
 
         for (const snake of game.snakes.values()) {
             if (!snake.hasChunks()) {

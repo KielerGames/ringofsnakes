@@ -24,8 +24,6 @@ export function render(game: Readonly<Game>): void {
     // compute transform matrix once
     const transform = game.camera.transformMatrix;
 
-    SkinLoader.setSkinTexture();
-
     // render parts
     FoodRenderer.render(game, transform);
     SnakeChunkRenderer.render(game, transform);
@@ -38,3 +36,5 @@ export function render(game: Readonly<Game>): void {
     TextRenderer.renderAll();
     HeatMapRenderer.render(game);
 }
+
+SkinLoader.init();

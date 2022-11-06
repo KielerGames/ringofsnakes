@@ -4,6 +4,7 @@ import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import Vector from "../../math/Vector";
 import Matrix from "../../math/Matrix";
 import { compileShader } from "../webgl/ShaderLoader";
+import * as TextureManager from "../webgl/TextureManager";
 
 const transform = new Matrix(true);
 let shaderProgram: WebGLShaderProgram;
@@ -29,8 +30,17 @@ const heatMapSize = 128;
     shaderProgram = await compileShader("heatmap");
     shaderProgram.setFixedBuffer(boxCoords.buffer);
 
-    texture1 = createTexture(gl);
-    texture2 = createTexture(gl);
+    texture1 = TextureManager.initTexture(2, {
+        wrap: gl.CLAMP_TO_EDGE,
+        minFilter: gl.LINEAR,
+        magFilter: gl.LINEAR
+    });
+
+    texture2 = TextureManager.initTexture(3, {
+        wrap: gl.CLAMP_TO_EDGE,
+        minFilter: gl.LINEAR,
+        magFilter: gl.LINEAR
+    });
 
     if (__DEBUG__) {
         console.info(`HeatMapRenderer initialized.`);
@@ -70,17 +80,6 @@ function worldToMapCoordinates(game: Readonly<Game>, worldPosition: Vector): [nu
     const width = cc.columns * cc.size;
     const height = cc.rows * cc.size;
     return [(0.5 * width + worldPosition.x) / width, (0.5 * height + worldPosition.y) / height];
-}
-
-function createTexture(gl: WebGL2RenderingContext): WebGLTexture {
-    const texture = gl.createTexture()!;
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-    return texture;
 }
 
 function manageData(gl: WebGL2RenderingContext, game: Readonly<Game>): void {

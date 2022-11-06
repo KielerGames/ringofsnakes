@@ -1,8 +1,8 @@
 import WebGLShaderProgram from "./webgl/WebGLShaderProgram";
 import * as Skins from "../data/misc/Skins";
 import * as WebGLContextProvider from "./webgl/WebGLContextProvider";
-import assert from "../util/assert";
 import { rgb2rgbaf } from "../util/ColorUtils";
+import * as TextureManager from "./webgl/TextureManager";
 
 const skinTextureData: Uint8Array = (() => {
     const skins = Skins.getAllSkins();
@@ -26,42 +26,34 @@ const skinTextureData: Uint8Array = (() => {
     return data;
 })();
 
-let texture: WebGLTexture;
-
-(async () => {
+export async function init(): Promise<void> {
     const gl = await WebGLContextProvider.waitForContext();
 
-    texture = gl.createTexture()!;
-    assert(texture !== null, "Failed to create texture.");
-
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-    // I do not know why but for textures
-    // with height > 1 RGB does not work
-    const format = gl.RGBA;
-
-    gl.texImage2D(
-        gl.TEXTURE_2D,
-        0, // mipmap level
-        format,
-        Skins.getAllSkins().length, // width
-        2, // height
+    TextureManager.initTexture(
         0,
-        format,
-        gl.UNSIGNED_BYTE,
-        skinTextureData
-    );
-})();
+        {
+            wrap: gl.CLAMP_TO_EDGE,
+            minFilter: gl.NEAREST,
+            magFilter: gl.NEAREST
+        },
+        (gl) => {
+            // I do not know why but for textures
+            // with height > 1 RGB does not work
+            const format = gl.RGBA;
 
-export function setSkinTexture(): void {
-    const gl = WebGLContextProvider.getContext();
-    const slot = WebGL2RenderingContext.TEXTURE0;
-    gl.activeTexture(slot);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(
+                gl.TEXTURE_2D,
+                0, // mipmap level
+                format,
+                Skins.getAllSkins().length, // width
+                2, // height
+                0,
+                format,
+                gl.UNSIGNED_BYTE,
+                skinTextureData
+            );
+        }
+    );
 }
 
 export function setColor(shader: WebGLShaderProgram, uniform: string, skinId: number): void {

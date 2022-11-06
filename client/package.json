@@ -1,6 +1,6 @@
 {
     "name": "ringofsnakes-client",
-    "version": "0.12.0",
+    "version": "0.13.0",
     "description": "",
     "repository": {
         "type": "git",
@@ -9,16 +9,17 @@
     "private": true,
     "scripts": {
         "test": "jest --maxWorkers=1",
-        "pack:shaders:dev": "node pack-shaders.js",
-        "pack:shaders": "node pack-shaders.js --minify",
+        "pack:shaders:dev": "node scripts/pack-shaders.js",
+        "pack:shaders": "node scripts/pack-shaders.js --minify",
         "build:js": "webpack --progress",
         "build:js:watch": "webpack --watch",
-        "build": "npm run pack:shaders:dev && npm run build:js",
-        "build:production": "npm run pack:shaders && webpack --mode=production",
+        "build": "npm run pack:shaders:dev && npm run copy:assets && npm run build:js",
+        "build:production": "npm run pack:shaders && npm run copy:assets && webpack --mode=production",
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\"",
         "lint": "eslint ./src/app --ext .ts,.tsx",
         "check:format": "prettier --check --no-color \"src/**/*.ts\" \"src/**/*.tsx\"",
-        "coverage": "jest --maxWorkers=1 --coverage"
+        "coverage": "jest --maxWorkers=1 --coverage",
+        "copy:assets": "node scripts/copy-assets.mjs"
     },
     "author": "KielerGames",
     "devDependencies": {
@@ -37,6 +38,7 @@
         "prettier": "^2.7.1",
         "rand-seed": "^1.0.2",
         "style-loader": "^3.3.1",
+        "svgo": "^3.0.0",
         "ts-jest": "^29.0.3",
         "ts-loader": "^9.4.1",
         "ts-node": "^10.9.1",

@@ -19,7 +19,9 @@ export function initTexture(
     const texture = requireNonNull(gl.createTexture(), `Failed to create texture ${slot}.`);
     textures.set(slot, texture);
 
+    gl.activeTexture(WebGL2RenderingContext.TEXTURE0 + slot);
     gl.bindTexture(gl.TEXTURE_2D, texture);
+
     if (options.wrap !== undefined) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, options.wrap);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, options.wrap);
@@ -35,20 +37,7 @@ export function initTexture(
         initializer(gl, texture, slot);
     }
 
-    gl.activeTexture(WebGL2RenderingContext.TEXTURE0 + slot);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
     return texture;
-}
-
-export function bindAllTextures(): void {
-    // TODO: why is this required
-    const gl = WebGLContextProvider.getContext();
-
-    for (const [slot, texture] of textures.entries()) {
-        gl.activeTexture(WebGL2RenderingContext.TEXTURE0 + slot);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-    }
 }
 
 export function loadImage(url: string, width?: number, height?: number): Promise<HTMLImageElement> {

@@ -224,7 +224,9 @@ export default class Game {
                 chunk.junk || (!chunk.couldBeVisible(camera, safeDist) && chunk.clientAge > 1.0)
         );
 
-        this.foodChunks.removeIf((chunk) => !chunk.isVisible(camera, safeDist) && chunk.age > 1.0);
+        this.foodChunks.removeIf(
+            (chunk) => !chunk.isVisible(camera, safeDist) && chunk.timeSinceLastUpdate > 1.0
+        );
 
         this.snakes.removeIf(
             (snake) =>

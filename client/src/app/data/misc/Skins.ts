@@ -1,7 +1,3 @@
-/**
- * Careful with imports, this file is also part of the worker.
- */
-
 type Color = [number, number, number];
 
 type Skin = Readonly<{
@@ -47,16 +43,10 @@ const skins: Skin[] = [
     }
 ];
 
-const numberOfSkins = skins.length;
-
 export function getSkin(idx: number): Skin {
     return skins[idx % skins.length];
 }
 
 export function getAllSkins(): Readonly<Skin[]> {
     return skins;
-}
-
-export function getNumberOfSkins(): number {
-    return numberOfSkins;
 }

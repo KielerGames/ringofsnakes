@@ -14,21 +14,21 @@ let textureMix = 0.0;
 let texture1IsCurrent: boolean = true;
 let lastTextureData: Uint8Array | null = null;
 
-// prettier-ignore
-const boxCoords = new Float32Array([
-    0.0, 1.0, // top-left
-    1.0, 1.0, // top-right
-    0.0, 0.0, // bottom-left
-    1.0, 0.0  // bottom-right
-]);
-
 const heatMapSize = 128;
 
 (async () => {
     const gl = await WebGLContextProvider.waitForContext();
 
     shaderProgram = await compileShader("heatmap");
-    shaderProgram.setFixedBuffer(boxCoords.buffer);
+    shaderProgram.setFixedBuffer(
+        // prettier-ignore
+        new Float32Array([
+        0.0, 1.0, // top-left
+        1.0, 1.0, // top-right
+        0.0, 0.0, // bottom-left
+        1.0, 0.0  // bottom-right
+        ]).buffer
+    );
 
     texture1 = TextureManager.initTexture(2, {
         wrap: gl.CLAMP_TO_EDGE,

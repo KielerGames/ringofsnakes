@@ -4,14 +4,13 @@ precision mediump float;
 
 in vec2 aPosition;
 
-out vec2 vUV;
+uniform mat3 uInvTransform;
 
-uniform mat3 uTransform;
+out vec2 vUV;
 
 void main(void) {
     vec3 sc = vec3(2.0 * aPosition - vec2(1.0, 1.0), 1.0);
-    // TODO: compute inverse once
-    vec3 wc = inverse(uTransform) * sc;
+    vec3 wc = uInvTransform * sc;
 
 
     vUV = 0.42 * wc.xy;

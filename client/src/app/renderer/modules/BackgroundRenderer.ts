@@ -3,14 +3,18 @@ import { compileShader } from "../webgl/ShaderLoader";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
 import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import * as TextureManager from "../webgl/TextureManager";
+import Matrix from "../../math/Matrix";
 
 let shaderProgram: WebGLShaderProgram;
 const textureSlot = 4;
+const invTransform = new Matrix(false);
 
 export function render(transform: ReadonlyMatrix): void {
+    Matrix.inverse(transform, invTransform);
+
     shaderProgram.use((gl) => {
         shaderProgram.setUniform("uTexture", textureSlot);
-        shaderProgram.setUniform("uTransform", transform.data);
+        shaderProgram.setUniform("uInvTransform", invTransform.data);
 
         shaderProgram.run(4, { mode: gl.TRIANGLE_STRIP });
     });

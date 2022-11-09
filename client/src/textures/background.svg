@@ -1,0 +1,51 @@
+<svg version="1.1" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <g id="row-a">
+            <rect x="0" y="0" width="16" height="16" fill="#111" />
+            <rect x="16" y="0" width="16" height="16" fill="#1e1e1e" />
+            <rect x="32" y="0" width="16" height="16" fill="#111" />
+            <rect x="48" y="0" width="16" height="16" fill="#1e1e1e" />
+        </g>
+        <g id="row-b">
+            <rect x="0" y="0" width="16" height="16" fill="#1e1e1e" />
+            <rect x="16" y="0" width="16" height="16" fill="#111" />
+            <rect x="32" y="0" width="16" height="16" fill="#1e1e1e" />
+            <rect x="48" y="0" width="16" height="16" fill="#111" />
+        </g>
+        <g id="corner-a" fill="#111">
+            <path d="
+                M 0,4
+                c 0,-4, 4,-4, 4,-4
+                l -4,-4
+                c 0,4, -4,4, -4, 4
+                " />
+        </g>
+        <g id="corner-b" fill="#1e1e1e">
+            <path d="
+                M 0,4
+                c 0,-4, 4,-4, 4,-4
+                l -4,-4
+                c 0,4, -4,4, -4, 4
+                " 
+                transform="rotate(90)"/>
+        </g>
+    </defs>
+    <g transform="rotate(45) scale(1.41421)">
+        <use href="#row-a" x="0" y="0"/>
+        <use href="#row-b" x="0" y="16"/>
+        <use href="#row-a" x="0" y="-32"/>
+        <use href="#row-b" x="0" y="-16"/>
+
+        <use href="#corner-a" x="16" y="0"/>
+        <use href="#corner-a" x="32" y="-16"/>
+        <use href="#corner-a" x="0" y="-32" transform="rotate(90)"/>
+        <use href="#corner-a" x="16" y="-16" transform="rotate(90)"/>
+        <use href="#corner-a" x="-16" y="-48" transform="rotate(90)"/>
+
+        <use href="#corner-b" x="32" y="16"/>
+        <use href="#corner-b" x="48" y="0"/>
+        <use href="#corner-b" x="-16" y="-16" transform="rotate(90)"/>
+        <use href="#corner-b" x="16" y="-48" transform="rotate(90)"/>
+    </g>
+    
+</svg>

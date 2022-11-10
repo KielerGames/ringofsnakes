@@ -15,5 +15,5 @@ void main(void) {
 
     // convert back to world coordinates
     vec3 wc = uInvTransform * sc;
-    vUV = 0.1 * wc.xy;
+    vUV = 0.08 * wc.xy;
 }

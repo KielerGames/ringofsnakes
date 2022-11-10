@@ -1,11 +1,17 @@
 <svg version="1.1" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <g id="a" transform="rotate(45) scale(0.7071)">
-            <rect x="8" y="-8" width="16" height="16" fill="#111"/>
-            <rect x="10" y="-6" width="12" height="12" stroke="#191919" fill="none" />
+            <rect x="8" y="-8" width="16" height="16" fill="#0e0e0e"/>
+            <rect x="10" y="-6" width="12" height="12" stroke="#191919" fill="#101010" />
         </g>
         <g id="b" transform="rotate(45) scale(0.7071)">
-            <rect x="10" y="-6" width="12" height="12" stroke="#101010" fill="none" />
+            <rect x="10" y="-6" width="12" height="12" fill="none" stroke="#0d0d0d"/>
+        </g>
+        <g id="c" transform="rotate(45) scale(0.7071)">
+            <rect x="9" y="-7" width="14" height="14" fill="#121212" stroke="#232323" stroke-width="2" />
+        </g>
+        <g id="d" transform="rotate(45) scale(0.7071)">
+            <rect x="10" y="-6" width="12" height="12" fill="#0c0c0c" stroke="#0c0c0c"/>
         </g>
         <g id="row-a">
             <use href="#a" x="0" y="0"/>
@@ -14,11 +20,11 @@
             <use href="#a" x="48" y="0"/>
         </g>
         <g id="row-b">
-            <use href="#b" x="-8" y="0"/>
-            <use href="#b" x="8" y="0"/>
-            <use href="#b" x="24" y="0"/>
-            <use href="#b" x="40" y="0"/>
-            <use href="#b" x="56" y="0"/>
+            <use href="#b" x="-8" y="0"  />
+            <use href="#b" x="8" y="0" stroke="#101010"/>
+            <use href="#b" x="24" y="0" stroke="#101010"/>
+            <use href="#b" x="40" y="0" stroke="#101010"/>
+            <use href="#b" x="56" y="0" stroke="#101010"/>
         </g>
     </defs>
     
@@ -34,4 +40,10 @@
     <use href="#row-b" y="24"/>
     <use href="#row-b" y="40"/>
     <use href="#row-b" y="56"/>
+
+    <use href="#c" x="8" y="8" />
+    <use href="#c" x="40" y="8" />
+    <use href="#c" x="8" y="40" />
+    <use href="#c" x="40" y="40" />
+    <use href="#d" x="24" y="24" />
 </svg>

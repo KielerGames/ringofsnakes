@@ -90,8 +90,10 @@ export default class Matrix {
         }
 
         const s = 1.0 / det;
-        
-        const ad = a.data, rd = result.data;
+
+        const ad = a.data;
+        const rd = result.data;
+
         rd[0] = s * (ad[4] * ad[8] - ad[7] * ad[5]);
         rd[1] = s * (ad[7] * ad[2] - ad[1] * ad[8]);
         rd[2] = s * (ad[1] * ad[5] - ad[4] * ad[2]);

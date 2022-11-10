@@ -40,8 +40,15 @@ export function initTexture(
     return texture;
 }
 
+export function loadImage(url: string): Promise<HTMLImageElement>;
+export function loadImage(url: string, size: number): Promise<HTMLImageElement>;
+export function loadImage(url: string, width: number, height: number): Promise<HTMLImageElement>;
 export function loadImage(url: string, width?: number, height?: number): Promise<HTMLImageElement> {
+    if (width !== undefined && height === undefined) {
+        height = width;
+    }
     const image = new Image(width, height);
+
     return new Promise((resolve, reject) => {
         image.onload = () => resolve(image);
         image.onerror = reject;

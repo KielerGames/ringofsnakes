@@ -34,7 +34,7 @@ export function render(transform: ReadonlyMatrix): void {
         ]).buffer
     );
 
-    const image = await TextureManager.loadImage("assets/background.svg", 64, 64);
+    const image = await TextureManager.loadImage("assets/background.svg", 64);
 
     TextureManager.initTexture(
         textureSlot,

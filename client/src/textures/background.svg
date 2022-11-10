@@ -1,51 +1,37 @@
 <svg version="1.1" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
     <defs>
+        <g id="a" transform="rotate(45) scale(0.7071)">
+            <rect x="8" y="-8" width="16" height="16" fill="#111"/>
+            <rect x="10" y="-6" width="12" height="12" stroke="#191919" fill="none" />
+        </g>
+        <g id="b" transform="rotate(45) scale(0.7071)">
+            <rect x="10" y="-6" width="12" height="12" stroke="#101010" fill="none" />
+        </g>
         <g id="row-a">
-            <rect x="0" y="0" width="16" height="16" fill="#111" />
-            <rect x="16" y="0" width="16" height="16" fill="#1e1e1e" />
-            <rect x="32" y="0" width="16" height="16" fill="#111" />
-            <rect x="48" y="0" width="16" height="16" fill="#1e1e1e" />
+            <use href="#a" x="0" y="0"/>
+            <use href="#a" x="16" y="0"/>
+            <use href="#a" x="32" y="0"/>
+            <use href="#a" x="48" y="0"/>
         </g>
         <g id="row-b">
-            <rect x="0" y="0" width="16" height="16" fill="#1e1e1e" />
-            <rect x="16" y="0" width="16" height="16" fill="#111" />
-            <rect x="32" y="0" width="16" height="16" fill="#1e1e1e" />
-            <rect x="48" y="0" width="16" height="16" fill="#111" />
-        </g>
-        <g id="corner-a" fill="#111">
-            <path d="
-                M 0,4
-                c 0,-4, 4,-4, 4,-4
-                l -4,-4
-                c 0,4, -4,4, -4, 4
-                " />
-        </g>
-        <g id="corner-b" fill="#1e1e1e">
-            <path d="
-                M 0,4
-                c 0,-4, 4,-4, 4,-4
-                l -4,-4
-                c 0,4, -4,4, -4, 4
-                " 
-                transform="rotate(90)"/>
+            <use href="#b" x="-8" y="0"/>
+            <use href="#b" x="8" y="0"/>
+            <use href="#b" x="24" y="0"/>
+            <use href="#b" x="40" y="0"/>
+            <use href="#b" x="56" y="0"/>
         </g>
     </defs>
-    <g transform="rotate(45) scale(1.41421)">
-        <use href="#row-a" x="0" y="0"/>
-        <use href="#row-b" x="0" y="16"/>
-        <use href="#row-a" x="0" y="-32"/>
-        <use href="#row-b" x="0" y="-16"/>
-
-        <use href="#corner-a" x="16" y="0"/>
-        <use href="#corner-a" x="32" y="-16"/>
-        <use href="#corner-a" x="0" y="-32" transform="rotate(90)"/>
-        <use href="#corner-a" x="16" y="-16" transform="rotate(90)"/>
-        <use href="#corner-a" x="-16" y="-48" transform="rotate(90)"/>
-
-        <use href="#corner-b" x="32" y="16"/>
-        <use href="#corner-b" x="48" y="0"/>
-        <use href="#corner-b" x="-16" y="-16" transform="rotate(90)"/>
-        <use href="#corner-b" x="16" y="-48" transform="rotate(90)"/>
-    </g>
     
+    <rect width="64" height="64" fill="#191919" />
+    
+    <use href="#row-a" y="0" />
+    <use href="#row-a" y="16" />
+    <use href="#row-a" y="32" />
+    <use href="#row-a" y="48" />
+
+    <use href="#row-b" y="-8"/>
+    <use href="#row-b" y="8"/>
+    <use href="#row-b" y="24"/>
+    <use href="#row-b" y="40"/>
+    <use href="#row-b" y="56"/>
 </svg>

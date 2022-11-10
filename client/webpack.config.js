@@ -85,7 +85,8 @@ module.exports = (env, argv) => {
             minimizer: [
                 `...`, // extend existing minimizers
                 new CssMinimizerPlugin()
-            ]
+            ],
+            concatenateModules: false
         }
     };
 };

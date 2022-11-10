@@ -1,3 +1,4 @@
+import assert from "../util/assert";
 import Vector, { VectorLike } from "./Vector";
 
 const n = 3;
@@ -82,26 +83,29 @@ export default class Matrix {
         return result;
     }
 
+    /**
+     * Compute the inverse of the given matrix.
+     */
     static inverse(a: ReadonlyMatrix, result: Matrix = new Matrix(false)): Matrix {
         const det = a.det();
-
-        if (det === 0.0) {
-            throw new Error("Matrix cannot be inverted.");
-        }
+        assert(det !== 0.0);
 
         const s = 1.0 / det;
 
         const ad = a.data;
         const rd = result.data;
 
+        // first column
         rd[0] = s * (ad[4] * ad[8] - ad[7] * ad[5]);
         rd[1] = s * (ad[7] * ad[2] - ad[1] * ad[8]);
         rd[2] = s * (ad[1] * ad[5] - ad[4] * ad[2]);
 
+        // second column
         rd[3] = s * (ad[6] * ad[5] - ad[3] * ad[8]);
         rd[4] = s * (ad[0] * ad[8] - ad[6] * ad[2]);
         rd[5] = s * (ad[3] * ad[2] - ad[0] * ad[5]);
 
+        // third column
         rd[6] = s * (ad[3] * ad[7] - ad[6] * ad[4]);
         rd[7] = s * (ad[6] * ad[1] - ad[0] * ad[7]);
         rd[8] = s * (ad[0] * ad[4] - ad[3] * ad[1]);

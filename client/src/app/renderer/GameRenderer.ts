@@ -8,6 +8,7 @@ import * as FoodRenderer from "./modules/FoodRenderer";
 import * as TextRenderer from "./modules/TextRenderer";
 import * as SnakeNameRenderer from "./modules/SnakeNameRenderer";
 import * as HeatMapRenderer from "./modules/HeatMapRenderer";
+import * as BackgroundRenderer from "./modules/BackgroundRenderer";
 import { updateCanvasSize } from "./webgl/WebGLUtils";
 
 export function render(game: Readonly<Game>): void {
@@ -25,6 +26,7 @@ export function render(game: Readonly<Game>): void {
     const transform = game.camera.transformMatrix;
 
     // render parts
+    BackgroundRenderer.render(transform);
     FoodRenderer.render(game, transform);
     SnakeChunkRenderer.render(game, transform);
     SnakeHeadRenderer.render(game, transform);

@@ -23,7 +23,7 @@ let basicMaterialShader: WebGLShaderProgram;
     ]);
 
     const GL2 = WebGL2RenderingContext;
-    const image = await TextureManager.loadImage("assets/scales.svg", 128, 128);
+    const image = await TextureManager.loadImage("assets/scales.svg", 128);
     TextureManager.initTexture(
         1,
         {

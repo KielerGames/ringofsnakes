@@ -21,7 +21,7 @@ public class SnakeServer {
     private final static Map<String, Client> clients = Collections.synchronizedMap(new HashMap<>(64));
     private static Game game;
 
-    public static Server startServerWithGame(Game game) {
+    public static Server start(Game game) {
         SnakeServer.game = game;
 
         Server server = new Server();
@@ -59,9 +59,9 @@ public class SnakeServer {
         return server;
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void start() throws InterruptedException {
         game = new Game();
-        final var server = startServerWithGame(game);
+        final var server = start(game);
         game.start();
         server.join();
     }

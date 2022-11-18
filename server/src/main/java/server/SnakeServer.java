@@ -6,6 +6,8 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.clients.Client;
 import server.clients.Player;
 
@@ -18,7 +20,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class SnakeServer {
-    private final static Map<String, Client> clients = Collections.synchronizedMap(new HashMap<>(64));
+    private static final Logger LOGGER = LoggerFactory.getLogger(SnakeServer.class);
+    private static final Map<String, Client> CLIENTS = Collections.synchronizedMap(new HashMap<>(64));
     private static Game game;
 
     public static Server start(Game game) {
@@ -62,7 +65,7 @@ public class SnakeServer {
     }
 
     public static void onNewClientConnected(Session session) {
-        System.out.println("A new client has connected.");
+        LOGGER.info("A new client has connected.");
         Player player;
         try {
             player = game.createPlayer(session).get();
@@ -71,24 +74,24 @@ public class SnakeServer {
             return;
         }
 
-        clients.put(session.getId(), player);
+        CLIENTS.put(session.getId(), player);
     }
 
     public static void removeClient(Session session) {
         final var sessionId = session.getId();
-        clients.remove(sessionId);
+        CLIENTS.remove(sessionId);
         game.removeClient(session);
-        System.out.println("Client has been removed. (" + sessionId + ")");
+        LOGGER.info("Client has been removed. (" + sessionId + ")");
     }
 
     public static void updateClient(Client newClient) {
         final var sessionId = newClient.session.getId();
-        final var oldClient = clients.put(sessionId, newClient);
+        final var oldClient = CLIENTS.put(sessionId, newClient);
         assert oldClient != null;
     }
 
     public static void handleClientMessage(Session session, float alpha, boolean fast, float ratio) {
-        final var client = clients.get(session.getId());
+        final var client = CLIENTS.get(session.getId());
         client.setViewBoxRatio(ratio);
         client.handleUserInput(alpha, fast);
     }
@@ -97,12 +100,12 @@ public class SnakeServer {
         final var env = System.getenv();
 
         if (!env.containsKey("SNAKE_KEYSTORE_PATH") || !env.containsKey("SNAKE_KEYSTORE_PW")) {
-            System.err.println("Cannot create a secure connector without keystore configuration.");
+            LOGGER.warn("Cannot create a secure connector without keystore configuration.");
             return;
         }
 
         if (!Files.exists(Paths.get(env.get("SNAKE_KEYSTORE_PATH")))) {
-            System.err.println("Keystore file not found, skipping secure connector.");
+            LOGGER.warn("Keystore file not found, skipping secure connector.");
             return;
         }
 
@@ -119,5 +122,6 @@ public class SnakeServer {
         final ServerConnector wssConnector = new ServerConnector(server, sslConnectionFactory, httpConnectionFactory);
         wssConnector.setPort(8443);
         server.addConnector(wssConnector);
+        LOGGER.debug("Secure Websockets enabled.");
     }
 }

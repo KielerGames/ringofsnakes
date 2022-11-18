@@ -3,6 +3,8 @@ package server.clients;
 import game.snake.Snake;
 import math.BoundingBox;
 import math.Vector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.protocol.SpectatorChange;
 import util.JSON;
 
@@ -11,6 +13,7 @@ import javax.websocket.CloseReason;
 import java.io.IOException;
 
 public class Spectator extends Client {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Spectator.class);
     private static final CloseReason ILLEGAL_INPUT = new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "User input not allowed as spectator.");
     private Vector position;
 
@@ -65,12 +68,12 @@ public class Spectator extends Client {
             return;
         }
 
-        System.err.println("Illegal request from client.");
+        LOGGER.error("Illegal request from client.");
         try {
             session.close(ILLEGAL_INPUT);
             // TODO: does this cause removeClient to be called?
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 }

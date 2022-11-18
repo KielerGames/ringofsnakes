@@ -101,11 +101,13 @@ public class SnakeServer {
 
         if (!env.containsKey("SNAKE_KEYSTORE_PATH") || !env.containsKey("SNAKE_KEYSTORE_PW")) {
             LOGGER.warn("Cannot create a secure connector without keystore configuration.");
+            LOGGER.warn("Set SNAKE_KEYSTORE_PATH and SNAKE_KEYSTORE_PW environment variables.");
             return;
         }
 
         if (!Files.exists(Paths.get(env.get("SNAKE_KEYSTORE_PATH")))) {
             LOGGER.warn("Keystore file not found, skipping secure connector.");
+            LOGGER.warn("Keystore path: {}", Paths.get(env.get("SNAKE_KEYSTORE_PATH")));
             return;
         }
 

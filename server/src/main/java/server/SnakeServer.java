@@ -33,17 +33,12 @@ public class SnakeServer {
         addSecureConnector(server);
 
         // Set up the basic application "context" for this application at "/"
-        // This is also known as the handler tree (in jetty speak)
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         server.setHandler(context);
 
         WebSocketServerContainerInitializer.configure(context, (servletContext, wsContainer) -> {
-            // This lambda will be called at the appropriate place in the
-            // ServletContext initialization phase where you can initialize
-            // and configure  your websocket container.
-
-            // Configure defaults for container
+            // TODO #155: Find optimal websocket config
             wsContainer.setDefaultMaxTextMessageBufferSize(65535);
 
             // Add WebSocket endpoint to javax.websocket layer

@@ -20,4 +20,6 @@ The last three steps are only required for our CI pipeline.
  - combine certificate and intermediate certificate: `cat certificate.cer int-cert.cer > cert-chain.txt`
  - create pkcs12 file: `openssl pkcs12 -export -inkey private.key -in cert-chain.txt -out ringofsnakes.pkcs12`
  - create keystore: `keytool -importkeystore -srckeystore ringofsnakes.pkcs12 -srcstoretype PKCS12 -destkeystore .keystore`
- - set env variables `SNAKE_KEYSTORE_PATH="$HOME/.keystore"` and `SNAKE_KEYSTORE_PW=password` (use the password used in previous commands)
+ - set env variables `SNAKE_KEYSTORE_PATH="$HOME/.keystore"` and `SNAKE_KEYSTORE_PW=password`
+   - use the password used in previous commands
+   - make sure the environment variables are available in commands run via ssh (see #280)

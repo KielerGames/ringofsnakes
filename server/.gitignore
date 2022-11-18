@@ -1,3 +1,4 @@
 target
 .classpath
 snake-server-*.jar
+*.log

@@ -8,6 +8,7 @@
  - create user `ci`: `sudo useradd -m ci`
  - add public key to `.ssh/authorized_keys`
  - copy restart script `scp restart.sh ci@<server>:/home/ci`
+ - configure logging (enable FileHandler in `logging.properties`)
 
 The last three steps are only required for our CI pipeline.
 

@@ -9,6 +9,8 @@ import game.snake.*;
 import game.world.Collidable;
 import game.world.World;
 import game.world.WorldChunk;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.SnakeServer;
 import server.clients.Client;
 import server.clients.Player;
@@ -31,6 +33,7 @@ import java.util.stream.Stream;
 import static util.TaskMeasurer.measure;
 
 public class Game {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Game.class);
     public final int id = 1; //TODO
     public final GameConfig config;
     public final World world;
@@ -62,7 +65,7 @@ public class Game {
         this.world = world;
         executor = new ExceptionalExecutorService();
         executor.onExceptionOrErrorDo((throwable) -> {
-            throwable.printStackTrace();
+            LOGGER.error("Critical error", throwable);
             System.exit(1);
         });
         collisionManager = new CollisionManager(this);
@@ -72,7 +75,7 @@ public class Game {
     private void onCollision(Snake snake, Collidable object) {
         if (object instanceof final SnakeChunk snakeChunk) {
             final var otherSnake = snakeChunk.getSnake();
-            System.out.println(snake + " collided with " + otherSnake + ".");
+            LOGGER.debug("{} collided with {}.", snake, otherSnake);
             snake.kill();
 
             if (snake.isAlive()) {
@@ -144,7 +147,7 @@ public class Game {
             final var player = new Player(snake, session);
             clientsBySession.put(session, player);
             clientsBySnake.put(snake, player);
-            System.out.println("Player " + player.getName() + " has joined game");
+            LOGGER.info("Player {} has joined game.", player.getName());
             return player;
         });
     }
@@ -219,8 +222,8 @@ public class Game {
             }
         }, 1, 8, TimeUnit.SECONDS);
 
-        System.out.println("Game started. Config:\n" + JSON.stringify(config, true));
-        System.out.println("Waiting for players to connect...");
+        LOGGER.info("Game started. Config:\n" + JSON.stringify(config, true));
+        LOGGER.info("Waiting for players to connect...");
     }
 
     /**
@@ -282,7 +285,7 @@ public class Game {
     private void killDesertingSnakes() {
         forEachSnake(snake -> {
             if (!world.box.isWithinSubBox(snake.getHeadPosition(), 0.5 * snake.getWidth())) {
-                System.out.println("Snake " + snake.id + " is out of bounds.");
+                LOGGER.warn("Snake {} is out of bounds.", snake.id);
                 snake.kill();
 
                 if (!snake.isAlive()) {

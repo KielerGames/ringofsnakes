@@ -6,6 +6,8 @@ import game.world.World;
 import lombok.Getter;
 import math.Direction;
 import math.Vector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.BitWithShortHistory;
 
 import java.nio.ByteBuffer;
@@ -20,7 +22,7 @@ public class Snake {
     public static final int INFO_BYTE_SIZE = 26;
     public static final int NUMBER_OF_SKINS = 7;
     public static final double LENGTH_FOR_95_PERCENT_OF_MAX_WIDTH = 1024.0;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(Snake.class);
     public final GameConfig config;
     public final char id;
     public final String name;
@@ -71,7 +73,7 @@ public class Snake {
 
     public void setTargetDirection(double alpha) {
         if (Math.abs(alpha) > Math.PI + 1e-4) {
-            System.err.println("Alpha out of range: " + alpha);
+            LOGGER.warn("Alpha out of range: {}", alpha);
             return;
         }
 

@@ -1,5 +1,8 @@
 package server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.nio.ByteBuffer;
@@ -7,10 +10,10 @@ import java.nio.ByteBuffer;
 @ClientEndpoint
 @ServerEndpoint(value = "/game")
 public class EventSocket {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSocket.class);
     @OnOpen
     public void onWebSocketConnect(Session session) {
-        System.out.println("Socket Connected: " + session);
-
+        LOGGER.debug("Socket Connected: {}", session);
         SnakeServer.onNewClientConnected(session);
 
         //session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
@@ -18,12 +21,13 @@ public class EventSocket {
 
     @OnMessage
     public void onWebSocketText(Session session, String message) {
+        LOGGER.error("Unexpected text message from client {}.", session.getId());
     }
 
     @OnMessage
     public void onWebSocketMessage(Session session, ByteBuffer buffer) {
         if(buffer.capacity() != 9) {
-            System.err.println("Illegal binary message from client.");
+            LOGGER.error("Illegal binary message from client.");
             return;
         }
 
@@ -33,17 +37,19 @@ public class EventSocket {
 
         if (Float.isFinite(alpha) && Float.isFinite(viewBoxRatio)) {
             SnakeServer.handleClientMessage(session, alpha, fast, viewBoxRatio);
+        } else {
+            LOGGER.warn("Client message ignored (infinite value).");
         }
     }
 
     @OnClose
     public void onWebSocketClose(Session session, CloseReason reason) {
-        System.out.println("Socket Closed: " + reason);
+        LOGGER.debug("Socket Closed: " + reason);
         SnakeServer.removeClient(session);
     }
 
     @OnError
     public void onWebSocketError(Throwable cause) {
-        cause.printStackTrace(System.err);
+        LOGGER.error("Websocket error", cause);
     }
 }

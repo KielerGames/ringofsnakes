@@ -28,7 +28,7 @@ public class DebugView extends Application {
 
         // start game server
         new Thread(() -> {
-            SnakeServer.startServerWithGame(game);
+            SnakeServer.start(game);
             game.start();
         }).start();
 

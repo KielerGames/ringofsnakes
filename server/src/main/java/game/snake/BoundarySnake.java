@@ -4,10 +4,13 @@ import game.world.World;
 import math.BoundingBox;
 import math.Direction;
 import math.Vector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BoundarySnake extends Snake {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BoundarySnake.class);
     private final BoundingBox bottom, right, up, left;
 
     BoundarySnake(char id, World world) {
@@ -95,7 +98,7 @@ public class BoundarySnake extends Snake {
 
     @Override
     public void kill() {
-        System.err.println("Boundary snake can not be killed.");
+        LOGGER.warn("Boundary snake can not be killed.");
     }
 
     @Override

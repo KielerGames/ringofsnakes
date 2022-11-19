@@ -277,6 +277,7 @@ public class Game {
             // Consume food.
             snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
             worldChunk.removeFood(collectedFood);
+            // TODO: remove food from neighboring chunks
         });
     }
 

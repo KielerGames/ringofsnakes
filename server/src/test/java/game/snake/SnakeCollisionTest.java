@@ -1,14 +1,10 @@
 package game.snake;
 
-import game.Game;
 import game.GameConfig;
-import game.world.Collidable;
+import game.world.TestGame;
 import game.world.World;
 import math.Vector;
 import org.junit.jupiter.api.Test;
-
-import java.util.LinkedList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,7 +20,7 @@ public class SnakeCollisionTest {
         final var center = spawnBox.getCenter();
         final var snake1 = SnakeFactory.createTestSnake(new Vector(center.x, center.y + 0.5 * offset), east, world);
         final var snake2 = SnakeFactory.createTestSnake(new Vector(center.x, center.y - 0.5 * offset), east, world);
-        final var testGame = new TestGame(config, world);
+        final var testGame = new TestGame(world);
         testGame.snakes.add(snake1);
         testGame.snakes.add(snake2);
 
@@ -46,7 +42,7 @@ public class SnakeCollisionTest {
         // start with parallel snakes
         final var snake1 = SnakeFactory.createTestSnake(new Vector(center.x, center.y + 0.5 * offset), 0.0, world);
         final var snake2 = SnakeFactory.createTestSnake(new Vector(center.x, center.y - 0.5 * offset), 0.0, world);
-        final var testGame = new TestGame(config, world);
+        final var testGame = new TestGame(world);
         testGame.snakes.add(snake1);
         testGame.snakes.add(snake2);
 
@@ -64,32 +60,10 @@ public class SnakeCollisionTest {
 
         assertEquals(1, testGame.collisions.size(), "Snakes should have collided.");
         final var collision = testGame.collisions.get(0);
-        assertEquals(collision.snake, snake2, "snake2 should be the colliding snake.");
+        assertEquals(collision.snake(), snake2, "snake2 should be the colliding snake.");
 
         testGame.collisions.clear();
         testGame.tickN(1, true);
         assertTrue(testGame.collisions.isEmpty(), "A snake may only collide once!");
-    }
-
-    private static class TestGame extends Game {
-        public final List<CollisionInfo> collisions = new LinkedList<>();
-
-        public TestGame(GameConfig config, World world) {
-            super(config, world);
-            this.collisionManager.onCollisionDo((s, sc) -> collisions.add(new CollisionInfo(s, sc)));
-        }
-
-        public void tickN(int n, boolean stopAfterCollision) {
-            for (int i = 0; i < n; i++) {
-                this.tick();
-
-                if (stopAfterCollision && !collisions.isEmpty()) {
-                    return;
-                }
-            }
-        }
-    }
-
-    private record CollisionInfo(Snake snake, Collidable object) {
     }
 }

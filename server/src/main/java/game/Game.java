@@ -57,11 +57,11 @@ public class Game {
      * For tests only.
      */
     protected Game(GameConfig config) {
-        this(config, new World(config));
+        this(new World(config));
     }
 
-    protected Game(GameConfig config, World world) {
-        this.config = config;
+    protected Game(World world) {
+        this.config = world.getConfig();
         this.world = world;
         executor = new ExceptionalExecutorService();
         executor.onExceptionOrErrorDo((throwable) -> {
@@ -261,9 +261,15 @@ public class Game {
             final var foodCollectRadius = snake.getWidth() * 1.1 + 0.32;
             final var headPosition = snake.getHeadPosition();
             final var worldChunk = world.chunks.findChunk(headPosition);
-            // TODO: consider neighboring chunks if distance is less than foodCollectRadius
 
-            final var collectedFood = worldChunk.streamFood()
+            // Consider food from worldChunk and its neighboring chunks
+            final var mainFoodStream = worldChunk.streamFood();
+            final var neighborChunkFoodStream = worldChunk.neighbors.stream()
+                    .filter(chunk -> chunk.box.isWithinRange(headPosition, foodCollectRadius))
+                    .flatMap(WorldChunk::streamFood);
+
+            // Find food to be consumed by the snake.
+            final var collectedFood = Stream.concat(mainFoodStream, neighborChunkFoodStream)
                     .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
                     .toList();
 
@@ -275,6 +281,7 @@ public class Game {
                     .mapToDouble(food -> food.size.area)
                     .sum() / Math.PI;
 
+            // Consume food.
             snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
             worldChunk.removeFood(collectedFood);
         });

@@ -5,12 +5,12 @@ import util.ByteUtilities;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static util.ByteUtilities.toNormalizedDouble;
 
 public class Food {
     public static final int BYTE_SIZE = 3;
-    private static final Random rand = new Random();
 
     public final Vector position;
     public final Size size;
@@ -38,12 +38,16 @@ public class Food {
     }
 
     public Food(WorldChunk chunk) {
+        Random rand = ThreadLocalRandom.current();
+
         // generate position
         final var bytePosition = new byte[2];
         rand.nextBytes(bytePosition);
+
         // set byte position
         byteX = bytePosition[0];
         byteY = bytePosition[1];
+
         // set global (double) position
         final var x = chunk.box.minX + toNormalizedDouble(bytePosition[0]) * chunk.box.getWidth();
         final var y = chunk.box.minY + toNormalizedDouble(bytePosition[1]) * chunk.box.getHeight();

@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static util.ByteUtilities.toNormalizedDouble;
 
-public class Food {
+public final class Food {
     public static final int BYTE_SIZE = 3;
 
     public final Vector position;
@@ -87,13 +87,13 @@ public class Food {
         SMALL(0.64, 0), MEDIUM(1.0, 1), LARGE(1.5, 2);
 
         public final double radius;
+        public final double area;
         public final byte byteValue;
-        public final double nutritionalValue;
 
         Size(double radius, int bv) {
             this.radius = radius;
             this.byteValue = (byte) bv;
-            this.nutritionalValue = radius * radius;
+            this.area = Math.PI * radius * radius;
         }
     }
 }

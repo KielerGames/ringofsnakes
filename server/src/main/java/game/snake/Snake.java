@@ -177,15 +177,22 @@ public class Snake {
 
     public void shrink(double amount) {
         assert (amount > 0);
+
+        // First take as much as we can from the length buffer.
         final var bufferAmount = Math.min(lengthBuffer, amount);
         lengthBuffer -= bufferAmount;
+
+        // Subtract the remaining amount from the actual snake length.
         final var snakeAmount = amount - bufferAmount;
         final var newLength = Math.max(config.snakes.minLength, length - snakeAmount);
         final var deltaLength = length - newLength;
         length = newLength;
-        final var smallFoodNutritionalValue = config.foodNutritionalValue * Food.Size.SMALL.nutritionalValue;
+
+        // Fill foodTrailBuffer if snake length has changed.
+        final var smallFoodNutritionalValue = config.foodNutritionalValue * Food.Size.SMALL.area / Math.PI;
         foodTrailBuffer += deltaLength * config.foodConversionEfficiency;
 
+        // Spawn food trail items.
         if (foodTrailBuffer >= smallFoodNutritionalValue) {
             foodTrailBuffer -= smallFoodNutritionalValue;
             spawnFoodAtTailPosition();

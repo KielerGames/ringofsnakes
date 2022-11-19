@@ -272,9 +272,9 @@ public class Game {
             }
 
             final var foodAmount = collectedFood.stream()
-                    .mapToDouble(food -> food.size.nutritionalValue)
-                    .sum();
-            // TODO: we have nutritionalValue twice, one should suffice
+                    .mapToDouble(food -> food.size.area)
+                    .sum() / Math.PI;
+
             snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
             worldChunk.removeFood(collectedFood);
         });

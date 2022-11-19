@@ -82,14 +82,14 @@ public class Food {
     public enum Size {
         SMALL(0.64, 0), MEDIUM(1.0, 1), LARGE(1.5, 2);
 
-        public final double value;
+        public final double radius;
         public final byte byteValue;
         public final double nutritionalValue;
 
-        Size(double value, int bv) {
-            this.value = value;
+        Size(double radius, int bv) {
+            this.radius = radius;
             this.byteValue = (byte) bv;
-            this.nutritionalValue = value * value;
+            this.nutritionalValue = radius * radius;
         }
     }
 }

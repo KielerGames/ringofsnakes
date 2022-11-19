@@ -79,7 +79,7 @@ public class DebugView extends Application {
         g.setFill(Color.RED);
         g.setStroke(Color.RED);
         game.world.chunks.forEach(chunk -> chunk.streamFood().forEach(food -> {
-            var size = food.size.value;
+            var size = food.size.radius;
             g.fillOval((food.position.x - camera.x) * ZOOM + 400 - size * ZOOM,
                     300 - (food.position.y - camera.y) * ZOOM - size * ZOOM,
                     size * ZOOM, size * ZOOM);

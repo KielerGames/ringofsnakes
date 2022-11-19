@@ -261,6 +261,7 @@ public class Game {
             final var foodCollectRadius = snake.getWidth() * 1.1 + 1.0;
             final var headPosition = snake.getHeadPosition();
             final var worldChunk = world.chunks.findChunk(headPosition);
+            // TODO: consider neighboring chunks if distance is less than foodCollectRadius
 
             final var collectedFood = worldChunk.streamFood()
                     .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
@@ -273,6 +274,7 @@ public class Game {
             final var foodAmount = collectedFood.stream()
                     .mapToDouble(food -> food.size.nutritionalValue)
                     .sum();
+            // TODO: we have nutritionalValue twice, one should suffice
             snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
             worldChunk.removeFood(collectedFood);
         });

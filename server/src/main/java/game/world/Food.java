@@ -66,6 +66,7 @@ public class Food {
     }
 
     public boolean isWithinRange(Vector p, double range) {
+        // TODO: consider food size
         return Vector.distance2(position, p) <= range * range;
     }
 

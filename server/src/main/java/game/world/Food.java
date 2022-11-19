@@ -65,8 +65,12 @@ public class Food {
         }
     }
 
+    /**
+     * Return {@code true} if this food item has a distance less than or equal to
+     * {@code range} from the given point {@code p}.
+     */
     public boolean isWithinRange(Vector p, double range) {
-        // TODO: consider food size
+        range += size.radius;
         return Vector.distance2(position, p) <= range * range;
     }
 

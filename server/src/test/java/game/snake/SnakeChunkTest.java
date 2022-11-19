@@ -81,8 +81,8 @@ public class SnakeChunkTest {
 
     @Test
     void testPathDataLengthRemainsTheSame() {
-        final var world = new World(config);
-        final var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
+        final var world = new World(config, false);
+        final var snake = TestSnakeFactory.createSnake(new Vector(0, 0), world);
 
         tickUntilFullLength(snake);
 
@@ -97,7 +97,7 @@ public class SnakeChunkTest {
     @Test
     void testTailChunkDecreasesInLength() {
         final var random = new Random(13374242);
-        final var snake = SnakeFactory.createTestSnake();
+        final var snake = TestSnakeFactory.createSnake();
         snake.grow(64.0);
         tickUntilFullLength(snake);
         tickUntilNewSnakeChunk(snake, random);
@@ -134,7 +134,7 @@ public class SnakeChunkTest {
     @Test
     void testOffsetValues() {
         final var random = new Random(666137);
-        final var snake = SnakeFactory.createTestSnake();
+        final var snake = TestSnakeFactory.createSnake();
         snake.grow(64.0);
         tickUntilFullLength(snake);
         tickUntilNewSnakeChunk(snake, random);
@@ -159,8 +159,8 @@ public class SnakeChunkTest {
     @Test
     void testJunkChunksShouldStayJunk() {
         final var random = new Random(1234);
-        final var world = new World(config);
-        final var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
+        final var world = new World(config, false);
+        final var snake = TestSnakeFactory.createSnake(new Vector(0, 0), world);
 
         snake.grow(64.0);
         tickUntilFullLength(snake);
@@ -182,7 +182,7 @@ public class SnakeChunkTest {
     @Test
     void testGetPositionAtMethod() {
         final var random = new Random(314159);
-        final var snake = SnakeFactory.createTestSnake();
+        final var snake = TestSnakeFactory.createSnake();
         snake.grow(64.0);
         tickUntilNewSnakeChunk(snake, random);
         assertTrue(snake.getSnakeChunks().size() > 1);

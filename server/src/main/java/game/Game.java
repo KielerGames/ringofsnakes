@@ -47,17 +47,10 @@ public class Game {
     private byte ticksSinceLastUpdate = 0;
 
     public Game() {
-        this(new GameConfig());
+        this(new World(new GameConfig(), true));
 
         final var boundarySnake = SnakeFactory.createBoundarySnake(world);
         snakes.add(boundarySnake);
-    }
-
-    /**
-     * For tests only.
-     */
-    protected Game(GameConfig config) {
-        this(new World(config));
     }
 
     protected Game(World world) {

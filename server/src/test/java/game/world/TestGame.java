@@ -11,7 +11,7 @@ public class TestGame extends Game {
     public final List<CollisionInfo> collisions = new LinkedList<>();
 
     public TestGame() {
-        super(new GameConfig());
+        this(new World(new GameConfig(), false));
     }
 
     public TestGame(World world) {

@@ -22,19 +22,22 @@ public class World {
     @Getter private final HeatMap heatMap;
 
     public World(double chunkSize, int repetitions) {
-        this(new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions)));
+        this(new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions)), false);
     }
 
     public World() {
         this(32.0, 16);
+        spawnInitialFood();
     }
 
-    public World(GameConfig config) {
+    public World(GameConfig config, boolean spawnFood) {
         this.config = config;
         chunks = WorldChunkFactory.createChunks(this);
         box = new BoundingBox(new Vector(0, 0), config.chunks.size * config.chunks.columns, config.chunks.size * config.chunks.rows);
         heatMap = new HeatMap(config, chunks::stream);
-        spawnInitialFood();
+        if (spawnFood) {
+            spawnInitialFood();
+        }
     }
 
     public Vector findSpawnPosition() {

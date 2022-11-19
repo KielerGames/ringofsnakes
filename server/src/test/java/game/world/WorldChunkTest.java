@@ -1,6 +1,6 @@
 package game.world;
 
-import game.snake.SnakeFactory;
+import game.snake.TestSnakeFactory;
 import math.Vector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ public class WorldChunkTest {
     @Test
     void testAddASnake() {
         var world = new World();
-        var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
+        var snake = TestSnakeFactory.createSnake(new Vector(0, 0), world);
 
         for (int i = 0; i < 512; i++) {
             snake.tick();
@@ -80,7 +80,7 @@ public class WorldChunkTest {
 
     @Test
     void testSnakeHeadChunkIsAlwaysInAChunk() {
-        final var snake = SnakeFactory.createTestSnake(world);
+        final var snake = TestSnakeFactory.createSnake(world);
 
         for (int i = 0; i < 512; i++) {
             snake.tick();
@@ -95,7 +95,7 @@ public class WorldChunkTest {
     @Test
     void testSnakesWithinWorldChunk() {
         var world = new World();
-        var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
+        var snake = TestSnakeFactory.createSnake(new Vector(0, 0), world);
 
         for (int i = 0; i < 512; i++) {
             snake.tick();
@@ -113,7 +113,7 @@ public class WorldChunkTest {
     @Test
     void testSnakeGetsRemoved() {
         var world = new World();
-        var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
+        var snake = TestSnakeFactory.createSnake(new Vector(0, 0), world);
         snake.tick();
         var worldChunk = world.chunks.stream()
                 .filter(chunk -> chunk.getSnakeChunkCount() > 0)

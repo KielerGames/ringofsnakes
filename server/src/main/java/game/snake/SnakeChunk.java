@@ -6,6 +6,7 @@ import lombok.Getter;
 import math.BoundingBox;
 import math.Vector;
 
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -88,36 +89,65 @@ public abstract class SnakeChunk implements Collidable {
 
     public abstract double getOffset();
 
-    public Vector getPositionAt(double inSnakeOffset) {
+    protected Vector getPositionAt(double inSnakeOffset, List<SnakePathPoint> pathData, @Nullable PointQueryInfo info) {
         final var inChunkOffset = inSnakeOffset - getOffset();
         assert 0.0 <= inChunkOffset && inChunkOffset <= getDataLength();
 
-        // TODO: use binary search instead
-
         double minError = Double.POSITIVE_INFINITY;
         Vector bestPoint = null;
+        double bestOffset = Double.NaN;
+        int bestIndex = -1;
 
-        for (final var pd : getPathData()) {
+        // Iterate over path data.
+        int index = -1;
+        for (final var pd : pathData) {
+            index++;
+
             final var offset = pd.getOffsetInChunk();
             final var error = Math.abs(inChunkOffset - offset);
 
             if (error > minError) {
-                // path data list is ordered, so it's only going to get worse
+                // pathData list is ordered, so it's only going to get worse.
                 break;
             }
 
             if (error < minError) {
+                // Update our currently best result.
                 minError = error;
                 bestPoint = pd.point;
+                bestIndex = index;
+                bestOffset = offset;
             }
         }
 
-        assert bestPoint != null;
+        if (bestPoint == null) {
+            throw new IllegalStateException("Failed to find a point at that position.");
+        }
+
+        if (info != null) {
+            // Store values to speed up future queries.
+            info.index = bestIndex;
+            info.offset = bestOffset;
+        }
+
         return bestPoint;
+    }
+
+    /**
+     * Find the {@link SnakePathPoint} closest to the requested offset.
+     * @param inSnakeOffset must be in range of this chunk's offset bounds.
+     */
+    public Vector getPositionAt(double inSnakeOffset) {
+        return getPositionAt(inSnakeOffset, getPathData(), null);
     }
 
     @Override
     public int hashCode() {
         return getUniqueId();
+    }
+
+    public static final class PointQueryInfo {
+        public int index;
+        public double offset;
     }
 }

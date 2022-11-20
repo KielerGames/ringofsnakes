@@ -21,14 +21,15 @@ public class FinalSnakeChunk extends SnakeChunk {
             ByteBuffer buffer,
             BoundingBox box,
             double dataLength,
-            List<SnakePathPoint> pathData
+            SnakePathPoint[] pathData
     ) {
         super(snake);
 
         assert buffer.position() == BYTE_SIZE;
         assert dataLength > 0;
 
-        this.pathData = pathData;
+        this.pathData = List.of(pathData);
+        this.pathData.forEach(pd -> pd.setFinalSnakeChunk(this));
         chunkByteBuffer = buffer;
         boundingBox = box;
         this.dataLength = dataLength;

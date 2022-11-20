@@ -91,7 +91,7 @@ public abstract class SnakeChunk implements Collidable {
         // TODO: use binary search instead
 
         double minError = Double.POSITIVE_INFINITY;
-        Vector minPoint = null;
+        Vector bestPoint = null;
 
         for (final var pd : getPathData()) {
             final var offset = pd.getOffsetInChunk();
@@ -104,12 +104,12 @@ public abstract class SnakeChunk implements Collidable {
 
             if (error < minError) {
                 minError = error;
-                minPoint = pd.point;
+                bestPoint = pd.point;
             }
         }
 
-        assert minPoint != null;
-        return minPoint;
+        assert bestPoint != null;
+        return bestPoint;
     }
 
     @Override

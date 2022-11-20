@@ -14,7 +14,8 @@ public class FoodEatingTest {
         // Init world.
         var game = TestGame.createWithSmallWorld();
         var mainChunk = game.world.chunks.findChunk(Vector.ORIGIN);
-        var neighborChunk = game.world.chunks.findChunk(new Vector(32.0, 0.0));
+        var foodPos = new Vector(13.0, 0.0);
+        var neighborChunk = game.world.chunks.findChunk(foodPos);
 
         // Init snake.
         var snake = TestSnakeFactory.createMockedSnake(Vector.ORIGIN, game.world);
@@ -22,14 +23,7 @@ public class FoodEatingTest {
         game.addSnake(snake);
 
         // Add a food item.
-        neighborChunk.addFood(
-                new Food(
-                        new Vector(13.0, 0.0),
-                        neighborChunk,
-                        Food.Size.MEDIUM,
-                        (byte) 0
-                )
-        );
+        Food.spawnAt(foodPos, game.world, Food.Size.MEDIUM, (byte) 0);
         assertEquals(0, mainChunk.getFoodCount());
         var foodCount = neighborChunk.getFoodCount();
         assertEquals(1, foodCount);

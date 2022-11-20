@@ -54,7 +54,7 @@ public class WorldChunk {
     }
 
     public void addFood() {
-        addFood(new Food(this));
+        Food.spawnAt(this);
     }
 
     public void addFood(Food food) {

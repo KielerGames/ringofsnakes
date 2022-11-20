@@ -96,12 +96,13 @@ public class World {
                 continue;
             }
             spawnPosition.addScaled(new Vector(random.nextDouble(), random.nextDouble()), foodScattering);
+
             if (!box.isWithinSubBox(spawnPosition, 1.0)) {
+                // Ignore out-of-bounds food.
                 continue;
             }
-            final var worldChunk = chunks.findChunk(spawnPosition);
-            final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM, snake.getSkin());
-            worldChunk.addFood(food);
+
+            Food.spawnAt(spawnPosition, this, Food.Size.MEDIUM, snake.getSkin());
         }
     }
 

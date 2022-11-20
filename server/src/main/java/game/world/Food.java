@@ -27,35 +27,37 @@ public final class Food {
         this.size = size;
     }
 
-    public Food(Vector position, WorldChunk chunk, Size size, byte color) {
-        this(
+    /**
+     * Spawn a food item at the given position.
+     */
+    public static void spawnAt(Vector position, World world, Size size, byte color) {
+        final var chunk = world.chunks.findChunk(position);
+        final var food = new Food(
                 chunk,
                 ByteUtilities.fromNormalizedDoubleToByte((position.x - chunk.box.minX) / chunk.box.getWidth()),
                 ByteUtilities.fromNormalizedDoubleToByte((position.y - chunk.box.minY) / chunk.box.getHeight()),
                 size,
                 color
         );
+        chunk.addFood(food);
     }
 
-    public Food(WorldChunk chunk) {
+    /**
+     * Spawn food at a random position within the given chunk.
+     */
+    public static void spawnAt(WorldChunk chunk) {
         Random rand = ThreadLocalRandom.current();
 
-        // generate position
+        // Generate random position.
         final var bytePosition = new byte[2];
         rand.nextBytes(bytePosition);
 
-        // set byte position
-        byteX = bytePosition[0];
-        byteY = bytePosition[1];
+        // Pick random color.
+        final var color = (byte) rand.nextInt(64);
 
-        // set global (double) position
-        final var x = chunk.box.minX + toNormalizedDouble(bytePosition[0]) * chunk.box.getWidth();
-        final var y = chunk.box.minY + toNormalizedDouble(bytePosition[1]) * chunk.box.getHeight();
-        position = new Vector(x, y);
-
-        color = (byte) rand.nextInt(64);
-
+        // Pick random size.
         final var sizeProb = rand.nextDouble();
+        final Size size;
         if (0.6 <= sizeProb && sizeProb < 0.9) {
             size = Size.MEDIUM;
         } else if (0.9 <= sizeProb) {
@@ -63,6 +65,10 @@ public final class Food {
         } else {
             size = Size.SMALL;
         }
+
+        // Create food and add to world.
+        final var food = new Food(chunk, bytePosition[0], bytePosition[1], size, color);
+        chunk.addFood(food);
     }
 
     /**

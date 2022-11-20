@@ -40,7 +40,7 @@ public class FoodEatingTest {
         }
 
         // Snake head is now partially in the other chunk and should consume food from it.
-        game.tickN(2, false);
+        game.tickN(1, false);
         assertTrue(neighborChunk.getFoodCount() < foodCount);
     }
 }

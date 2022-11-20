@@ -260,29 +260,28 @@ public class Game {
             final var headPosition = snake.getHeadPosition();
             final var worldChunk = world.chunks.findChunk(headPosition);
 
-            // Consider food from worldChunk and its neighboring chunks
-            final var mainFoodStream = worldChunk.streamFood();
-            final var neighborChunkFoodStream = worldChunk.neighbors.stream()
-                    .filter(chunk -> chunk.box.isWithinRange(headPosition, foodCollectRadius))
-                    .flatMap(WorldChunk::streamFood);
+            Stream.concat(
+                    Stream.of(worldChunk),
+                    worldChunk.neighbors.stream().filter(chunk -> chunk.box.isWithinRange(headPosition, foodCollectRadius))
+            ).forEach(chunk -> {
+                // Find food to be consumed by the snake.
+                final var collectedFood = chunk.streamFood()
+                        .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
+                        .toList();
 
-            // Find food to be consumed by the snake.
-            final var collectedFood = Stream.concat(mainFoodStream, neighborChunkFoodStream)
-                    .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
-                    .toList();
+                if (collectedFood.isEmpty()) {
+                    // Continue with next chunk.
+                    return;
+                }
 
-            if (collectedFood.isEmpty()) {
-                return;
-            }
+                final var foodAmount = collectedFood.stream()
+                        .mapToDouble(food -> food.size.area)
+                        .sum() / Math.PI;
 
-            final var foodAmount = collectedFood.stream()
-                    .mapToDouble(food -> food.size.area)
-                    .sum() / Math.PI;
-
-            // Consume food.
-            snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
-            worldChunk.removeFood(collectedFood);
-            // TODO: remove food from neighboring chunks
+                // Consume food.
+                snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
+                chunk.removeFood(collectedFood);
+            });
         });
     }
 

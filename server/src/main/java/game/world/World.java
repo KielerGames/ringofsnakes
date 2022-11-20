@@ -83,8 +83,8 @@ public class World {
         // - fine adjust food value per dead snake
         final var foodScattering = 1.0;
         final var caloricValueOfSnake = 0.64 * snake.getLength(); //TODO: adjust
-        final var caloricValueOfFoodSpawn = Food.Size.MEDIUM.radius * Food.Size.MEDIUM.radius * config.foodNutritionalValue;
-        final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
+        final var caloricValueOfFood = Food.Size.MEDIUM.nutritionalValue(config);
+        final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFood);
         final var lengthUntilFoodSpawn = snake.getLength() / Math.max(1, numberOfFoodSpawns);
 
         for (int i = 0; i < numberOfFoodSpawns; i++) {

@@ -189,7 +189,7 @@ public class Snake {
         length = newLength;
 
         // Fill foodTrailBuffer if snake length has changed.
-        final var smallFoodNutritionalValue = config.foodNutritionalValue * Food.Size.SMALL.area / Math.PI;
+        final var smallFoodNutritionalValue = Food.Size.SMALL.nutritionalValue(config);
         foodTrailBuffer += deltaLength * config.foodConversionEfficiency;
 
         // Spawn food trail items.

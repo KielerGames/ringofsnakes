@@ -1,5 +1,6 @@
 package game.world;
 
+import game.GameConfig;
 import math.Vector;
 import util.ByteUtilities;
 
@@ -93,13 +94,15 @@ public final class Food {
         SMALL(0.64, 0), MEDIUM(1.0, 1), LARGE(1.5, 2);
 
         public final double radius;
-        public final double area;
         public final byte byteValue;
 
         Size(double radius, int bv) {
             this.radius = radius;
             this.byteValue = (byte) bv;
-            this.area = Math.PI * radius * radius;
+        }
+
+        public double nutritionalValue(GameConfig config) {
+            return this.radius * this.radius * config.foodNutritionalValue;
         }
     }
 }

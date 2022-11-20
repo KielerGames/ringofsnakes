@@ -275,11 +275,11 @@ public class Game {
                 }
 
                 final var foodAmount = collectedFood.stream()
-                        .mapToDouble(food -> food.size.area)
-                        .sum() / Math.PI;
+                        .mapToDouble(food -> food.size.nutritionalValue(config))
+                        .sum();
 
                 // Consume food.
-                snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
+                snake.grow(foodAmount / snake.getWidth());
                 chunk.removeFood(collectedFood);
             });
         });

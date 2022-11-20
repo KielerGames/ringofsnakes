@@ -5,12 +5,14 @@ import math.BoundingBox;
 import math.Vector;
 
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class GrowingSnakeChunk extends SnakeChunk {
     public final char id;
     private final List<SnakePathPoint> pathData = new LinkedList<>();
+    private final List<SnakePathPoint> unmodifiablePathData = Collections.unmodifiableList(pathData);
     private final ChainCodeCoder coder;
     private final Vector end;
     private final float endDirection;
@@ -153,7 +155,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
 
     @Override
     public List<SnakePathPoint> getPathData() {
-        return pathData;
+        return unmodifiablePathData;
     }
 
     @Override

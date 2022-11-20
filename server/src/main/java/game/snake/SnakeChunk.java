@@ -55,6 +55,10 @@ public abstract class SnakeChunk implements Collidable {
         return clamp(snake.getLength() - getOffset(), 0.0, getDataLength());
     }
 
+    /**
+     * Returns an unmodifiable view of this chunks path data ordered by distance from snake head ascending.
+     * Can contain "junk" data (offset > length) at the end.
+     */
     public abstract List<SnakePathPoint> getPathData();
 
     public final boolean isJunk() {

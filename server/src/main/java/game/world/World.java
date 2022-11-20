@@ -78,12 +78,10 @@ public class World {
     public void recycleDeadSnake(Snake snake) {
         final var random = getRandom();
 
-        //TODO:
-        // - consider spawning larger food items for larger snakes #120
-        // - fine adjust food value per dead snake
         final var foodScattering = 1.0;
-        final var caloricValueOfSnake = 0.64 * snake.getLength(); //TODO: adjust
-        final var caloricValueOfFood = Food.Size.MEDIUM.nutritionalValue(config);
+        final var caloricValueOfSnake = 0.64 * snake.getLength();
+        final var foodSize = snake.getWidth() > 3.0 ? Food.Size.LARGE : Food.Size.MEDIUM;
+        final var caloricValueOfFood = foodSize.nutritionalValue(config);
         final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFood);
         final var lengthUntilFoodSpawn = snake.getLength() / Math.max(1, numberOfFoodSpawns);
 
@@ -102,7 +100,7 @@ public class World {
                 continue;
             }
 
-            Food.spawnAt(spawnPosition, this, Food.Size.MEDIUM, snake.getSkin());
+            Food.spawnAt(spawnPosition, this, foodSize, snake.getSkin());
         }
     }
 

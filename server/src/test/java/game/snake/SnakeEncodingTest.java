@@ -1,15 +1,28 @@
 package game.snake;
 
 import game.world.World;
-import math.Vector;
+import math.Direction;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SnakeEncodingTest {
-    private static final ChainCodeCoder coder = new ChainCodeCoder(SnakeFactory.createTestSnake());
+    private static final ChainCodeCoder coder = new ChainCodeCoder(TestSnakeFactory.createSnake());
+
+    @BeforeAll
+    static void setup() {
+        TestSnakeFactory.setRandom(new Random(85694001));
+    }
+
+    @AfterAll
+    static void cleanup() {
+        TestSnakeFactory.setRandom(null);
+    }
 
     @SuppressWarnings("ConstantConditions")
     @Test
@@ -22,7 +35,7 @@ public class SnakeEncodingTest {
 
     @Test
     void testEarlyChunkBuilding() {
-        Snake snake = SnakeFactory.createTestSnake();
+        Snake snake = TestSnakeFactory.createSnake();
         final char chunkId = 42;
         GrowingSnakeChunk builder = new GrowingSnakeChunk(coder, snake, chunkId);
         assertFalse(builder.isFull());
@@ -34,7 +47,7 @@ public class SnakeEncodingTest {
 
     @Test
     void testSnakeInfoBuffer() {
-        Snake snake = SnakeFactory.createTestSnake();
+        Snake snake = TestSnakeFactory.createSnake();
         var snakeInfo = snake.encodeInfo();
         assertEquals(Snake.INFO_BYTE_SIZE, snakeInfo.capacity());
         var buffer = ByteBuffer.allocate(1 + Snake.INFO_BYTE_SIZE);
@@ -47,7 +60,7 @@ public class SnakeEncodingTest {
     @Test
     void testSnakeChunkBuffer() {
         World world = new World(64.0, 20);
-        Snake snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
+        Snake snake = TestSnakeFactory.createSnake(world, Direction.DOWN);
         var n = snake.getSnakeChunks().size();
         var i = 0;
 

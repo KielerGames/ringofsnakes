@@ -4,6 +4,8 @@ import game.GameConfig;
 import game.world.World;
 import math.Direction;
 import math.Vector;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,6 +16,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SnakeChunkTest {
     static final GameConfig config = new GameConfig();
+
+    @BeforeAll
+    static void setup() {
+        TestSnakeFactory.setRandom(new Random(747));
+    }
+
+    @AfterAll
+    static void cleanup() {
+        TestSnakeFactory.setRandom(null);
+    }
 
     static double computeSnakeChunkLength(SnakeChunk chunk) {
         final var snakeLength = chunk.getSnake().getLength();
@@ -81,8 +93,8 @@ public class SnakeChunkTest {
 
     @Test
     void testPathDataLengthRemainsTheSame() {
-        final var world = new World(config);
-        final var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
+        final var world = new World(config, false);
+        final var snake = TestSnakeFactory.createSnake(new Vector(0, 0), world);
 
         tickUntilFullLength(snake);
 
@@ -97,7 +109,7 @@ public class SnakeChunkTest {
     @Test
     void testTailChunkDecreasesInLength() {
         final var random = new Random(13374242);
-        final var snake = SnakeFactory.createTestSnake();
+        final var snake = TestSnakeFactory.createSnake();
         snake.grow(64.0);
         tickUntilFullLength(snake);
         tickUntilNewSnakeChunk(snake, random);
@@ -134,7 +146,7 @@ public class SnakeChunkTest {
     @Test
     void testOffsetValues() {
         final var random = new Random(666137);
-        final var snake = SnakeFactory.createTestSnake();
+        final var snake = TestSnakeFactory.createSnake();
         snake.grow(64.0);
         tickUntilFullLength(snake);
         tickUntilNewSnakeChunk(snake, random);
@@ -159,8 +171,8 @@ public class SnakeChunkTest {
     @Test
     void testJunkChunksShouldStayJunk() {
         final var random = new Random(1234);
-        final var world = new World(config);
-        final var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
+        final var world = new World(config, false);
+        final var snake = TestSnakeFactory.createSnake(new Vector(0, 0), world);
 
         snake.grow(64.0);
         tickUntilFullLength(snake);
@@ -182,7 +194,7 @@ public class SnakeChunkTest {
     @Test
     void testGetPositionAtMethod() {
         final var random = new Random(314159);
-        final var snake = SnakeFactory.createTestSnake();
+        final var snake = TestSnakeFactory.createSnake();
         snake.grow(64.0);
         tickUntilNewSnakeChunk(snake, random);
         assertTrue(snake.getSnakeChunks().size() > 1);

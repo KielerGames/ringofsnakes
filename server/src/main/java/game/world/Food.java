@@ -1,16 +1,17 @@
 package game.world;
 
+import game.GameConfig;
 import math.Vector;
 import util.ByteUtilities;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static util.ByteUtilities.toNormalizedDouble;
 
-public class Food {
+public final class Food {
     public static final int BYTE_SIZE = 3;
-    private static final Random rand = new Random();
 
     public final Vector position;
     public final Size size;
@@ -27,31 +28,37 @@ public class Food {
         this.size = size;
     }
 
-    public Food(Vector position, WorldChunk chunk, Size size, byte color) {
-        this(
+    /**
+     * Spawn a food item at the given position.
+     */
+    public static void spawnAt(Vector position, World world, Size size, byte color) {
+        final var chunk = world.chunks.findChunk(position);
+        final var food = new Food(
                 chunk,
                 ByteUtilities.fromNormalizedDoubleToByte((position.x - chunk.box.minX) / chunk.box.getWidth()),
                 ByteUtilities.fromNormalizedDoubleToByte((position.y - chunk.box.minY) / chunk.box.getHeight()),
                 size,
                 color
         );
+        chunk.addFood(food);
     }
 
-    public Food(WorldChunk chunk) {
-        // generate position
+    /**
+     * Spawn food at a random position within the given chunk.
+     */
+    public static void spawnAt(WorldChunk chunk) {
+        Random rand = ThreadLocalRandom.current();
+
+        // Generate random position.
         final var bytePosition = new byte[2];
         rand.nextBytes(bytePosition);
-        // set byte position
-        byteX = bytePosition[0];
-        byteY = bytePosition[1];
-        // set global (double) position
-        final var x = chunk.box.minX + toNormalizedDouble(bytePosition[0]) * chunk.box.getWidth();
-        final var y = chunk.box.minY + toNormalizedDouble(bytePosition[1]) * chunk.box.getHeight();
-        position = new Vector(x, y);
 
-        color = (byte) rand.nextInt(64);
+        // Pick random color.
+        final var color = (byte) rand.nextInt(64);
 
+        // Pick random size.
         final var sizeProb = rand.nextDouble();
+        final Size size;
         if (0.6 <= sizeProb && sizeProb < 0.9) {
             size = Size.MEDIUM;
         } else if (0.9 <= sizeProb) {
@@ -59,9 +66,18 @@ public class Food {
         } else {
             size = Size.SMALL;
         }
+
+        // Create food and add to world.
+        final var food = new Food(chunk, bytePosition[0], bytePosition[1], size, color);
+        chunk.addFood(food);
     }
 
+    /**
+     * Return {@code true} if this food item has a distance less than or equal to
+     * {@code range} from the given point {@code p}.
+     */
     public boolean isWithinRange(Vector p, double range) {
+        range += size.radius;
         return Vector.distance2(position, p) <= range * range;
     }
 
@@ -77,14 +93,16 @@ public class Food {
     public enum Size {
         SMALL(0.64, 0), MEDIUM(1.0, 1), LARGE(1.5, 2);
 
-        public final double value;
+        public final double radius;
         public final byte byteValue;
-        public final double nutritionalValue;
 
-        Size(double value, int bv) {
-            this.value = value;
+        Size(double radius, int bv) {
+            this.radius = radius;
             this.byteValue = (byte) bv;
-            this.nutritionalValue = value * value;
+        }
+
+        public double nutritionalValue(GameConfig config) {
+            return this.radius * this.radius * config.foodNutritionalValue;
         }
     }
 }

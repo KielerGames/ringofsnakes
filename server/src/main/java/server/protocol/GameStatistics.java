@@ -25,7 +25,7 @@ public class GameStatistics extends ServerToClientJSONMessage {
 
         numBots = game.getNumberOfBots();
         final int numNPCs = numBots + 1; // NPCs: bots and boundary snake
-        numPlayers = game.snakes.size() - numNPCs;
+        numPlayers = game.getSnakes().size() - numNPCs;
     }
 
     private static class LeaderboardEntry {

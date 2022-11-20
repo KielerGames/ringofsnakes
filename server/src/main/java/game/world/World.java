@@ -22,19 +22,22 @@ public class World {
     @Getter private final HeatMap heatMap;
 
     public World(double chunkSize, int repetitions) {
-        this(new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions)));
+        this(new GameConfig(new GameConfig.ChunkInfo(chunkSize, repetitions)), false);
     }
 
     public World() {
         this(32.0, 16);
+        spawnInitialFood();
     }
 
-    public World(GameConfig config) {
+    public World(GameConfig config, boolean spawnFood) {
         this.config = config;
         chunks = WorldChunkFactory.createChunks(this);
         box = new BoundingBox(new Vector(0, 0), config.chunks.size * config.chunks.columns, config.chunks.size * config.chunks.rows);
         heatMap = new HeatMap(config, chunks::stream);
-        spawnInitialFood();
+        if (spawnFood) {
+            spawnInitialFood();
+        }
     }
 
     public Vector findSpawnPosition() {
@@ -75,13 +78,11 @@ public class World {
     public void recycleDeadSnake(Snake snake) {
         final var random = getRandom();
 
-        //TODO:
-        // - consider spawning larger food items for larger snakes #120
-        // - fine adjust food value per dead snake
         final var foodScattering = 1.0;
-        final var caloricValueOfSnake = 0.64 * snake.getLength(); //TODO: adjust
-        final var caloricValueOfFoodSpawn = Food.Size.MEDIUM.value * Food.Size.MEDIUM.value * config.foodNutritionalValue;
-        final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFoodSpawn);
+        final var caloricValueOfSnake = 0.64 * snake.getLength();
+        final var foodSize = snake.getWidth() > 3.0 ? Food.Size.LARGE : Food.Size.MEDIUM;
+        final var caloricValueOfFood = foodSize.nutritionalValue(config);
+        final var numberOfFoodSpawns = (int) (caloricValueOfSnake / caloricValueOfFood);
         final var lengthUntilFoodSpawn = snake.getLength() / Math.max(1, numberOfFoodSpawns);
 
         for (int i = 0; i < numberOfFoodSpawns; i++) {
@@ -93,12 +94,13 @@ public class World {
                 continue;
             }
             spawnPosition.addScaled(new Vector(random.nextDouble(), random.nextDouble()), foodScattering);
+
             if (!box.isWithinSubBox(spawnPosition, 1.0)) {
+                // Ignore out-of-bounds food.
                 continue;
             }
-            final var worldChunk = chunks.findChunk(spawnPosition);
-            final var food = new Food(spawnPosition, worldChunk, Food.Size.MEDIUM, snake.getSkin());
-            worldChunk.addFood(food);
+
+            Food.spawnAt(spawnPosition, this, foodSize, snake.getSkin());
         }
     }
 

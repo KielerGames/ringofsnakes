@@ -38,8 +38,9 @@ public class Game {
     public final GameConfig config;
     public final World world;
     public final CollisionManager collisionManager;
-    public final List<Snake> snakes = new LinkedList<>();
+    protected final List<Snake> snakes = new LinkedList<>();
     protected final ExceptionalExecutorService executor;
+    private final List<Snake> unmodifiableViewOfSnakes = Collections.unmodifiableList(snakes);
     private final Map<Session, Client> clientsBySession = Collections.synchronizedMap(new HashMap<>(64));
     private final Multimap<Snake, Client> clientsBySnake = Multimaps.synchronizedMultimap(HashMultimap.create(64, 4));
     private final List<Bot> bots = new LinkedList<>();
@@ -47,21 +48,14 @@ public class Game {
     private byte ticksSinceLastUpdate = 0;
 
     public Game() {
-        this(new GameConfig());
+        this(new World(new GameConfig(), true));
 
         final var boundarySnake = SnakeFactory.createBoundarySnake(world);
         snakes.add(boundarySnake);
     }
 
-    /**
-     * For tests only.
-     */
-    protected Game(GameConfig config) {
-        this(config, new World(config));
-    }
-
-    protected Game(GameConfig config, World world) {
-        this.config = config;
+    protected Game(World world) {
+        this.config = world.getConfig();
         this.world = world;
         executor = new ExceptionalExecutorService();
         executor.onExceptionOrErrorDo((throwable) -> {
@@ -70,6 +64,10 @@ public class Game {
         });
         collisionManager = new CollisionManager(this);
         collisionManager.onCollisionDo(this::onCollision);
+    }
+
+    public List<Snake> getSnakes() {
+        return unmodifiableViewOfSnakes;
     }
 
     private void onCollision(Snake snake, Collidable object) {
@@ -258,23 +256,32 @@ public class Game {
 
     private void eatFood() {
         forEachSnake(snake -> {
-            final var foodCollectRadius = snake.getWidth() * 1.1 + 1.0;
+            final var foodCollectRadius = snake.getWidth() * 1.1 + 0.32;
             final var headPosition = snake.getHeadPosition();
             final var worldChunk = world.chunks.findChunk(headPosition);
 
-            final var collectedFood = worldChunk.streamFood()
-                    .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
-                    .toList();
+            Stream.concat(
+                    Stream.of(worldChunk),
+                    worldChunk.neighbors.stream().filter(chunk -> chunk.box.isWithinRange(headPosition, foodCollectRadius))
+            ).forEach(chunk -> {
+                // Find food to be consumed by the snake.
+                final var collectedFood = chunk.streamFood()
+                        .filter(food -> food.isWithinRange(headPosition, foodCollectRadius))
+                        .toList();
 
-            if (collectedFood.isEmpty()) {
-                return;
-            }
+                if (collectedFood.isEmpty()) {
+                    // Continue with next chunk.
+                    return;
+                }
 
-            final var foodAmount = collectedFood.stream()
-                    .mapToDouble(food -> food.size.nutritionalValue)
-                    .sum();
-            snake.grow(foodAmount * config.foodNutritionalValue / snake.getWidth());
-            worldChunk.removeFood(collectedFood);
+                final var foodAmount = collectedFood.stream()
+                        .mapToDouble(food -> food.size.nutritionalValue(config))
+                        .sum();
+
+                // Consume food.
+                snake.grow(foodAmount / snake.getWidth());
+                chunk.removeFood(collectedFood);
+            });
         });
     }
 

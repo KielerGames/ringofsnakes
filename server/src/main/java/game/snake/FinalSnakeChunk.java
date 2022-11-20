@@ -2,6 +2,7 @@ package game.snake;
 
 import lombok.Getter;
 import math.BoundingBox;
+import math.Vector;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -14,21 +15,23 @@ public class FinalSnakeChunk extends SnakeChunk {
     @Getter private final int uniqueId;
     private final BoundingBox boundingBox;
     final private List<SnakePathPoint> pathData;
-    private double snakeOffset = 0.0;
+    private double offsetInSnake = 0.0;
+    private SnakeChunk.PointQueryInfo lastQueryInfo;
 
     protected FinalSnakeChunk(
             Snake snake,
             ByteBuffer buffer,
             BoundingBox box,
             double dataLength,
-            List<SnakePathPoint> pathData
+            SnakePathPoint[] pathData
     ) {
         super(snake);
 
         assert buffer.position() == BYTE_SIZE;
         assert dataLength > 0;
 
-        this.pathData = pathData;
+        this.pathData = List.of(pathData);
+        this.pathData.forEach(pd -> pd.setFinalSnakeChunk(this));
         chunkByteBuffer = buffer;
         boundingBox = box;
         this.dataLength = dataLength;
@@ -58,11 +61,11 @@ public class FinalSnakeChunk extends SnakeChunk {
 
     @Override
     public double getOffset() {
-        return snakeOffset;
+        return offsetInSnake;
     }
 
     public void setOffset(double offset) {
-        this.snakeOffset = offset;
+        this.offsetInSnake = offset;
         chunkByteBuffer.putFloat(BUFFER_OFFSET_POS, (float) offset);
     }
 
@@ -73,5 +76,23 @@ public class FinalSnakeChunk extends SnakeChunk {
     @Override
     public int hashCode() {
         return this.getUniqueId();
+    }
+
+    @Override
+    public Vector getPositionAt(double inSnakeOffset) {
+        var pathData = getPathData();
+
+        if (lastQueryInfo != null && inSnakeOffset >= lastQueryInfo.offset) {
+            // Performance optimization: Since points in pathData are ordered by offset
+            // we can skip the ones before the last queried point and thereby avoid O(n²)
+            // runtime in World#recycleDeadSnake.
+            pathData = pathData.subList(lastQueryInfo.index, pathData.size());
+        }
+
+        if (lastQueryInfo == null) {
+            lastQueryInfo = new SnakeChunk.PointQueryInfo();
+        }
+
+        return getPositionAt(inSnakeOffset, pathData, lastQueryInfo);
     }
 }

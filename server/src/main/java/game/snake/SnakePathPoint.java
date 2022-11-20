@@ -2,7 +2,7 @@ package game.snake;
 
 import math.Vector;
 
-public class SnakePathPoint {
+public final class SnakePathPoint {
     public final Vector point;
     private final double localPathLength;
     private SnakeChunk snakeChunk;

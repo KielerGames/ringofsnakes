@@ -70,26 +70,4 @@ public class SnakeFactory {
         return (byte) ThreadLocalRandom.current().nextInt(Snake.NUMBER_OF_SKINS);
     }
 
-    // TODO: move methods only used by tests to the test source folder
-    public static Snake createTestSnake() {
-        // TODO: use seeded random in tests
-        final double direction = Direction.getRandom(ThreadLocalRandom.current());
-        return createSnake(new Vector(0, 0), direction, new World(), "TestSnake");
-    }
-
-    public static Snake createTestSnake(World world) {
-        // TODO: use seeded random in tests
-        final double direction = Direction.getRandom(ThreadLocalRandom.current());
-        return createSnake(new Vector(0, 0), direction, world, "TestSnake");
-    }
-
-    public static Snake createTestSnake(Vector position, World world) {
-        // TODO: use seeded random in tests
-        final double direction = Direction.getRandom(ThreadLocalRandom.current());
-        return createTestSnake(position, direction, world);
-    }
-
-    public static Snake createTestSnake(Vector position, double direction, World world) {
-        return createSnake(position, direction, world, "TestSnake");
-    }
 }

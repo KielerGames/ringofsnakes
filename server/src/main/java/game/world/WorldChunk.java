@@ -54,16 +54,11 @@ public class WorldChunk {
     }
 
     public void addFood() {
-        addFood(Collections.singletonList(new Food(this)));
+        Food.spawnAt(this);
     }
 
     public void addFood(Food food) {
         foodList.add(food);
-        onFoodChange();
-    }
-
-    public void addFood(Collection<Food> foodItemsToAdd) {
-        foodList.addAll(foodItemsToAdd);
         onFoodChange();
     }
 

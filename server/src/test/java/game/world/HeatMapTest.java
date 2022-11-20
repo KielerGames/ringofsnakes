@@ -1,6 +1,7 @@
 package game.world;
 
-import game.snake.SnakeFactory;
+import game.snake.TestSnakeFactory;
+import math.Direction;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +26,7 @@ class HeatMapTest {
     void testNonEmptyWorld() {
         final var world = new World();
         final var heatMap = world.getHeatMap();
-        final var snake = SnakeFactory.createTestSnake(world);
+        final var snake = TestSnakeFactory.createSnake(world, Direction.UP);
 
         for (int i = 0; i < 10; i++) {
             snake.tick();

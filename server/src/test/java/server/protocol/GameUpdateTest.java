@@ -2,11 +2,11 @@ package server.protocol;
 
 import game.snake.Snake;
 import game.snake.SnakeChunk;
-import game.snake.SnakeFactory;
+import game.snake.TestSnakeFactory;
 import game.world.World;
 import game.world.WorldChunk;
 import math.BoundingBox;
-import math.Vector;
+import math.Direction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -89,7 +89,7 @@ public class GameUpdateTest {
     @Test
     void testKnowledgeDecay() {
         var client = new TestClient(session);
-        var snake = SnakeFactory.createTestSnake(new Vector(0, 0), world);
+        var snake = TestSnakeFactory.createSnake(world, Direction.LEFT);
 
         for (int i = 0; i < 10; i++) {
             snake.tick();

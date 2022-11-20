@@ -2,7 +2,9 @@ package game.world;
 
 import game.snake.TestSnakeFactory;
 import math.Vector;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -14,6 +16,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class WorldChunkTest {
     final World world = new World();
+
+    @AfterAll
+    static void cleanup() {
+        TestSnakeFactory.setRandom(null);
+    }
+
+    @BeforeEach
+    void setup() {
+        TestSnakeFactory.setRandom(new Random(12345678));
+    }
 
     @Test
     void testNumberOfChunks() {

@@ -1,11 +1,26 @@
 package game.snake;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SnakeWidthTest {
+
+    @AfterAll
+    static void cleanup() {
+        TestSnakeFactory.setRandom(null);
+    }
+
+    @BeforeEach
+    void setup() {
+        TestSnakeFactory.setRandom(new Random(9876543));
+    }
+
     @Test
     void testLowerBound() {
         final var snake = TestSnakeFactory.createSnake();

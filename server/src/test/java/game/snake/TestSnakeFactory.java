@@ -1,30 +1,32 @@
 package game.snake;
 
 import game.world.World;
+import lombok.Setter;
 import math.Direction;
 import math.Vector;
 import org.mockito.Mockito;
 
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
 public class TestSnakeFactory {
     private static char nextSnakeId = (char) 1;
+    @Setter private static Random random;
 
     public static Snake createSnake() {
-        // TODO: use seeded random in tests
-        final double direction = Direction.getRandom(ThreadLocalRandom.current());
-        return SnakeFactory.createSnake(new Vector(0, 0), direction, new World(), "TestSnake");
+        return createSnake(new World());
     }
 
     public static Snake createSnake(World world) {
-        // TODO: use seeded random in tests
-        final double direction = Direction.getRandom(ThreadLocalRandom.current());
+        final double direction = getRandomDirection();
+        return SnakeFactory.createSnake(new Vector(0, 0), direction, world, "TestSnake");
+    }
+
+    public static Snake createSnake(World world, double direction) {
         return SnakeFactory.createSnake(new Vector(0, 0), direction, world, "TestSnake");
     }
 
     public static Snake createSnake(Vector position, World world) {
-        // TODO: use seeded random in tests
-        final double direction = Direction.getRandom(ThreadLocalRandom.current());
+        final double direction = getRandomDirection();
         return createSnake(position, direction, world);
     }
 
@@ -46,5 +48,13 @@ public class TestSnakeFactory {
         world.addSnake(mock);
 
         return mock;
+    }
+
+    private static double getRandomDirection() {
+        if (random == null) {
+            return Direction.RIGHT;
+        }
+
+        return Direction.getRandom(random);
     }
 }

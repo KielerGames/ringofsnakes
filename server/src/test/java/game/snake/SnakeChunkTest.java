@@ -4,6 +4,8 @@ import game.GameConfig;
 import game.world.World;
 import math.Direction;
 import math.Vector;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,6 +16,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SnakeChunkTest {
     static final GameConfig config = new GameConfig();
+
+    @BeforeAll
+    static void setup() {
+        TestSnakeFactory.setRandom(new Random(747));
+    }
+
+    @AfterAll
+    static void cleanup() {
+        TestSnakeFactory.setRandom(null);
+    }
 
     static double computeSnakeChunkLength(SnakeChunk chunk) {
         final var snakeLength = chunk.getSnake().getLength();

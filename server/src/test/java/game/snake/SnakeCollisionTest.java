@@ -21,8 +21,8 @@ public class SnakeCollisionTest {
         final var snake1 = TestSnakeFactory.createSnake(new Vector(center.x, center.y + 0.5 * offset), east, world);
         final var snake2 = TestSnakeFactory.createSnake(new Vector(center.x, center.y - 0.5 * offset), east, world);
         final var testGame = new TestGame(world);
-        testGame.snakes.add(snake1);
-        testGame.snakes.add(snake2);
+        testGame.addSnake(snake1);
+        testGame.addSnake(snake2);
 
         testGame.collisionManager.onCollisionDo((s, sc) -> {
             throw new IllegalStateException("These snakes should never collide.");
@@ -43,8 +43,8 @@ public class SnakeCollisionTest {
         final var snake1 = TestSnakeFactory.createSnake(new Vector(center.x, center.y + 0.5 * offset), 0.0, world);
         final var snake2 = TestSnakeFactory.createSnake(new Vector(center.x, center.y - 0.5 * offset), 0.0, world);
         final var testGame = new TestGame(world);
-        testGame.snakes.add(snake1);
-        testGame.snakes.add(snake2);
+        testGame.addSnake(snake1);
+        testGame.addSnake(snake2);
 
         // make snake 1 longer
         snake1.grow(100.0);

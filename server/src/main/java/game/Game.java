@@ -38,8 +38,9 @@ public class Game {
     public final GameConfig config;
     public final World world;
     public final CollisionManager collisionManager;
-    public final List<Snake> snakes = new LinkedList<>();
+    protected final List<Snake> snakes = new LinkedList<>();
     protected final ExceptionalExecutorService executor;
+    private final List<Snake> unmodifiableViewOfSnakes = Collections.unmodifiableList(snakes);
     private final Map<Session, Client> clientsBySession = Collections.synchronizedMap(new HashMap<>(64));
     private final Multimap<Snake, Client> clientsBySnake = Multimaps.synchronizedMultimap(HashMultimap.create(64, 4));
     private final List<Bot> bots = new LinkedList<>();
@@ -63,6 +64,10 @@ public class Game {
         });
         collisionManager = new CollisionManager(this);
         collisionManager.onCollisionDo(this::onCollision);
+    }
+
+    public List<Snake> getSnakes() {
+        return unmodifiableViewOfSnakes;
     }
 
     private void onCollision(Snake snake, Collidable object) {

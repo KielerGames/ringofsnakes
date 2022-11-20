@@ -54,7 +54,7 @@ public class DebugView extends Application {
                 game.awaitExecution(() -> {
                     ctx.clearRect(0, 0, 800, 600);
 
-                    if (!game.snakes.isEmpty()) {
+                    if (!game.getSnakes().isEmpty()) {
                         final var playerId = game.streamClients()
                                 .filter(Player.class::isInstance)
                                 .map(Player.class::cast)
@@ -87,7 +87,7 @@ public class DebugView extends Application {
     }
 
     private void drawSnakes(GraphicsContext g, OptionalInt playerId) {
-        game.snakes.forEach(snake -> {
+        game.getSnakes().forEach(snake -> {
             g.setFill(Color.BLACK);
             g.setStroke(Color.BLACK);
             if (playerId.isPresent() && snake.id == playerId.getAsInt()) {
@@ -129,8 +129,8 @@ public class DebugView extends Application {
 
 
     private void drawCurrentWorldChunk(GraphicsContext g) {
-        if (game != null && game.snakes.size() != 0) {
-            var snake = game.snakes.get(0);
+        if (game != null && game.getSnakes().size() != 0) {
+            var snake = game.getSnakes().get(0);
             var x = game.world.chunks.findChunk(snake.getHeadPosition()).box.getCenter().x;
             var y = game.world.chunks.findChunk(snake.getHeadPosition()).box.getCenter().y;
             var height = game.world.chunks.findChunk(snake.getHeadPosition()).box.getHeight();

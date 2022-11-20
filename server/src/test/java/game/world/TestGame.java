@@ -19,6 +19,10 @@ public class TestGame extends Game {
         this.collisionManager.onCollisionDo((s, sc) -> collisions.add(new CollisionInfo(s, sc)));
     }
 
+    public static TestGame createWithSmallWorld() {
+        return new TestGame(new World(24.0, 3));
+    }
+
     public void tickN(int n, boolean stopAfterCollision) {
         for (int i = 0; i < n; i++) {
             this.tick();
@@ -27,6 +31,10 @@ public class TestGame extends Game {
                 return;
             }
         }
+    }
+
+    public void addSnake(Snake snake) {
+        this.snakes.add(snake);
     }
 
     public record CollisionInfo(Snake snake, Collidable object) {

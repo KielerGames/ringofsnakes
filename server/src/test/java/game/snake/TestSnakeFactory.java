@@ -31,4 +31,20 @@ public class TestSnakeFactory {
     public static Snake createSnake(Vector position, double direction, World world) {
         return SnakeFactory.createSnake(position, direction, world, "TestSnake");
     }
+
+    public static Snake createMockedSnake(Vector position, World world) {
+        var id = nextSnakeId++;
+        var snake = new Snake(id, world, "TestSnake", (byte) 0);
+
+        snake.headPosition = position.clone();
+        snake.headDirection = Direction.RIGHT;
+        snake.setTargetDirection(snake.getHeadDirection());
+        snake.beginChunk();
+
+        var mock = Mockito.spy(snake);
+
+        world.addSnake(mock);
+
+        return mock;
+    }
 }

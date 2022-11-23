@@ -13,7 +13,7 @@ export function initTexture(
     assert(slot >= 0);
     const gl = WebGLContextProvider.getContext();
 
-    if (textures.has(slot)) {
+    if (__DEBUG__ && textures.has(slot)) {
         throw new Error(`Texture slot ${slot} is already occupied.`);
     }
 

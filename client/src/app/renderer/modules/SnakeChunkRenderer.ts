@@ -12,10 +12,10 @@ import * as TextureManager from "../webgl/TextureManager";
 
 const finalChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
 const growingChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
-let basicMaterialShader: WebGLShaderProgram;
+let shader: WebGLShaderProgram;
 
 (async () => {
-    basicMaterialShader = await compileShader("snake", [
+    shader = await compileShader("snake", [
         "aPosition",
         "aNormal",
         "aNormalOffset",
@@ -39,7 +39,6 @@ let basicMaterialShader: WebGLShaderProgram;
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
     const camera = game.camera;
-    const shader = basicMaterialShader;
 
     shader.use((gl) => {
         shader.setUniform("uTransform", transform.data);

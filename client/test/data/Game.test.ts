@@ -6,7 +6,7 @@ import { DataUpdateDTO } from "../../src/app/data/dto/DataUpdateDTO";
 import * as FrameTime from "../../src/app/util/FrameTime";
 
 jest.mock("../../src/app/worker/WorkerFactory", () => ({
-    default: () => RemoteMock
+    default: () => Promise.resolve(RemoteMock)
 }));
 
 jest.mock("comlink", () => ({

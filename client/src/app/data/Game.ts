@@ -38,8 +38,8 @@ export default class Game {
     #targetSnakeKills: number = 0;
     #stopped: boolean = false;
 
-    private constructor() {
-        this.#remote = createRemote();
+    private constructor(remote: Comlink.Remote<WorkerAPI>) {
+        this.#remote = remote;
         this.snakes = new ManagedMap((dto) => new Snake(dto, this.#config));
         this.snakeChunks = new ManagedMap((dto) => {
             const snake = this.snakes.get(dto.snakeId);
@@ -64,8 +64,8 @@ export default class Game {
     }
 
     static async joinAsPlayer(): Promise<[Game, Player]> {
-        const game = new Game();
-        const remote = game.#remote;
+        const remote = await createRemote();
+        const game = new Game(remote);
 
         const info = await remote.init(__GAME_SERVER__).catch(async (e) => {
             await dialog({ title: "Error", content: `Failed to connect to the game server.` });

@@ -3,7 +3,6 @@ import requireNonNull from "../../util/requireNonNull";
 import * as WebGLContextProvider from "./WebGLContextProvider";
 
 const textures: Map<number, WebGLTexture> = new Map();
-const images: Map<string, Promise<HTMLImageElement>> = new Map();
 
 export function initTexture(
     slot: number,
@@ -39,50 +38,6 @@ export function initTexture(
     }
 
     return texture;
-}
-
-export function loadImage(url: string): Promise<HTMLImageElement>;
-export function loadImage(url: string, size: number): Promise<HTMLImageElement>;
-export function loadImage(url: string, width: number, height: number): Promise<HTMLImageElement>;
-export async function loadImage(
-    url: string,
-    width?: number,
-    height?: number
-): Promise<HTMLImageElement> {
-    if (width !== undefined && height === undefined) {
-        height = width;
-    }
-
-    // Avoid fetching the same image twice.
-    if (images.has(url)) {
-        const image = await images.get(url)!;
-
-        if (width !== undefined) {
-            image.width = width;
-        }
-        if (height !== undefined) {
-            image.height = height;
-        }
-
-        return image;
-    }
-
-    return await loadNewImage(url, width, height);
-}
-
-async function loadNewImage(url: string, width?: number, height?: number): Promise<HTMLImageElement> {
-    const promise = new Promise<HTMLImageElement>((resolve, reject) => {
-        const image = new Image(width, height);
-        image.onload = () => resolve(image);
-        image.onerror = reject;
-        image.src = url;
-    });
-
-    // Store the promise before it has finished loading so it can be reused immediately.
-    images.set(url, promise);
-
-    const image = await promise;
-    return image;
 }
 
 type TextureOptions = {

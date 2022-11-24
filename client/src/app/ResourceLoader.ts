@@ -10,19 +10,6 @@ class LoadingStage {
         this.#previous = previous ?? null;
     }
 
-    async waitForCompletion(): Promise<void> {
-        if (this.#numRequested === 0) {
-            await sleep(0);
-            if (this.#numRequested === 0) {
-                console.error(this);
-                throw new Error("Loading failed.");
-            }
-            return await this.waitForCompletion();
-        }
-
-        return await this.#completion;
-    }
-
     loadJSON<ResultType>(url: string, guard?: TypeGuard<ResultType>): Promise<ResultType> {
         return this.#fetch(url, async (response) => {
             guard = guard ?? defaultGuard;
@@ -31,16 +18,22 @@ class LoadingStage {
             if (guard(data)) {
                 return data;
             } else {
-                return Promise.reject(new Error("Invalid JSON data."));
+                throw new Error("Invalid JSON data.");
             }
         });
     }
 
-    loadImage(url: string): Promise<HTMLImageElement> {
+    loadImage(url: string, size?: number): Promise<HTMLImageElement>;
+    loadImage(url: string, width: number, height: number): Promise<HTMLImageElement>;
+    loadImage(url: string, width?: number, height?: number): Promise<HTMLImageElement> {
+        if (width !== undefined && height === undefined) {
+            height = width;
+        }
+        
         return this.#fetch(url, async (response) => {
             const blob = await response.blob();
             const blobURL = URL.createObjectURL(blob);
-            const image = new Image();
+            const image = new Image(width, height);
             await new Promise((resolve, reject) => {
                 image.onload = resolve;
                 image.onerror = reject;
@@ -60,6 +53,19 @@ class LoadingStage {
             return 0;
         }
         return this.#numCompleted / this.#numRequested;
+    }
+
+    async waitForCompletion(): Promise<void> {
+        if (this.#numRequested === 0) {
+            await sleep(0);
+            if (this.#numRequested === 0) {
+                console.error(this);
+                throw new Error("Loading failed.");
+            }
+            return await this.waitForCompletion();
+        }
+
+        return await this.#completion;
     }
 
     #waitForStart(): Promise<void> {
@@ -100,6 +106,7 @@ async function getResponse(url: string): Promise<Response> {
             method: "GET",
             cache: __DEBUG__ ? "no-store" : "force-cache"
         });
+        // Store the promise before it has finished loading so it can be reused immediately.
         requests.set(url, promise);
     }
 

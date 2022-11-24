@@ -1,4 +1,4 @@
-import { loadJSON } from "../../util/JSONLoader";
+import * as ResourceLoader from "../../ResourceLoader";
 
 export type ClientConfig = {
     server: {
@@ -18,9 +18,10 @@ const defaultConfig: ClientConfig = {
     }
 };
 
-const configPromise: Promise<ClientConfig> = loadJSON<ClientConfig>("client-config.json", {
-    guard: isValidClientConfig
-}).then(
+const configPromise: Promise<ClientConfig> = ResourceLoader.MAIN.loadJSON<ClientConfig>(
+    "client-config.json",
+    isValidClientConfig
+).then(
     (cfg) => {
         if (HTTPS && !cfg.server.wss) {
             throw new Error("Cannot use insecure websocket connection.");

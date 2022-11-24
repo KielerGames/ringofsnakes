@@ -19,12 +19,7 @@ let shader: WebGLShaderProgram;
     const GL2 = WebGL2RenderingContext;
 
     const [shaderProgram, image] = await Promise.all([
-        compileShader("snake", [
-            "aPosition",
-            "aNormal",
-            "aNormalOffset",
-            "aRelativePathOffset"
-        ]),
+        compileShader("snake", ["aPosition", "aNormal", "aNormalOffset", "aRelativePathOffset"]),
         ResourceLoader.MAIN.loadImage("assets/scales.svg", 128)
     ]);
 

@@ -8,7 +8,7 @@ import { GameStatisticsDTO } from "./dto/GameStatisticsDTO";
 import Vector from "../math/Vector";
 import Player from "./Player";
 import FoodChunk from "./world/FoodChunk";
-import createRemote from "../worker/WorkerFactory";
+import createRemote from "../worker/factory";
 import { ManagedMap } from "../util/ManagedMap";
 import { SnakeDTO } from "./dto/SnakeDTO";
 import { SnakeChunkDTO } from "./dto/SnakeChunkDTO";

@@ -5,7 +5,7 @@ import * as UserInput from "../../src/app/input/UserInput";
 import { DataUpdateDTO } from "../../src/app/data/dto/DataUpdateDTO";
 import * as FrameTime from "../../src/app/util/FrameTime";
 
-jest.mock("../../src/app/worker/WorkerFactory", () => ({
+jest.mock("../../src/app/worker/factory", () => ({
     default: () => Promise.resolve(RemoteMock)
 }));
 

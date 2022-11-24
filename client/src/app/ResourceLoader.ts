@@ -29,7 +29,7 @@ class LoadingStage {
         if (width !== undefined && height === undefined) {
             height = width;
         }
-        
+
         return this.#fetch(url, async (response) => {
             const blob = await response.blob();
             const blobURL = URL.createObjectURL(blob);

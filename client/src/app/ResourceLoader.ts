@@ -4,55 +4,55 @@ class LoadingStage {
     #previous: LoadingStage | null = null;
     #numRequested = 0;
     #numCompleted = 0;
+    #completion: Promise<void> = Promise.resolve();
 
     constructor(previous?: LoadingStage) {
         this.#previous = previous ?? null;
     }
 
-    waitForCompletion(): Promise<void> {
-        // TODO
-        return Promise.resolve();
-    }
-
-    async loadJSON<ResultType>(url: string, guard?: TypeGuard<ResultType>): Promise<ResultType> {
-        guard = guard ?? defaultGuard;
-        await this.#waitForStart();
-        this.#numRequested++;
-        const response = await getResponse(url);
-        const data = await response.json();
-        this.#numCompleted++;
-
-        if (guard(data)) {
-            return data;
-        } else {
-            return Promise.reject(new Error("Invalid JSON data."));
+    async waitForCompletion(): Promise<void> {
+        if (this.#numRequested === 0) {
+            await sleep(0);
+            if (this.#numRequested === 0) {
+                console.error(this);
+                throw new Error("Loading failed.");
+            }
+            return await this.waitForCompletion();
         }
+
+        return await this.#completion;
     }
 
-    async loadImage(url: string): Promise<HTMLImageElement> {
-        await this.#waitForStart();
-        this.#numRequested++;
-        const response = await getResponse(url);
-        const blob = await response.blob();
-        const blobURL = URL.createObjectURL(blob);
-        const image = new Image();
-        await new Promise((resolve, reject) => {
-            image.onload = resolve;
-            image.onerror = reject;
-            image.src = blobURL;
+    loadJSON<ResultType>(url: string, guard?: TypeGuard<ResultType>): Promise<ResultType> {
+        return this.#fetch(url, async (response) => {
+            guard = guard ?? defaultGuard;
+            const data = await response.json();
+
+            if (guard(data)) {
+                return data;
+            } else {
+                return Promise.reject(new Error("Invalid JSON data."));
+            }
         });
-        URL.revokeObjectURL(blobURL);
-        this.#numCompleted++;
-        return image;
     }
 
-    async loadWorker(url: string): Promise<Blob> {
-        await this.#waitForStart();
-        this.#numRequested++;
-        const response = await getResponse(url);
-        const blob = await response.blob();
-        this.#numCompleted++;
-        return blob;
+    loadImage(url: string): Promise<HTMLImageElement> {
+        return this.#fetch(url, async (response) => {
+            const blob = await response.blob();
+            const blobURL = URL.createObjectURL(blob);
+            const image = new Image();
+            await new Promise((resolve, reject) => {
+                image.onload = resolve;
+                image.onerror = reject;
+                image.src = blobURL;
+            });
+            URL.revokeObjectURL(blobURL);
+            return image;
+        });
+    }
+
+    loadWorker(url: string): Promise<Blob> {
+        return this.#fetch(url, (response) => response.blob());
     }
 
     get progress(): number {
@@ -68,6 +68,22 @@ class LoadingStage {
         }
 
         return this.#previous.waitForCompletion();
+    }
+
+    #fetch<T>(url: string, mapFunc: (response: Response) => Promise<T>): Promise<T> {
+        // Promises of a loading stage should execute concurrently (not sequentially).
+        const promise = (async () => {
+            await this.#waitForStart();
+            this.#numRequested++;
+            const response = await getResponse(url);
+            const result = await mapFunc(response);
+            this.#numCompleted++;
+            return result;
+        })();
+
+        this.#completion = Promise.all([this.#completion, promise]).then(() => undefined);
+
+        return promise;
     }
 }
 
@@ -90,10 +106,14 @@ async function getResponse(url: string): Promise<Response> {
     const response = await promise;
 
     if (!response.ok) {
-        return Promise.reject(new Error(`Failed to load (status ${response.status}): ${url}`));
+        throw new Error(`Failed to load (status ${response.status}): ${url}`);
     }
 
     return response;
+}
+
+function sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 function defaultGuard<T>(data: unknown): data is T {

@@ -8,6 +8,7 @@ import * as TextRenderer from "./renderer/modules/TextRenderer";
 import * as GameRenderer from "./renderer/GameRenderer";
 import * as UserInput from "./input/UserInput";
 import * as InputDirectionDisplay from "./ui/InputDirectionDisplay";
+import * as ResourceLoader from "./ResourceLoader";
 import { dialog, init as initDialogs } from "./ui/Dialogs";
 
 // create styles (in <head>)
@@ -36,6 +37,9 @@ UserInput.init(uiRoot);
 initDialogs();
 
 (async () => {
+    await ResourceLoader.MAIN.waitForCompletion();
+    console.log("Loading completed.");
+
     FrameTime.update(performance.now());
 
     while (true) {

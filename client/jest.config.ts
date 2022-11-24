@@ -10,7 +10,8 @@ const config: JestConfigWithTsJest = {
     globals: {
         __DEBUG__: true,
         __TEST__: true,
-        __VERSION__: "TEST VERSION"
+        __VERSION__: "TEST VERSION",
+        __GAME_SERVER__: "ws://127.0.0.1:8080/test",
     },
     collectCoverageFrom: ["**/src/app/**/*.{ts,tsx}", "!**/test/**", "!**/node_modules/**"],
     errorOnDeprecated: true

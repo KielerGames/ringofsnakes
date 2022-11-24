@@ -9,10 +9,6 @@ jest.mock("../../src/app/worker/WorkerFactory", () => ({
     default: () => RemoteMock
 }));
 
-jest.mock("../../src/app/data/config/ClientConfig", () => ({
-    get: () => ({})
-}));
-
 jest.mock("comlink", () => ({
     proxy: (callback: () => void) => callback
 }));

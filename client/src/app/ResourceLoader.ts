@@ -65,7 +65,10 @@ class LoadingStage {
             return await this.waitForCompletion();
         }
 
-        return await this.#completion;
+        while (this.#numCompleted < this.#numRequested) {
+            await this.#completion;
+            await sleep(0);
+        }
     }
 
     #waitForStart(): Promise<void> {

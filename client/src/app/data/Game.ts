@@ -1,6 +1,5 @@
 import * as Comlink from "comlink";
 import { WorkerAPI } from "../worker/worker";
-import * as ClientConfig from "./config/ClientConfig";
 import { GameConfig } from "./config/GameConfig";
 import Camera from "./camera/Camera";
 import Snake from "./snake/Snake";
@@ -65,11 +64,10 @@ export default class Game {
     }
 
     static async joinAsPlayer(): Promise<[Game, Player]> {
-        const clientConfig = await ClientConfig.get();
         const game = new Game();
         const remote = game.#remote;
 
-        const info = await remote.init(clientConfig).catch(async (e) => {
+        const info = await remote.init(__GAME_SERVER__).catch(async (e) => {
             await dialog({ title: "Error", content: `Failed to connect to the game server.` });
             return Promise.reject(e);
         });

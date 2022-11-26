@@ -1,0 +1,28 @@
+#loading-screen {
+    position: absolute;
+    inset: 0;
+    background-color: rgb(16,16,16);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-bar {
+    position: relative;
+    width: 400px;
+    max-width: 80vw;
+    height: 18px;
+    background-color: rgb(64,64,64);
+    overflow: hidden;
+
+    &::before {
+        content: " ";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: calc(100% * var(--progress));
+        background-color: rgb(75, 150, 255);
+        transition: width 0.33s;
+    }
+}

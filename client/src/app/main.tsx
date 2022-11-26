@@ -13,6 +13,7 @@ import { dialog, init as initDialogs } from "./ui/Dialogs";
 
 // create styles (in <head>)
 import "../styles/main.less";
+import LoadingScreen from "./ui/components/LoadingScreen";
 
 // initialize main canvas
 const canvas = document.createElement("canvas");
@@ -32,6 +33,7 @@ InputDirectionDisplay.appendTo(document.body);
 const uiRoot = document.createElement("div");
 uiRoot.id = "root";
 document.body.append(uiRoot);
+Preact.render(Preact.createElement(LoadingScreen, { stage: ResourceLoader.MAIN }), uiRoot);
 UserInput.init(uiRoot);
 
 initDialogs();

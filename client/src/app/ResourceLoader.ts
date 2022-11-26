@@ -3,7 +3,7 @@ import { Consumer } from "./util/FunctionTypes";
 
 const requests = new Map<string, Promise<Response>>();
 
-class LoadingStage {
+export class LoadingStage {
     #previous: LoadingStage | null = null;
     #numRequested = 0;
     #numCompleted = 0;
@@ -73,6 +73,8 @@ class LoadingStage {
             await this.#completion;
             await nextTick();
         }
+
+        this.#changeEvent.done();
     }
 
     addChangeListener(onchange: Consumer<number>): void {

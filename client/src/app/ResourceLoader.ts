@@ -1,3 +1,6 @@
+import { AppEvent } from "./util/AppEvent";
+import { Consumer } from "./util/FunctionTypes";
+
 const requests = new Map<string, Promise<Response>>();
 
 class LoadingStage {
@@ -5,6 +8,7 @@ class LoadingStage {
     #numRequested = 0;
     #numCompleted = 0;
     #completion: Promise<void> = Promise.resolve();
+    #changeEvent = new AppEvent<number>();
 
     constructor(previous?: LoadingStage) {
         this.#previous = previous ?? null;
@@ -57,7 +61,7 @@ class LoadingStage {
 
     async waitForCompletion(): Promise<void> {
         if (this.#numRequested === 0) {
-            await sleep(0);
+            await nextTick();
             if (this.#numRequested === 0) {
                 console.error(this);
                 throw new Error("Loading failed.");
@@ -67,8 +71,12 @@ class LoadingStage {
 
         while (this.#numCompleted < this.#numRequested) {
             await this.#completion;
-            await sleep(0);
+            await nextTick();
         }
+    }
+
+    addChangeListener(onchange: Consumer<number>): void {
+        this.#changeEvent.addListener(onchange);
     }
 
     #waitForStart(): Promise<void> {
@@ -91,6 +99,8 @@ class LoadingStage {
         })();
 
         this.#completion = Promise.all([this.#completion, promise]).then(() => undefined);
+
+        promise.then(() => nextTick()).then(() => this.#changeEvent.trigger(this.progress));
 
         return promise;
     }
@@ -122,8 +132,8 @@ async function getResponse(url: string): Promise<Response> {
     return response;
 }
 
-function sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => window.setTimeout(resolve, ms));
+function nextTick(): Promise<void> {
+    return new Promise((resolve) => window.setTimeout(resolve, 0));
 }
 
 function defaultGuard<T>(data: unknown): data is T {

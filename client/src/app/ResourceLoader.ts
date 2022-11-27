@@ -10,10 +10,17 @@ export class LoadingStage {
     #completion: Promise<void> = Promise.resolve();
     #changeEvent = new AppEvent<number>();
 
+    /**
+     * If there is a previous stage all loading requests of this stage
+     * will wait for the previous stage to complete.
+     */
     constructor(previous?: LoadingStage) {
         this.#previous = previous ?? null;
     }
 
+    /**
+     * Fetch and parse JSON. The parsed JSON can be validated with a guard function.
+     */
     loadJSON<ResultType>(url: string, guard?: TypeGuard<ResultType>): Promise<ResultType> {
         return this.#fetch(url, async (response) => {
             guard = guard ?? defaultGuard;
@@ -48,10 +55,16 @@ export class LoadingStage {
         });
     }
 
-    loadWorker(url: string): Promise<Blob> {
+    /**
+     * Load a resource as a blob. Can be used to load worker scripts.
+     */
+    loadBlob(url: string): Promise<Blob> {
         return this.#fetch(url, (response) => response.blob());
     }
 
+    /**
+     * Get the loading progress as a number between 0 and 1.
+     */
     get progress(): number {
         if (this.#numRequested === 0) {
             return 0;
@@ -59,6 +72,10 @@ export class LoadingStage {
         return this.#numCompleted / this.#numRequested;
     }
 
+    /**
+     * Get a promise that resolved when all resources associated with
+     * this loading task have been successfully loaded.
+     */
     async waitForCompletion(): Promise<void> {
         if (this.#numRequested === 0) {
             await nextTick();
@@ -77,6 +94,10 @@ export class LoadingStage {
         this.#changeEvent.done();
     }
 
+    /**
+     * Listen for loading progress changes. Listeners will be removed
+     * automatically when loading of this stage has completed.
+     */
     addChangeListener(onchange: Consumer<number>): void {
         this.#changeEvent.addListener(onchange);
     }

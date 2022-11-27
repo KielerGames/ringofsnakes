@@ -5,7 +5,7 @@ import * as ResourceLoader from "../ResourceLoader";
 // can be mocked in tests
 
 const blobURL = (async () => {
-    const blob = await ResourceLoader.PREGAME.loadWorker("worker.bundle.js");
+    const blob = await ResourceLoader.PREGAME.loadBlob("worker.bundle.js");
     return URL.createObjectURL(blob);
 })();
 

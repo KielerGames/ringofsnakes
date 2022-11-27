@@ -23,6 +23,10 @@ module.exports = (env, argv) => {
     const mode = argv.mode ?? "development";
     const versionString = pkg.version + (mode === "development" ? "-dev" : "");
 
+    if (mode === "production" && process.env.GAME_SERVER === undefined) {
+        console.warn("WARNING: GAME_SERVER env variable not set.");
+    }
+
     return {
         mode: mode ?? "development",
         entry: {

@@ -15,3 +15,6 @@ This should create
  - `public/shaders.json`.
 
 Open `public/index.html` in a web browser.
+
+> **Note**:
+> You can configure the server address the client will connect to by setting an environment variable `GAME_SERVER`. The default value is `ws://127.0.0.1:8080/game`.

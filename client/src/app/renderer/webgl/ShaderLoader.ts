@@ -1,8 +1,8 @@
 import { dialog } from "../../ui/Dialogs";
 import AsyncEvent from "../../util/AsyncEvent";
-import { loadJSON } from "../../util/JSONLoader";
 import WebGLShaderProgram from "./WebGLShaderProgram";
 import * as WebGLContextProvider from "./WebGLContextProvider";
+import * as ResourceLoader from "../../ResourceLoader";
 
 type Filename = string;
 type ShaderSource = string;
@@ -13,8 +13,9 @@ const loaded = new AsyncEvent();
 
 (async () => {
     const filePath = "shaders.json?h=" + __SHADER_HASH__;
-    const shaderData = await loadJSON<JSONData>(filePath, {
-        guard: function (data: unknown): data is JSONData {
+    const shaderData = await ResourceLoader.MAIN.loadJSON<JSONData>(
+        filePath,
+        (data: unknown): data is JSONData => {
             if (typeof data !== "object") {
                 return false;
             }
@@ -37,7 +38,7 @@ const loaded = new AsyncEvent();
 
             return true;
         }
-    });
+    );
 
     for (const [key, value] of Object.entries(shaderData)) {
         shaders.set(key, value);

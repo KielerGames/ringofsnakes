@@ -1,5 +1,4 @@
 import * as Comlink from "comlink";
-import { ClientConfig } from "../data/config/ClientConfig";
 import { connect, Socket } from "./socket";
 import RateLimiter from "../util/RateLimiter";
 import GameDataBuffer from "./data/GameDataBuffer";
@@ -36,15 +35,13 @@ const events = {
 const data = new GameDataBuffer(triggerServerUpdateEvent);
 
 const api = {
-    async init(cfg: Readonly<ClientConfig>): Promise<GameInfoDTO> {
+    async init(server: string): Promise<GameInfoDTO> {
         if (socket !== null) {
             throw new Error("Worker is already initialized.");
         }
 
-        const protocol = cfg.server.wss ? "wss" : "ws";
-        const url = `${protocol}://${cfg.server.host}:${cfg.server.port}/game`;
-        console.info(`Connecting to ${url}`);
-        socket = await connect(url);
+        console.info(`Connecting to ${server}`);
+        socket = await connect(server);
 
         const gameInfo: GameInfo = await new Promise((resolve, reject) => {
             const timeoutId = setTimeout(() => reject(new Error("GameInfo timeout.")), 1500);

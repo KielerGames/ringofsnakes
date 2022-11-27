@@ -1,6 +1,5 @@
 import * as Comlink from "comlink";
 import { WorkerAPI } from "../worker/worker";
-import * as ClientConfig from "./config/ClientConfig";
 import { GameConfig } from "./config/GameConfig";
 import Camera from "./camera/Camera";
 import Snake from "./snake/Snake";
@@ -9,7 +8,7 @@ import { GameStatisticsDTO } from "./dto/GameStatisticsDTO";
 import Vector from "../math/Vector";
 import Player from "./Player";
 import FoodChunk from "./world/FoodChunk";
-import createRemote from "../worker/WorkerFactory";
+import createRemote from "../worker/factory";
 import { ManagedMap } from "../util/ManagedMap";
 import { SnakeDTO } from "./dto/SnakeDTO";
 import { SnakeChunkDTO } from "./dto/SnakeChunkDTO";
@@ -39,8 +38,8 @@ export default class Game {
     #targetSnakeKills: number = 0;
     #stopped: boolean = false;
 
-    private constructor() {
-        this.#remote = createRemote();
+    private constructor(remote: Comlink.Remote<WorkerAPI>) {
+        this.#remote = remote;
         this.snakes = new ManagedMap((dto) => new Snake(dto, this.#config));
         this.snakeChunks = new ManagedMap((dto) => {
             const snake = this.snakes.get(dto.snakeId);
@@ -65,11 +64,10 @@ export default class Game {
     }
 
     static async joinAsPlayer(): Promise<[Game, Player]> {
-        const clientConfig = await ClientConfig.get();
-        const game = new Game();
-        const remote = game.#remote;
+        const remote = await createRemote();
+        const game = new Game(remote);
 
-        const info = await remote.init(clientConfig).catch(async (e) => {
+        const info = await remote.init(__GAME_SERVER__).catch(async (e) => {
             await dialog({ title: "Error", content: `Failed to connect to the game server.` });
             return Promise.reject(e);
         });

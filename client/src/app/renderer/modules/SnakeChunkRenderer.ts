@@ -9,21 +9,22 @@ import * as SkinLoader from "../SkinLoader";
 import Vector from "../../math/Vector";
 import { compileShader } from "../webgl/ShaderLoader";
 import * as TextureManager from "../webgl/TextureManager";
+import * as ResourceLoader from "../../ResourceLoader";
 
 const finalChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
 const growingChunkBuffers = new WeakMap<SnakeChunk, WebGLBuffer>();
-let basicMaterialShader: WebGLShaderProgram;
+let shader: WebGLShaderProgram;
 
 (async () => {
-    basicMaterialShader = await compileShader("snake", [
-        "aPosition",
-        "aNormal",
-        "aNormalOffset",
-        "aRelativePathOffset"
+    const GL2 = WebGL2RenderingContext;
+
+    const [shaderProgram, image] = await Promise.all([
+        compileShader("snake", ["aPosition", "aNormal", "aNormalOffset", "aRelativePathOffset"]),
+        ResourceLoader.MAIN.loadImage("assets/scales.svg", 128)
     ]);
 
-    const GL2 = WebGL2RenderingContext;
-    const image = await TextureManager.loadImage("assets/scales.svg", 128);
+    shader = shaderProgram;
+
     TextureManager.initTexture(
         1,
         {
@@ -39,7 +40,6 @@ let basicMaterialShader: WebGLShaderProgram;
 
 export function render(game: Readonly<Game>, transform: ReadonlyMatrix): void {
     const camera = game.camera;
-    const shader = basicMaterialShader;
 
     shader.use((gl) => {
         shader.setUniform("uTransform", transform.data);

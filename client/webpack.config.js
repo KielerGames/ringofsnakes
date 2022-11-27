@@ -64,7 +64,8 @@ module.exports = (env, argv) => {
                 __VERSION__: JSON.stringify(versionString),
                 __SHADER_HASH__: JSON.stringify(SHADER_HASH),
                 __DEBUG__: mode === "development" ? "true" : "false",
-                __TEST__: "false"
+                __TEST__: "false",
+                __GAME_SERVER__: JSON.stringify(process.env.GAME_SERVER ?? "ws://127.0.0.1:8080/game")
             }),
             new BundleAnalyzerPlugin({
                 analyzerMode: mode === "development" ? "disabled" : "static",

@@ -1,9 +1,9 @@
 import type { ReadonlyMatrix } from "../../math/Matrix";
 import { compileShader } from "../webgl/ShaderLoader";
 import WebGLShaderProgram from "../webgl/WebGLShaderProgram";
-import * as WebGLContextProvider from "../webgl/WebGLContextProvider";
 import * as TextureManager from "../webgl/TextureManager";
 import Matrix from "../../math/Matrix";
+import * as ResourceLoader from "../../ResourceLoader";
 
 let shaderProgram: WebGLShaderProgram;
 const textureSlot = 4;
@@ -21,9 +21,14 @@ export function render(transform: ReadonlyMatrix): void {
 }
 
 (async () => {
-    const gl = await WebGLContextProvider.waitForContext();
+    const GL2 = WebGL2RenderingContext;
 
-    shaderProgram = await compileShader("background");
+    const [shader, image] = await Promise.all([
+        compileShader("background"),
+        ResourceLoader.MAIN.loadImage("assets/background.svg", 128)
+    ]);
+
+    shaderProgram = shader;
     shaderProgram.setFixedBuffer(
         // prettier-ignore
         new Float32Array([
@@ -34,14 +39,12 @@ export function render(transform: ReadonlyMatrix): void {
         ]).buffer
     );
 
-    const image = await TextureManager.loadImage("assets/background.svg", 128);
-
     TextureManager.initTexture(
         textureSlot,
         {
-            wrap: gl.REPEAT,
-            minFilter: gl.LINEAR_MIPMAP_LINEAR,
-            magFilter: gl.LINEAR
+            wrap: GL2.REPEAT,
+            minFilter: GL2.LINEAR_MIPMAP_LINEAR,
+            magFilter: GL2.LINEAR
         },
         (gl) => {
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);

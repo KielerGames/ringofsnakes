@@ -12,7 +12,7 @@ export function initTexture(
     assert(slot >= 0);
     const gl = WebGLContextProvider.getContext();
 
-    if (textures.has(slot)) {
+    if (__DEBUG__ && textures.has(slot)) {
         throw new Error(`Texture slot ${slot} is already occupied.`);
     }
 
@@ -38,22 +38,6 @@ export function initTexture(
     }
 
     return texture;
-}
-
-export function loadImage(url: string): Promise<HTMLImageElement>;
-export function loadImage(url: string, size: number): Promise<HTMLImageElement>;
-export function loadImage(url: string, width: number, height: number): Promise<HTMLImageElement>;
-export function loadImage(url: string, width?: number, height?: number): Promise<HTMLImageElement> {
-    if (width !== undefined && height === undefined) {
-        height = width;
-    }
-    const image = new Image(width, height);
-
-    return new Promise((resolve, reject) => {
-        image.onload = () => resolve(image);
-        image.onerror = reject;
-        image.src = url;
-    });
 }
 
 type TextureOptions = {

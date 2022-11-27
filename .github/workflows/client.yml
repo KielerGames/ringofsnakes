@@ -35,6 +35,8 @@ jobs:
         working-directory: client
         
       - name: Build client
+        env:
+          GAME_SERVER: ${{ secrets.GAME_SERVER }}
         run: npm run build:production
         working-directory: client
         

@@ -55,7 +55,7 @@ jobs:
     concurrency: game-server # avoid multiple jobs of this kind to run at the same time
     steps:
       - name: Download jar from previous job
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v3.0.1
         with:
           name: server-uber-jar
 

@@ -120,7 +120,10 @@ function addDebugBox(game: Readonly<Game>, chunk: Readonly<SnakeChunk>) {
 
     if (chunk !== snake.headChunk) {
         const worldPosition = new Vector(chunk.boundingBox.minX, chunk.boundingBox.maxY);
-        const canvasPosition = game.camera.computeScreenCoordinates(worldPosition, gl.canvas);
+        const canvasPosition = game.camera.computeScreenCoordinates(
+            worldPosition,
+            gl.canvas as HTMLCanvasElement
+        );
         TextRenderer.addText(chunk.debugInfo, "sc" + chunk.id, {
             x: canvasPosition.x,
             y: canvasPosition.y,

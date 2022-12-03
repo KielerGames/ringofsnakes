@@ -20,7 +20,7 @@ export function render(game: Readonly<Game>): void {
             continue;
         }
 
-        const p = game.camera.computeScreenCoordinates(snake.position, canvas);
+        const p = game.camera.computeScreenCoordinates(snake.position, canvas as HTMLCanvasElement);
         const offset = 10 + 0.5 * snake.width;
         const text = snake.name;
 

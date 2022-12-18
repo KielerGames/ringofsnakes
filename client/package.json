@@ -24,7 +24,7 @@
     "author": "KielerGames",
     "devDependencies": {
         "@types/jest": "^29.2.4",
-        "@typescript-eslint/eslint-plugin": "^5.45.0",
+        "@typescript-eslint/eslint-plugin": "^5.46.1",
         "@typescript-eslint/parser": "^5.46.1",
         "css-loader": "^6.7.2",
         "css-minimizer-webpack-plugin": "^4.2.2",

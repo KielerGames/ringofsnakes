@@ -5,8 +5,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/client"
     schedule:
-      interval: "weekly"
-      day: "saturday"
+      interval: "monthly"
   - package-ecosystem: "maven"
     directory: "/server"
     schedule:

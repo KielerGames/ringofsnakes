@@ -44,7 +44,7 @@ jobs:
           rm client/public/bundle-stats.json
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3.9.1 # TODO: consider using the official GitHub Pages Action when out of beta
+        uses: peaceiris/actions-gh-pages@v3.9.2 # TODO: consider using the official GitHub Pages Action when out of beta
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

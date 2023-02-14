@@ -2,7 +2,7 @@
 
 ## Setting up a game server VM
 
- - install Java, Maven(?)
+ - install Java and Maven: `sudo apt install openjdk-17-jre maven`
  - `sudo apt install screen`
  - `sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080`
  - create user `ci`: `sudo useradd -m ci`

@@ -6,7 +6,7 @@
  - install packages required for CI and port managing: `sudo apt install screen iptables`
  - (optional) map port 80 to 8080: `sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080`
  - create user `ci`: `sudo useradd -m ci` and change default shell to bash `chsh -s /bin/bash ci` (recommended, not required)
- - add public key to `.ssh/authorized_keys`
+ - create a public/private keypair for the CI and add the public key to `/home/ci/.ssh/authorized_keys` (create a new file and folder if this does not exist) and the private key as a GitHub Actions Secret
  - copy restart script `scp restart.sh ci@<server>:/home/ci`
  - configure logging (enable FileHandler in `logging.properties`)
 

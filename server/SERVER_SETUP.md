@@ -5,7 +5,7 @@
  - install Java and Maven: `sudo apt install openjdk-17-jre maven`
  - `sudo apt install screen`
  - `sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080`
- - create user `ci`: `sudo useradd -m ci`
+ - create user `ci`: `sudo useradd -m ci` and change default shell to bash `chsh -s /bin/bash ci` (recommended, not required)
  - add public key to `.ssh/authorized_keys`
  - copy restart script `scp restart.sh ci@<server>:/home/ci`
  - configure logging (enable FileHandler in `logging.properties`)

@@ -2,9 +2,9 @@
 
 ## Setting up a game server VM
 
- - install Java and Maven: `sudo apt install openjdk-17-jre maven`
- - `sudo apt install screen`
- - `sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080`
+ - install the required Java runtime: `sudo apt install openjdk-17-jre`
+ - install packages required for CI and port managing: `sudo apt install screen iptables`
+ - (optional) map port 80 to 8080: `sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080`
  - create user `ci`: `sudo useradd -m ci` and change default shell to bash `chsh -s /bin/bash ci` (recommended, not required)
  - add public key to `.ssh/authorized_keys`
  - copy restart script `scp restart.sh ci@<server>:/home/ci`

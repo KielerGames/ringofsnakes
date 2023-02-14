@@ -10,7 +10,7 @@
  - copy restart script `scp restart.sh ci@<server>:/home/ci`
  - configure logging (enable FileHandler in `logging.properties`)
 
-The last three steps are only required for our CI pipeline.
+The last four steps are only required for our CI pipeline.
 
 ## Enable SSL
 

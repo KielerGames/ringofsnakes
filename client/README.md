@@ -2,7 +2,7 @@
 
 ## Install dependencies
 
-Requires node.js (tested with version 16, usually the latest LTS version should work).
+Requires node.js (tested with version 18, usually the latest LTS version should work).
 Run `npm install` in this directory.
 
 ## Build

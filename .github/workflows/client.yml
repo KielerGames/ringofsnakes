@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v3.5.0
       
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.6.0
@@ -64,7 +64,7 @@ jobs:
       pull-requests: write # required for github/webpack-bundlesize-compare-action
 
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v3.5.0
 
       - name: Download PR artifact
         uses: actions/download-artifact@v3.0.2

@@ -1,6 +1,7 @@
 package game.ai;
 
 import game.snake.Snake;
+import game.snake.SnakeChunk;
 import game.snake.SnakeFactory;
 import game.snake.SnakeNameGenerator;
 import game.world.World;
@@ -59,6 +60,22 @@ public abstract class Bot {
         otherSnakes.removeIf(s -> Vector.distance2(head, s.getHeadPosition()) <= bound);
 
         return otherSnakes;
+    }
+
+    protected Set<SnakeChunk> getSnakeChunksInVicinity(double radius) {
+        assert radius > 0.0;
+        assert radius < 2.0 * world.getConfig().chunks.size;
+
+        final var bound = radius*radius;
+        final var head = snake.getHeadPosition();
+
+        final var snakesInVicinity = getSnakesInVicinity(radius);
+        final var snakeChunks = new HashSet<SnakeChunk>();
+        snakesInVicinity.forEach(s -> snakeChunks.addAll(s.streamSnakeChunks().toList()));
+        snakeChunks.removeIf(snakeChunk -> snakeChunk.getSnake().equals(snake));
+        snakeChunks.removeIf(snakeChunk -> Vector.distance2(head, snakeChunk.getBoundingBox().getCenter()) < bound);
+
+        return snakeChunks;
     }
 
     protected void moveInRandomDirection() {

@@ -7,7 +7,7 @@ export type ShaderVarValue = number | number[] | Float32Array;
 const GL2 = WebGL2RenderingContext;
 
 abstract class ShaderVar<Location> {
-    static readonly #NUM_COMPONENTS = new Map([
+    static readonly #NUM_COMPONENTS = new Map<number, number>([
         [GL2.FLOAT, 1],
         [GL2.FLOAT_VEC2, 2],
         [GL2.FLOAT_VEC3, 3],

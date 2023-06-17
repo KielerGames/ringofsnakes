@@ -34,7 +34,7 @@ public final class Direction {
     }
 
     /**
-     * Get a random angle in the interval [-PI, PI].
+     * Get a random angle in the interval [-PI, PI).
      */
     public static double getRandom(Random random) {
         return (random.nextDouble() * 2.0 - 1.0) * Math.PI;

@@ -1,9 +1,11 @@
 package game.ai;
 
 import game.snake.Snake;
+import game.snake.SnakeChunk;
 import game.snake.SnakeFactory;
 import game.snake.SnakeNameGenerator;
 import game.world.World;
+import game.world.WorldChunk;
 import lombok.Getter;
 import math.Direction;
 import math.Vector;
@@ -11,6 +13,8 @@ import math.Vector;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static math.Direction.TAU;
 
@@ -51,14 +55,36 @@ public abstract class Bot {
 
         final var bound = radius * radius;
         final var head = snake.getHeadPosition();
-        final var chunk = world.chunks.findChunk(snake.getHeadPosition());
+        final var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
 
-        final var otherSnakes = new HashSet<>(chunk.getSnakes());
-        chunk.neighbors.forEach(c -> otherSnakes.addAll(c.getSnakes()));
+        final var otherSnakes = new HashSet<>(worldChunk.getSnakes());
+        worldChunk.neighbors.forEach(c -> otherSnakes.addAll(c.getSnakes()));
         otherSnakes.remove(snake);
         otherSnakes.removeIf(s -> Vector.distance2(head, s.getHeadPosition()) <= bound);
 
         return otherSnakes;
+    }
+
+    /**
+     * Get {@link SnakeChunk}s in the current {@link game.world.WorldChunk}
+     * and its neighbors, excluding chunks from the snake of this bot and those
+     * whose bounding box does not intersect with the circle defined by the given radius.
+     *
+     * @param radius search radius, should not be too big
+     * @return A modifiable set of SnakeChunks
+     */
+    protected Set<SnakeChunk> getSnakeChunksInVicinity(double radius) {
+        assert radius > 0.0;
+        assert radius < 2.0 * world.getConfig().chunks.size;
+
+        final var head = snake.getHeadPosition();
+        final var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
+
+        return Stream.concat(Stream.of(worldChunk), worldChunk.neighbors.stream())
+                .flatMap(WorldChunk::streamSnakeChunks)
+                .filter(snakeChunk -> snakeChunk.getSnake() != snake)
+                .filter(snakeChunk -> snakeChunk.getBoundingBox().isWithinRange(head, radius))
+                .collect(Collectors.toSet());
     }
 
     protected void moveInRandomDirection() {

@@ -24,6 +24,8 @@ public final class Direction {
 
         assert Math.abs(direction) <= Math.PI;
 
+        // Directions should map to a unique angle. PI and -PI are the same direction.
+        // We map PI to -PI to make it easy to map directions to array indices.
         if (direction == Math.PI) {
             return -Math.PI;
         }

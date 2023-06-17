@@ -1,11 +1,14 @@
 package game.ai;
 
+import math.Direction;
+
 import java.util.Arrays;
 
 import static math.Direction.TAU;
 
 public class DirectionalSensor {
     public static final int BUCKETS = 16;
+    private static final double BUCKET_SIZE = TAU / BUCKETS;
     private final double[] values = new double[BUCKETS];
 
     /**
@@ -19,6 +22,8 @@ public class DirectionalSensor {
      * Sense something in the given direction with the given intensity.
      */
     public void add(double direction, double intensity) {
+        assert Double.isFinite(intensity);
+
         final int bucket = getBucketIndex(direction);
         values[bucket] += intensity;
     }
@@ -43,6 +48,8 @@ public class DirectionalSensor {
             }
         }
 
+        assert maxIndex >= 0 && minIndex >= 0;
+
         return new Result(
                 getBucketDirection(maxIndex),
                 maxValue,
@@ -52,11 +59,15 @@ public class DirectionalSensor {
     }
 
     private static int getBucketIndex(double direction) {
-        return (int) Math.floor(BUCKETS * (direction + Math.PI) / TAU);
+        // Normalize direction to [0, TAU):
+        final var nd = Direction.normalize(direction) + Math.PI;
+        // Convert to the closest bucket index:
+        return (int) Math.floor(BUCKETS * nd / TAU);
     }
 
     private static double getBucketDirection(int bucketIndex) {
-        return bucketIndex * (TAU / BUCKETS) - Math.PI;
+        // Offset by 0.5 to get the center point of the bucket.
+        return (bucketIndex + 0.5) * BUCKET_SIZE - Math.PI;
     }
 
     public record Result(

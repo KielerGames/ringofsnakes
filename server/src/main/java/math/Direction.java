@@ -11,7 +11,7 @@ public final class Direction {
     public static final double DOWN = -0.5 * Math.PI;
 
     /**
-     * Normalize an angle to the interval [-PI, PI].
+     * Normalize an angle to the interval [-PI, PI).
      */
     public static double normalize(double direction) {
         if (!Double.isFinite(direction)) {
@@ -23,6 +23,10 @@ public final class Direction {
         }
 
         assert Math.abs(direction) <= Math.PI;
+
+        if (direction == Math.PI) {
+            return -Math.PI;
+        }
 
         return direction;
     }

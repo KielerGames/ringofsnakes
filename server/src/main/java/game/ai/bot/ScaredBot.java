@@ -24,7 +24,7 @@ class ScaredBot extends Bot {
     public void act() {
         counter++;
 
-        final int delay = imminentDangerInPreviousTick ? 3 : 5;
+        final int delay = imminentDangerInPreviousTick ? 4 : 6;
 
         if (counter < delay) {
             return;
@@ -67,8 +67,11 @@ class ScaredBot extends Bot {
 
                     final var closeness = 1.0 / Math.max(d2 - wd * wd, wd * wd);
                     final var dangerDirection = Direction.getFromTo(headPosition, snakePathPoint.point);
-                    dangerSensor.add(dangerDirection, 0.25 * closeness);
+                    dangerSensor.add(dangerDirection, 0.3 * closeness);
                 });
+
+        // Add a slight preference for keeping the current direction.
+        dangerSensor.add(snake.getHeadDirection(), snake.getWidth() / 30.0, 0.0);
 
         // Escape in the direction where there is the least danger.
         final var sensorData = dangerSensor.findExtrema();
@@ -77,7 +80,7 @@ class ScaredBot extends Bot {
         imminentDangerInPreviousTick = sensorData.maxValue() > 100.0;
 
         // This offset should make the movement seem more natural.
-        final var offset = (random.nextDouble() - 0.5) * DirectionalSensor.BUCKET_SIZE;
+        final var offset = (random.nextDouble() - 0.25) * DirectionalSensor.BUCKET_SIZE;
 
         snake.setTargetDirection(Direction.normalize(escapeDirection + offset));
     }

@@ -9,17 +9,14 @@ import math.Direction;
 
 class ScaredBot extends Bot {
     private final DirectionalSensor dangerSensor = new DirectionalSensor();
-    private final double maxDistanceFromCenter;
     private int counter = random.nextInt(3) - 10;
 
     ScaredBot(World world) {
         super(world);
-        maxDistanceFromCenter = 0.4 * world.box.getWidth();
     }
 
     ScaredBot(Snake snake, World world) {
         super(snake, world);
-        maxDistanceFromCenter = 0.4 * world.box.getWidth();
     }
 
     @Override
@@ -67,17 +64,6 @@ class ScaredBot extends Bot {
                     // TODO: explain approx
                     dangerSensor.add(dangerDirection, 0.5 * (d2 - wd * wd));
                 });
-
-        // Add a slight preference for keeping the current direction.
-        dangerSensor.add(snake.getHeadDirection(), -snake.getWidth() / 100.0);
-
-        // When close to the edge, move towards center.
-        {
-            final var centerDir = Direction.getFromTo(headPosition, world.center);
-            final var centerDist = Vector.distance(headPosition, world.center);
-            final var centerDesire = 0.05 * Math.max(0.0, centerDist - maxDistanceFromCenter);
-            dangerSensor.add(centerDir, -centerDesire);
-        }
 
         // Escape in the direction where there is the least danger.
         final var sensorData = dangerSensor.findExtrema();

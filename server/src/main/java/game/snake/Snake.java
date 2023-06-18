@@ -39,7 +39,7 @@ public class Snake {
     private char currentChunkId;
     @Getter private boolean alive = true;
     private char nextChunkId = 0;
-    @Getter private double targetDirection;
+    private double targetDirection;
     private boolean userWantsFast = false;
     private double lengthBuffer = 0.0;
     @Getter private double width;
@@ -78,13 +78,6 @@ public class Snake {
         }
 
         this.targetDirection = alpha;
-    }
-
-    /**
-     * For tests only.
-     */
-    protected void setLength(double newLength) {
-        this.length = newLength;
     }
 
     /**

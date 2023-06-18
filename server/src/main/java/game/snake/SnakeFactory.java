@@ -35,12 +35,6 @@ public class SnakeFactory {
         return snake;
     }
 
-    static Snake createSnakeWithLength(Vector position, double direction, World world, String name, double length) {
-        final var snake = createSnake(position, direction, world, name);
-        snake.setLength(length);
-        return snake;
-    }
-
     public static BoundarySnake createBoundarySnake(World world) {
         final var snake = new BoundarySnake(generateSnakeId(world), world);
 

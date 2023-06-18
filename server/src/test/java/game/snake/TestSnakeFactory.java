@@ -53,7 +53,7 @@ public class TestSnakeFactory {
     public  static Snake createSnakeFromTo(Vector tail, Vector head, World world) {
         final var length = Vector.distance(head, tail);
         final var direction = Direction.getFromTo(tail, head);
-        final var snake = SnakeFactory.createSnakeWithLength(tail, direction, world, "TestSnake", length);
+        final var snake = SnakeFactory.createSnake(tail, direction, world, "TestSnake");
         final var speed = snake.world.getConfig().snakes.speed;
         final int steps = (int) Math.round(length / speed);
         for (int i = 0; i < steps; i++) {

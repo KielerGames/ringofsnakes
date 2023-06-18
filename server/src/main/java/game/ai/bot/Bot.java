@@ -81,7 +81,7 @@ public abstract class Bot {
         assert radius < 2.0 * world.getConfig().chunks.size;
 
         final var head = snake.getHeadPosition();
-        final var worldChunk = world.chunks.findChunk(snake.getHeadPosition());
+        final var worldChunk = world.chunks.findChunk(head);
 
         return Stream.concat(Stream.of(worldChunk), worldChunk.neighbors.stream())
                 .flatMap(WorldChunk::streamSnakeChunks)

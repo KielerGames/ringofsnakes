@@ -59,7 +59,7 @@ public class DirectionalSensor {
     }
 
     private static int getBucketIndex(double direction) {
-        // Normalize direction to [0, TAU):
+        // Normalize direction to [0, 2*PI):
         final var nd = Direction.normalize(direction) + Math.PI;
         // Convert to the closest bucket index:
         return (int) Math.floor(BUCKETS * nd / TAU);

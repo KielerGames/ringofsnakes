@@ -33,10 +33,13 @@ class ScaredBot extends Bot {
 
         final var snake = this.getSnake();
         final var headPosition = snake.getHeadPosition();
-        final var otherSnakes = getSnakesInVicinity(28.0);
+        final var otherSnakeHeads = getSnakesInVicinity(28.0);
         final var otherSnakeChunks = getSnakeChunksInVicinity(28.0);
 
-        if (otherSnakes.isEmpty()) {
+        // If there are snake heads there should also be other snake chunks.
+        assert otherSnakeHeads.isEmpty() || !otherSnakeChunks.isEmpty();
+
+        if (otherSnakeHeads.isEmpty() && otherSnakeChunks.isEmpty()) {
             if (random.nextDouble() < 0.25) {
                 moveInRandomDirection();
             }
@@ -47,7 +50,7 @@ class ScaredBot extends Bot {
 
         // Consider other snakes in the vicinity.
         // TODO: consider SnakeChunks in vicinity
-        otherSnakes.forEach(otherSnake -> {
+        otherSnakeHeads.forEach(otherSnake -> {
             final var pos = otherSnake.getHeadPosition();
             final var d2 = Vector.distance2(headPosition, pos);
             final var dangerDirection = Direction.getFromTo(pos, headPosition);

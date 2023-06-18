@@ -1,9 +1,12 @@
 package game.ai.bot;
 
 import game.ai.DirectionalSensor;
+import game.snake.SnakeChunk;
 import game.world.World;
 import math.Vector;
 import math.Direction;
+
+import java.util.List;
 
 import static game.ai.DirectionalSensor.BUCKETS;
 import static math.Direction.TAU;
@@ -31,6 +34,7 @@ class ScaredBot extends Bot {
         final var snake = this.getSnake();
         final var headPosition = snake.getHeadPosition();
         final var otherSnakes = getSnakesInVicinity(28.0);
+        final var otherSnakeChunks = getSnakeChunksInVicinity(28.0);
 
         if (otherSnakes.isEmpty()) {
             if (random.nextDouble() < 0.25) {
@@ -46,9 +50,20 @@ class ScaredBot extends Bot {
         otherSnakes.forEach(otherSnake -> {
             final var pos = otherSnake.getHeadPosition();
             final var d2 = Vector.distance2(headPosition, pos);
-            final var dangerDirection = Direction.getFromTo(headPosition, pos);
-            dangerSensor.add(dangerDirection, otherSnake.getWidth() / d2);
+            final var dangerDirection = Direction.getFromTo(pos, headPosition);
+            // TODO: direction should factor into intensity
+            dangerSensor.add(dangerDirection, -otherSnake.getWidth() / d2);
         });
+
+        /*otherSnakeChunks.stream()
+                .flatMap(SnakeChunk::getActivePathData)
+                .forEach(snakePathPoint -> {
+                    final var d2 = Vector.distance2(headPosition, snakePathPoint.point);
+                    final var wd = 0.5 * snakePathPoint.getSnakeWidth();
+                    final var dangerDirection = Direction.getFromTo(headPosition, snakePathPoint.point);
+                    // TODO: approx
+                    dangerSensor.add(dangerDirection, d2 - wd * wd);
+                });*/
 
         // Add a slight preference for keeping the current direction.
         dangerSensor.add(snake.getHeadDirection(), -snake.getWidth() / 20.0);

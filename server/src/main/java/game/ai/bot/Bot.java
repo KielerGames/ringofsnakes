@@ -24,6 +24,9 @@ public abstract class Bot {
     protected final World world;
     @Getter private final Snake snake;
 
+    /**
+     * FOR BOTS ONLY!
+     */
     public Bot(World world, Vector spawnPosition) {
         final var name = SnakeNameGenerator.generateBotName();
         this.world = world;

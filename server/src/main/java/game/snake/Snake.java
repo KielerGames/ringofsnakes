@@ -266,8 +266,7 @@ public class Snake {
 
     public Vector getTailPosition() {
         final var lastSnakeChunk = chunks.isEmpty() ? currentChunk : chunks.getLast();
-        final var sp = lastSnakeChunk.getPathData().stream()
-                .filter(snakePathPoint -> snakePathPoint.getOffsetInSnake() < length)
+        final var sp = lastSnakeChunk.getActivePathData()
                 .max(Comparator.comparing(SnakePathPoint::getOffsetInSnake));
 
         if (sp.isPresent()) {

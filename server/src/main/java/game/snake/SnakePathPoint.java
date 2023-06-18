@@ -25,6 +25,9 @@ public final class SnakePathPoint {
         return snakeChunk.getOffset() + getOffsetInChunk();
     }
 
+    /**
+     * Returns the snake width at this point.
+     */
     public double getSnakeWidth() {
         final var offset = getOffsetInSnake();
         return snakeChunk.getSnake().getWidthAt(offset);

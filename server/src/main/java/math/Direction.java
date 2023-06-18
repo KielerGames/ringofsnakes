@@ -65,4 +65,11 @@ public final class Direction {
         // = cos(alpha - beta)  [addition theorem]
         return Math.cos(alpha - beta);
     }
+
+    /**
+     * Get the opposite direction of the given direction.
+     */
+    public static double opposite(double alpha) {
+        return normalize(alpha + Math.PI);
+    }
 }

@@ -1,15 +1,11 @@
 package game.ai.bot;
 
 import game.ai.DirectionalSensor;
+import game.snake.Snake;
 import game.snake.SnakeChunk;
 import game.world.World;
 import math.Vector;
 import math.Direction;
-
-import java.util.List;
-
-import static game.ai.DirectionalSensor.BUCKETS;
-import static math.Direction.TAU;
 
 class ScaredBot extends Bot {
     private final DirectionalSensor dangerSensor = new DirectionalSensor();
@@ -18,6 +14,11 @@ class ScaredBot extends Bot {
 
     ScaredBot(World world) {
         super(world);
+        maxDistanceFromCenter = 0.4 * world.box.getWidth();
+    }
+
+    ScaredBot(Snake snake, World world) {
+        super(snake, world);
         maxDistanceFromCenter = 0.4 * world.box.getWidth();
     }
 
@@ -49,27 +50,29 @@ class ScaredBot extends Bot {
         dangerSensor.reset();
 
         // Consider other snakes in the vicinity.
-        // TODO: consider SnakeChunks in vicinity
         otherSnakeHeads.forEach(otherSnake -> {
             final var pos = otherSnake.getHeadPosition();
             final var d2 = Vector.distance2(headPosition, pos);
-            final var dangerDirection = Direction.getFromTo(pos, headPosition);
+            final var dangerDirection = Direction.getFromTo(headPosition, pos);
+            final var escapeDirection = Direction.opposite(dangerDirection);
             // TODO: direction should factor into intensity
-            dangerSensor.add(dangerDirection, -otherSnake.getWidth() / d2);
+            dangerSensor.add(dangerDirection, otherSnake.getWidth() / d2);
+            dangerSensor.add(escapeDirection, -0.2 * otherSnake.getWidth() / d2);
         });
 
-        /*otherSnakeChunks.stream()
+        otherSnakeChunks.stream()
                 .flatMap(SnakeChunk::getActivePathData)
                 .forEach(snakePathPoint -> {
                     final var d2 = Vector.distance2(headPosition, snakePathPoint.point);
                     final var wd = 0.5 * snakePathPoint.getSnakeWidth();
                     final var dangerDirection = Direction.getFromTo(headPosition, snakePathPoint.point);
-                    // TODO: approx
-                    dangerSensor.add(dangerDirection, d2 - wd * wd);
-                });*/
+                    // TODO: explain approx
+                    dangerSensor.add(dangerDirection, 0.5 * (d2 - wd * wd));
+                    dangerSensor.add(Direction.opposite(dangerDirection), 0.1 * (d2 - wd * wd));
+                });
 
         // Add a slight preference for keeping the current direction.
-        dangerSensor.add(snake.getHeadDirection(), -snake.getWidth() / 20.0);
+        dangerSensor.add(snake.getHeadDirection(), -snake.getWidth() / 100.0);
 
         // When close to the edge, move towards center.
         {
@@ -84,7 +87,7 @@ class ScaredBot extends Bot {
         final var escapeDirection = sensorData.minDirection();
 
         // This offset should make the movement seem more natural.
-        final var offset = (random.nextDouble() - 0.5) * (TAU / BUCKETS);
+        final var offset = (random.nextDouble() - 0.5) * DirectionalSensor.BUCKET_SIZE;
 
         snake.setTargetDirection(Direction.normalize(escapeDirection + offset));
     }

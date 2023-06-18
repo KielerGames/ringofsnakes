@@ -8,7 +8,7 @@ import static math.Direction.TAU;
 
 public class DirectionalSensor {
     public static final int BUCKETS = 16;
-    private static final double BUCKET_SIZE = TAU / BUCKETS;
+    public static final double BUCKET_SIZE = TAU / BUCKETS;
     private final double[] values = new double[BUCKETS];
 
     /**

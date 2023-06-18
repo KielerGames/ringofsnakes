@@ -24,17 +24,20 @@ public abstract class Bot {
     protected final World world;
     @Getter private final Snake snake;
 
-    /**
-     * FOR BOTS ONLY!
-     */
-    public Bot(World world, Vector spawnPosition) {
+    private Bot(World world, Vector spawnPosition) {
         final var name = SnakeNameGenerator.generateBotName();
+        final var snake = SnakeFactory.createSnake(spawnPosition, world, name);
         this.world = world;
-        this.snake = SnakeFactory.createSnake(spawnPosition, world, name);
+        this.snake = snake;
     }
 
     public Bot(World world) {
         this(world, world.findSpawnPosition());
+    }
+
+    protected Bot(Snake snake, World world) {
+        this.world = world;
+        this.snake = snake;
     }
 
     public boolean isAlive() {

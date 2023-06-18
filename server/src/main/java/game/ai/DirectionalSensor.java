@@ -22,10 +22,19 @@ public class DirectionalSensor {
      * Sense something in the given direction with the given intensity.
      */
     public void add(double direction, double intensity) {
+        add(direction, intensity, -0.1);
+    }
+
+    public void add(double direction, double intensity, double opposing) {
         assert Double.isFinite(intensity);
+        assert Double.isFinite(opposing);
 
         final int bucket = getBucketIndex(direction);
         values[bucket] += intensity;
+
+        // Add a small impulse in the opposite direction to help find unique extrema.
+        final int opposingBucket = (bucket + (BUCKETS/2)) % BUCKETS;
+        values[opposingBucket] += opposing * intensity;
     }
 
     /**

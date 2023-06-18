@@ -54,10 +54,8 @@ class ScaredBot extends Bot {
             final var pos = otherSnake.getHeadPosition();
             final var d2 = Vector.distance2(headPosition, pos);
             final var dangerDirection = Direction.getFromTo(headPosition, pos);
-            final var escapeDirection = Direction.opposite(dangerDirection);
             // TODO: direction should factor into intensity
             dangerSensor.add(dangerDirection, otherSnake.getWidth() / d2);
-            dangerSensor.add(escapeDirection, -0.2 * otherSnake.getWidth() / d2);
         });
 
         otherSnakeChunks.stream()
@@ -68,7 +66,6 @@ class ScaredBot extends Bot {
                     final var dangerDirection = Direction.getFromTo(headPosition, snakePathPoint.point);
                     // TODO: explain approx
                     dangerSensor.add(dangerDirection, 0.5 * (d2 - wd * wd));
-                    dangerSensor.add(Direction.opposite(dangerDirection), 0.1 * (d2 - wd * wd));
                 });
 
         // Add a slight preference for keeping the current direction.

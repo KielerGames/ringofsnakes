@@ -1,4 +1,4 @@
-package game.ai;
+package game.ai.bot;
 
 import game.world.World;
 import math.Vector;

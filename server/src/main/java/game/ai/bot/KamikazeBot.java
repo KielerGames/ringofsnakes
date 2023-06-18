@@ -1,4 +1,4 @@
-package game.ai;
+package game.ai.bot;
 
 import game.snake.BoundarySnake;
 import game.snake.Snake;

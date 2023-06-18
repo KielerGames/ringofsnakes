@@ -1,5 +1,6 @@
-package game.ai;
+package game.ai.bot;
 
+import game.ai.DirectionalSensor;
 import game.world.World;
 import math.Vector;
 import math.Direction;

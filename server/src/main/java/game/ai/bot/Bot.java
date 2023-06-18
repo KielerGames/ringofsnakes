@@ -26,15 +26,17 @@ public abstract class Bot {
 
     private Bot(World world, Vector spawnPosition) {
         final var name = SnakeNameGenerator.generateBotName();
-        final var snake = SnakeFactory.createSnake(spawnPosition, world, name);
         this.world = world;
-        this.snake = snake;
+        this.snake = SnakeFactory.createSnake(spawnPosition, world, name);
     }
 
     public Bot(World world) {
         this(world, world.findSpawnPosition());
     }
 
+    /**
+     * For testing only.
+     */
     protected Bot(Snake snake, World world) {
         this.world = world;
         this.snake = snake;

@@ -35,8 +35,6 @@ public class ScaredBotTest {
 
         for (int i = 0; i < ticks; i++) {
             botSnake.tick();
-            // TODO: remove println before merging this
-            System.out.println(botSnake.getHeadPosition());
             bot.act();
             assertTrue(botSnake.getHeadPosition().y < frozenSnake.getHeadPosition().y);
         }

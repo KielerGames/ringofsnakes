@@ -63,6 +63,9 @@ public abstract class SnakeChunk implements Collidable {
      */
     protected abstract List<SnakePathPoint> getPathData();
 
+    /**
+     * Get a {@link Stream} of points of this {@link SnakeChunk} which are still part of the {@link Snake} (not junk).
+     */
     public Stream<SnakePathPoint> getActivePathData() {
         return getPathData().stream().filter(dataPoint -> dataPoint.getOffsetInSnake() < snake.length);
     }

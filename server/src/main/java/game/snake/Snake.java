@@ -294,6 +294,7 @@ public class Snake {
                 })
                 .findFirst();
 
+        //noinspection OptionalIsPresent
         if (chunk.isEmpty()) {
             // This might occur at the tail position. We could add a special case for that
             // and return getTailPosition() instead but that is computationally more expensive

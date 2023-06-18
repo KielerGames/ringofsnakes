@@ -10,7 +10,7 @@ import math.Direction;
 class ScaredBot extends Bot {
     private final DirectionalSensor dangerSensor = new DirectionalSensor();
     private int counter = random.nextInt(3) - 10;
-    private boolean dangerInPreviousTick = false;
+    private boolean imminentDangerInPreviousTick = false;
 
     ScaredBot(World world) {
         super(world);
@@ -24,7 +24,7 @@ class ScaredBot extends Bot {
     public void act() {
         counter++;
 
-        final int delay = dangerInPreviousTick ? 3 : 5;
+        final int delay = imminentDangerInPreviousTick ? 3 : 5;
 
         if (counter < delay) {
             return;
@@ -44,11 +44,10 @@ class ScaredBot extends Bot {
             if (random.nextDouble() < 0.25) {
                 moveInRandomDirection();
             }
-            dangerInPreviousTick = false;
+            imminentDangerInPreviousTick = false;
             return;
         }
 
-        dangerInPreviousTick = true;
         dangerSensor.reset();
 
         // Consider other snakes in the vicinity.
@@ -65,14 +64,17 @@ class ScaredBot extends Bot {
                 .forEach(snakePathPoint -> {
                     final var d2 = Vector.distance2(headPosition, snakePathPoint.point);
                     final var wd = 0.5 * snakePathPoint.getSnakeWidth();
+
+                    final var closeness = 1.0 / Math.max(d2 - wd * wd, wd * wd);
                     final var dangerDirection = Direction.getFromTo(headPosition, snakePathPoint.point);
-                    // TODO: explain approx
-                    dangerSensor.add(dangerDirection, 0.5 * (d2 - wd * wd));
+                    dangerSensor.add(dangerDirection, 0.25 * closeness);
                 });
 
         // Escape in the direction where there is the least danger.
         final var sensorData = dangerSensor.findExtrema();
         final var escapeDirection = sensorData.minDirection();
+
+        imminentDangerInPreviousTick = sensorData.maxValue() > 100.0;
 
         // This offset should make the movement seem more natural.
         final var offset = (random.nextDouble() - 0.5) * DirectionalSensor.BUCKET_SIZE;

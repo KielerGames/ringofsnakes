@@ -10,6 +10,7 @@ import math.Direction;
 class ScaredBot extends Bot {
     private final DirectionalSensor dangerSensor = new DirectionalSensor();
     private int counter = random.nextInt(3) - 10;
+    private boolean dangerInPreviousTick = false;
 
     ScaredBot(World world) {
         super(world);
@@ -23,7 +24,9 @@ class ScaredBot extends Bot {
     public void act() {
         counter++;
 
-        if (counter < 5) {
+        final int delay = dangerInPreviousTick ? 3 : 5;
+
+        if (counter < delay) {
             return;
         }
 
@@ -41,9 +44,11 @@ class ScaredBot extends Bot {
             if (random.nextDouble() < 0.25) {
                 moveInRandomDirection();
             }
+            dangerInPreviousTick = false;
             return;
         }
 
+        dangerInPreviousTick = true;
         dangerSensor.reset();
 
         // Consider other snakes in the vicinity.

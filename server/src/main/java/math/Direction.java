@@ -11,7 +11,7 @@ public final class Direction {
     public static final double DOWN = -0.5 * Math.PI;
 
     /**
-     * Normalize an angle to the interval [-PI, PI].
+     * Normalize an angle to the interval [-PI, PI).
      */
     public static double normalize(double direction) {
         if (!Double.isFinite(direction)) {
@@ -24,11 +24,17 @@ public final class Direction {
 
         assert Math.abs(direction) <= Math.PI;
 
+        // Directions should map to a unique angle. PI and -PI are the same direction.
+        // We map PI to -PI to make it easy to map directions to array indices.
+        if (direction == Math.PI) {
+            return -Math.PI;
+        }
+
         return direction;
     }
 
     /**
-     * Get a random angle in the interval [-PI, PI].
+     * Get a random angle in the interval [-PI, PI).
      */
     public static double getRandom(Random random) {
         return (random.nextDouble() * 2.0 - 1.0) * Math.PI;

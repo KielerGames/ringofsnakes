@@ -9,6 +9,7 @@ import math.Vector;
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static math.MathFunctions.clamp;
 
@@ -60,7 +61,14 @@ public abstract class SnakeChunk implements Collidable {
      * Returns an unmodifiable view of this chunks path data ordered by distance from snake head ascending.
      * Can contain "junk" data (offset > length) at the end.
      */
-    public abstract List<SnakePathPoint> getPathData();
+    protected abstract List<SnakePathPoint> getPathData();
+
+    /**
+     * Get a {@link Stream} of points of this {@link SnakeChunk} which are still part of the {@link Snake} (not junk).
+     */
+    public Stream<SnakePathPoint> getActivePathData() {
+        return getPathData().stream().filter(dataPoint -> dataPoint.getOffsetInSnake() < snake.length);
+    }
 
     public final boolean isJunk() {
         // the length can increase and thus un-junk a snake chunk

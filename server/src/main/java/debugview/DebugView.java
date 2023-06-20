@@ -1,5 +1,6 @@
 package debugview;
 
+import game.snake.SnakeChunk;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -99,11 +100,9 @@ public class DebugView extends Application {
             }
 
             final var snakeSize = snake.getWidth();
-            final var snakeLength = snake.getLength();
 
             snake.streamSnakeChunks()
-                    .flatMap(chunk -> chunk.getPathData().stream())
-                    .filter(pd -> pd.getOffsetInSnake() < snakeLength)
+                    .flatMap(SnakeChunk::getActivePathData)
                     .forEach(pd -> {
                         final var x = pd.point.x;
                         final var y = pd.point.y;

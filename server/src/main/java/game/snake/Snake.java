@@ -41,7 +41,7 @@ public class Snake {
     private char nextChunkId = 0;
     private double targetDirection;
     private boolean userWantsFast = false;
-    private double lengthBuffer = 0;
+    private double lengthBuffer = 0.0;
     @Getter private double width;
     private double foodTrailBuffer = 0f;
     @Getter private int kills = 0;
@@ -266,8 +266,7 @@ public class Snake {
 
     public Vector getTailPosition() {
         final var lastSnakeChunk = chunks.isEmpty() ? currentChunk : chunks.getLast();
-        final var sp = lastSnakeChunk.getPathData().stream()
-                .filter(snakePathPoint -> snakePathPoint.getOffsetInSnake() < length)
+        final var sp = lastSnakeChunk.getActivePathData()
                 .max(Comparator.comparing(SnakePathPoint::getOffsetInSnake));
 
         if (sp.isPresent()) {
@@ -295,6 +294,7 @@ public class Snake {
                 })
                 .findFirst();
 
+        //noinspection OptionalIsPresent
         if (chunk.isEmpty()) {
             // This might occur at the tail position. We could add a special case for that
             // and return getTailPosition() instead but that is computationally more expensive

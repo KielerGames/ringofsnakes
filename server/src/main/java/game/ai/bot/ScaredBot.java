@@ -11,6 +11,7 @@ class ScaredBot extends Bot {
     private final DirectionalSensor dangerSensor = new DirectionalSensor();
     private int counter = random.nextInt(3) - 10;
     private boolean imminentDangerInPreviousTick = false;
+    private boolean losingWeight = false;
 
     ScaredBot(World world) {
         super(world);
@@ -23,19 +24,25 @@ class ScaredBot extends Bot {
     @Override
     public void act() {
         counter++;
-
         final int delay = imminentDangerInPreviousTick ? 4 : 6;
-
         if (counter < delay) {
             return;
         }
-
         counter = 0;
 
         final var snake = this.getSnake();
+
+        if (losingWeight && snake.getLength() < 80.0) {
+            losingWeight = false;
+            snake.setUserFast(false);
+        } else if (!losingWeight && snake.getLength() > 100.0) {
+            losingWeight = true;
+            snake.setUserFast(true);
+        }
+
         final var headPosition = snake.getHeadPosition();
-        final var otherSnakeHeads = getSnakesInVicinity(25.0);
-        final var otherSnakeChunks = getSnakeChunksInVicinity(20.0);
+        final var otherSnakeHeads = getSnakesInVicinity(20.0);
+        final var otherSnakeChunks = getSnakeChunksInVicinity(16.0);
 
         // If there are snake heads there should also be other snake chunks.
         assert otherSnakeHeads.isEmpty() || !otherSnakeChunks.isEmpty();

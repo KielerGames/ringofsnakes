@@ -1,6 +1,8 @@
 package server.protocol;
 
-public abstract class ServerToClientJSONMessage {
+import java.io.Serializable;
+
+public abstract class ServerToClientJSONMessage implements Serializable {
     public final String tag;
 
     protected ServerToClientJSONMessage() {

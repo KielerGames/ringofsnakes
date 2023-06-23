@@ -1,6 +1,8 @@
 package game;
 
-public final class GameConfig {
+import java.io.Serializable;
+
+public final class GameConfig implements Serializable {
     public final double tickDuration = 1.0 / 25.0; // in seconds
     public final double foodNutritionalValue = 1.0;
     public final double foodConversionEfficiency = 0.5;

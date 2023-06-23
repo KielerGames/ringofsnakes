@@ -11,6 +11,7 @@ import server.protocol.SnakeNameUpdate;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public final class ClientKnowledge {
     private final Set<SnakeChunk> knownSnakeChunks = Collections.newSetFromMap(new WeakHashMap<>());
@@ -101,6 +102,10 @@ public final class ClientKnowledge {
         final var update = this.nextNameUpdate;
         this.nextNameUpdate = new SnakeNameUpdate();
         return update;
+    }
+
+    public Stream<Snake> streamKnownSnakes() {
+        return knownSnakes.keySet().stream();
     }
 
     private void augmentGameUpdate(GameUpdate update) {

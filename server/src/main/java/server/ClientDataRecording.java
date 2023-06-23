@@ -15,7 +15,7 @@ import java.util.List;
 public class ClientDataRecording implements Serializable {
     private final List<WebsocketMessage> messages = new LinkedList<>();
 
-    public static ClientDataRecording startAfterStart(Snake snake, ClientKnowledge knowledge) {
+    public static ClientDataRecording startRecordingAfterGameStart(Snake snake, ClientKnowledge knowledge) {
         final var recording = new ClientDataRecording();
         recording.addTextMessage(JSON.stringify(new GameInfo(snake)));
 

@@ -108,6 +108,10 @@ public final class ClientKnowledge {
         return knownSnakes.keySet().stream();
     }
 
+    public Stream<SnakeChunk> streamKnownSnakeChunks() {
+        return knownSnakeChunks.stream();
+    }
+
     private void augmentGameUpdate(GameUpdate update) {
         // The client should continue to receive updates about a known snake
         // for a short time (until knowledge decays) to improve client experience.

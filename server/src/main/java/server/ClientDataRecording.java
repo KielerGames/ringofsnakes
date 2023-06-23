@@ -3,6 +3,7 @@ package server;
 import game.snake.Snake;
 import server.clients.ClientKnowledge;
 import server.protocol.GameInfo;
+import server.protocol.GameUpdate;
 import server.protocol.SnakeNameUpdate;
 import util.JSON;
 
@@ -10,7 +11,6 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class ClientDataRecording implements Serializable {
     private final List<WebsocketMessage> messages = new LinkedList<>();
@@ -21,10 +21,13 @@ public class ClientDataRecording implements Serializable {
 
         // Send known snake names.
         final var snakeNames = new SnakeNameUpdate();
-        Stream.concat(Stream.of(snake), knowledge.streamKnownSnakes()).forEach(snakeNames::addNameOf);
+        knowledge.streamKnownSnakes().forEach(snakeNames::addNameOf);
         recording.addTextMessage(JSON.stringify(snakeNames));
 
-        // TODO: Send known snake chunks
+        // Send known snake chunks.
+        final var gameUpdate = new GameUpdate();
+        knowledge.streamKnownSnakeChunks().forEach(gameUpdate::addSnakeChunk);
+        recording.addBinaryMessage(gameUpdate.createUpdateBuffer());
 
         return recording;
     }

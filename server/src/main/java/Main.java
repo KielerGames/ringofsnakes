@@ -13,7 +13,7 @@ public class Main {
         final var cmd = getCommandLine(args);
 
         if (cmd.hasOption("playback")) {
-            new PlaybackController();
+            PlaybackController.create();
             // TODO
             return;
         }

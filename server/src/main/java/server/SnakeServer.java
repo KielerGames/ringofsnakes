@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import server.clients.Client;
 import server.clients.Player;
 import server.endpoints.GameEndpoint;
+import server.endpoints.PlaybackEndpoint;
 
 import javax.websocket.Session;
 import java.nio.file.Files;
@@ -28,13 +29,27 @@ public class SnakeServer {
     public static Server start(Game game) {
         SnakeServer.game = game;
 
-        Server server = new Server();
+        final var server = createServer(true, GameEndpoint.class);
+
+        try {
+            server.start();
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to start jetty server.", e);
+        }
+
+        return server;
+    }
+
+    private static Server createServer(boolean secure, Class<?>... endpoints) {
+        final var server = new Server();
 
         ServerConnector wsConnector = new ServerConnector(server);
         wsConnector.setPort(8080);
         server.addConnector(wsConnector);
 
-        addSecureConnector(server);
+        if (secure) {
+            addSecureConnector(server);
+        }
 
         // Set up the basic application "context" for this application at "/"
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -45,9 +60,18 @@ public class SnakeServer {
             // TODO #155: Find optimal websocket config
             wsContainer.setDefaultMaxTextMessageBufferSize(65535);
 
-            // Add WebSocket endpoint to javax.websocket layer
-            wsContainer.addEndpoint(GameEndpoint.class);
+            // Add WebSocket endpoints to javax.websocket layer
+            for (final var endpoint : endpoints) {
+                wsContainer.addEndpoint(endpoint);
+            }
         });
+
+        return server;
+    }
+
+    public static Server startPlaybackServer() {
+        // TODO: add game endpoint
+        final var server = createServer(false, PlaybackEndpoint.class);
 
         try {
             server.start();

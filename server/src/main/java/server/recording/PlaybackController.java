@@ -4,17 +4,25 @@ import javax.websocket.Session;
 import java.util.Iterator;
 
 public class PlaybackController {
+    private static PlaybackController instance;
     private ClientDataRecording recording;
-    private Session session;
     private Iterator<ClientDataRecording.WebsocketMessage> messageIterator;
 
-    private void init(Session session, ClientDataRecording recording) {
+    private PlaybackController(ClientDataRecording recording) {
         this.recording = recording;
-        this.session = session;
         this.messageIterator = this.recording.iterator();
     }
 
-    private void sendNextMessage() {
+    public static PlaybackController create() {
+        instance = null;
+        return instance;
+    }
+
+    public static PlaybackController getInstance() {
+        return instance;
+    }
+
+    public void sendNextMessage(Session session) {
         assert messageIterator != null;
 
         if (!messageIterator.hasNext()) {

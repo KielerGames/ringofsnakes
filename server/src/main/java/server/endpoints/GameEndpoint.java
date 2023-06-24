@@ -1,7 +1,8 @@
-package server;
+package server.endpoints;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import server.SnakeServer;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -9,8 +10,9 @@ import java.nio.ByteBuffer;
 
 @ClientEndpoint
 @ServerEndpoint(value = "/game")
-public class EventSocket {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventSocket.class);
+public class GameEndpoint {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GameEndpoint.class);
+
     @OnOpen
     public void onWebSocketConnect(Session session) {
         LOGGER.debug("Socket Connected: {}", session);

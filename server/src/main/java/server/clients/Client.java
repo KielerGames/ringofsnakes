@@ -6,7 +6,7 @@ import game.world.HeatMap;
 import game.world.WorldChunk;
 import lombok.Getter;
 import math.BoundingBox;
-import server.ClientDataRecording;
+import server.recording.ClientDataRecording;
 import server.protocol.GameUpdate;
 import util.JSON;
 

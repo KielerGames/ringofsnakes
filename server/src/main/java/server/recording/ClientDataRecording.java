@@ -1,4 +1,4 @@
-package server;
+package server.recording;
 
 import game.snake.Snake;
 import server.clients.ClientKnowledge;
@@ -7,12 +7,15 @@ import server.protocol.GameUpdate;
 import server.protocol.SnakeNameUpdate;
 import util.JSON;
 
+import javax.websocket.Session;
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ClientDataRecording implements Serializable {
+public class ClientDataRecording implements Serializable, Iterable<ClientDataRecording.WebsocketMessage> {
     private final List<WebsocketMessage> messages = new LinkedList<>();
 
     public static ClientDataRecording startRecordingAfterGameStart(Snake snake, ClientKnowledge knowledge) {
@@ -40,7 +43,12 @@ public class ClientDataRecording implements Serializable {
         messages.add(new WebsocketBinaryMessage(binaryData.isReadOnly() ? binaryData : binaryData.asReadOnlyBuffer()));
     }
 
-    private static class WebsocketMessage implements Serializable {
+    public Iterator<WebsocketMessage> iterator() {
+        return messages.iterator();
+    }
+
+    public abstract static class WebsocketMessage implements Serializable {
+        public abstract void resend(Session session);
     }
 
     private static class WebsocketTextMessage extends WebsocketMessage {
@@ -49,6 +57,15 @@ public class ClientDataRecording implements Serializable {
         WebsocketTextMessage(String textData) {
             this.data = textData;
         }
+
+        @Override
+        public void resend(Session session) {
+            try {
+                session.getBasicRemote().sendText(data);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private static class WebsocketBinaryMessage extends WebsocketMessage {
@@ -56,6 +73,15 @@ public class ClientDataRecording implements Serializable {
 
         WebsocketBinaryMessage(ByteBuffer binaryData) {
             this.data = binaryData;
+        }
+
+        @Override
+        public void resend(Session session) {
+            try {
+                session.getBasicRemote().sendBinary(data);
+            } catch(IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

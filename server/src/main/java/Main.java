@@ -1,4 +1,6 @@
+import org.apache.commons.cli.*;
 import server.SnakeServer;
+import server.recording.PlaybackController;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,6 +10,14 @@ import java.util.logging.LogManager;
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         initializeLogging();
+        final var cmd = getCommandLine(args);
+
+        if (cmd.hasOption("playback")) {
+            new PlaybackController();
+            // TODO
+            return;
+        }
+
         SnakeServer.start();
     }
 
@@ -27,6 +37,22 @@ public class Main {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    private static CommandLine getCommandLine(String[] args) {
+
+        final var options = new Options();
+        options.addOption("playback", false, "Switch to playback mode.");
+
+        try {
+            return new DefaultParser().parse(options, args);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            new HelpFormatter().printHelp("server", options);
+
+            System.exit(1);
+            return null;
         }
     }
 }

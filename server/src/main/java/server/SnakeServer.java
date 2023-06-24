@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.clients.Client;
 import server.clients.Player;
+import server.endpoints.GameEndpoint;
 
 import javax.websocket.Session;
 import java.nio.file.Files;
@@ -45,7 +46,7 @@ public class SnakeServer {
             wsContainer.setDefaultMaxTextMessageBufferSize(65535);
 
             // Add WebSocket endpoint to javax.websocket layer
-            wsContainer.addEndpoint(EventSocket.class);
+            wsContainer.addEndpoint(GameEndpoint.class);
         });
 
         try {

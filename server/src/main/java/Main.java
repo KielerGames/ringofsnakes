@@ -14,6 +14,7 @@ public class Main {
 
         if (cmd.hasOption("playback")) {
             PlaybackController.create();
+            SnakeServer.startPlaybackServer();
             // TODO
             return;
         }
@@ -43,7 +44,7 @@ public class Main {
     private static CommandLine getCommandLine(String[] args) {
 
         final var options = new Options();
-        options.addOption("playback", false, "Switch to playback mode.");
+        options.addOption("p", "playback", false, "Switch to playback mode.");
 
         try {
             return new DefaultParser().parse(options, args);

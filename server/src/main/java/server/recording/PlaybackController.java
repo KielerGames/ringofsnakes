@@ -1,12 +1,15 @@
 package server.recording;
 
 import javax.websocket.Session;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class PlaybackController {
     private static PlaybackController instance;
-    private ClientDataRecording recording;
+    private final ClientDataRecording recording;
     private Iterator<ClientDataRecording.WebsocketMessage> messageIterator;
+    private final Set<Session> clients = new HashSet<>();
 
     private PlaybackController(ClientDataRecording recording) {
         this.recording = recording;
@@ -19,10 +22,13 @@ public class PlaybackController {
     }
 
     public static PlaybackController getInstance() {
+        if (instance == null) {
+            throw new RuntimeException("No playback instance available.");
+        }
         return instance;
     }
 
-    public void sendNextMessage(Session session) {
+    public void sendNextMessage() {
         assert messageIterator != null;
 
         if (!messageIterator.hasNext()) {
@@ -33,6 +39,18 @@ public class PlaybackController {
         }
 
         final var message = messageIterator.next();
-        message.resend(session);
+        clients.forEach(message::resend);
+    }
+
+    public void addClient(Session session) {
+        synchronized (clients) {
+            clients.add(session);
+        }
+    }
+
+    public void removeClient(Session session) {
+        synchronized (clients) {
+            clients.remove(session);
+        }
     }
 }

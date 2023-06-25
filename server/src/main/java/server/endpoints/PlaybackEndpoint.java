@@ -16,6 +16,7 @@ public class PlaybackEndpoint {
     @OnOpen
     public void onWebSocketConnect(Session session) {
         LOGGER.debug("Playback socket connection opened.");
+        PlaybackController.getInstance().addClient(session);
     }
 
     @OnMessage
@@ -23,10 +24,16 @@ public class PlaybackEndpoint {
         final var playback = PlaybackController.getInstance();
 
         if (Objects.equals("next", message)) {
-            playback.sendNextMessage(session);
+            playback.sendNextMessage();
             return;
         }
 
         throw new IllegalArgumentException(String.format("Received unknown message '%s'", message));
+    }
+
+    @OnClose
+    public void onWebSocketClose(Session session) {
+        LOGGER.debug("Playback socket connection closed.");
+        PlaybackController.getInstance().removeClient(session);
     }
 }

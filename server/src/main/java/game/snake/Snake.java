@@ -26,7 +26,7 @@ public class Snake {
     public final GameConfig config;
     public final char id;
     public final String name;
-    protected final World world;
+    @Getter protected final World world;
     private final ChainCodeCoder coder;
     private final ByteBuffer snakeInfoBuffer = ByteBuffer.allocate(Snake.INFO_BYTE_SIZE);
     private final LinkedList<FinalSnakeChunk> chunks = new LinkedList<>();

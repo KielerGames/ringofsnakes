@@ -24,7 +24,7 @@ public class PlaybackController {
         this.messageIterator = this.recording.iterator();
     }
 
-    public static PlaybackController create() {
+    public static void initialize() {
         instance = null;
         final var file = selectFile();
         if (file == null) {
@@ -35,7 +35,6 @@ public class PlaybackController {
         final var recording = deserialize(file);
         LOGGER.debug("Loading successful.");
         instance = new PlaybackController(recording);
-        return instance;
     }
 
     public static PlaybackController getInstance() {

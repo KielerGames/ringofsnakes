@@ -7,6 +7,7 @@ import server.SnakeServer;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 @ClientEndpoint
 @ServerEndpoint(value = "/game")
@@ -23,12 +24,20 @@ public class GameEndpoint {
 
     @OnMessage
     public void onWebSocketText(Session session, String message) {
+        if (Objects.equals(message, "start-recording")) {
+            SnakeServer.getClient(session).startRecording();
+            return;
+        } else if (Objects.equals(message, "stop-recording")) {
+            final var recording = SnakeServer.getClient(session).stopRecording();
+            recording.saveAsFile();
+            return;
+        }
         LOGGER.error("Unexpected text message from client {}.", session.getId());
     }
 
     @OnMessage
     public void onWebSocketMessage(Session session, ByteBuffer buffer) {
-        if(buffer.capacity() != 9) {
+        if (buffer.capacity() != 9) {
             LOGGER.error("Illegal binary message from client.");
             return;
         }

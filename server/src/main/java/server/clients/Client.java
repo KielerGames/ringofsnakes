@@ -131,4 +131,18 @@ public abstract class Client {
     }
 
     public abstract void handleUserInput(float alpha, boolean fast);
+
+    public void startRecording() {
+        assert recording == null;
+        recording = ClientDataRecording.createAfterGameStart(snake, knowledge);
+    }
+
+    public ClientDataRecording stopRecording() {
+        if (recording == null) {
+            throw new IllegalStateException();
+        }
+        final var rec = recording;
+        recording = null;
+        return rec;
+    }
 }

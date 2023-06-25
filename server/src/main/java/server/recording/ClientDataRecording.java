@@ -18,7 +18,10 @@ import java.util.List;
 public class ClientDataRecording implements Serializable, Iterable<ClientDataRecording.WebsocketMessage> {
     private final List<WebsocketMessage> messages = new LinkedList<>();
 
-    public static ClientDataRecording startRecordingAfterGameStart(Snake snake, ClientKnowledge knowledge) {
+    private ClientDataRecording() {
+    }
+
+    public static ClientDataRecording createAfterGameStart(Snake snake, ClientKnowledge knowledge) {
         final var recording = new ClientDataRecording();
         recording.addTextMessage(JSON.stringify(new GameInfo(snake)));
 
@@ -41,6 +44,10 @@ public class ClientDataRecording implements Serializable, Iterable<ClientDataRec
 
     public void addBinaryMessage(ByteBuffer binaryData) {
         messages.add(new WebsocketBinaryMessage(binaryData.isReadOnly() ? binaryData : binaryData.asReadOnlyBuffer()));
+    }
+
+    public void saveAsFile() {
+        // TODO
     }
 
     public Iterator<WebsocketMessage> iterator() {
@@ -79,7 +86,7 @@ public class ClientDataRecording implements Serializable, Iterable<ClientDataRec
         public void resend(Session session) {
             try {
                 session.getBasicRemote().sendBinary(data);
-            } catch(IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }

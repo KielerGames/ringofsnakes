@@ -51,6 +51,7 @@ public class SnakeServer {
             addSecureConnector(server);
         }
 
+        // TODO: One context per game?
         // Set up the basic application "context" for this application at "/"
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
@@ -90,6 +91,7 @@ public class SnakeServer {
     }
 
     public static void onNewClientConnected(Session session) {
+        // TODO: Allow connecting as spectator.
         LOGGER.info("A new client has connected.");
         Player player;
         try {
@@ -119,6 +121,14 @@ public class SnakeServer {
         final var client = CLIENTS.get(session.getId());
         client.setViewBoxRatio(ratio);
         client.handleUserInput(alpha, fast);
+    }
+
+    public static Client getClient(Session session) {
+        final var client = CLIENTS.get(session.getId());
+        if (client == null) {
+            throw new RuntimeException("No client associated with the session.");
+        }
+        return client;
     }
 
     private static void addSecureConnector(Server server) {

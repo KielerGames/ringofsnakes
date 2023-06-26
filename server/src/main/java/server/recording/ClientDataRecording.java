@@ -1,10 +1,14 @@
 package server.recording;
 
+import com.sun.javafx.PlatformUtil;
 import game.snake.Snake;
+import javafx.application.Platform;
+import javafx.stage.FileChooser;
 import server.clients.ClientKnowledge;
 import server.protocol.GameInfo;
 import server.protocol.GameUpdate;
 import server.protocol.SnakeNameUpdate;
+import util.FileUtilities;
 import util.JSON;
 
 import javax.websocket.Session;
@@ -48,6 +52,7 @@ public class ClientDataRecording implements Serializable, Iterable<ClientDataRec
 
     public void saveAsFile() {
         // TODO
+        final var file = FileUtilities.selectFileToSaveTo("Save recording");
     }
 
     public Iterator<WebsocketMessage> iterator() {

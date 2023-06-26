@@ -17,7 +17,7 @@ public class Main {
 
         if (cmd.hasOption("playback")) {
             PlaybackController.initialize();
-            SnakeServer.startPlaybackServer();
+            SnakeServer.startPlaybackServer().join();
             // TODO
             return;
         }

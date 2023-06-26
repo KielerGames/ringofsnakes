@@ -1,16 +1,17 @@
 package server.recording;
 
-import javafx.application.Platform;
-import javafx.stage.FileChooser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.FileUtilities;
 
 import javax.websocket.Session;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 public class PlaybackController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlaybackController.class);
@@ -26,7 +27,7 @@ public class PlaybackController {
 
     public static void initialize() {
         instance = null;
-        final var file = selectFile();
+        final var file = FileUtilities.selectFileToOpen("Open recording");
         if (file == null) {
             LOGGER.warn("No file selected.");
             System.exit(0);
@@ -68,18 +69,6 @@ public class PlaybackController {
         synchronized (clients) {
             clients.remove(session);
         }
-    }
-
-    private static File selectFile() {
-        final var future = new CompletableFuture<File>();
-        // TODO: Fix of "Unsupported JavaFX configuration" warning
-        Platform.startup(() -> {
-            FileChooser fileChooser = new FileChooser();
-            future.complete(fileChooser.showOpenDialog(null));
-        });
-        final var file = future.join();
-        Platform.exit();
-        return file;
     }
 
     private static ClientDataRecording deserialize(File file) {

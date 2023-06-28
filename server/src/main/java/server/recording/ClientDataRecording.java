@@ -1,9 +1,8 @@
 package server.recording;
 
-import com.sun.javafx.PlatformUtil;
 import game.snake.Snake;
-import javafx.application.Platform;
-import javafx.stage.FileChooser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.clients.ClientKnowledge;
 import server.protocol.GameInfo;
 import server.protocol.GameUpdate;
@@ -12,14 +11,14 @@ import util.FileUtilities;
 import util.JSON;
 
 import javax.websocket.Session;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ClientDataRecording implements Serializable, Iterable<ClientDataRecording.WebsocketMessage> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientDataRecording.class);
     private final List<WebsocketMessage> messages = new LinkedList<>();
 
     private ClientDataRecording() {
@@ -42,6 +41,20 @@ public class ClientDataRecording implements Serializable, Iterable<ClientDataRec
         return recording;
     }
 
+    public static ClientDataRecording loadFromFile(File file) {
+        LOGGER.debug("Loading recording from file {}.", file);
+        try {
+            final var fileInputStream = new FileInputStream(file);
+            final var objectInputStream = new ObjectInputStream(fileInputStream);
+            final var recording = (ClientDataRecording) objectInputStream.readObject();
+            objectInputStream.close();
+            LOGGER.debug("Loading successful.");
+            return recording;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void addTextMessage(String textData) {
         messages.add(new WebsocketTextMessage(textData));
     }
@@ -51,8 +64,24 @@ public class ClientDataRecording implements Serializable, Iterable<ClientDataRec
     }
 
     public void saveAsFile() {
-        // TODO
         final var file = FileUtilities.selectFileToSaveTo("Save recording");
+
+        if (file == null) {
+            LOGGER.warn("The recording was not saved. No output file selected.");
+            return;
+        }
+
+        try {
+            final var fileOutputStream = new FileOutputStream(file);
+            final var objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(this);
+            objectOutputStream.flush();
+            objectOutputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        LOGGER.debug("Recording saved as {}.", file);
     }
 
     public Iterator<WebsocketMessage> iterator() {

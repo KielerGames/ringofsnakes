@@ -5,10 +5,6 @@ import org.slf4j.LoggerFactory;
 import util.FileUtilities;
 
 import javax.websocket.Session;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -32,9 +28,7 @@ public class PlaybackController {
             LOGGER.warn("No file selected.");
             System.exit(0);
         }
-        LOGGER.debug("Loading recording: {}", file.getName());
-        final var recording = deserialize(file);
-        LOGGER.debug("Loading successful.");
+        final var recording = ClientDataRecording.loadFromFile(file);
         instance = new PlaybackController(recording);
     }
 
@@ -68,18 +62,6 @@ public class PlaybackController {
     public void removeClient(Session session) {
         synchronized (clients) {
             clients.remove(session);
-        }
-    }
-
-    private static ClientDataRecording deserialize(File file) {
-        try {
-            final var fileInputStream = new FileInputStream(file);
-            final var objectInputStream = new ObjectInputStream(fileInputStream);
-            final ClientDataRecording recording = (ClientDataRecording) objectInputStream.readObject();
-            objectInputStream.close();
-            return recording;
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 }

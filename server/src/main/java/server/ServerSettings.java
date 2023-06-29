@@ -13,7 +13,7 @@ public class ServerSettings {
     public static void initialize(CommandLine cmd) {
         if (cmd.hasOption("allow-recording")) {
             recordingAllowed = true;
-            LOGGER.debug("Recording enabled.");
+            LOGGER.info("Recording enabled.");
         }
     }
 }

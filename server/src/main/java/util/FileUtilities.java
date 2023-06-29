@@ -25,15 +25,12 @@ public final class FileUtilities {
     private static File chooseFile(Function<FileChooser, File> function) {
         final var future = new CompletableFuture<File>();
 
-        Platform.startup(() -> {
+        JavaFXPlatformManager.run(() -> {
             final var fileChooser = new FileChooser();
             final var file = function.apply(fileChooser);
             future.complete(file);
         });
 
-        final var file = future.join();
-        Platform.exit();
-
-        return file;
+        return future.join();
     }
 }

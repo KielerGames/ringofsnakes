@@ -1,7 +1,10 @@
+import javafx.application.Platform;
 import org.apache.commons.cli.*;
 import server.ServerSettings;
 import server.SnakeServer;
 import server.recording.PlaybackController;
+import util.FileUtilities;
+import util.JavaFXPlatformManager;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,6 +26,7 @@ public class Main {
         }
 
         SnakeServer.start();
+        JavaFXPlatformManager.exit();
     }
 
     private static void initializeLogging() {

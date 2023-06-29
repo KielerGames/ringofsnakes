@@ -2,6 +2,7 @@ package server.endpoints;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import server.ServerSettings;
 import server.SnakeServer;
 
 import javax.websocket.*;
@@ -24,13 +25,15 @@ public class GameEndpoint {
 
     @OnMessage
     public void onWebSocketText(Session session, String message) {
-        if (Objects.equals(message, "start-recording")) {
-            SnakeServer.getClient(session).startRecording();
-            return;
-        } else if (Objects.equals(message, "stop-recording")) {
-            final var recording = SnakeServer.getClient(session).stopRecording();
-            recording.saveAsFile();
-            return;
+        if (ServerSettings.isRecordingAllowed()) {
+            if (Objects.equals(message, "start-recording")) {
+                SnakeServer.getClient(session).startRecording();
+                return;
+            } else if (Objects.equals(message, "stop-recording")) {
+                final var recording = SnakeServer.getClient(session).stopRecording();
+                recording.saveAsFile();
+                return;
+            }
         }
         LOGGER.error("Unexpected text message from client {}.", session.getId());
     }

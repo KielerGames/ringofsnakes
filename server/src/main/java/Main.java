@@ -1,5 +1,5 @@
-import lombok.Getter;
 import org.apache.commons.cli.*;
+import server.ServerSettings;
 import server.SnakeServer;
 import server.recording.PlaybackController;
 
@@ -9,21 +9,17 @@ import java.nio.file.Paths;
 import java.util.logging.LogManager;
 
 public class Main {
-    @Getter private static boolean recordingAllowed = false;
-
-    public static void main(String[] args) throws InterruptedException {
+        public static void main(String[] args) throws InterruptedException {
         initializeLogging();
         final var cmd = getCommandLine(args);
+
+        ServerSettings.initialize(cmd);
 
         if (cmd.hasOption("playback")) {
             PlaybackController.initialize();
             SnakeServer.startPlaybackServer().join();
             // TODO
             return;
-        }
-
-        if (cmd.hasOption("allow-recording")) {
-            recordingAllowed = true;
         }
 
         SnakeServer.start();

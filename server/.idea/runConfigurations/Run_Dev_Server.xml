@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Playback Mode" type="Application" factoryName="Application">
+  <configuration default="false" name="Run Dev Server" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="Main" />
     <module name="ringofsnakes-server" />
-    <option name="PROGRAM_PARAMETERS" value="--playback" />
+    <option name="PROGRAM_PARAMETERS" value="--allow-recording" />
     <option name="VM_PARAMETERS" value="-ea" />
     <method v="2">
       <option name="Make" enabled="true" />

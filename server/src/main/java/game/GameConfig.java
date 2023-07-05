@@ -5,6 +5,9 @@ public final class GameConfig {
     public final double foodNutritionalValue = 1.0;
     public final double foodConversionEfficiency = 0.5;
     public final int targetSnakePopulation = 60;
+
+    public final BotPopulationDistributionTarget botPopulationDistributionTarget
+            = new BotPopulationDistributionTarget(0.4, 0.4, 0.2);
     public final boolean selfCollision = false;
 
     public final ChunkInfo chunks;
@@ -33,6 +36,14 @@ public final class GameConfig {
             columns = n;
             rows = n;
         }
+    }
+
+    public record BotPopulationDistributionTarget(double stupidBotRatio, double kamikazeBotRatio,
+                                                  double scaredBotRatio) {
+        public BotPopulationDistributionTarget {
+            assert (stupidBotRatio + kamikazeBotRatio + scaredBotRatio == 1.0);
+        }
+
     }
 
     public static final class SnakeInfo {

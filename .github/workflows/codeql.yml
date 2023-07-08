@@ -43,12 +43,14 @@ jobs:
 
     - name: Set up JDK
       uses: actions/setup-java@v3.11.0
+      if: ${{matrix.language == 'java'}}
       with:
         java-version: 17
         distribution: temurin
         cache: maven
 
     - name: Build Server
+      if: ${{matrix.language == 'java'}}
       run: mvn clean package -f "pom.xml" -B -V -e -Dfindbugs.skip -Dcheckstyle.skip -Dpmd.skip=true -Dspotbugs.skip -Denforcer.skip -Dmaven.javadoc.skip -DskipTests -Dmaven.test.skip.exec -Dlicense.skip=true -Drat.skip=true -Dspotless.check.skip=true
       working-directory: server
 

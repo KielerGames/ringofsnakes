@@ -28,7 +28,6 @@ public class CollisionManager {
 
     private boolean collidesWithSnakeChunk(Snake snake, SnakeChunk snakeChunk) {
         final var otherSnake = snakeChunk.getSnake();
-        final var otherSnakeLength = otherSnake.getLength();
         final var radius1 = 0.5 * snake.getWidth();
         final var radius2 = 0.5 * otherSnake.getWidth();
         final var collisionBound = (radius1 + radius2) * (radius1 + radius2);
@@ -39,8 +38,7 @@ public class CollisionManager {
                 pd -> pd.getOffsetInSnake() > selfCollisionBound
         ) : (pd -> true);
 
-        return snakeChunk.getPathData().stream()
-                .filter(pd -> pd.getOffsetInSnake() < otherSnakeLength)
+        return snakeChunk.getActivePathData()
                 .filter(pdFilter)
                 .filter(pd -> Vector.distance2(headPosition, pd.point) < collisionBound)
                 .anyMatch(pd -> {

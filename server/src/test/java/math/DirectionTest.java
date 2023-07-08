@@ -39,6 +39,12 @@ public class DirectionTest {
     }
 
     @Test
+    void testNormalizeBounds() {
+        assertEquals(-Math.PI, Direction.normalize(Math.PI));
+        assertEquals(-Math.PI, Direction.normalize(-Math.PI));
+    }
+
+    @Test
     void testAxes() {
         {
             var p1 = new Vector(2.718, 10.0);

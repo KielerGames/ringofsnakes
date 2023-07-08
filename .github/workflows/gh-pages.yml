@@ -19,7 +19,7 @@ jobs:
       contents: write # for peaceiris/actions-gh-pages
 
     steps:
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v3.5.3
       
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.6.0

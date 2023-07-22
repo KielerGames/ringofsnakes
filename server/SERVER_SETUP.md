@@ -22,6 +22,7 @@ Perform these steps only for the CI deployment server.
    - change the GitHub Actions Secret `DEPLOY_SSH_KEY` to the contents of `~/.ssh/github-ci-ed25519` (not the public `.pub` one)
    - you can create additional keypairs for other devices (use different filenames)
  - copy restart script `scp restart.sh ci@<server>:/home/ci` and make it executable `chmod +x restart.sh`
+ - if server domain or IP has changed update `GAME_SERVER` secret to `wss://<url-or-ip>:433/game`
 
 ## Enable SSL
 

@@ -83,7 +83,8 @@ function createSpawnInfo(snakeId: number): GameInfo {
         snakeId,
         snakeName: "TestSnakeName",
         startPosition: { x: 0, y: 0 },
-        gameConfig: defaultConfig
+        gameConfig: defaultConfig,
+        recordingEnabled: false
     };
 }
 

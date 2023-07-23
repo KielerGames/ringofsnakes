@@ -54,6 +54,9 @@ public class PlaybackController {
     }
 
     public void addClient(Session session) {
+        if (!clients.isEmpty()) {
+            LOGGER.warn("Multiple playback clients are not properly supported.");
+        }
         synchronized (clients) {
             clients.add(session);
         }

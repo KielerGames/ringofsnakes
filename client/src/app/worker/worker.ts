@@ -124,7 +124,7 @@ const api = {
     },
 
     // TS does not support method overloads with mapped types. Therefore Comlink cannot
-    // properly expose a properly typed addEventListener(event, listener) method.
+    // correctly expose a properly typed addEventListener(event, listener) method.
     // If the number of events increases we should consider auto-generating these methods:
     onError(listener: Consumer<string>): void {
         events.error.addListener(listener);
@@ -132,6 +132,14 @@ const api = {
 
     onSpectatorChange(listener: Consumer<SpectatorChangeDTO>): void {
         events.spectatorChange.addListener(listener);
+    },
+
+    startRecording(): void {
+        socket!.sendText("start-recording");
+    },
+
+    stopRecording(): void {
+        socket!.sendText("stop-recording");
     }
 };
 

@@ -11,7 +11,7 @@ public class ServerSettings {
     @Getter private static boolean recordingEnabled;
 
     public static void initialize(CommandLine cmd) {
-        if (cmd.hasOption("enable-recording")) {
+        if (cmd.hasOption("enable-recording") && !cmd.hasOption("playback")) {
             recordingEnabled = true;
             LOGGER.info("Recording enabled.");
         }

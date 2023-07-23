@@ -52,7 +52,7 @@ public class Main {
 
         final var options = new Options();
         options.addOption("p", "playback", false, "Switch to playback mode.");
-        options.addOption("r", "allow-recording", false, "Allow communication recording to be started and stopped by a client.");
+        options.addOption("r", "enable-recording", false, "Allow communication recording to be started and stopped by a client.");
 
         try {
             return new DefaultParser().parse(options, args);

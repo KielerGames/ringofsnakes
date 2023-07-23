@@ -25,7 +25,7 @@ public class GameEndpoint {
 
     @OnMessage
     public void onWebSocketText(Session session, String message) {
-        if (ServerSettings.isRecordingAllowed()) {
+        if (ServerSettings.isRecordingEnabled()) {
             if (Objects.equals(message, "start-recording")) {
                 SnakeServer.getClient(session).startRecording();
                 return;

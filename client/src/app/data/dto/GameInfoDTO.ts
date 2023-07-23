@@ -7,4 +7,5 @@ export type GameInfoDTO = {
         x: number;
         y: number;
     };
+    readonly recording: boolean;
 };

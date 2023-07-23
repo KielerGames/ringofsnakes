@@ -82,7 +82,8 @@ const api = {
         return {
             config: data.config,
             targetSnakeId: gameInfo.snakeId,
-            startPosition: gameInfo.startPosition
+            startPosition: gameInfo.startPosition,
+            recording: gameInfo.recordingEnabled
         };
     },
 

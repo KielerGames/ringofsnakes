@@ -3,6 +3,9 @@ package game.ai.bot;
 import game.Game;
 import game.world.World;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 public class BotFactory {
@@ -25,46 +28,76 @@ public class BotFactory {
      * Creates one of the various Bot types with the type chosen
      * depending on the current bot population and the target population such that bot distribution
      * converges towards the target bot distribution
-     *
-     * @param world
-     * @param game
-     * @return
      */
-    public static Bot createBotDynamically(World world, Game game) {
+    public static List<Bot> createBotsDynamically(World world, Game game, int numberOfBots) {
 
-        final int scaredBotCount = game.countBotsOfType(ScaredBot.class);
-        final int kamikazeBotCount = game.countBotsOfType(KamikazeBot.class);
-        final int stupidBotCount = game.countBotsOfType(StupidBot.class);
+        final List<Bot> botList = new LinkedList<>();
 
-        final int botCount = game.getNumberOfBots();
+        int scaredBotCount = game.countBotsOfType(ScaredBot.class);
+        int kamikazeBotCount = game.countBotsOfType(KamikazeBot.class);
+        int stupidBotCount = game.countBotsOfType(StupidBot.class);
+
+        int scaredBotTargetCount = game.config.botPopulationDistributionTarget.scaredBotTarget;
+        int kamikazeBotTargetCount = game.config.botPopulationDistributionTarget.kamikazeBotTarget;
+        int stupidBotTargetCount = game.config.botPopulationDistributionTarget.stupidBotTarget;
+
+        int botCount = game.getNumberOfBots();
         assert (scaredBotCount + kamikazeBotCount + stupidBotCount == botCount);
 
-        if (botCount == 0) {
-            return new StupidBot(world);
+        //Better get an assertion Error than a division by Zero error?
+        assert (scaredBotTargetCount >= 1 && kamikazeBotTargetCount >= 1 && stupidBotTargetCount >= 1);
+
+        for (int i = 0; i < numberOfBots; i++) {
+            if (botCount == 0) {
+                botList.add(new StupidBot(world));
+                stupidBotCount++;
+                botCount++;
+                continue;
+            }
+
+            double scaredBotFulfilmentQuota = scaredBotCount / (double) scaredBotTargetCount;
+            double kamikazeBotFulfilmentQuota = kamikazeBotCount / (double) kamikazeBotTargetCount;
+            double stupidBotFulfilmentQuota = stupidBotCount / (double) stupidBotTargetCount;
+
+            if (scaredBotFulfilmentQuota <= kamikazeBotFulfilmentQuota &&
+                    scaredBotFulfilmentQuota <= stupidBotFulfilmentQuota) {
+                botList.add(new ScaredBot(world));
+                scaredBotCount++;
+                botCount++;
+                scaredBotFulfilmentQuota = scaredBotCount / (double) scaredBotTargetCount;
+
+
+                System.out.println("Added scared Bot");
+                System.out.println("Number of scared Bots: " + scaredBotCount);
+                System.out.println("Number of Bots: " + botCount);
+                System.out.println("scaredBotFulfilmentQuota: " + scaredBotFulfilmentQuota);
+
+
+            } else if (kamikazeBotFulfilmentQuota <= stupidBotFulfilmentQuota &&
+                    kamikazeBotFulfilmentQuota <= scaredBotFulfilmentQuota) {
+                botList.add(new KamikazeBot(world));
+                kamikazeBotCount++;
+                botCount++;
+                kamikazeBotFulfilmentQuota = kamikazeBotCount / (double) kamikazeBotTargetCount;
+
+                System.out.println("Added kamikazeBot");
+                System.out.println("Number of kamikaze Bots: " + kamikazeBotCount);
+                System.out.println("kamikazeBotFulfilmentQuota: " + kamikazeBotFulfilmentQuota);
+
+
+            } else {
+                botList.add(new StupidBot(world));
+                stupidBotCount++;
+                botCount++;
+                stupidBotFulfilmentQuota = stupidBotCount / (double) stupidBotTargetCount;
+
+                System.out.println("Added stupid Bot");
+                System.out.println("Number of stupid Bots: " + stupidBotCount);
+                System.out.println("stupidBotFulfilmentQuota: " + stupidBotFulfilmentQuota);
+            }
         }
 
-        final double scaredBotRatio = scaredBotCount / (double) botCount;
-        final double kamikazeBotRatio = kamikazeBotCount / (double) botCount;
-        final double stupidBotRatio = stupidBotCount / (double) botCount;
-
-        final double scaredBotRatioDiscrepancy = game.config.botPopulationDistributionTarget.scaredBotRatio() -
-                scaredBotRatio;
-        final double kamikazeBotRatioDiscrepancy = game.config.botPopulationDistributionTarget.kamikazeBotRatio()
-                - kamikazeBotRatio;
-        final double stupidBotRatioDiscrepancy = game.config.botPopulationDistributionTarget.stupidBotRatio() -
-                stupidBotRatio;
-
-        if (scaredBotRatioDiscrepancy >= kamikazeBotRatioDiscrepancy &&
-                scaredBotRatioDiscrepancy >= stupidBotRatioDiscrepancy) {
-            return new ScaredBot(world);
-        }
-
-        if (kamikazeBotRatioDiscrepancy >= scaredBotRatioDiscrepancy &&
-                kamikazeBotRatioDiscrepancy >= stupidBotRatioDiscrepancy) {
-            return new KamikazeBot(world);
-        }
-
-        return new StupidBot(world);
+        return botList;
 
     }
 

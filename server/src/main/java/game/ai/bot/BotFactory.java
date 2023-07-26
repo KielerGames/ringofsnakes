@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Random;
 
 public class BotFactory {
-    private static final Random random = new Random();
 
     /**
      * Creates n of the various Bot types with the type chosen
@@ -23,15 +22,18 @@ public class BotFactory {
         int kamikazeBotCount = game.countBotsOfType(KamikazeBot.class);
         int stupidBotCount = game.countBotsOfType(StupidBot.class);
 
-        int scaredBotTargetCount = game.config.botPopulationDistributionTarget.scaredBotTarget;
-        int kamikazeBotTargetCount = game.config.botPopulationDistributionTarget.kamikazeBotTarget;
-        int stupidBotTargetCount = game.config.botPopulationDistributionTarget.stupidBotTarget;
+        double scaredBotTargetCount = game.config.botPopulationDistributionTarget.scaredBotTarget;
+        double kamikazeBotTargetCount = game.config.botPopulationDistributionTarget.kamikazeBotTarget;
+        double stupidBotTargetCount = game.config.botPopulationDistributionTarget.stupidBotTarget;
 
         int botCount = game.getNumberOfBots();
         assert (scaredBotCount + kamikazeBotCount + stupidBotCount == botCount);
 
-        //Better get an assertion Error than a division by Zero error?
-        assert (scaredBotTargetCount >= 1 && kamikazeBotTargetCount >= 1 && stupidBotTargetCount >= 1);
+        //I know, I know...but it should work and avoid division by Zero if a target is 0.
+        if (scaredBotTargetCount == 0) {scaredBotTargetCount = 0.1;}
+        if (kamikazeBotTargetCount == 0) {kamikazeBotTargetCount = 0.1;}
+        if(stupidBotTargetCount == 0){stupidBotTargetCount = 0.1;}
+
 
         for (int i = 0; i < numberOfBots; i++) {
             if (botCount == 0) {
@@ -41,16 +43,16 @@ public class BotFactory {
                 continue;
             }
 
-            double scaredBotFulfilmentQuota = scaredBotCount / (double) scaredBotTargetCount;
-            double kamikazeBotFulfilmentQuota = kamikazeBotCount / (double) kamikazeBotTargetCount;
-            double stupidBotFulfilmentQuota = stupidBotCount / (double) stupidBotTargetCount;
+            double scaredBotFulfilmentQuota = scaredBotCount / scaredBotTargetCount;
+            double kamikazeBotFulfilmentQuota = kamikazeBotCount / kamikazeBotTargetCount;
+            double stupidBotFulfilmentQuota = stupidBotCount / stupidBotTargetCount;
 
             if (scaredBotFulfilmentQuota <= kamikazeBotFulfilmentQuota &&
                     scaredBotFulfilmentQuota <= stupidBotFulfilmentQuota) {
                 botList.add(new ScaredBot(world));
                 scaredBotCount++;
                 botCount++;
-                scaredBotFulfilmentQuota = scaredBotCount / (double) scaredBotTargetCount;
+                scaredBotFulfilmentQuota = scaredBotCount / scaredBotTargetCount;
 
 
                 System.out.println("Added scared Bot");
@@ -64,7 +66,7 @@ public class BotFactory {
                 botList.add(new KamikazeBot(world));
                 kamikazeBotCount++;
                 botCount++;
-                kamikazeBotFulfilmentQuota = kamikazeBotCount / (double) kamikazeBotTargetCount;
+                kamikazeBotFulfilmentQuota = kamikazeBotCount / kamikazeBotTargetCount;
 
                 System.out.println("Added kamikazeBot");
                 System.out.println("Number of kamikaze Bots: " + kamikazeBotCount);
@@ -75,7 +77,7 @@ public class BotFactory {
                 botList.add(new StupidBot(world));
                 stupidBotCount++;
                 botCount++;
-                stupidBotFulfilmentQuota = stupidBotCount / (double) stupidBotTargetCount;
+                stupidBotFulfilmentQuota = stupidBotCount / stupidBotTargetCount;
 
                 System.out.println("Added stupid Bot");
                 System.out.println("Number of stupid Bots: " + stupidBotCount);

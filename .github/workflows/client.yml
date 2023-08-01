@@ -90,7 +90,7 @@ jobs:
           unzip temp/main-branch-client.zip -d temp/main
 
       - name: Bundle comparison
-        uses: github/webpack-bundlesize-compare-action@v1.8.1
+        uses: github/webpack-bundlesize-compare-action@v1.8.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           current-stats-json-path: temp/pr/bundle-stats.json

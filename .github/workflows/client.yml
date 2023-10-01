@@ -49,7 +49,7 @@ jobs:
         working-directory: client
       
       - name: Upload client files
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3.1.3
         with:
           name: client-files
           path: client/public/*

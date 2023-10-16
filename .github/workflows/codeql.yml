@@ -42,7 +42,7 @@ jobs:
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
 
     - name: Set up JDK
-      uses: actions/setup-java@v3.12.0
+      uses: actions/setup-java@v3.13.0
       if: ${{matrix.language == 'java'}}
       with:
         java-version: 17

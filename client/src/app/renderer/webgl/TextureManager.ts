@@ -32,6 +32,13 @@ export function initTexture(
     if (options.magFilter !== undefined) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, options.magFilter);
     }
+    if (options.anisotropy !== undefined) {
+        const extension = requireNonNull(
+            gl.getExtension("EXT_texture_filter_anisotropic"),
+            "No anisotropic filtering"
+        );
+        gl.texParameterf(gl.TEXTURE_2D, extension.TEXTURE_MAX_ANISOTROPY_EXT, options.anisotropy);
+    }
 
     if (initializer) {
         initializer(gl, texture, slot);
@@ -44,6 +51,7 @@ type TextureOptions = {
     wrap: number;
     minFilter: number;
     magFilter: number;
+    anisotropy: number;
 };
 
 type TextureInitializer = (gl: WebGL2RenderingContext, texture: WebGLTexture, slot: number) => void;

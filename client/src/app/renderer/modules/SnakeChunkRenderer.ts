@@ -29,7 +29,8 @@ let shader: WebGLShaderProgram;
         1,
         {
             wrap: GL2.REPEAT,
-            minFilter: GL2.LINEAR_MIPMAP_LINEAR
+            minFilter: GL2.LINEAR_MIPMAP_LINEAR,
+            anisotropy: 4
         },
         (gl) => {
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);

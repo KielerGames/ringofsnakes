@@ -40,6 +40,9 @@ export function init(canvas: HTMLCanvasElement): void {
         });
     });
 
+    // Best Mipmap quality (default is DONT_CARE, there is also FASTEST)
+    ctx.hint(ctx.GENERATE_MIPMAP_HINT, ctx.NICEST);
+
     if (__DEBUG__) {
         console.info("Canvas initialized.");
     }

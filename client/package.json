@@ -33,7 +33,7 @@
         "jest": "^29.7.0",
         "jest-environment-jsdom": "^29.7.0",
         "less": "^4.2.0",
-        "less-loader": "^11.1.2",
+        "less-loader": "^11.1.4",
         "mini-css-extract-plugin": "^2.7.6",
         "prettier": "^3.1.0",
         "rand-seed": "^1.0.2",

@@ -55,6 +55,17 @@ jobs:
           path: client/public/*
           retention-days: ${{ (github.ref == 'refs/heads/main') && 90 || 1 }} # 90 days on main branch, 1 for PRs
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"
+        working-directory: client
+
   compare:
     name: Compare with main
     runs-on: ubuntu-latest

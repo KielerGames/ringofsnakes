@@ -47,6 +47,17 @@ jobs:
           name: server-uber-jar
           path: server/snake-server-*.jar
           if-no-files-found: error
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:java"
+        working-directory: server
   
   deploy:
     if: github.ref == 'refs/heads/main'

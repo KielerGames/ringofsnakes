@@ -69,7 +69,6 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:javascript"
-        working-directory: client
 
   compare:
     name: Compare with main

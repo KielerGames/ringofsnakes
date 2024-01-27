@@ -63,8 +63,9 @@ jobs:
         with:
           name: client-files
           path: client/public/*
-          retention-days: ${{ (github.ref == 'refs/heads/main') && 90 || 2 }} # 90 days on main branch, 2 for PRs
-      
+          retention-days: ${{ (github.ref == 'refs/heads/main') && 32 || 3 }} # 32 days on main branch, 3 for PRs
+          if-no-files-found: error
+
       - name: Cleanup for CodeQL
         run: rm bundle-report.html bundle-stats.json *.LICENSE.txt
         working-directory: client/public

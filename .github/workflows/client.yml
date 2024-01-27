@@ -27,6 +27,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
       
       - name: Setup Node.js environment
         uses: actions/setup-node@v4.0.1
@@ -58,12 +63,7 @@ jobs:
         with:
           name: client-files
           path: client/public/*
-          retention-days: ${{ (github.ref == 'refs/heads/main') && 90 || 1 }} # 90 days on main branch, 1 for PRs
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript
+          retention-days: ${{ (github.ref == 'refs/heads/main') && 90 || 2 }} # 90 days on main branch, 2 for PRs
       
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

@@ -65,6 +65,10 @@ jobs:
           path: client/public/*
           retention-days: ${{ (github.ref == 'refs/heads/main') && 90 || 2 }} # 90 days on main branch, 2 for PRs
       
+      - name: Cleanup for CodeQL
+        run: rm bundle-report.html bundle-stats.json *.LICENSE.txt
+        working-directory: client/public
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:

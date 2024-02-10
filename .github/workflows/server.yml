@@ -78,8 +78,8 @@ jobs:
       - name: Rename file
         run: mv snake-server-*.jar snake-server.jar
 
-      - name: Initialize SSH
-        uses: kielabokkie/ssh-key-and-known-hosts-action@v1.3.5
+      - name: Setup SSH
+        uses: kielabokkie/ssh-key-and-known-hosts-action@v1.4.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
           ssh-host: ${{ secrets.DEPLOY_SERVER }}

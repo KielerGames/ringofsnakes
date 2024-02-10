@@ -15,11 +15,11 @@ public class GrowingSnakeChunk extends SnakeChunk {
     private final List<SnakePathPoint> unmodifiablePathData = Collections.unmodifiableList(pathData);
     private final ChainCodeCoder coder;
     private final Vector end;
-    private final float endDirection;
+    private final double endDirection;
     private final ByteBuffer chunkByteBuffer;
     private int numberOfChainCodes = 0;
     private double x, y;
-    private float direction;
+    private double direction;
     private double minX, maxX, minY, maxY;
     @Getter private double dataLength = 0.0;
     private int lastSteps = 0;
@@ -33,7 +33,7 @@ public class GrowingSnakeChunk extends SnakeChunk {
 
         end = snake.headPosition.clone();
         pathData.add(new SnakePathPoint(this, end.clone(), 0.0));
-        endDirection = (float) snake.headDirection;
+        endDirection = snake.headDirection;
         direction = endDirection;
 
         minX = maxX = x = end.x;
@@ -66,11 +66,15 @@ public class GrowingSnakeChunk extends SnakeChunk {
         buffer.putChar(this.snake.id);
         buffer.putChar(this.id);
         buffer.put((byte) this.numberOfChainCodes);
-        buffer.putFloat(this.endDirection);
+        buffer.putFloat((float) this.endDirection);
         buffer.putFloat((float) this.end.x);
         buffer.putFloat((float) this.end.y);
+
         assert (buffer.position() == BUFFER_OFFSET_POS);
+        // A new snake chunk will always be starting at the end of the snake
+        // and this its offset (from the head) will be 0.
         buffer.putFloat(0.0f);
+
         assert (buffer.position() == HEADER_BYTE_SIZE);
 
         return buffer;

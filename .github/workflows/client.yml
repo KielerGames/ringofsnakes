@@ -32,6 +32,7 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: javascript
+          source-root: client/src
       
       - name: Setup Node.js environment
         uses: actions/setup-node@v4.0.1
@@ -74,6 +75,7 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:javascript"
+          upload: ${{ (github.ref == 'refs/heads/main') && 'always' || 'failure-only' }}
 
   compare:
     name: Compare with main

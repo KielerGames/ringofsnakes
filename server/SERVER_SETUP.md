@@ -2,7 +2,9 @@
 
 ## Setting up a game server VM
 Run these commands on the game server VM.
- - install the required Java runtime: `sudo apt install openjdk-17-jre` (if this fails check [#462](https://github.com/KielerGames/ringofsnakes/issues/462))
+ - install the required Java runtime: `sudo apt install openjdk-21-jre`
+   - if this fails check [#462](https://github.com/KielerGames/ringofsnakes/issues/462)
+   - this documentation might be out-of-sync with the actual Java version, please check actual version used in `pom.xml` or the server workflow for GitHub Actions
  - install packages required for CI and port managing: `sudo apt install screen iptables`
  - (optional) map port 80 to 8080: `sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080`
  - configure logging 

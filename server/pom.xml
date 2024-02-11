@@ -15,7 +15,6 @@
 
         <javax.websocket.api.version>1.1</javax.websocket.api.version>
         <jetty.version>9.4.53.v20231009</jetty.version>
-        <mockito.version>5.2.0</mockito.version>
         <junit.version>5.10.2</junit.version>
         <slf4j.version>2.0.12</slf4j.version>
         <javafx.version>21.0.2</javafx.version>
@@ -52,13 +51,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
-            <version>${mockito.version}</version>
+            <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.version}</version>
+            <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

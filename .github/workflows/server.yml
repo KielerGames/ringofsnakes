@@ -59,6 +59,18 @@ jobs:
           path: server/snake-server-*.jar
           retention-days: 10
           if-no-files-found: error
+
+      - name: Maven Dependency Report
+        run: mvn --batch-mode project-info-reports:dependencies
+        working-directory: server
+
+      - name: Upload Dependency Report
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: maven-dependencies
+          path: server/target/site/**/*
+          retention-days: 10
+          if-no-files-found: warn
       
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

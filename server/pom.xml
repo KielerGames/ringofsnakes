@@ -143,6 +143,8 @@
                                     <!-- ByteBuddy is a dependency of Mockito and not required in the final build -->
                                     <exclude>net.bytebuddy:*</exclude>
                                     <exclude>org.mockito:*</exclude>
+                                    <!-- https://github.com/google/gson/releases/tag/gson-parent-2.11.0 -->
+                                    <exclude>org.google.errorprone:*</exclude>
                                 </excludes>
                             </artifactSet>
                             <createDependencyReducedPom>false</createDependencyReducedPom>

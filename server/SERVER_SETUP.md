@@ -31,7 +31,7 @@ The following steps can be done on any computer:
  - combine certificate and intermediate certificate: `cat certificate.cer int-cert.cer > cert-chain.txt`
  - create pkcs12 file: `openssl pkcs12 -export -inkey private.key -in cert-chain.txt -out ringofsnakes.pkcs12`
  - create keystore: `keytool -importkeystore -srckeystore ringofsnakes.pkcs12 -srcstoretype PKCS12 -destkeystore .keystore`
- - copy keystore: `scp .keystore ci@<server>:/home/ci`
+ - copy keystore: `scp .keystore ci@<server>:/home/ci` (check that this worked, sometimes there are issues with hidden files)
 
 Perform the following steps on the server:
  - make sure traffic through port 443 is allowed

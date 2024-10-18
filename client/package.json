@@ -49,7 +49,7 @@
     },
     "dependencies": {
         "comlink": "^4.4.1",
-        "preact": "^10.22.1"
+        "preact": "^10.24.1"
     },
     "engines": {
         "node": "~20",

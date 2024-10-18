@@ -36,7 +36,7 @@
         "less-loader": "^12.2.0",
         "mini-css-extract-plugin": "^2.9.1",
         "prettier": "^3.2.5",
-        "rand-seed": "^1.0.2",
+        "rand-seed": "^2.1.7",
         "style-loader": "^4.0.0",
         "svgo": "^3.3.2",
         "ts-jest": "^29.2.4",

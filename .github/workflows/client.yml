@@ -35,7 +35,7 @@ jobs:
           source-root: client/src
       
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4.0.4
+        uses: actions/setup-node@v4.1.0
         with:
           node-version-file: client/package.json
           cache: npm

@@ -48,7 +48,7 @@
         "webpack-cli": "^6.0.1"
     },
     "dependencies": {
-        "comlink": "^4.4.1",
+        "comlink": "^4.4.2",
         "preact": "^10.24.1"
     },
     "engines": {

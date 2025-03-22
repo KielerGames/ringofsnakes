@@ -6,6 +6,7 @@ import game.world.HeatMap;
 import game.world.WorldChunk;
 import lombok.Getter;
 import math.BoundingBox;
+import server.recording.ClientDataRecording;
 import server.protocol.GameUpdate;
 import util.JSON;
 
@@ -24,6 +25,7 @@ public abstract class Client {
     @Getter
     @Nullable
     protected Snake snake;
+    private ClientDataRecording recording;
 
     protected Client(Session session, @Nullable Snake snake) {
         this.session = session;
@@ -82,12 +84,18 @@ public abstract class Client {
     }
 
     protected void send(ByteBuffer binaryData) {
+        if (recording != null) {
+            recording.addBinaryMessage(binaryData);
+        }
         if (session.isOpen()) {
             session.getAsyncRemote().sendBinary(binaryData);
         }
     }
 
     public void send(String textData) {
+        if (recording != null) {
+            recording.addTextMessage(textData);
+        }
         if (session.isOpen()) {
             session.getAsyncRemote().sendText(textData);
         }
@@ -123,4 +131,18 @@ public abstract class Client {
     }
 
     public abstract void handleUserInput(float alpha, boolean fast);
+
+    public void startRecording() {
+        assert recording == null;
+        recording = ClientDataRecording.createAfterGameStart(snake, knowledge);
+    }
+
+    public ClientDataRecording stopRecording() {
+        if (recording == null) {
+            throw new IllegalStateException();
+        }
+        final var rec = recording;
+        recording = null;
+        return rec;
+    }
 }

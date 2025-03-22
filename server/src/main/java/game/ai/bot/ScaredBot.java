@@ -45,6 +45,7 @@ class ScaredBot extends Bot {
         final var otherSnakeChunks = getSnakeChunksInVicinity(16.0);
 
         // If there are snake heads there should also be other snake chunks.
+        // TODO: this assertion fails sometimes
         assert otherSnakeHeads.isEmpty() || !otherSnakeChunks.isEmpty();
 
         if (otherSnakeHeads.isEmpty() && otherSnakeChunks.isEmpty()) {

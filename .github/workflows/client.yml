@@ -26,7 +26,7 @@ jobs:
       security-events: write
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
@@ -86,7 +86,7 @@ jobs:
       pull-requests: write # required for github/webpack-bundlesize-compare-action
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Download PR artifact
         uses: actions/download-artifact@v6.0.0

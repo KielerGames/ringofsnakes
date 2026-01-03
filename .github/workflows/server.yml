@@ -53,7 +53,7 @@ jobs:
         working-directory: server
 
       - name: Upload Uber Jar
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: server-uber-jar
           path: server/snake-server-*.jar
@@ -65,7 +65,7 @@ jobs:
         working-directory: server
 
       - name: Upload Dependency Report
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: maven-dependencies
           path: server/target/site/**/*

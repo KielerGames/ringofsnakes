@@ -60,7 +60,7 @@ jobs:
         working-directory: client
       
       - name: Upload client files
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: client-files
           path: client/public/*

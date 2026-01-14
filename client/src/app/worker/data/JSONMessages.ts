@@ -15,6 +15,7 @@ export type GameInfo = Readonly<{
     snakeName?: string;
     startPosition: { x: number; y: number };
     gameConfig: GameConfig;
+    recordingEnabled: boolean;
 }>;
 
 export type SnakeDeathInfo = Readonly<{

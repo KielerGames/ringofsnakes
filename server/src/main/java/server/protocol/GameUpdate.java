@@ -65,7 +65,7 @@ public class GameUpdate {
         }
         ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
 
-        assert ticksSinceLastUpdate >= 0; // TODO: should be > 0
+        assert ticksSinceLastUpdate >= 0;
         assert snakes.size() < 256;
         assert snakeChunkBuffers.size() < 256;
         assert foodChunkBuffers.size() < 256;

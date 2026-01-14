@@ -1,12 +1,15 @@
 import { Consumer } from "../util/FunctionTypes";
 import { ClientToServerJSONMessage, ServerToClientJSONMessage } from "./data/JSONMessages";
 
+type TextMessage = "start-recording" | "stop-recording";
+
 export interface Socket {
     onclose: () => void;
     onJSONMessage: (message: ServerToClientJSONMessage) => void;
     onBinaryMessage: (message: ArrayBuffer) => void;
     readonly sendJSON: (message: ClientToServerJSONMessage) => void;
     readonly sendBinary: (message: ArrayBuffer) => void;
+    readonly sendText: (message: TextMessage) => void;
     readonly close: () => void;
     readonly isOpen: () => boolean;
 }
@@ -45,6 +48,10 @@ class SocketImpl implements Socket {
     }
 
     sendBinary(message: ArrayBuffer) {
+        this.#websocket.send(message);
+    }
+
+    sendText(message: TextMessage) {
         this.#websocket.send(message);
     }
 

@@ -7,7 +7,8 @@ const defaultGameInfo: GameInfoDTO = {
     startPosition: {
         x: 0,
         y: 0
-    }
+    },
+    recording: false
 };
 
 export default defaultGameInfo;

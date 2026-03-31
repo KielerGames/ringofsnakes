@@ -150,12 +150,10 @@ public class Game {
         });
     }
 
-    private void addBotsRandomly(int n) {
-        for (int i = 0; i < n; i++) {
-            final Bot bot = BotFactory.createBot(world);
-            snakes.add(bot.getSnake());
-            bots.add(bot);
-        }
+    private void addBotsDynamically(int n) {
+        final List<Bot> newBots = BotFactory.createBotsDynamically(world, this, n);
+        newBots.forEach(bot -> snakes.add(bot.getSnake()));
+        bots.addAll(newBots);
     }
 
     public void removeClient(Session session) {
@@ -215,8 +213,8 @@ public class Game {
         executor.scheduleAtFixedRate(() -> {
             final var n = snakes.stream().filter(Snake::isAlive).count();
 
-            if (n < config.targetSnakePopulation) {
-                addBotsRandomly((int) Math.min(6, config.targetSnakePopulation - n));
+            if (n < config.botPopulationDistributionTarget.totalBotTarget) {
+                addBotsDynamically((int) Math.min(6, config.botPopulationDistributionTarget.totalBotTarget - n));
             }
         }, 1, 8, TimeUnit.SECONDS);
 
@@ -312,6 +310,16 @@ public class Game {
 
     public int getNumberOfBots() {
         return this.bots.size();
+    }
+
+    public <U extends Bot> int countBotsOfType(Class<U> botType) {
+        int count = 0;
+        for (Bot bot : this.bots) {
+            if (botType.isInstance(bot)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**

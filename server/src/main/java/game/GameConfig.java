@@ -4,9 +4,9 @@ public final class GameConfig {
     public final double tickDuration = 1.0 / 25.0; // in seconds
     public final double foodNutritionalValue = 1.0;
     public final double foodConversionEfficiency = 0.5;
-    public final int targetSnakePopulation = 60;
+    public final BotPopulationTarget botPopulationDistributionTarget
+            = new BotPopulationTarget(25, 25, 10);
     public final boolean selfCollision = false;
-
     public final ChunkInfo chunks;
     public final SnakeInfo snakes;
 
@@ -32,6 +32,21 @@ public final class GameConfig {
             this.size = size;
             columns = n;
             rows = n;
+        }
+    }
+
+    public static final class BotPopulationTarget {
+        public final int stupidBotTarget;
+        public final int kamikazeBotTarget;
+        public final int scaredBotTarget;
+        public final int totalBotTarget;
+
+        public BotPopulationTarget(int stupidBotTarget, int kamikazeBotTarget, int scaredBotTarget) {
+            this.stupidBotTarget = stupidBotTarget;
+            this.kamikazeBotTarget = kamikazeBotTarget;
+            this.scaredBotTarget = scaredBotTarget;
+            this.totalBotTarget = stupidBotTarget + kamikazeBotTarget + scaredBotTarget;
+
         }
     }
 
